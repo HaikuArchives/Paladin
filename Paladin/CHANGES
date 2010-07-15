@@ -1,0 +1,17 @@
+Changes since 1.2.1
+Added some platform migration assistance -- libstdc++.r4.so, libsupc++.so in Haiku GCC4
+Implemented fastdep dependency checking under Haiku
+Improved error handling with slow dependency update code
+Better feedback when examining sources
+Replaced internal tooltip code with OS-level ones. R5 tooltips are now completely gone.
+The Terminal window now uses a fixed-width font
+Implemented basic Locale support under Zeta and Haiku
+Edit Program Settings context menu action works for resource files under Haiku now
+Worked around a bug in Haiku related to setting the type of a resource file created via Add New File.
+Bring the Error window to the front when starting a build
+Projects can no longer load a project more than once
+Dropping a Paladin project on a project window opens the project
+.rdef files are created with a form that can be filled in
+Tweaked the file filters for folder and project importing to exclude Jamfiles, Makefiles, and system folders for Git and Mercurial.
+Preferences window now reports the unavailability of external tools like fastdep and ccache
+

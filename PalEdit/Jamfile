@@ -1,0 +1,10 @@
+SubDir TOP ;
+
+SubInclude TOP rez ;
+SubInclude TOP Sources ;
+SubInclude TOP Extensions ;
+SubInclude TOP Resources ;
+SubInclude TOP Languages ;
+
+MakeDistro distro ;
+

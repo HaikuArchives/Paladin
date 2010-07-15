@@ -1,0 +1,152 @@
+# BuildSettings
+#
+# Setup global variables.
+
+# C and C++ flags
+if $(OS) = HAIKU {
+	CCFLAGS += -DBONE_BUILD ;
+	C++FLAGS += -DBONE_BUILD ;
+	LINKLIBS += -lnetwork ;
+	COMMON_FOLDER = /boot/common ;
+} else {
+	# BeOS
+
+	COMMON_FOLDER = /boot/home/config ;
+	if $(OSPLAT) = PPC {
+		# filter out -nosyspath
+		CFLAGS = [ FFilter $(CFLAGS) : -nosyspath ] ;
+		C++FLAGS = [ FFilter $(C++FLAGS) : -nosyspath ] ;
+		LINKFLAGS += -warn -export pragma ;
+
+		# set file containing preprocessed headers:
+		PREFIX_FILE ?= [ FDirName $(LOCATE_TARGET) pe.headers ] ;
+	}
+
+	if $(OSPLAT) = X86 {
+		# check for BONE...
+		local haveBone = [ GLOB /boot/develop/headers/be/bone/arpa : inet.h ] ;
+		if $(haveBone)	{
+			CCFLAGS += -DBONE_BUILD ;
+			C++FLAGS += -DBONE_BUILD ;
+			SYSHDRS += /boot/develop/headers/be/bone /boot/develop/headers/be/bone/sys ;
+			LINKLIBS += -lsocket -lbind ;
+		} else {
+			LINKLIBS += -lnet ;
+		}
+	}
+
+	# check for Zeta...
+	local haveZeta = [ GLOB /boot/develop/lib/x86 : libzeta.so ] ;
+	if $(haveZeta)	{
+		LINKLIBS += -lzeta ;
+	}
+}
+
+# check for pcre...
+local haveHeadersPcre = [ GLOB /boot/develop/headers/pcre : pcre.h ] ;
+if $(haveHeadersPcre) {
+	CCFLAGS += -isystem /boot/develop/headers/pcre ;
+	C++FLAGS += -isystem /boot/develop/headers/pcre ;
+} else {
+	haveHeadersPcre = [ GLOB /boot/common/include : pcre.h ] ;
+	if ! $(haveHeadersPcre) {
+		haveHeadersPcre = [ GLOB /boot/home/config/include : pcre.h ] ;
+		if ! $(haveHeadersPcre) {
+			Exit "You need to have pcre installed on your system." ;
+		}
+	}
+}
+
+# Use copyattr for copying.
+CP = copyattr --data ;
+
+# Default paths for bison and flex:
+BISON = bison ;
+LEX = flex ;
+
+# mkdir shall not fail, if the directory already exists.
+MKDIR = mkdir -p ;
+
+# Modify the main target dirs for languages and extensions.
+SetConfigVar LOCATE_MAIN_TARGET : TOP Languages
+	: [ FDirName $(DISTRO_DIR) Languages ] ;
+SetConfigVar LOCATE_MAIN_TARGET : TOP Extensions
+	: [ FDirName $(DISTRO_DIR) Extensions ] ;
+
+rule SetUpSubDirBuildSettings {
+	# SetUpSubDirBuildSettings <dir> ;
+	#
+	# Sets up the compiler flags and defines based on the WARNINGS, DEBUG, and
+	# OPTIMIZE variables. Also sets the locations for the targets (objects,
+	# libraries and executables).
+	#
+	# <dir>: Parameters as passed to the SubDir rule, i.e. the name of the
+	#        TOP variable and the subdir tokens.
+	#
+	local dir = $(1) ;
+
+	# warnings settings
+	if $(WARNINGS) != 0 {
+		if $(OSPLAT) = X86 {
+			CCFLAGS += -Wall -Wno-multichar -Wmissing-prototypes ;
+			CCFLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
+			C++FLAGS += -Wall -Wno-multichar ;
+			C++FLAGS += -Wno-ctor-dtor-privacy -Woverloaded-virtual ;
+			C++FLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
+			C++FLAGS += -Wno-unknown-pragmas ;
+		} else {
+			CCFLAGS += -w on -requireprotos ;
+		}
+	}
+
+	# set the objects-folder according to debugging settings:
+	if $(DEBUG) && $(DEBUG) != 0
+	{
+		OBJECTS_DIR			= [ FDirName $(TOP) generated objects-debug ] ;
+	} 
+	else 
+	{
+		OBJECTS_DIR			= [ FDirName $(TOP) generated objects-nodebug ] ;
+	}
+	
+	# debugging settings
+	if $(DEBUG) > 0 {
+		OPTIMIZE = 0 ;
+		STRIP_APPS = 0 ;
+		DEFINES += DEBUG=$(DEBUG) ;
+		CCFLAGS += -g ;
+		C++FLAGS += -g ;
+		LINKFLAGS += -g ;
+	}
+
+	# optimization settings
+	if $(OPTIMIZE) = 0 {
+		if $(OSPLAT) = X86 {
+			OPTIM = -O0 ;
+		} else {
+			OPTIM = -O0 ;
+		}
+	} else {
+		if $(OSPLAT) = X86 {
+			OPTIM ?= -O2 ;
+		} else {
+			OPTIM ?= -O7 ;
+		}
+	}
+
+	# setup objects location
+	local objdir = [ FDirName $(OBJECTS_DIR) $(dir[2-]) ] ;
+	SEARCH_SOURCE += $(objdir) ;
+	LOCATE_SOURCE = $(objdir) ;
+	LOCATE_TARGET = $(objdir) ;
+
+	# setup main targets location
+	LOCATE_MAIN_TARGET ?= [ FDirName $(DISTRO_DIR) ] ;
+}
+
+# The LOCATE_MAIN_TARGET variable shall be reset for each subdirectory.
+AUTO_SET_UP_CONFIG_VARIABLES += LOCATE_MAIN_TARGET ;
+
+# Add the rules setting up the build settings for a subdirectory to the
+# rules invoked by SubDir.
+SUBDIRRULES += SetUpSubDirBuildSettings ;

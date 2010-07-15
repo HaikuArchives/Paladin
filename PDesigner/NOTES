@@ -1,0 +1,9 @@
+Finish PScrollBar and P[HV]ScrollBar
+
+Add a UsePreferredSize method to the interface, if possible
+
+Add a ScrollView property
+
+Create resize / move handles for each control that has focus, windows excepted
+
+Will need to create a window for managing the application/project settings

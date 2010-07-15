@@ -1,0 +1,27 @@
+SubDir TOP Languages Resources ;
+
+# <pe-src>
+RezObjects
+	keywords.asm.r
+	keywords.cpp.r
+	keywords.d.r
+	keywords.diff.r
+	keywords.g.r
+	keywords.html-js.r
+	keywords.html-css-js-php.r
+	keywords.html.r
+	keywords.jam.r
+	keywords.java.r
+	keywords.lt.r
+	keywords.lua.r
+	keywords.m.r
+	keywords.ob2.r
+	keywords.pas.r
+	keywords.pl.r
+	keywords.py.r
+	keywords.rez.r
+	keywords.sh.r
+	keywords.sql.r
+	keywords.tex.r
+	;
+# </pe-src>

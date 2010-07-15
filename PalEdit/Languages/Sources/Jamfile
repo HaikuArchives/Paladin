@@ -1,0 +1,178 @@
+
+SubDir TOP Languages Sources ;
+
+SubDirHdrs $(TOP) Sources ;
+
+if $(OSPLAT) = X86 {
+	C++FLAGS += -include [ FDirName $(TOP) Languages Sources LanguageIncludes.h ] -Wno-unused ;
+} else {
+	C++FLAGS += -prefix LanguageIncludes.h -w nounusedvar ;
+}
+
+# <pe-src>
+PeLanguage AntlrExt 
+	: Antlr_Language.cpp Antlr_Popup.cpp 
+	: be 
+	: keywords.g.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage AsmExt 
+	: Asm_Language.cpp
+	: be 
+	: keywords.asm.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage CppExt 
+	: Cpp_Language.cpp Cpp_Popup.cpp 
+	: be 
+	: keywords.cpp.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage DExt
+	: D_Language.cpp D_Popup.cpp 
+	: be 
+	: keywords.d.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage DiffExt 
+	: Diff_Language.cpp
+	: be 
+	: keywords.diff.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage HtmlExt 
+	: Html_Language.cpp Html_Popup.cpp 
+	: be $(STDC++LIB) 
+	: keywords.html.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage HtmlJSExt 
+	: HtmlJs_Language.cpp HtmlJs_Popup.cpp 
+	: be $(STDC++LIB) 
+	: keywords.html-js.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage HtmlCssJsPhpExt 
+	: HtmlCssJsPhp_Language.cpp HtmlCssJsPhp_Popup.cpp 
+	: be $(STDC++LIB) 
+	: keywords.html-css-js-php.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage JamExt 
+	: Jam_Language.cpp 
+	: be 
+	: keywords.jam.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage JavaExt 
+	: Java_Language.cpp Java_Popup.l 
+	: be 
+	: keywords.java.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage LoutExt
+	: Lout_Language.cpp Lout_Popup.l 
+	: be
+	: keywords.lt.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage LuaExt 
+	: Lua_Language.cpp Lua_Popup.cpp 
+	: be 
+	: keywords.lua.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage MathematicaExt 
+	: Mathematica_Language.cpp Mathematica_Popup.l 
+	: be 
+	: keywords.m.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage OberonExt 
+	: Oberon_Language.cpp Oberon_Popup.l 
+	: be 
+	: keywords.ob2.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage PascalExt 
+	: Pascal_Language.cpp Pascal_Popup.cpp 
+	: be 
+	: keywords.pas.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage PerlExt 
+	: Perl_Language.cpp Perl_Popup.l 
+	: be 
+	: keywords.pl.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage PythonExt 
+	: Python_Language.cpp Python_Popup.l 
+	: be 
+	: keywords.py.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage RezExt 
+	: Rez_Language.cpp Rez_Popup.l 
+	: be 
+	: keywords.rez.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage ShellExt 
+	: Shell_Language.cpp 
+	: be 
+	: keywords.sh.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage SQLExt 
+	: Sql_Language.cpp 
+	: be 
+	: keywords.sql.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage TexExt 
+	: Tex_Language.cpp Tex_Popup.l 
+	: be 
+	: keywords.tex.rsrc 
+	;
+# </pe-src>

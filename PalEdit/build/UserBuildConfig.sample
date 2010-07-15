@@ -1,0 +1,61 @@
+# UserBuildConfig
+#
+# Sample of a UserBuildConfig file. It is a central place where the user can
+# set variables affecting certain aspects of the build, such as debug,
+# warnings and optimization settings. The file is ignored by CVS.
+#
+# The following variables can be set:
+# 
+# CCFLAGS, C++FLAGS		- Flags passed to the C/C++ compiler.
+# DEBUG					- If not empty, will turn on debugging, i.e. will
+#						  add respective C/C++ compiler and linker flags and
+#						  the CPP DEBUG macro.
+# DEFINES				- CPP macros to be defined, e.g. something like
+#						  `SPECIAL_FEATURE' or `CACHE_SIZE=1024'.
+# HDRS					- List of directories to be added to the local include
+#						  search paths.
+# LINKFLAGS				- Flags passed to the linker.
+# LOCATE_MAIN_TARGET	- Directory where the main targets (i.e. applications,
+#						  libraries shall be placed). Should usually not be
+#						  tampered with by the user.
+# OPTIM					- Optimization specific flags passed to the C/C++
+#						  compiler. Usually you want to use OPTIMIZE instead.
+# OPTIMIZE				- If not set to `0', will turn on optimization, i.e.
+#						  will set the respective C/C++ compiler flags
+#						  (i.e. the OPTIM variable).
+# STRIP_APPS			- if not set to '0', will cause all generated apps to
+#						  be stripped. Default is '0', i.e. no stripping
+# SYSHDRS				- List of directories to be added to the system include
+#						  search paths.
+# WARNINGS				- If not set to `0', will turn on warnings, i.e. will
+#						  set the respective C/C++ compiler flags.
+
+# Examples:
+
+# Globally turn off debugging:
+#
+# DEBUG = 0 ;
+
+# Globally activate debugging:
+#
+# DEBUG = 1 ;
+
+# ... e.g. like this, for the `add-ons/catalogs' directory and all its
+# subdirectories.
+#
+# SetConfigVar WARNINGS : TOP add-ons catalogs : 1 ;
+
+# Turn on debugging for the the directory `Languages' and all its subdirectories.
+#
+# SetConfigVar DEBUG : TOP Languages : 1 ;
+
+# Turn off optimization for the `rez' directory and all its subdirectories.
+#
+# SetConfigVar OPTIMIZE : TOP rez : 0 ;
+
+# Define the CPP macro INSANE_DEBUGGING_LEVEL to the value `100' in the
+# `lpe' directory, but NOT in its subdirectories (note the use of the
+# optional fourth parameter `local', which works for both SetConfigVar and
+# AppendToConfigVar).
+#
+# AppendToConfigVar DEFINES : TOP lpe : INSANE_DEBUGGING_LEVEL=100 : local ;

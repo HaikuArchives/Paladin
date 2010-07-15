@@ -1,0 +1,27 @@
+SubDir TOP Resources ;
+
+SubDirHdrs $(TOP) Sources ;
+
+# <pe-src>
+RezObjects
+	Bindings.r
+	Cursor.r
+	Dialog-Colorpicker.r
+	Dialog-FontTabs.r
+	Dialog-Info.r
+	Dialog-Open.r
+	Dialog-Preferences.r
+	Dialog-Wrap.r
+	Icons.r
+	Menus.r
+	MimeInfo.r
+	ToolBarIcons.r
+	ToolBars.r
+	UTF-Mappings.r
+	UTF-Tables.r
+	WordBreakTable.r
+	;
+# </pe-src>
+
+Includes RMimeinfo.r : pe.types.rsrc ;
+SEARCH on pe.types.rsrc = $(SUBDIR) ;

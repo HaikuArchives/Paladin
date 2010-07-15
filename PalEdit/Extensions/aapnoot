@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+#	This is a sample of a script that pipes the input throug sed to
+#	replace every occurence of aap with noot.
+#
+
+sed s/aap/noot/g

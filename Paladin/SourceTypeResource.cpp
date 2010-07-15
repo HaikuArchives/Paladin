@@ -1,0 +1,188 @@
+#include "SourceTypeResource.h"
+#include <Entry.h>
+#include <stdio.h>
+#include <Menu.h>
+#include <MenuItem.h>
+#include <Node.h>
+
+#include "BuildInfo.h"
+#include "DebugTools.h"
+#include "FileActions.h"
+#include "Globals.h"
+
+SourceTypeResource::SourceTypeResource(void)
+{
+}
+
+
+int32
+SourceTypeResource::CountExtensions(void) const
+{
+	return 2;
+}
+
+
+BString
+SourceTypeResource::GetExtension(const int32 &index)
+{
+	const char *extensions[] = { "rdef","rsrc" };
+	
+	BString string;
+	if (index >= 0 && index <= 2)
+		string = extensions[index];
+	return string;
+}
+
+	
+SourceFile *
+SourceTypeResource::CreateSourceFile(const char *path)
+{
+	return (path) ? new SourceFileResource(path) : NULL;
+}
+
+
+SourceOptionView *
+SourceTypeResource::CreateOptionView(void)
+{
+	return NULL;
+}
+
+
+BString
+SourceTypeResource::GetName(void) const
+{
+	return BString("Resource");
+}
+
+
+SourceFileResource::SourceFileResource(const char *path)
+	:	SourceFile(path)
+{
+}
+
+
+bool
+SourceFileResource::UsesBuild(void) const
+{
+	return (BString(GetPath().GetExtension()).ICompare("rsrc") != 0);
+}
+
+
+bool
+SourceFileResource::CheckNeedsBuild(BuildInfo &info, bool check_deps)
+{
+	// This function only matters if the file is an rdef or a rez file
+	if (!info.objectFolder.GetFullPath())
+		return false;
+	
+	if (BString(GetPath().GetExtension()).ICompare("rsrc") == 0)
+		return false;
+	
+	if (BuildFlag() == BUILD_YES)
+		return true;
+	
+	BString objname(GetPath().GetBaseName());
+	objname << ".rsrc";
+	
+	DPath objpath(info.objectFolder);
+	objpath.Append(objname);
+	if (!BEntry(objpath.GetFullPath()).Exists())
+		return true;
+	
+	struct stat objstat;
+	if (stat(objpath.GetFullPath(),&objstat) != 0)
+		return false;
+	
+	// Fix mod times set into the future
+	time_t now = real_time_clock();
+	if (GetModTime() > now)
+	{
+		BNode node(GetPath().GetFullPath());
+		node.SetModificationTime(now);
+	}
+	
+	if (GetModTime() > objstat.st_mtime)
+		return true;
+	
+	return false;
+}
+
+
+void
+SourceFileResource::Compile(BuildInfo &info, const char *options)
+{
+	BString abspath = GetPath().GetFullPath();
+	if (abspath[0] != '/')
+	{
+		abspath.Prepend("/");
+		abspath.Prepend(info.projectFolder.GetFullPath());
+	}
+	
+	if (BString(GetPath().GetExtension()).ICompare("rsrc") == 0)
+		return;
+	
+	BString pipestr = "rc -o '";
+	pipestr << GetResourcePath(info).GetFullPath()
+			<< "' '" << abspath << "'";
+	
+	
+	BString errmsg;
+	RunPipedCommand(pipestr.String(), errmsg, false);
+	
+	STRACE(1,("Compiling %s\nCommand:%s\nOutput:%s\n",
+			abspath.String(),pipestr.String(),errmsg.String()));
+	
+	ParseRCErrors(errmsg.String(),info.errorList);
+}
+
+
+DPath
+SourceFileResource::GetResourcePath(BuildInfo &info)
+{
+	if (BString(GetPath().GetExtension()).ICompare("rsrc") == 0)
+	{
+		BString path(GetPath().GetFullPath());
+		if (path[0] != '/')
+		{
+			path.Prepend("/");
+			path.Prepend(info.projectFolder.GetFullPath());
+		}
+		return DPath(path);
+	}
+	
+	BString objname(GetPath().GetBaseName());
+	objname << ".rsrc";
+	
+	DPath objfolder(info.objectFolder);
+	objfolder.Append(objname);
+	return objfolder;
+}
+
+
+void
+SourceFileResource::RemoveObjects(BuildInfo &info)
+{
+	if (BString(GetPath().GetExtension()).ICompare("rsrc") == 0)
+		return;
+	
+	DPath path(GetObjectPath(info));
+	BString base = path.GetFolder();
+	base << "/" << path.GetBaseName() << ".rsrc";
+	
+	BEntry(base.String()).Remove();
+}
+
+
+void
+SourceFileResource::AddActionsItems(BMenu *menu)
+{
+	menu->AddItem(new BMenuItem("Edit Program Settings…",
+					new BMessage(M_RUN_FILE_TYPES)));
+}
+
+
+int8
+SourceFileResource::CountActions(void) const
+{
+	return 1;
+}

@@ -24,7 +24,8 @@ enum
 {
 	M_OPEN_SELECTION = 'opsl',
 	M_REMOVE_FROM_LIST = 'rmls',
-	M_SHOW_IMPORT = 'shim'
+	M_SHOW_IMPORT = 'shim',
+	M_OPEN_FROM_LIST = 'ofls'
 };
 
 class RefStringItem : public BStringItem
@@ -165,6 +166,15 @@ StartWindow::StartWindow(void)
 	}
 	gSettings.Unlock();
 	
+	// Alt + number opens that number project from the list
+	int32 count = (fListView->CountItems() > 9) ? 9 : fListView->CountItems();
+	for (int32 i = 0; i < count; i++)
+	{
+		BMessage *listMsg = new BMessage(M_OPEN_FROM_LIST);
+		listMsg->AddInt32("index", i);
+		AddShortcut('1' + i, B_COMMAND_KEY, listMsg);
+	}
+	
 	fNewButton->MakeFocus(true);
 }
 
@@ -226,6 +236,16 @@ StartWindow::MessageReceived(BMessage *msg)
 		case M_SHOW_IMPORT:
 		{
 			fImportPanel->Show();
+			break;
+		}
+		case M_OPEN_FROM_LIST:
+		{
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK)
+			{
+				fListView->Select(index);
+				PostMessage(M_OPEN_SELECTION);
+			}
 			break;
 		}
 		case M_QUICK_IMPORT:

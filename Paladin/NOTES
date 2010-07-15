@@ -1,0 +1,11 @@
+TODO:
+	Bug: where if you close the Settings window and run a build it hangs
+	Use rsync to synchronize the code library.
+
+Features to implement / consider:
+	Find Definition (find in headers)
+	Build-related options in an options class
+	Add New Class (add custom classes) - this one is quite hard!
+	BeHappy integration?
+	Way to specify output folder for executable?
+	Code completion

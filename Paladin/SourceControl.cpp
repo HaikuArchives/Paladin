@@ -198,6 +198,20 @@ SourceControl::SetDebugMode(bool value)
 
 
 void
+SourceControl::SetVerboseMode(bool value)
+{
+	fVerbose = value;
+}
+
+
+bool
+SourceControl::GetVerboseMode(void) const
+{
+	return fVerbose;
+}
+
+
+void
 SourceControl::SetUpdateCallback(SourceControlCallback cb)
 {
 	fCallback = cb;

@@ -13,5 +13,8 @@ Projects can no longer load a project more than once
 Dropping a Paladin project on a project window opens the project
 .rdef files are created with a form that can be filled in
 Tweaked the file filters for folder and project importing to exclude Jamfiles, Makefiles, and system folders for Git and Mercurial.
+Automatically add libsupc++ to new GUI projects under Haiku GCC4
+Fixed Run in Debugger under Haiku
+Fixed adding files to a module in the code library via file chooser
+Automatically remove libsupc++ from Haiku GCC4 projects under other platforms
 Preferences window now reports the unavailability of external tools like fastdep and ccache
-

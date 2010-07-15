@@ -41,7 +41,12 @@ status_t
 HgSourceControl::CreateRepository(const char *path)
 {
 	BString command;
-	command << "hg init '" << path << "'";
+	command << "hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command << "init '" << path << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -54,8 +59,12 @@ HgSourceControl::CreateRepository(const char *path)
 	
 	SetWorkingDirectory(path);
 	command = "";
-	command << "cd '" << path << "'; "
-			<< "hg add";
+	command << "cd '" << path << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< " add";
 	RunCommand(command, out);
 	return B_OK;
 }
@@ -68,7 +77,12 @@ HgSourceControl::CloneRepository(const char *url, const char *dest)
 		return B_BAD_DATA;
 	
 	BString command;
-	command << "hg clone '" << url << "' '" << dest << "'";
+	command << "hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command << "clone '" << url << "' '" << dest << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -83,8 +97,12 @@ status_t
 HgSourceControl::AddToRepository(const char *path)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg add '" << path << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "add '" << path << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -96,8 +114,12 @@ status_t
 HgSourceControl::RemoveFromRepository(const char *path)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg remove '" << path << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "hg remove '" << path << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -109,8 +131,12 @@ status_t
 HgSourceControl::Commit(const char *msg)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg commit -m '" << msg << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "commit -m '" << msg << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -123,8 +149,12 @@ status_t
 HgSourceControl::Merge(const char *rev)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg merge '" << rev << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "merge '" << rev << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -140,8 +170,12 @@ HgSourceControl::Push(const char *url)
 		SetURL(url);
 	
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg push '" << url << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "push '" << url << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -157,8 +191,12 @@ HgSourceControl::Pull(const char *url)
 		SetURL(url);
 	
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg pull '" << url << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "pull '" << url << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -171,8 +209,12 @@ void
 HgSourceControl::Recover(void)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg recover";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "recover";
 	
 	BString out;
 	RunCommand(command, out);
@@ -183,8 +225,12 @@ status_t
 HgSourceControl::Revert(const char *relPath)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg revert";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<< "revert";
 	
 	if (relPath)
 		command << " '" << relPath << "'";
@@ -202,8 +248,12 @@ status_t
 HgSourceControl::Rename(const char *oldname, const char *newname)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<< "hg rename '" << oldname << "' '" << newname << "'";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command << "rename '" << oldname << "' '" << newname << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -216,8 +266,12 @@ status_t
 HgSourceControl::GetHistory(BString &out, const char *file)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; "
-			<<	"hg log ";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command	<<	"log ";
 	
 	if (file)
 		command << "'" << file << "'";
@@ -239,7 +293,12 @@ status_t
 HgSourceControl::GetChangeStatus(BString &out)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; hg status";
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command << "status";
 	
 	// Temporarily disable the update callback to eliminate redundancy
 	// and prevent getting the info twice. ;-)

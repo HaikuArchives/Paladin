@@ -70,7 +70,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	
 	BString command;
 	
-	if (gUseFastDep && gFastDepEnabled)
+	if (gUseFastDep && gFastDepAvailable)
 		command << "fastdep " << info.includeString << " '" << abspath.String() << "'";
 	else
 		command << "gcc -MM " << info.includeString << " '" << abspath.String() << "'";
@@ -81,7 +81,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	STRACE(1,("Update Dependencies for %s\nCommand:%s\nOutput:%s\n",
 			GetPath().GetFullPath(),command.String(),depstr.String()));
 	
-	if (gUseFastDep && gFastDepEnabled)
+	if (gUseFastDep && gFastDepAvailable)
 	{
 		if (depstr.FindFirst("error ") == 0)
 		{
@@ -278,7 +278,7 @@ SourceFileC::Compile(BuildInfo &info, const char *options)
 	BString compileString = "gcc -c ";
 	
 	// This will make sure that we can still build if ccache is borked
-	if (gUseCCache && gCCacheEnabled)
+	if (gUseCCache && gCCacheAvailable)
 		compileString.Prepend("ccache ");
 	
 	if (gPlatform == PLATFORM_ZETA)

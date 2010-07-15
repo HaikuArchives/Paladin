@@ -28,6 +28,7 @@
 #include "FileActions.h"
 #include "FileFactory.h"
 #include "FindOpenFileWindow.h"
+#include "GetTextWindow.h"
 #include "Globals.h"
 #include "GroupRenameWindow.h"
 #include "LibWindow.h"
@@ -43,6 +44,7 @@
 #include "Project.h"
 #include "RunArgsWindow.h"
 #include "SCMManager.h"
+#include "SCMOutputWindow.h"
 #include "Settings.h"
 #include "SourceFile.h"
 #include "VRegWindow.h"
@@ -69,6 +71,7 @@ enum
 	M_SHOW_CODE_LIBRARY = 'shcl',
 	M_SYNC_MODULES = 'synm',
 	
+	M_GET_CHECK_IN_MSG = 'gcim',
 	M_CHECK_IN_PROJECT = 'prci',
 	M_REVERT_PROJECT = 'prrv',
 	
@@ -102,8 +105,13 @@ ProjectWindow::ProjectWindow(BRect frame, Project *project)
 	if (fProject)
 	{
 		fSourceControl = GetSCM(fProject->SourceControl());
-		if (fSourceControl && fSourceControl->NeedsInit(fProject->GetPath().GetFolder()))
-			fSourceControl->CreateRepository(fProject->GetPath().GetFolder());
+		if (fSourceControl)
+		{
+			if (fSourceControl->NeedsInit(fProject->GetPath().GetFolder()))
+				fSourceControl->CreateRepository(fProject->GetPath().GetFolder());
+			
+			fSourceControl->SetUpdateCallback(SCMOutputCallback);
+		}
 	}
 	
 	BView *top = GetBackgroundView();
@@ -311,13 +319,49 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		case M_GET_CHECK_IN_MSG:
+		{
+			if (!fSourceControl)
+			{
+				printf("NULL source control\n");
+				break;
+			}
+			
+			GetTextWindow *gtw = new GetTextWindow("Paladin",
+													TR("Enter the description "
+														"for the changes in this "
+														"revision."),
+													BMessage(M_CHECK_IN_PROJECT),
+													BMessenger(this));
+			gtw->Show();
+			break;
+		}
 		case M_CHECK_IN_PROJECT:
 		{
-			
+			BString commitstr;
+			if (msg->FindString("text", &commitstr) == B_OK && fSourceControl)
+			{
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Commit"));
+				win->Show();
+				fSourceControl->Commit(commitstr.String());
+			}
 			break;
 		}
 		case M_REVERT_PROJECT:
 		{
+			if (!fSourceControl)
+				break;
+			
+			BAlert *revertAlert = new BAlert("Paladin", TR("This will undo all changes "
+															"since the last commit. "
+															"Continue?"), "Don't Revert",
+															"Revert");
+			if (revertAlert->Go() == 1)
+			{
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Revert"));
+				win->Show();
+				fSourceControl->Revert(NULL);
+			}
 			break;
 		}
 		case M_CULL_EMPTY_GROUPS:
@@ -745,7 +789,7 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		{
 			// We don't do this when forcing a rebuild of the sources because sometimes it
 			// can take quite a while
-			if (gUseCCache && gCCacheEnabled)
+			if (gUseCCache && gCCacheAvailable)
 			{
 				fStatusBar->SetText(TR("Emptying build cache"));
 				UpdateIfNeeded();
@@ -1123,7 +1167,7 @@ ProjectWindow::SetupMenus(void)
 	
 	fSourceMenu = new BMenu(TR("Source Control"));
 	fSourceMenu->AddItem(new BMenuItem(TR("Check Project In"),
-										new BMessage(M_CHECK_IN_PROJECT)));
+										new BMessage(M_GET_CHECK_IN_MSG)));
 	fSourceMenu->AddItem(new BMenuItem(TR("Revert Project"),
 										new BMessage(M_REVERT_PROJECT)));
 	
@@ -1174,7 +1218,7 @@ ProjectWindow::SetupMenus(void)
 	
 	BMenuItem *item = new BMenuItem(TR("Empty Build Cache"),new BMessage(M_EMPTY_CCACHE));
 	fBuildMenu->AddItem(item);
-	item->SetEnabled(gCCacheEnabled);
+	item->SetEnabled(gCCacheAvailable);
 	
 	fBuildMenu->AddItem(new BMenuItem(TR("Force Rebuild"),new BMessage(M_FORCE_REBUILD),'-'));
 	fMenuBar->AddItem(fBuildMenu);

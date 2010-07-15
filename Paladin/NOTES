@@ -1,11 +1,39 @@
 TODO:
-	Bug: where if you close the Settings window and run a build it hangs
-	Use rsync to synchronize the code library.
+	Bug: Running the project after opening and closing the Project Settings window crashes the app -- project locked at the beginning of the build
+	Exercise and test the SourceControl code for SVN and HG
+	Add code to really help clean up the includes in a project -- no duplicates and project relative paths
+	Code Library cleanup:
+		1) Scan for modules and save the item for each module file into a map of vectors.
+		2) Run the rsync on a module as --list-only and parse the output to find out what files are updated.
+		2b) If any of the changed files are new, add them to the project -- need to be able to specify a group
+		2c) Run the rsync for real --> rsync -rX <user>/config/share/Paladin/CodeLibrary/<modulename>  <projectfolder>/ModuleFiles
+		2d) Iterate through the module vector and see if any files disappeared. If they did, remove them from the project
+	Add source control to imported projects
+	Implement Git source control class
+
+Locale Kit notes:
+
+Create text file for translators:
+---------------------------------------------------
+cpp *.cpp > preprocessed.cpp.tmp
+collectcatkeys preprocessed.cpp.tmp -l english -o english.catkeys
+rm preprocessed.cpp.tmp
+
+Convert catalog to binary format for packaging and distribution
+-----------------------------------------------------------------------------------------------------
+linkcatkeys english.catkeys -l english -s mimesignature -o english.catalog
 
 Features to implement / consider:
-	Find Definition (find in headers)
-	Build-related options in an options class
+	Numeric shortcuts in Start window for choosing projects from the list
+	Tooltip for errors / warnings in the error window
+	Integrated version control via SVN, Git, and Mercurial
+	Add SymbolLocator to Tools menu
+	Finish getting Haiku localization to work
+	Import project from repository
+	Improve library window to handle such a large set of libraries in Haiku
+	Add keyboard acceleration to library window
+	Project-wide find-and-replace -- create Find in Project (Cmd+Shift+F)
+	Rudimentary profiling
 	Add New Class (add custom classes) - this one is quite hard!
-	BeHappy integration?
-	Way to specify output folder for executable?
 	Code completion
+	Find Definition (find in headers)

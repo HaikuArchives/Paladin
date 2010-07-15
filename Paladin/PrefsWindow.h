@@ -1,6 +1,8 @@
 #ifndef PREFS_WINDOW_H
 #define PREFS_WINDOW_H
 
+#include <MenuField.h>
+
 #include "DWindow.h"
 #include "CheckBox.h"
 
@@ -20,6 +22,8 @@ private:
 					*fCCache,
 					*fFastDep,
 					*fAutoSyncModules;
+	
+	BMenuField		*fSCMChooser;
 };
 
 #endif

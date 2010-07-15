@@ -26,10 +26,8 @@ bool gSingleThreadedBuild = false;
 bool gShowFolderOnOpen = false;
 bool gAutoSyncModules = true;
 bool gUseCCache = false;
-bool gCCacheEnabled = false;
 bool gCCacheAvailable = false;
 bool gUseFastDep = false;
-bool gFastDepEnabled = false;
 bool gFastDepAvailable = false;
 bool gHgAvailable = false;
 bool gGitAvailable = false;
@@ -63,7 +61,9 @@ InitGlobals(void)
 	gAutoSyncModules = gSettings.GetBool("autosyncmodules",true);
 	gUseCCache = gSettings.GetBool("ccache",false);
 	gUseFastDep = gSettings.GetBool("fastdep",false);
-
+	
+	gDefaultSCM = (scm_t)gSettings.GetInt32("defaultSCM", SCM_HG);
+	
 	system_info sysinfo;
 	get_system_info(&sysinfo);
 	gCPUCount = sysinfo.cpu_count;
@@ -74,11 +74,14 @@ InitGlobals(void)
 	// wants to use it.
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4 || gPlatform == PLATFORM_ZETA) &&
 		system("ccache > /dev/null 2>&1") == 1)
-		gCCacheEnabled = true;
+	{
+		printf("ccache enabled\n");
+		gCCacheAvailable = true;
+	}
 		
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
 		system("fastdep > /dev/null 2>&1") == 0)
-		gFastDepEnabled = true;
+		gFastDepAvailable = true;
 		
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
 		system("hg > /dev/null 2>&1") == 0)

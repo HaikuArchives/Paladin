@@ -1,11 +1,17 @@
 #include "PrefsWindow.h"
 
+#include <Box.h>
+#include <Font.h>
+#include <Menu.h>
+#include <MenuItem.h>
+
 #include "DPath.h"
 #include "Globals.h"
 #include "PathBox.h"
 #include "PLocale.h"
 #include "Settings.h"
 
+#define M_SET_SCM 'sscm'
 
 PrefsWindow::PrefsWindow(BRect frame)
 	:	DWindow(frame,TR("Program Settings"))
@@ -44,21 +50,33 @@ PrefsWindow::PrefsWindow(BRect frame)
 								"its parent folder is opened in Tracker"));
 	
 	r = fShowProjFolder->Frame();
-	r.OffsetBy(0,r.Height());
-	fSlowBuilds = new BCheckBox(r,"slowbuilds",	TR("Limit Build Threads to 1"),
+	r.OffsetBy(0,r.Height() + 5.0);
+	
+	BBox *buildBox = new BBox(r);
+	buildBox->SetLabel(TR("Build"));
+	top->AddChild(buildBox);
+	
+	BRect boxr(buildBox->Bounds().InsetByCopy(10.0, 10.0));
+	boxr.bottom = boxr.top + fShowProjFolder->Frame().Height();
+	
+	font_height fheight;
+	be_bold_font->GetHeight(&fheight);
+	boxr.top = fheight.ascent + fheight.descent + fheight.leading;
+	
+	fSlowBuilds = new BCheckBox(boxr,"slowbuilds",	TR("Limit Build Threads to 1"),
 								new BMessage,
 								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fSlowBuilds);
+	buildBox->AddChild(fSlowBuilds);
 	if (gSingleThreadedBuild)
 		fSlowBuilds->SetValue(B_CONTROL_ON);
 	SetToolTip(fSlowBuilds,TR("Paladin will build a project with just one "
 							"thread instead of one per processor"));
 	
-	r = fSlowBuilds->Frame();
-	r.OffsetBy(0,r.Height());
-	fCCache = new BCheckBox(r,"ccache",TR("Use ccache to build faster"),
+	boxr = fSlowBuilds->Frame();
+	boxr.OffsetBy(0,r.Height());
+	fCCache = new BCheckBox(boxr,"ccache",TR("Use ccache to build faster"),
 							new BMessage, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fCCache);
+	buildBox->AddChild(fCCache);
 	if (gCCacheAvailable)
 	{
 		if (gUseCCache)
@@ -73,13 +91,13 @@ PrefsWindow::PrefsWindow(BRect frame)
 	}
 	SetToolTip(fCCache,TR("Compiler caching is another way to speed up builds."));
 	
-	r = fCCache->Frame();
-	r.OffsetBy(0,r.Height());
-	fFastDep = new BCheckBox(r,"fastdep",
+	boxr = fCCache->Frame();
+	boxr.OffsetBy(0,r.Height());
+	fFastDep = new BCheckBox(boxr,"fastdep",
 									TR("Use fast dependency updates"),
 									new BMessage,
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fFastDep);
+	buildBox->AddChild(fFastDep);
 	if (gFastDepAvailable)
 	{
 		if (gUseFastDep)
@@ -94,7 +112,9 @@ PrefsWindow::PrefsWindow(BRect frame)
 	}
 	SetToolTip(fFastDep,TR("Use the fastdep dependency checker instead of gcc."));
 	
-	r.OffsetBy(0,r.Height());
+	buildBox->ResizeTo(buildBox->Bounds().Width(), fFastDep->Frame().bottom + 5.0);
+	
+	r.OffsetTo(10, buildBox->Frame().bottom + 10.0);
 	fAutoSyncModules = new BCheckBox(r,"autosync",
 									TR("Automatically Synchronize Modules"),
 									new BMessage,
@@ -106,6 +126,27 @@ PrefsWindow::PrefsWindow(BRect frame)
 								"projects with the those in the code library"));
 	
 	r.OffsetBy(0,r.Height() + 5.0);
+	
+	BMenu *menu = new BMenu("SCM Chooser");
+	menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
+	menu->AddItem(new BMenuItem("Git", new BMessage()));
+	menu->AddItem(new BMenuItem("Subversion", new BMessage()));
+	menu->AddItem(new BMenuItem("None", new BMessage()));
+	
+	fSCMChooser = new BMenuField(r, "scmchooser", "Preferred Source Control: ",
+								menu);
+	top->AddChild(fSCMChooser);
+	
+	menu->SetLabelFromMarked(true);
+	BMenuItem *marked = menu->ItemAt(gDefaultSCM);
+	if (marked)
+		marked->SetMarked(true);
+	else
+		menu->ItemAt(menu->CountItems() - 1)->SetMarked(true);
+	
+	
+	
+	r.OffsetBy(0.0, r.Height() + 5.0);
 	r.right = r.left + 1.0;
 	r.bottom = r.top + 1.0;
 	fBackupFolder = new PathBox(r,"backupfolder", gBackupPath.GetFullPath(),
@@ -148,6 +189,8 @@ PrefsWindow::QuitRequested(void)
 	gAutoSyncModules = (fAutoSyncModules->Value() == B_CONTROL_ON);
 	gSettings.SetBool("autosyncmodules",gAutoSyncModules);
 	
+	gDefaultSCM = (scm_t)fSCMChooser->Menu()->IndexOf(fSCMChooser->Menu()->FindMarked());
+	gSettings.SetInt32("defaultSCM", gDefaultSCM);
 	return true;
 }
 

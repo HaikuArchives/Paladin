@@ -65,6 +65,9 @@ public:
 			SourceControlCallback	GetUpdateCallback(void) const;
 			
 			void			SetDebugMode(bool value);
+			
+			void			SetVerboseMode(bool value);
+			bool			GetVerboseMode(void) const;
 protected:
 			void			SetShortName(const char *name);
 			void			SetLongName(const char *name);
@@ -87,7 +90,8 @@ private:
 							fPassword;
 	
 	BString					fWorkingDir;
-	bool					fDebug;
+	bool					fDebug,
+							fVerbose;
 	SourceControlCallback	fCallback;
 };
 

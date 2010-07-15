@@ -69,7 +69,11 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 	fPostBuildAction = postbuild;
 	
 	if (fProject->IsLocked())
-		debugger("Project locked at beginning of build");
+	{
+		BString outstr("Project lockeed at beginning of build. Holding thread is ");
+		outstr << fProject->LockingThread();
+		debugger(outstr.String());
+	}
 	
 	// Check for existence of object directory and create it when necessary
 	BEntry entry(proj->GetObjectPath().GetFullPath());

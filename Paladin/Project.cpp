@@ -239,6 +239,29 @@ Project::Save(const char *path)
 	data << "NAME=" << fName << "\nTARGETNAME=" << fTargetName << "\n";
 	data << "PLATFORM=" << sPlatformArray[fPlatform] << "\n";
 	
+	switch (fSCMType)
+	{
+		case SCM_HG:
+		{
+			data << "SCM=hg\n;";
+			break;
+		}
+		case SCM_GIT:
+		{
+			data << "SCM=git\n;";
+			break;
+		}
+		case SCM_SVN:
+		{
+			data << "SCM=svn\n;";
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+	
 	for (int32 i = 0; i < CountGroups(); i++)
 	{
 		SourceGroup *group = GroupAt(i);

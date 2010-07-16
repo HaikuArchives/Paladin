@@ -1,6 +1,6 @@
 TODO:
 	Bug: Running the project after opening and closing the Project Settings window crashes the app -- project locked at the beginning of the build
-	Exercise and test the SourceControl code for SVN and HG
+	Exercise and test the SourceControl code for SVN, HG, and Git
 	Add code to really help clean up the includes in a project -- no duplicates and project relative paths
 	Code Library cleanup:
 		1) Scan for modules and save the item for each module file into a map of vectors.
@@ -9,7 +9,6 @@ TODO:
 		2c) Run the rsync for real --> rsync -rX <user>/config/share/Paladin/CodeLibrary/<modulename>  <projectfolder>/ModuleFiles
 		2d) Iterate through the module vector and see if any files disappeared. If they did, remove them from the project
 	Add source control to imported projects
-	Implement Git source control class
 
 Locale Kit notes:
 
@@ -24,9 +23,7 @@ Convert catalog to binary format for packaging and distribution
 linkcatkeys english.catkeys -l english -s mimesignature -o english.catalog
 
 Features to implement / consider:
-	Numeric shortcuts in Start window for choosing projects from the list
 	Tooltip for errors / warnings in the error window
-	Integrated version control via SVN, Git, and Mercurial
 	Add SymbolLocator to Tools menu
 	Finish getting Haiku localization to work
 	Import project from repository

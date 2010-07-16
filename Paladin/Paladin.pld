@@ -128,6 +128,7 @@ SOURCEFILE=TypedRefFilter.cpp
 DEPENDENCY=/BeOS/develop/projects/Paladin-Related/Paladin.dev/TypedRefFilter.cpp|/BeOS/develop/projects/Paladin-Related/Paladin.dev/TypedRefFilter.h
 GROUP=Source Control
 EXPANDGROUP=yes
+SOURCEFILE=GitSourceControl.cpp
 SOURCEFILE=HgSourceControl.cpp
 DEPENDENCY=HgSourceControl.o:| /boot/home/projects/Paladin-related/Paladin/HgSourceControl.cpp| /boot/home/projects/Paladin-related/Paladin/HgSourceControl.h| /boot/home/projects/Paladin-related/Paladin/SourceControl.h
 SOURCEFILE=SCMManager.cpp

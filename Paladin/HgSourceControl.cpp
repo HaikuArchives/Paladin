@@ -119,7 +119,7 @@ HgSourceControl::RemoveFromRepository(const char *path)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "hg remove '" << path << "'";
+	command	<< "remove '" << path << "'";
 	
 	BString out;
 	RunCommand(command, out);

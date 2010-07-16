@@ -243,17 +243,17 @@ Project::Save(const char *path)
 	{
 		case SCM_HG:
 		{
-			data << "SCM=hg\n;";
+			data << "SCM=hg\n";
 			break;
 		}
 		case SCM_GIT:
 		{
-			data << "SCM=git\n;";
+			data << "SCM=git\n";
 			break;
 		}
 		case SCM_SVN:
 		{
-			data << "SCM=svn\n;";
+			data << "SCM=svn\n";
 			break;
 		}
 		default:

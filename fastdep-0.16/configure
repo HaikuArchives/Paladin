@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd config
+rm -f config.me
+./configure $@
+cd ..

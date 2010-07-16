@@ -1,0 +1,262 @@
+<HTML
+><HEAD
+><TITLE
+>Automatically regenerating dependency information</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="fastdep manual"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="Writing a make-rule to generate dependency information"
+HREF="c49.htm"><LINK
+REL="NEXT"
+TITLE="Adding an external dependency"
+HREF="c90.htm"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>fastdep manual</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c49.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c90.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN63"
+>Chapter 4. Automatically regenerating dependency information</A
+></H1
+><P
+>Every time you change a dependency relationship (for example when
+you include an extra header in some source file), you have to regenerate
+the dependency information manually by executing
+<B
+CLASS="COMMAND"
+>make .depend</B
+>
+(as mentioned in the previous chapter deleting <TT
+CLASS="FILENAME"
+>.depend</TT
+>
+also works)</P
+><P
+>Off course this is very error-prone. Why don't we let make regenerate
+	the dependencies everytime one of the source files changes? Easy
+	enough :</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN69"
+></A
+><P
+><B
+>Example 4-1. Makefile fragment to generate dependencies each time a source
+		file changes (wrong).</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>.depend: $(SOURCES)
+	fastdep $(SOURCES) &#62; .depend
+
+-include .depend</PRE
+></DIV
+><P
+>This seems to work fine, but in fact doesn't. Suppose
+	one (or more) of our source files in <TT
+CLASS="VARNAME"
+>SOURCES</TT
+>
+	includes a certain header <TT
+CLASS="FILENAME"
+>foo.h</TT
+>. Now imagine
+	that during an edit-compile cycle we don't change
+	anything in the source files, but we added a new include
+	of <TT
+CLASS="FILENAME"
+>bar.h</TT
+> in <TT
+CLASS="FILENAME"
+>foo.h</TT
+>.
+	This means that the dependencies for each source file that
+	includes <TT
+CLASS="FILENAME"
+>foo.h</TT
+> must change. However since
+	none of the source files themself change, make will find
+	that <TT
+CLASS="FILENAME"
+>.depend</TT
+> is still up to date
+	and not regenerate it.
+	The end result is incorrect dependency information.</P
+><P
+>To summarize, the dependency information of a source file
+	not only depends on the source file itself, but also on all
+	files it includes. Hence the earlier makefile fragment is
+	incorrect.</P
+><P
+>To solve this problem, the info manual of GNU make proposes
+	a solution where the output of the dependency generator is
+	modified by piping it through sed. While this works for
+	normal dependency generators like the GNU C/C++ compiler
+	(and still works with fastdep), there is a much more elegant
+	solution in <SPAN
+CLASS="APPLICATION"
+>fastdep</SPAN
+>.
+	By adding the <B
+CLASS="COMMAND"
+>--remakedeptarget=file</B
+>
+	command line option fastdep will also emit a suitable
+	dependency line for its own output.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN83"
+></A
+><P
+><B
+>Example 4-2. Makefile fragment to generate dependencies each time a source
+		or included file changes (right).</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>.depend:
+	fastdep --remakedeptarget=.depend $(ALLSOURCES) &#62; .depend
+
+-include dependinfo</PRE
+></DIV
+><P
+>The <TT
+CLASS="FILENAME"
+>.depend</TT
+> file will now look like this : </P
+><PRE
+CLASS="SCREEN"
+>file1.o: file1.cc \
+	header1.h \
+	header2.h \
+	header3.h
+file2.o: file2.cc \
+	header1.h \
+	header3.h \
+	header4.h \
+.depend: \
+	file1.cc \
+	header1.h \
+	header2.h \
+	header3.h \
+	file2.cc \
+	header4.h \</PRE
+><P
+>which is exactly how we want it to be.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c49.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c90.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Writing a make-rule to generate dependency information</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Adding an external dependency</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

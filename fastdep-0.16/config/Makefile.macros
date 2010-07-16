@@ -1,0 +1,6 @@
+include config/link.mk
+
+-include config/config.me
+
+config/config.me:
+	sh -c "(cd config; ./configure)"

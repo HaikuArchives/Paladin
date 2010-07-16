@@ -1,0 +1,3 @@
+../foo.o: ../foo.cpp \
+	/home/bvh/src/fastdep/tests/foo.h \
+	/home/bvh/src/fastdep/tests/barcfg.h

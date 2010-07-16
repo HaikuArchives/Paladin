@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# configure script to glue .sh single issue configures
+
+for i in *.sh
+do
+	. ./$i
+done
+
+for i in $@
+do
+	if [ "--help" = "$i" ]
+	then
+		echo Usage
+		echo
+		echo -e "\tconfigure [options]"
+		echo
+		echo -e "where options is on or more of"
+		echo
+		for i in *.sh
+		do
+			${i%\.sh}_help
+		done
+		exit 0
+	fi
+done
+
+rm -f config.me
+
+for i in *.sh
+do
+	${i%\.sh}_commandline $@
+done
+
+for i in *.sh
+do
+	${i%\.sh}_go $@
+done
+
+echo Succesfully configured

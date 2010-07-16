@@ -1,0 +1,19 @@
+#CXXFLAGS=-Wall -O2
+UNAME_SYS=$(shell uname -s)
+ifneq (,$(findstring CYGWIN, $(UNAME_SYS)))
+	HOST_SYSTEM=cygwin
+else
+	HOST_SYSTEM=unix
+endif
+
+ifeq ($(shell uname),FreeBSD)
+   CXXFLAGS:=$(CXXFLAGS) -I .
+endif
+
+$(call classgroup,fastdep,all) = CheckVersion CompileState Define Element Expression \
+	FileCache FileStructure If Include MappedFile Sequence fastdep
+
+GROUPS=all
+
+ALLMAKEFILES = Makefile Makefile.common
+

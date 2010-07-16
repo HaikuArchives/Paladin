@@ -1,0 +1,15 @@
+Source: fastdep
+Section: devel
+Priority: optional
+Maintainer: Robert Lemmen <robertle@semistable.com>
+Build-Depends: debhelper (>= 7.0.0)
+Standards-Version: 3.8.1
+
+Package: fastdep
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: fast dependency generator for C/C++ files
+ Efficiently generates dependency information for C and C++ files, suitable for
+ inclusion in makefiles, and optionally generates dependency information for
+ its own output. This can be used to create robust, fast and largely automated
+ build rules. 

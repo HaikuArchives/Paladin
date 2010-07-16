@@ -1,0 +1,32 @@
+.SUFFIXES: .cc
+
+NAME =  fastdep
+OBJS =  CheckVersion.obj \
+        CompileState.obj \
+        Define.obj \
+        Element.obj \
+        Expression.obj \
+        fastdep.obj \
+        FileCache.obj \
+        FileStructure.obj \
+        If.obj \
+        Include.obj \
+        Sequence.obj \
+        getopt.obj \
+        getopt1.obj
+
+_CFLAGS = -W3 -I external -DWIN32=1 -D__STDC__=1
+_CPPFLAGS = -TP -GX $(_CFLAGS)
+
+.cc.obj::
+        $(CC) -nologo -c $(_CPPFLAGS) $(CPPFLAGS) $<
+        
+{extra}.c.obj::
+        $(CC) -nologo -c $(_CFLAGS) $(CFLAGS) $<
+        
+$(NAME): $(OBJS)
+        $(CC) -Fe $(NAME).exe $?
+
+clean:
+        -del *.obj
+        -del *.exe

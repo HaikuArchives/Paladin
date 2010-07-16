@@ -1,0 +1,78 @@
+fastdep (0.16-11) unstable; urgency=low
+
+  * Included missing header to make fastdep compile with GCC 4.4 
+    (closes: #505125)
+
+ -- Robert Lemmen <robertle@semistable.com>  Thu, 12 Mar 2009 19:18:37 +0000
+
+fastdep (0.16-10) unstable; urgency=low
+
+  * Included a doc-base registration file (closes: #451643)
+  * Fixed includes for g++ 4.3 (closes: #454848)
+
+ -- Robert Lemmen <robertle@semistable.com>  Mon, 10 Dec 2007 16:07:27 +0100
+
+fastdep (0.16-9) unstable; urgency=low
+
+  * Used the same kludge in FileCache as it is already used in realpath,
+  	should make it work on the hurd
+  * Bumped standards version and made minor tweaks (FSF address)
+
+ -- Robert Lemmen <robertle@semistable.com>  Thu, 26 Oct 2006 16:20:04 +0200
+
+fastdep (0.16-8) unstable; urgency=low
+
+  * Rebuild for the g++ transition
+  * Updated to newer standards version
+
+ -- Robert Lemmen <robertle@semistable.com>  Tue, 19 Jul 2005 10:35:28 +0200
+
+fastdep (0.16-7) unstable; urgency=low
+
+  * smallish fixes for description and manual page (closes: #258017,#259372)
+
+ -- Robert Lemmen <robertle@semistable.com>  Mon, 15 Nov 2004 11:23:23 +0100
+
+fastdep (0.16-6) unstable; urgency=low
+
+  * [jps@debian.org] Sponsored upload
+  * [jps@debian.org] Patch to stop segfault on i386
+  * [jps@debian.org] Fix broken link (book1.htm)
+  
+ -- Robert Lemmen <robertle@semistable.com>  Wed,  9 Jun 2004 23:47:30 +0200
+
+fastdep (0.16-5) unstable; urgency=low
+
+  * trivial fix for a bug that caused fastdep to segfault in some cases
+  * regression test for this bug
+  * no longer uses itself while building if installed
+
+ -- Robert Lemmen <robertle@semistable.com>  Thu, 27 May 2004 18:03:40 +0200
+
+fastdep (0.16-4) unstable; urgency=low
+
+  * fixed debian/rules for a cleaner package build
+  * removed README (just compile info) and added AUTHORS
+  * fixed links in documentation
+
+ -- Robert Lemmen <robertle@semistable.com>  Sun, 16 May 2004 21:06:15 +0200
+
+fastdep (0.16-3) unstable; urgency=low
+
+  * Fixed description
+
+ -- Robert Lemmen <robertle@semistable.com>  Sun, 18 Apr 2004 16:26:18 +0200
+
+fastdep (0.16-2) unstable; urgency=low
+
+  * Fixed copyright file
+  * Cleaned up debian/rules
+
+ -- Robert Lemmen <robertle@semistable.com>  Sun, 18 Apr 2004 15:26:09 +0200
+
+fastdep (0.16-1) unstable; urgency=low
+
+  * Initial Release. (closes: #214408)
+
+ -- Robert Lemmen <robertle@semistable.com>  Sat, 17 Apr 2004 15:56:30 +0200
+

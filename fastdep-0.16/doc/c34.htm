@@ -1,0 +1,177 @@
+<HTML
+><HEAD
+><TITLE
+>Basic usage</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="fastdep manual"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="About fastdep and this manual"
+HREF="c23.htm"><LINK
+REL="NEXT"
+TITLE="Writing a make-rule to generate dependency information"
+HREF="c49.htm"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>fastdep manual</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c23.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c49.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN34"
+>Chapter 2. Basic usage</A
+></H1
+><P
+>The commandline synopsis for basic usage is</P
+><P
+><B
+CLASS="COMMAND"
+>fastdep</B
+>  [--version]  <TT
+CLASS="REPLACEABLE"
+><I
+>sourcefile</I
+></TT
+>... </P
+><P
+><B
+CLASS="COMMAND"
+>fastdep --version</B
+> will show version information
+and a short copyright statement and exit immediatly.</P
+><P
+>To produce dependency information for two files
+	named file1.cc and file2.cc, execute 
+	<B
+CLASS="COMMAND"
+>fastdep file1.cc file2.cc</B
+> from the shell.</P
+><P
+>The result will be written to standard output. For example 
+it could be</P
+><PRE
+CLASS="SCREEN"
+>file1.o: file1.cc \
+	header1.h \
+	header2.h \
+	header3.h
+file2.o: file2.cc \
+	header1.h \
+	header3.h \
+	header4.h</PRE
+><P
+>To save the output, use your shell to redirect standard output 
+	to a file which you can include in a makefile.
+	</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c23.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c49.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>About fastdep and this manual</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Writing a make-rule to generate dependency information</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

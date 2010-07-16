@@ -1,0 +1,24 @@
+# Simple install/uninstall script for projects with one binary only
+# Version 0
+
+include Makefile.options
+
+TARGETDIR=$(PREFIX)/$(CATEGORY)/$(NAME)
+
+check-install:
+	make -f Makefile.install -n install
+
+install:
+	install -D $(BINARY) $(TARGETDIR)/bin/$(BINARY)
+	install -D Makefile.install $(TARGETDIR)/Makefile.install
+	install -D Makefile.options $(TARGETDIR)/Makefile.options
+
+check-uninstall:
+	make -f Makefile.install -n uninstall
+
+uninstall:
+	-rm $(TARGETDIR)/bin/$(BINARY)
+	-rm $(TARGETDIR)/Makefile.install
+	-rm $(TARGETDIR)/Makefile.options	
+	-rm -r $(TARGETDIR)/bin
+	-rm -r $(TARGETDIR)

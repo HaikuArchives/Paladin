@@ -1,0 +1,4 @@
+PREFIX=/opt
+CATEGORY=devel/c
+NAME=fastdep
+BINARY=fastdep

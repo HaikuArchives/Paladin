@@ -1,0 +1,4 @@
+#!/bin/sh
+cd bar
+../../fastdep -I .. ../foo.cpp
+cd ..

@@ -1,0 +1,65 @@
+# Jamfile
+#
+# Builds fastdep with VC++ and GCC using 'jam'
+#
+# Why use Make if there is free Jam at www.perforce.com?
+#
+
+if $(NT) && $(MSVCNT)
+{
+	FASTDEP_BINDIR ?= f:$(SLASH)bin_dos ;
+
+	SubDirC++Flags 
+			-GX 
+			-D "WIN32" 
+			-D "VC_GETOPT" 	# external/getopt1.c
+			-I external 
+			-TP				# let the *.cc be C++
+			;
+
+	EXTSRC = 				#extra sources
+		external\\getopt.c 
+		external\\getopt1.c
+		realpath.cc
+		;
+}
+
+else # Linux, Unix, Windows GCC (Mingw, Cygwin)
+{
+	
+	if $(MINGW)
+	{
+		EXTSRC = realpath.cc ;
+	}
+	else
+	{
+		FASTDEP_BINDIR ?= $(SLASH)usr$(SLASH)local$(SLASH)bin  ;
+	}
+	C++ 	= g++ ;
+	LINK 	= g++ ;
+
+	SubDirC++Flags -Wall -O2 -g ;
+}
+
+# Target to build: fastdep
+#
+Main fastdep :
+	$(EXTSRC)
+	CheckVersion.cc
+	CompileState.cc
+	Define.cc
+	Element.cc
+	Expression.cc
+	FileCache.cc
+	FileStructure.cc
+	If.cc
+	Include.cc
+	MappedFile.cc
+	Sequence.cc
+	fastdep.cc
+	;
+
+InstallBin "$(FASTDEP_BINDIR)" : fastdep ;
+
+# vim:ts=4:nu
+

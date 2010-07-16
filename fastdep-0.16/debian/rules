@@ -1,0 +1,72 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+CFLAGS=-g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+
+config/config.me: configure
+	dh_testdir
+	./configure --debian --without-fastdep
+
+
+build: build-stamp
+
+build-stamp:  config/config.me
+	dh_testdir
+	CFLAGS="$(CFLAGS)" $(MAKE)
+	cd tests && ./run.sh
+	# regression test, replace with a full test suite
+	./fastdep ./Define.cc ./FileCache.cc > /dev/null
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp 
+	[ ! -f Makefile ] || $(MAKE) clean
+	rm -f config/a.out
+	rm -f tests/last/*.out
+	dh_clean  --exclude ./FileCache.cc.orig --exclude ./FileCache.h.orig --exclude ./Include.cc.orig --exclude ./fastdep.cc.orig
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep  --exclude ./FileCache.cc.orig --exclude ./FileCache.h.orig --exclude ./Include.cc.orig --exclude ./fastdep.cc.orig
+	dh_installdirs
+	dh_install fastdep /usr/bin/
+
+
+# Build architecture-independent files here.
+binary-indep: build install
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs CHANGELOG
+	dh_installdocs
+	# custom doc installation
+	dh_install doc/c*.htm /usr/share/doc/fastdep/manual/
+	dh_install doc/fastdep.html /usr/share/doc/fastdep/manual/
+	dh_install doc/fastdep.pdf /usr/share/doc/fastdep/
+	dh_link /usr/share/doc/fastdep/manual/fastdep.html /usr/share/doc/fastdep/manual/book1.htm
+	dh_installman doc/fastdep.1
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install 

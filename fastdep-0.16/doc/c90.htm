@@ -1,0 +1,185 @@
+<HTML
+><HEAD
+><TITLE
+>Adding an external dependency</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="fastdep manual"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="Automatically regenerating dependency information"
+HREF="c63.htm"><LINK
+REL="NEXT"
+TITLE="Links and references"
+HREF="c100.htm"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>fastdep manual</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c63.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c100.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN90"
+>Chapter 5. Adding an external dependency</A
+></H1
+><P
+>Suppose you change your Makefile. For example you add -O2 to the CFLAGS
+variable, because finally it's release time. Of course all object files
+have to be regenerated. The classical way to do that is</P
+><PRE
+CLASS="SCREEN"
+>make clean
+make</PRE
+><P
+>But isn't it easier to let all .o files depend on the Makefile itself? 
+	So that once you touch the makefile, all objects are immediatly out of
+	date and thus regenerated.
+	That's what the --extraremakedep= option is for.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN95"
+></A
+><P
+><B
+>Example 5-1. Adding an extra dependency to all targets</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>.depend:
+	fastdep --extraremakedep=Makefile \
+			  --remakedeptarget=.depend $(SOURCES) &#62; .depend
+
+-include .depend</PRE
+></DIV
+><P
+>Here is a possible result</P
+><PRE
+CLASS="SCREEN"
+>file1.o: file1.cc \
+	header1.h \
+	header2.h \
+	header3.h
+file2.o: file2.cc \
+	header1.h \
+	header3.h \
+	header4.h \
+.depend: \
+	file1.cc \
+	header1.h \
+	header2.h \
+	header3.h \
+	file2.cc \
+	header4.h \
+	Makefile</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c63.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c100.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Automatically regenerating dependency information</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Links and references</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

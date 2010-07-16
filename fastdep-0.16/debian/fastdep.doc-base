@@ -1,0 +1,13 @@
+Document: fastdep
+Title: Fastdep Manual
+Author: Bart Vanhauwaert
+Abstract: This manual describes fastdep, what it does and how you can
+ include it in your build system.
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/fastdep/manual/fastdep.html
+Files: /usr/share/doc/fastdep/manual/*.html
+
+Format: PDF
+Files: /usr/share/doc/fastdep/fastdep.pdf.gz

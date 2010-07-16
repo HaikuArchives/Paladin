@@ -1,0 +1,4 @@
+asterix_comment.o: asterix_comment.cc \
+	a.h \
+	c.h \
+	d.h

@@ -1,0 +1,8 @@
+syntax: glob
+(Objects.*
+*.dbg
+*.a
+Paladin/PalEdit
+Paladin/Paladin
+Paladin/Paladin.new
+PalEdit/generated

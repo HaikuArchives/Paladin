@@ -2,19 +2,29 @@
 
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <map>
 #include <Path.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+#include <vector>
 
 #include "DNode.h"
+#include "Globals.h"
 #include "Project.h"
 #include "SourceFile.h"
 #include "TextFile.h"
+
+using namespace std;
 
 //#define ATTR_MODTIME "Paladin:modtime"
 #define ATTR_MODULE "Paladin:modname"
 
 static BString sCodeLibraryPath;
+
+typedef vector<SourceFile*> SourceFileVector;
+typedef map<BString,SourceFileVector> ModuleMap;
+
 
 BString
 GetCodeLibraryPath(void)
@@ -810,6 +820,7 @@ CodeLib::PrintToStream(void)
 void
 SyncProjectModules(CodeLib &lib, Project *project)
 {
+#if 0
 	/*
 		To synchronize a module, these conditions must be handled:
 		1) File added to library side, missing on project side
@@ -821,8 +832,25 @@ SyncProjectModules(CodeLib &lib, Project *project)
 	*/
 	if (!project)
 		return;
+	/*
+		Sync Process:
+		
+		1) Scan for modules and save the item for each module file into a map of vectors.
+		2) Run the rsync on a module as --list-only and parse the output to find out what files are updated.
+		2b) If any of the changed files are new, add them to the project -- need to be able to specify a group
+		2c) Run the rsync for real --> rsync -rX <user>/config/share/Paladin/CodeLibrary/<modulename>  <projectfolder>/ModuleFiles
+		2d) Iterate through the module vector and see if any files disappeared. If they did, remove them from the project
+	*/
 	
 	project->Lock();
+	
+	DPath modulesPath = project->GetPath();
+	modulesPath << "ProjectModules";
+	
+	// Step 1: Scan for modules in the project and save them into a map which
+	// contains vectors for each of the source files.
+	ModuleMap modmap;
+	
 	for (int32 i = 0; i < project->CountGroups(); i++)
 	{
 		SourceGroup *group = project->GroupAt(i);
@@ -833,13 +861,35 @@ SyncProjectModules(CodeLib &lib, Project *project)
 			
 			if (mod)
 			{
-				bool updated = false;
-				mod->SyncWithFile(file->GetPath().GetFullPath(),&updated);
-				if (updated)
-					project->MakeFileDirty(file);
+				if (modmap.find(mod->GetName()) == modmap.end())
+					modmap.insert(pair<BString,SourceFileVector>(mod->GetName(),SourceFileVector()));
+				modmap[mod->GetName()].push_back(file);
 			}
 		}
 	}
+	
+	// Step 2: Run the rsync on a module as --list-only and parse the output to find
+	// out what files are updated.
+	ModuleMap::iterator mapIndex;
+	for (mapIndex = modmap.begin(); mapIndex != modmap.end(); mapIndex++)
+	{
+		BString command, out;
+		
+		DPath syncPath(modulesPath);
+		syncPath << mapIndex->first;
+		
+		DPath sysmodsPath(GetCodeLibraryPath());
+		sysmodsPath << mapIndex->first;
+		
+		command = "rsync -avz --delete-during --list-only '";
+		command << syncPath.GetFullPath() << "' '" << sysmodsPath.GetFullPath() << "'";
+		RunPipedCommand(command.String(), out, false);
+		
+		printf("%s\n", out.String());
+	}
+	
+	
 	project->Unlock();
+#endif
 }
 

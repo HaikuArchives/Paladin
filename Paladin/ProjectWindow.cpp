@@ -1224,7 +1224,7 @@ ProjectWindow::SetupMenus(void)
 	fMenuBar->AddItem(fBuildMenu);
 	
 	fToolsMenu = new BMenu(TR("Tools"));
-	fToolsMenu->AddItem(new BMenuItem(TR("Code Library…"),new BMessage(M_SHOW_CODE_LIBRARY),'L'));
+	//fToolsMenu->AddItem(new BMenuItem(TR("Code Library…"),new BMessage(M_SHOW_CODE_LIBRARY),'L'));
 	fToolsMenu->AddItem(new BMenuItem(TR("Error Window…"),new BMessage(M_TOGGLE_ERROR_WINDOW),'I'));
 	fToolsMenu->AddItem(new BMenuItem(TR("ASCII Table…"),new BMessage(M_SHOW_ASCII_TABLE)));
 	fToolsMenu->AddItem(new BMenuItem(TR("Regular Expression Tester…"),new BMessage(M_SHOW_VREGEX)));
@@ -1716,6 +1716,7 @@ ProjectWindow::BackupThread(void *data)
 int32
 ProjectWindow::SyncThread(void *data)
 {
+	/*
 	ProjectWindow *parent = (ProjectWindow*)data;
 	
 	parent->Lock();
@@ -1730,6 +1731,7 @@ ProjectWindow::SyncThread(void *data)
 	parent->SetMenuLock(false);
 	parent->Unlock();
 	
+	*/
 	return 0;
 }
 

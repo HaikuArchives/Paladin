@@ -88,6 +88,15 @@ public:
 };
 
 
+class OSDrawerImporter : public SCMProjectImporter
+{
+public:
+							OSDrawerImporter(void);
+			BString			GetImportCommand(bool readOnly);
+			bool			SupportsSCM(const scm_t &scm) const;
+};
+
+
 class BitbucketImporter : public SCMProjectImporter
 {
 public:

@@ -6,6 +6,7 @@ SCMProjectImporterManager::SCMProjectImporterManager(void)
 {
 	fImporterList.AddItem(new SourceforgeImporter());
 	fImporterList.AddItem(new BerliosImporter());
+	fImporterList.AddItem(new OSDrawerImporter());
 	fImporterList.AddItem(new BitbucketImporter());
 	fImporterList.AddItem(new GitoriousImporter());
 }
@@ -202,7 +203,7 @@ SCMProjectImporter::GetSCMCommand(void)
 	return out;
 }
 
-#pragma mark -
+#pragma mark - Importers
 
 SourceforgeImporter::SourceforgeImporter(void)
 {
@@ -376,6 +377,51 @@ BerliosImporter::SupportsSCM(const scm_t &scm) const
 		default:
 			return false;
 	}
+}
+
+
+OSDrawerImporter::OSDrawerImporter(void)
+{
+	SetName("OSDrawer");
+}
+
+
+BString
+OSDrawerImporter::GetImportCommand(bool readOnly)
+{
+	BString command;
+	
+	switch (GetSCM())
+	{
+		case SCM_SVN:
+		{
+			// Read-only: http://svn.osdrawer.net/PROJNAME
+			// developer: --username USERNAME http://svn.osdrawer.net/PROJNAME
+			
+			command = "svn co";
+			if (!readOnly)
+				command << "--username " << GetUserName();
+				
+			command << "http://svn.osdrawer.net/" << GetProjectName();
+
+			if (GetPath() && strlen(GetPath()))
+				command << " '" << GetPath() << "'";
+			break;
+		}
+		default:
+		{
+			// Do nothing
+			break;
+		}
+	}
+	return command;
+}
+
+
+bool
+OSDrawerImporter::SupportsSCM(const scm_t &scm) const
+{
+	return (scm == SCM_SVN);
 }
 
 

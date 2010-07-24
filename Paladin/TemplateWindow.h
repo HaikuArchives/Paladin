@@ -29,6 +29,7 @@ private:
 		
 		BButton			*fOK;
 		TemplateManager	fTempList;
+		BMenuField		*fSCMChooser;
 };
 
 #endif

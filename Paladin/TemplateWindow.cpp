@@ -49,6 +49,8 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	BRect r(Bounds());
 	BRect bounds(r);
 	
+	float divider = be_plain_font->StringWidth(TR("Source Control:")) + 5.0;
+	
 	BMenu *menu = new BMenu("Project Type");
 	for (int32 i = 0; i < fTempList.CountTemplates(); i++)
 	{
@@ -80,7 +82,7 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fNameBox->ResizeToPreferred();
 	r.bottom = r.top + fNameBox->Bounds().Height();
 	fNameBox->ResizeTo(bounds.Width() - 20.0,r.Height());
-	fNameBox->SetDivider(be_plain_font->StringWidth(TR("Project Name:")) + 5.0);
+	fNameBox->SetDivider(divider);
 	
 	r.OffsetBy(0,r.IntegerHeight() + 10);
 	fTargetBox = new AutoTextControl(r,"targetbox",TR("Target Name:"),"BeApp",
@@ -90,7 +92,7 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fTargetBox->ResizeToPreferred();
 	r.bottom = r.top + fTargetBox->Bounds().Height();
 	fTargetBox->ResizeTo(bounds.Width() - 20.0,r.Height());
-	fTargetBox->SetDivider(be_plain_font->StringWidth(TR("Target Name:")) + 5.0);
+	fTargetBox->SetDivider(divider);
 	
 	if (!BEntry(PROJECT_PATH).Exists())
 		create_directory(PROJECT_PATH,0777);
@@ -102,11 +104,29 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fPathBox->ResizeToPreferred();
 	r.bottom = r.top + fPathBox->Bounds().Height();
 	fPathBox->ResizeTo(bounds.Width() - 20.0,r.Height());
-	fPathBox->SetDivider(be_plain_font->StringWidth(TR("Target Name:")) + 5.0);
+	fPathBox->SetDivider(divider);
+	
+	menu = new BMenu("SCM Chooser");
+	menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
+	menu->AddItem(new BMenuItem("Git", new BMessage()));
+	menu->AddItem(new BMenuItem("Subversion", new BMessage()));
+	menu->AddItem(new BMenuItem("None", new BMessage()));
+	
+	r.OffsetBy(0,r.Height() + 5.0);
+	fSCMChooser = new BMenuField(r, "scmchooser", "Source Control: ", menu);
+	top->AddChild(fSCMChooser);
+	fSCMChooser->SetDivider(divider);
+	
+	menu->SetLabelFromMarked(true);
+	BMenuItem *marked = menu->ItemAt(gDefaultSCM);
+	if (marked)
+		marked->SetMarked(true);
+	else
+		menu->ItemAt(menu->CountItems() - 1)->SetMarked(true);
 	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fCreateFolder = new BCheckBox(r,"createfolder",TR("Create Project Folder"),NULL);
-	fCreateFolder->MoveTo(fPathBox->Divider() + 10.0, r.top);
+	fCreateFolder->MoveTo(divider + 10.0, r.top);
 	fCreateFolder->SetValue(B_CONTROL_ON);
 	top->AddChild(fCreateFolder);
 	
@@ -183,8 +203,10 @@ TemplateWindow::MessageReceived(BMessage *msg)
 			projmsg.AddInt32("type",ptemp->TargetType());
 			projmsg.AddString("path",fPathBox->Path());
 			
-			// TODO: This will later one be an option
-			projmsg.AddInt32("scmtype",SCM_HG);
+			
+			BMenu *scmMenu = fSCMChooser->Menu();
+			int32 scm = scmMenu->IndexOf(scmMenu->FindMarked());
+			projmsg.AddInt32("scmtype",scm);
 			
 			for (int32 i = 0; i < ptemp->CountFiles(); i++)
 				projmsg.AddRef("refs",ptemp->FileAt(i));

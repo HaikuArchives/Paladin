@@ -2,13 +2,8 @@ TODO:
 	Bug: Running the project after opening and closing the Project Settings window crashes the app -- project locked at the beginning of the build
 	Exercise and test the SourceControl code for SVN, HG, and Git
 	Add code to really help clean up the includes in a project -- no duplicates and project relative paths
-	Code Library cleanup:
-		1) Scan for modules and save the item for each module file into a map of vectors.
-		2) Run the rsync on a module as --list-only and parse the output to find out what files are updated.
-		2b) If any of the changed files are new, add them to the project -- need to be able to specify a group
-		2c) Run the rsync for real --> rsync -rX <user>/config/share/Paladin/CodeLibrary/<modulename>  <projectfolder>/ModuleFiles
-		2d) Iterate through the module vector and see if any files disappeared. If they did, remove them from the project
 	Add source control to imported projects
+	Add a Start window checkbox to allow the user to use/not use source control.
 
 Locale Kit notes:
 

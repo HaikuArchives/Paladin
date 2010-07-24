@@ -2,17 +2,11 @@
 #define SCM_PROJECT_IMPORTER_H
 
 #include <String.h>
+
 #include "ObjectList.h"
+#include "Project.h"
 
 class SCMProjectImporter;
-
-typedef enum
-{
-	SCM_HG = 0,
-	SCM_GIT,
-	SCM_SVN,
-	SCM_NONE
-} scm_t;
 
 class SCMProjectImporterManager
 {
@@ -33,7 +27,7 @@ class SCMProjectImporter
 {
 public:
 							SCMProjectImporter(void);
-							~SCMProjectImporter(void);
+			virtual			~SCMProjectImporter(void);
 			
 			const char *	GetName(void);
 	
@@ -52,10 +46,12 @@ public:
 			void			SetSCM(const scm_t &scm);
 			scm_t			GetSCM(void) const;
 			
+	virtual	bool			SupportsSCM(const scm_t &scm) const;
+			
 			void			SetPath(const char *path);
 			const char *	GetPath(void);
 	
-	virtual	BString			GetImportCommand(void);
+	virtual	BString			GetImportCommand(bool readOnly);
 
 protected:
 			void			SetName(const char *name);
@@ -78,7 +74,36 @@ class SourceforgeImporter : public SCMProjectImporter
 {
 public:
 							SourceforgeImporter(void);
-			BString			GetImportCommand(void);
+			BString			GetImportCommand(bool readOnly);
+			bool			SupportsSCM(const scm_t &scm) const;
 };
+
+
+class BerliosImporter : public SCMProjectImporter
+{
+public:
+							BerliosImporter(void);
+			BString			GetImportCommand(bool readOnly);
+			bool			SupportsSCM(const scm_t &scm) const;
+};
+
+
+class BitbucketImporter : public SCMProjectImporter
+{
+public:
+							BitbucketImporter(void);
+			BString			GetImportCommand(bool readOnly);
+			bool			SupportsSCM(const scm_t &scm) const;
+};
+
+
+class GitoriousImporter : public SCMProjectImporter
+{
+public:
+							GitoriousImporter(void);
+			BString			GetImportCommand(bool readOnly);
+			bool			SupportsSCM(const scm_t &scm) const;
+};
+
 
 #endif

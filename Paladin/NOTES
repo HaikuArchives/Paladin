@@ -3,7 +3,6 @@ TODO:
 	Exercise and test the SourceControl code for SVN, HG, and Git
 	Add code to really help clean up the includes in a project -- no duplicates and project relative paths
 	Add source control to imported projects
-	Add a Start window checkbox to allow the user to use/not use source control.
 
 Locale Kit notes:
 
@@ -21,7 +20,6 @@ Features to implement / consider:
 	Tooltip for errors / warnings in the error window
 	Add SymbolLocator to Tools menu
 	Finish getting Haiku localization to work
-	Import project from repository
 	Improve library window to handle such a large set of libraries in Haiku
 	Add keyboard acceleration to library window
 	Project-wide find-and-replace -- create Find in Project (Cmd+Shift+F)

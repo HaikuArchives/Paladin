@@ -117,11 +117,23 @@ StartWindow::StartWindow(void)
 	SetToolTip(fQuickImportButton,
 				TR("Quickly make a project by importing all source files and resource files."));
 
+	fOnlineImportButton = MakeButton("onlineimport","OnlineImportButtonUp.png",
+									"OnlineImportButtonDown.png",M_SHOW_IMPORT);
+	top->AddChild(fOnlineImportButton);
+	fOnlineImportButton->MoveTo(10,fQuickImportButton->Frame().bottom + 10.0);
+	
+	label = MakeLabel(fOnlineImportButton,"Import a project from online");
+	top->AddChild(label);
+	label->SetMessage(new BMessage(M_SHOW_IMPORT));
+	SetToolTip(label,TR("Import a project from an online repository"));
+	SetToolTip(fQuickImportButton,
+				TR("Import a project from an online repository"));
+
 	
 	fQuitButton = MakeButton("quit","QuitButtonUp.png","QuitButtonDown.png",
 							B_QUIT_REQUESTED);
 	top->AddChild(fQuitButton);
-	fQuitButton->MoveTo(10,fQuickImportButton->Frame().bottom + 10.0);
+	fQuitButton->MoveTo(10,fOnlineImportButton->Frame().bottom + 10.0);
 	
 	label = MakeLabel(fQuitButton,TR("Quit Paladin"));
 	top->AddChild(label);

@@ -29,6 +29,7 @@ private:
 						*fOpenButton,
 						*fOpenRecentButton,
 						*fQuickImportButton,
+						*fOnlineImportButton,
 						*fQuitButton;
 		
 		BListView		*fListView;

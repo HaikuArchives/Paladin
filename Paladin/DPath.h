@@ -32,6 +32,7 @@ public:
 			const char *	GetFileName(void) const;
 			const char *	GetBaseName(void) const;
 			const char *	GetExtension(void) const;
+			entry_ref		GetRef(void) const;
 			
 			DPath &			operator <<(const char *string);
 			DPath &			operator <<(const BString &string);

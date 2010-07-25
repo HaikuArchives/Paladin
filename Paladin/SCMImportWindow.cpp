@@ -4,6 +4,11 @@
 #include <String.h>
 
 #include "Globals.h"
+#include "GitSourceControl.h"
+#include "HgSourceControl.h"
+#include "SCMOutputWindow.h"
+#include "SourceControl.h"
+#include "SVNSourceControl.h"
 
 enum
 {
@@ -15,7 +20,7 @@ enum
 };
 
 SCMImportWindow::SCMImportWindow(void)
-  :	DWindow(BRect(0,0,300,300), "Import from Repository")
+  :	DWindow(BRect(0,0,350,300), "Import from Repository")
 {
 	MakeCenteredOnShow(true);
 	
@@ -53,13 +58,13 @@ SCMImportWindow::SCMImportWindow(void)
 	
 	menu = new BMenu("Methods");
 	if (gHgAvailable)
-		menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
+		menu->AddItem(new BMenuItem("Mercurial", new BMessage(M_UPDATE_COMMAND)));
 	
 	if (gGitAvailable)
-		menu->AddItem(new BMenuItem("Git", new BMessage()));
+		menu->AddItem(new BMenuItem("Git", new BMessage(M_UPDATE_COMMAND)));
 	
 	if (gSvnAvailable)
-		menu->AddItem(new BMenuItem("Subversion", new BMessage()));
+		menu->AddItem(new BMenuItem("Subversion", new BMessage(M_UPDATE_COMMAND)));
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(0L)->SetMarked(true);
 	fProvider = fProviderMgr.ImporterAt(0);
@@ -83,6 +88,7 @@ SCMImportWindow::SCMImportWindow(void)
 									new BMessage(M_TOGGLE_ANONYMOUS));
 	top->AddChild(fAnonymousBox);
 	fAnonymousBox->ResizeToPreferred();
+	fAnonymousBox->SetValue(B_CONTROL_ON);
 	
 	r.OffsetBy(0.0, fAnonymousBox->Bounds().Height() + 10.0);
 	fUserNameBox = new AutoTextControl(r, "username", "Username: ", "",
@@ -107,7 +113,7 @@ SCMImportWindow::SCMImportWindow(void)
 	top->AddChild(fCommandLabel);
 	
 	r.OffsetBy(0.0, fCommandLabel->Bounds().Height() + 5.0);
-	r.bottom = r.top + 50.0;
+	r.bottom = r.top + 75.0;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	BRect textRect = r.OffsetToCopy(0.0, 0.0).InsetByCopy(10.0, 10.0);
 	fCommandView = new BTextView(r, "command", textRect, B_FOLLOW_ALL);
@@ -129,8 +135,10 @@ SCMImportWindow::SCMImportWindow(void)
 	
 	top->AddChild(fOK);
 	fOK->MakeDefault(true);
+	fOK->SetEnabled(false);
 	
 	UpdateCommand();
+	fProviderField->MakeFocus(true);
 }
 
 
@@ -161,6 +169,11 @@ SCMImportWindow::MessageReceived(BMessage *msg)
 		case M_UPDATE_COMMAND:
 		{
 			UpdateCommand();
+			break;
+		}
+		case M_SCM_IMPORT:
+		{
+			
 			break;
 		}
 		default:
@@ -238,12 +251,102 @@ SCMImportWindow::SetProvider(SCMProjectImporter *importer)
 			}
 		}
 	}
+	UpdateCommand();
 }
 
 
 void
 SCMImportWindow::UpdateCommand(void)
 {
+	if (!fProjectBox->Text() || strlen(fProjectBox->Text()) < 1)
+	{
+		if (fOK->IsEnabled())
+			fOK->SetEnabled(false);
+		
+		fCommandView->SetText("");
+		return;
+	}
+	else
+		if (!fOK->IsEnabled())
+			fOK->SetEnabled(true);
+	
+	fProvider->SetProjectName(fProjectBox->Text());
+	fProvider->SetUserName(fUserNameBox->Text());
+	fProvider->SetRepository(fRepository->Text());
+	
+	BMenuItem *item = fSCMField->Menu()->FindMarked();
+	
+	if (!item)
+	{
+		printf("No SCM found in SCMImportWindow::UpdateCommand()\n");
+		return;
+	}
+	
+	BString command;
+	scm_t scm = SCM_NONE;
+	if (strcmp("Mercurial", item->Label()) == 0)
+	{
+		scm = SCM_HG;
+		command = "hg ";
+	}
+	else if (strcmp("Git", item->Label()) == 0)
+	{
+		scm = SCM_GIT;
+		command = "git ";
+	}
+	else if (strcmp("Subversion", item->Label()) == 0)
+	{
+		scm = SCM_SVN;
+		command = "svn ";
+	}
+	else
+	{
+		printf("Invalid SCM in SCMImportWindow::UpdateCommand()\n");
+		return;
+	}
+	fProvider->SetSCM(scm);
+	
+	
+	command << fProvider->GetImportCommand(fAnonymousBox->Value() == B_CONTROL_OFF);
+	command << " '" << gProjectPath.GetFullPath() << "' ";
+	fCommandView->SetText(command.String());
+}
+
+
+void
+SCMImportWindow::DoImport(void)
+{
+	SourceControl *scm = NULL;
+	switch (fProvider->GetSCM())
+	{
+		case SCM_HG:
+		{
+			scm = new HgSourceControl(gProjectPath.GetRef());
+			break;
+		}
+		case SCM_GIT:
+		{
+			scm = new GitSourceControl(gProjectPath.GetRef());
+			break;
+		}
+		case SCM_SVN:
+		{
+			scm = new SVNSourceControl(gProjectPath.GetRef());
+			break;
+		}
+		default:
+		{
+			return;
+		}
+	}
+	
+	scm->SetUpdateCallback(SCMOutputCallback);
+	
+	SCMOutputWindow *win = new SCMOutputWindow("Import from Online");
+	win->Show();
+	
+	scm->RunCustomCommand(fProvider->GetImportCommand(
+						fAnonymousBox->Value() == B_CONTROL_OFF).String());
 	
 }
 

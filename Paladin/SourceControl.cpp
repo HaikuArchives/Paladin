@@ -226,6 +226,16 @@ SourceControl::GetUpdateCallback(void) const
 
 
 void
+SourceControl::RunCustomCommand(const char *command)
+{
+	BString cmd;
+	cmd << GetShortName() << " " << command;
+	BString out;
+	RunCommand(cmd, out);
+}
+
+
+void
 SourceControl::SetShortName(const char *name)
 {
 	fShortName = name;

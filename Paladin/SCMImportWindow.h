@@ -26,6 +26,7 @@ public:
 private:
 			void		SetProvider(SCMProjectImporter *importer);
 			void		UpdateCommand(void);
+			void		DoImport(void);
 			
 	BMenuField		*fProviderField;
 	BMenuField		*fSCMField;

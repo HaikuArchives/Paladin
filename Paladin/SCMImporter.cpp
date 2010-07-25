@@ -223,14 +223,17 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 			// Read-only:	http://PROJNAME.hg.sourceforge.net:8000/hgroot/PROJNAME/PROJNAME
 			// Developer:  ssh://USERNAME@PROJNAME.hg.sourceforge.net/hgroot/PROJNAME/PROJNAME
 			if (!readOnly)
-				command << "hg clone ssh://" << GetUserName() << "@"
+				command << "clone ssh://" << GetUserName() << "@"
 						<< GetProjectName()
 						<< ".hg.sourceforge.net/hgroot/" << GetProjectName()
 						<< "/" << GetProjectName();
 			else
-				command << "hg clone http://" << GetProjectName()
+				command << "clone http://" << GetProjectName()
 						<< ".hg.sourceforge.net:8000/hgroot/" << GetProjectName()
 						<< "/" << GetProjectName();
+			
+			if (GetRepository() && strlen(GetRepository()) > 0)
+				command << "/" << GetRepository();
 			
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";
@@ -241,11 +244,11 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 			// Read-only: git://PROJNAME.git.sourceforge.net/gitroot/PROJNAME/REPONAME
 			// Developer: ssh://USERNAME@PROJNAME.git.sourceforge.net/gitroot/PROJNAME/REPONAME
 			if (!readOnly)
-				command << "git clone ssh://" << GetUserName() << "@"
+				command << "clone ssh://" << GetUserName() << "@"
 						<< GetProjectName() << ".git.sourceforge.net/gitroot/"
 						<< GetProjectName();
 			else
-				command << "git clone git://" << GetProjectName()
+				command << "clone git://" << GetProjectName()
 						<< ".git.sourceforge.net/gitroot/"
 						<< GetProjectName();
 				
@@ -260,10 +263,13 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 		{
 			// Read-only / developer:
 			// svn co https://PROJNAME.svn.sourceforge.net/svnroot/PROJNAME FOLDERNAME
-			command << "svn co https://" << GetProjectName()
+			command << "co https://" << GetProjectName()
 					<< ".svn.sourceforge.net/svnroot/" << GetProjectName()
 					<< "/" << GetProjectName();
 
+			if (GetRepository() && strlen(GetRepository()) > 0)
+				command << "/" << GetRepository();
+			
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";
 			break;
@@ -312,10 +318,10 @@ BerliosImporter::GetImportCommand(bool readOnly)
 			// Read-only: http://hg.berlios.de/repos/PROJNAME FOLDERNAME
 			// Developer: https://USERNAME@hg.berlios.de/repos/PROJNAME FOLDERNAME
 			if (!readOnly)
-				command << "hg clone https://" << GetUserName() << "@"
+				command << "clone https://" << GetUserName() << "@"
 						<< "hg.berlios.de/repos/" << GetProjectName();
 			else
-				command << "hg clone http://hg.berlios.de/repos/" << GetProjectName();
+				command << "clone http://hg.berlios.de/repos/" << GetProjectName();
 			
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";
@@ -326,10 +332,10 @@ BerliosImporter::GetImportCommand(bool readOnly)
 			// Read-only: git://git.berlios.de/PROJNAME
 			// Developer: ssh://USERNAME@git.berlios.de/gitroot/PROJNAME
 			if (!readOnly)
-				command << "git clone ssh://" << GetUserName() 
+				command << "clone ssh://" << GetUserName() 
 						<< "@git.berlios.de/" << GetProjectName();
 			else
-				command << "git clone git://git.berlios.de/" << GetProjectName();
+				command << "clone git://git.berlios.de/" << GetProjectName();
 				
 			if (GetRepository() && strlen(GetRepository()))
 				command << "/" << GetRepository();
@@ -343,11 +349,11 @@ BerliosImporter::GetImportCommand(bool readOnly)
 			// Read-only: svn://svn.berlios.de/PROJNAME/REPONAME
 			// developer: svn+ssh://USERNAME@svn.berlios.de/svnroot/repos/PROJNAME/REPONAME
 			if (!readOnly)
-				command << "svn co svn+ssh://" << GetUserName()
+				command << "co svn+ssh://" << GetUserName()
 						<< "@svn.berlios.de/svnroot/repos/" << GetProjectName()
 						<< "/" << GetRepository();
 			else
-				command << "svn co svn://svn.berlios.de/" << GetProjectName()
+				command << "co svn://svn.berlios.de/" << GetProjectName()
 						<< "/" << GetRepository();
 			
 			if (GetPath() && strlen(GetPath()))
@@ -398,7 +404,7 @@ OSDrawerImporter::GetImportCommand(bool readOnly)
 			// Read-only: http://svn.osdrawer.net/PROJNAME
 			// developer: --username USERNAME http://svn.osdrawer.net/PROJNAME
 			
-			command = "svn co";
+			command = "co ";
 			if (!readOnly)
 				command << "--username " << GetUserName();
 				
@@ -443,10 +449,10 @@ BitbucketImporter::GetImportCommand(bool readOnly)
 			// read-only: http://bitbucket.org/USERNAME(projectname)/REPONAME
 			// developer: ssh://hg@bitbucket.org/USERNAME(projectname)/REPONAME
 			if (!readOnly)
-				command << "hg clone ssh://hg@bitbucket.org/" << GetProjectName()
+				command << "clone ssh://hg@bitbucket.org/" << GetProjectName()
 						<< "/" << GetRepository();
 			else
-				command << "hg clone http://bitbucket.org/" << GetProjectName()
+				command << "clone http://bitbucket.org/" << GetProjectName()
 						<< "/" << GetRepository();
 			
 			if (GetPath() && strlen(GetPath()))
@@ -488,10 +494,10 @@ GitoriousImporter::GetImportCommand(bool readOnly)
 			// read-only: http://git.gitorious.org/PROJNAME/REPONAME.git
 			// developer: git://git.gitorious.org/PROJNAME/REPONAME.git
 			if (!readOnly)
-				command << "git clone git://git.gitorious.org/" << GetProjectName()
+				command << "clone git://git.gitorious.org/" << GetProjectName()
 						<< "/" << GetRepository() << ".git";
 			else
-				command << "git clone http://git.gitorious.org/" << GetProjectName()
+				command << "clone http://git.gitorious.org/" << GetProjectName()
 						<< "/" << GetRepository() << ".git";
 			
 			if (GetPath() && strlen(GetPath()))

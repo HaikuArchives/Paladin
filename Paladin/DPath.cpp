@@ -171,6 +171,16 @@ DPath::GetExtension(void) const
 }
 
 
+entry_ref
+DPath::GetRef(void) const
+{
+	entry_ref ref;
+	BEntry entry(fFullPath.String());
+	entry.GetRef(&ref);
+	return ref;
+}
+
+
 DPath &
 DPath::operator <<(const char *string)
 {

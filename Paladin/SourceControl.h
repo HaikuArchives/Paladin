@@ -68,6 +68,8 @@ public:
 			
 			void			SetVerboseMode(bool value);
 			bool			GetVerboseMode(void) const;
+			
+			void			RunCustomCommand(const char *command);
 protected:
 			void			SetShortName(const char *name);
 			void			SetLongName(const char *name);

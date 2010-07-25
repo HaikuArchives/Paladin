@@ -1,5 +1,6 @@
 #include "StartWindow.h"
 
+#include <Alert.h>
 #include <Entry.h>
 #include <MenuItem.h>
 #include <Messenger.h>
@@ -16,6 +17,7 @@
 #include "Paladin.h"
 #include "PLocale.h"
 #include "Project.h"
+#include "SCMImportWindow.h"
 #include "Settings.h"
 #include "TemplateWindow.h"
 #include "TypedRefFilter.h"
@@ -25,6 +27,7 @@ enum
 	M_OPEN_SELECTION = 'opsl',
 	M_REMOVE_FROM_LIST = 'rmls',
 	M_SHOW_IMPORT = 'shim',
+	M_ONLINE_IMPORT = 'olim',
 	M_OPEN_FROM_LIST = 'ofls'
 };
 
@@ -118,13 +121,13 @@ StartWindow::StartWindow(void)
 				TR("Quickly make a project by importing all source files and resource files."));
 
 	fOnlineImportButton = MakeButton("onlineimport","OnlineImportButtonUp.png",
-									"OnlineImportButtonDown.png",M_SHOW_IMPORT);
+									"OnlineImportButtonDown.png",M_ONLINE_IMPORT);
 	top->AddChild(fOnlineImportButton);
 	fOnlineImportButton->MoveTo(10,fQuickImportButton->Frame().bottom + 10.0);
 	
 	label = MakeLabel(fOnlineImportButton,"Import a project from online");
 	top->AddChild(label);
-	label->SetMessage(new BMessage(M_SHOW_IMPORT));
+	label->SetMessage(new BMessage(M_ONLINE_IMPORT));
 	SetToolTip(label,TR("Import a project from an online repository"));
 	SetToolTip(fQuickImportButton,
 				TR("Import a project from an online repository"));
@@ -248,6 +251,23 @@ StartWindow::MessageReceived(BMessage *msg)
 		case M_SHOW_IMPORT:
 		{
 			fImportPanel->Show();
+			break;
+		}
+		case M_ONLINE_IMPORT:
+		{
+			if (!gHgAvailable && !gGitAvailable && !gSvnAvailable)
+			{
+				BAlert *alert = new BAlert("Paladin", "Online import requires Mercurial, "
+													"Git, and/or Subversion to be installed, "
+													"but Paladin can't find them. Sorry.",
+											"OK");
+				alert->Go();
+			}
+			else
+			{
+				SCMImportWindow *win = new SCMImportWindow();
+				win->Show();
+			}
 			break;
 		}
 		case M_OPEN_FROM_LIST:

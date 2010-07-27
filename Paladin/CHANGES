@@ -20,3 +20,4 @@ Automatically remove libsupc++ from Haiku GCC4 projects under other platforms
 Preferences window now reports the unavailability of external tools like fastdep and ccache
 Source control is (optionally) integrated with projects now: Git, SVN, and Hg
 Start window has a keyboard shortcut to choose from the list -- Alt + number
+New vector icon for project files

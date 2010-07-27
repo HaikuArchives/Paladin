@@ -29,6 +29,7 @@ InitFileTypes(void)
 	mime.SetLongDescription(TR("File to build a program with Paladin"));
 	mime.SetIcon(&large_icon, B_LARGE_ICON);
 	mime.SetIcon(&mini_icon, B_MINI_ICON);
+	mime.SetIcon(kProjectVectorIconBits,sizeof(kProjectVectorIconBits));
 	mime.SetPreferredApp(APP_SIGNATURE);
 	mime.Install();
 	

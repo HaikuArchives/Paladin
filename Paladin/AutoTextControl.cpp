@@ -126,6 +126,24 @@ AutoTextControl::GetCharacterLimit(const uint32 &limit)
 
 
 void
+AutoTextControl::AllowCharacters(const char *string)
+{
+	uint32 i = 0;
+	while (string[i])
+		TextView()->AllowChar(string[i++]);
+}
+
+
+void
+AutoTextControl::DisallowCharacters(const char *string)
+{
+	uint32 i = 0;
+	while (string[i])
+		TextView()->DisallowChar(string[i++]);
+}
+
+
+void
 AutoTextControl::SetFilter(AutoTextControlFilter *filter)
 {
 	if (fFilter) {

@@ -49,6 +49,8 @@ public:
 			void	SetCharacterLimit(const uint32 &limit);
 			uint32	GetCharacterLimit(const uint32 &limit);
 	
+			void	AllowCharacters(const char *string);
+			void	DisallowCharacters(const char *string);
 private:
 	friend class AutoTextControlFilter;
 	

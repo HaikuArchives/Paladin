@@ -1,7 +1,6 @@
 TODO:
 	Exercise and test the SourceControl code for SVN, HG, and Git
 	Add code to really help clean up the includes in a project -- no duplicates and project relative paths
-	Add source control to imported projects
 
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window

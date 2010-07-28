@@ -132,19 +132,9 @@ StartWindow::StartWindow(void)
 	SetToolTip(fQuickImportButton,
 				TR("Import a project from an online repository"));
 
-	
-	fQuitButton = MakeButton("quit","QuitButtonUp.png","QuitButtonDown.png",
-							B_QUIT_REQUESTED);
-	top->AddChild(fQuitButton);
-	fQuitButton->MoveTo(10,fOnlineImportButton->Frame().bottom + 10.0);
-	
-	label = MakeLabel(fQuitButton,TR("Quit Paladin"));
-	top->AddChild(label);
-	label->SetMessage(new BMessage(B_QUIT_REQUESTED));
-	
 	SetSizeLimits(scrollView->Frame().left + 110.0,30000,
-				fQuitButton->Frame().bottom + 10.0,30000);
-	ResizeTo(scrollView->Frame().left + 160.0,fQuitButton->Frame().bottom + 10.0);
+				fOnlineImportButton->Frame().bottom + 10.0,30000);
+	ResizeTo(scrollView->Frame().left + 160.0,fOnlineImportButton->Frame().bottom + 10.0);
 	
 	fProjectFilter = new TypedRefFilter(PROJECT_MIME_TYPE);
 	

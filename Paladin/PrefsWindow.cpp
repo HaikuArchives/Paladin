@@ -115,6 +115,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 	buildBox->ResizeTo(buildBox->Bounds().Width(), fFastDep->Frame().bottom + 5.0);
 	
 	r.OffsetTo(10, buildBox->Frame().bottom + 10.0);
+	#ifdef BUILD_CODE_LIBRARY
 	fAutoSyncModules = new BCheckBox(r,"autosync",
 									TR("Automatically Synchronize Modules"),
 									new BMessage,
@@ -124,8 +125,8 @@ PrefsWindow::PrefsWindow(BRect frame)
 		fAutoSyncModules->SetValue(B_CONTROL_ON);
 	SetToolTip(fAutoSyncModules,TR("Automatically synchronize modules in your "
 								"projects with the those in the code library"));
-	
 	r.OffsetBy(0,r.Height() + 5.0);
+	#endif
 	
 	BMenu *menu = new BMenu("SCM Chooser");
 	menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
@@ -186,8 +187,10 @@ PrefsWindow::QuitRequested(void)
 	gUseFastDep = (fFastDep->Value() == B_CONTROL_ON);
 	gSettings.SetBool("fastdep",gUseFastDep);
 	
+	#ifdef BUILD_CODE_LIBRARY
 	gAutoSyncModules = (fAutoSyncModules->Value() == B_CONTROL_ON);
 	gSettings.SetBool("autosyncmodules",gAutoSyncModules);
+	#endif
 	
 	gDefaultSCM = (scm_t)fSCMChooser->Menu()->IndexOf(fSCMChooser->Menu()->FindMarked());
 	gSettings.SetInt32("defaultSCM", gDefaultSCM);

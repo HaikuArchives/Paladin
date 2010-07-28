@@ -29,6 +29,7 @@ typedef map<BString,SourceFileVector> ModuleMap;
 BString
 GetCodeLibraryPath(void)
 {
+	#ifdef BUILD_CODE_LIBRARY
 	if (sCodeLibraryPath.CountChars() < 1)
 	{
 		BPath path;
@@ -41,6 +42,7 @@ GetCodeLibraryPath(void)
 				create_directory(path.Path(),0777);
 		}
 	}
+	#endif
 	
 	return sCodeLibraryPath;
 }
@@ -820,7 +822,7 @@ CodeLib::PrintToStream(void)
 void
 SyncProjectModules(CodeLib &lib, Project *project)
 {
-#if 0
+#ifdef BUILD_CODE_LIBRARY
 	/*
 		To synchronize a module, these conditions must be handled:
 		1) File added to library side, missing on project side

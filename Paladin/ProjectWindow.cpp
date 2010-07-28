@@ -21,7 +21,7 @@
 #include "AltTabFilter.h"
 #include "AppDebug.h"
 #include "AsciiWindow.h"
-#include "CodeLibWindow.h"
+//#include "CodeLibWindow.h"
 #include "DebugTools.h"
 #include "ErrorParser.h"
 #include "ErrorWindow.h"
@@ -464,12 +464,14 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+#ifdef BUILD_CODE_LIBRARY
 		case M_SHOW_CODE_LIBRARY:
 		{
 			CodeLibWindow *libwin = CodeLibWindow::GetInstance(BRect(100,100,500,350));
 			libwin->Show();
 			break;
 		}
+#endif
 		case M_OPEN_PARTNER:
 		{
 			int32 selection = fProjectList->FullListCurrentSelection();

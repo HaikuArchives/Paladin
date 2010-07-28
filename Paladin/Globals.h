@@ -12,6 +12,9 @@
 class DPath;
 class StatCache;
 
+// Define this to enable the code library
+//#define BUILD_CODE_LIBRARY
+
 void		InitGlobals(void);
 entry_ref	MakeProjectFile(DPath folder, const char *name,
 							const char *data = NULL,

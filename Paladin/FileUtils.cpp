@@ -34,6 +34,8 @@ InitFileTypes(void)
 	mime.SetIcon(kProjectVectorIconBits, sizeof(kProjectVectorIconBits));
 	#endif
 	
+	mime.SetSnifferRule("0.50  [0:32]( -i \"NAME=\" | \"TARGETNAME=\" | "
+						"\"PLATFORM=\" | \"GROUP=\" | \"SOURCEFILE=\")");
 	mime.SetPreferredApp(APP_SIGNATURE);
 	mime.Install();
 	

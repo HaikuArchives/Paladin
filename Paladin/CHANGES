@@ -23,3 +23,4 @@ Source control is (optionally) integrated with projects now: Git, SVN, and Hg
 Start window has a keyboard shortcut to choose from the list -- Alt + number
 New vector icon for project files
 Removed the unnecessary quit button from start window
+Added a MIME sniffer rule to the Paladin project type to work around another MIME bug in Haiku

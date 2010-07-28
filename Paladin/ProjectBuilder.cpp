@@ -67,14 +67,21 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 	
 	fProject = proj;
 	fPostBuildAction = postbuild;
-	
+
+// This will work around a bug in Haiku's locking mechanism until such time that I
+// can find and fix it
+#if 0
 	if (fProject->IsLocked())
 	{
-		BString outstr("Project lockeed at beginning of build. Holding thread is ");
+		BString outstr("Project locked at beginning of build. Holding thread is ");
 		outstr << fProject->LockingThread();
 		debugger(outstr.String());
 	}
-	
+#else
+	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
+		fProject->IsLocked() && fProject->LockingThread() == find_thread(NULL))
+		fProject->Unlock();
+#endif
 	// Check for existence of object directory and create it when necessary
 	BEntry entry(proj->GetObjectPath().GetFullPath());
 	if (!entry.Exists())

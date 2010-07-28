@@ -70,6 +70,20 @@ GitSourceControl::CreateRepository(const char *path)
 }
 
 
+bool
+GitSourceControl::DetectRepository(const char *path)
+{
+	BEntry entry(path);
+	if (!entry.Exists())
+		return false;
+	
+	BPath repoPath(path);
+	repoPath.Append(".git");
+	entry.SetTo(repoPath.Path());
+	return entry.Exists();
+}
+
+
 // untested
 status_t
 GitSourceControl::CloneRepository(const char *url, const char *dest)

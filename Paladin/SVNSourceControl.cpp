@@ -64,6 +64,20 @@ SVNSourceControl::CreateRepository(const char *path)
 }
 
 
+bool
+SVNSourceControl::DetectRepository(const char *path)
+{
+	BEntry entry(path);
+	if (!entry.Exists())
+		return false;
+	
+	BPath repoPath(path);
+	repoPath.Append(".svn");
+	entry.SetTo(repoPath.Path());
+	return entry.Exists();
+}
+
+
 status_t
 SVNSourceControl::CloneRepository(const char *url, const char *dest)
 {

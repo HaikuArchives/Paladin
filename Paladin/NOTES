@@ -1,25 +1,12 @@
 TODO:
-	Bug: Running the project after opening and closing the Project Settings window crashes the app -- project locked at the beginning of the build
 	Exercise and test the SourceControl code for SVN, HG, and Git
 	Add code to really help clean up the includes in a project -- no duplicates and project relative paths
 	Add source control to imported projects
 
-Locale Kit notes:
-
-Create text file for translators:
----------------------------------------------------
-cpp *.cpp > preprocessed.cpp.tmp
-collectcatkeys preprocessed.cpp.tmp -l english -o english.catkeys
-rm preprocessed.cpp.tmp
-
-Convert catalog to binary format for packaging and distribution
------------------------------------------------------------------------------------------------------
-linkcatkeys english.catkeys -l english -s mimesignature -o english.catalog
-
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window
 	Add SymbolLocator to Tools menu
-	Finish getting Haiku localization to work
+	Finish Haiku localization when Locale kit settles down
 	Improve library window to handle such a large set of libraries in Haiku
 	Add keyboard acceleration to library window
 	Project-wide find-and-replace -- create Find in Project (Cmd+Shift+F)

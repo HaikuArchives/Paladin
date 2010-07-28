@@ -93,6 +93,13 @@ SourceControl::CreateRepository(const char *path)
 }
 
 
+bool
+SourceControl::DetectRepository(const char *path)
+{
+	return false;
+}
+
+
 status_t
 SourceControl::CloneRepository(const char *url, const char *dest)
 {
@@ -139,12 +146,6 @@ status_t
 SourceControl::Pull(const char *url)
 {
 	return B_OK;
-}
-
-
-void
-SourceControl::Recover(void)
-{
 }
 
 

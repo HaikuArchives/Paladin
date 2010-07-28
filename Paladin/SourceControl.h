@@ -33,6 +33,12 @@ public:
 	// Committing the changes is still necessary
 	virtual	status_t		CreateRepository(const char *path);
 	
+	// Returns true if the specified path contains a folder dedicated to
+	// source control. This only checks the specified path. If the path is, for
+	// example a subdirectory of a Git repository, the .git folder will not be
+	// detected and will return false.
+	virtual	bool			DetectRepository(const char *path);
+	
 	virtual	status_t		CloneRepository(const char *url, const char *dest);
 	
 	virtual	bool			NeedsInit(const char *topDir);
@@ -47,9 +53,6 @@ public:
 	virtual	status_t		Push(const char *url = NULL);
 	virtual	status_t		Pull(const char *url = NULL);
 	
-	// Recovers a failed commit. This is specific to Mercurial
-			void			Recover(void);
-
 	// Pass NULL to revert the whole working copy.
 	virtual	status_t		Revert(const char *relPath);
 	

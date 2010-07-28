@@ -12,6 +12,7 @@ public:
 	virtual					~GitSourceControl(void);
 	
 	virtual	status_t		CreateRepository(const char *path);
+	virtual	bool			DetectRepository(const char *path);
 	virtual	status_t		CloneRepository(const char *url, const char *dest);
 	
 	virtual	bool			NeedsInit(const char *topDir);

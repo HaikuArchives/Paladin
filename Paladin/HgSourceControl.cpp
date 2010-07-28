@@ -70,6 +70,20 @@ HgSourceControl::CreateRepository(const char *path)
 }
 
 
+bool
+HgSourceControl::DetectRepository(const char *path)
+{
+	BEntry entry(path);
+	if (!entry.Exists())
+		return false;
+	
+	BPath repoPath(path);
+	repoPath.Append(".hg");
+	entry.SetTo(repoPath.Path());
+	return entry.Exists();
+}
+
+
 status_t
 HgSourceControl::CloneRepository(const char *url, const char *dest)
 {

@@ -10,7 +10,8 @@ public:
 							SVNSourceControl(const entry_ref &workingDir);
 							~SVNSourceControl(void);
 	
-			status_t		CreateRepository(const char *url);
+			status_t		CreateRepository(const char *path);
+			bool			DetectRepository(const char *path);
 			status_t		CloneRepository(const char *url, const char *dest);
 			
 			bool			NeedsInit(const char *topDir);

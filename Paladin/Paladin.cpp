@@ -24,6 +24,7 @@
 #include "Project.h"
 #include "ProjectBuilder.h"
 #include "ProjectWindow.h"
+#include "SCMManager.h"
 #include "Settings.h"
 #include "SourceFile.h"
 #include "StartWindow.h"
@@ -634,7 +635,9 @@ App::CreateNewProject(const char *projname, const char *target,	int32 type,
 	if (!proj)
 		return NULL;
 	
-	proj->SetSourceControl((scm_t)scmType);
+	scm_t detectedSCM = DetectSCM(path);
+printf("SCM: %d\n", detectedSCM);
+	proj->SetSourceControl(detectedSCM == SCM_NONE ? (scm_t)scmType : detectedSCM);
 	
 	gCurrentProject = proj;
 	gProjectList->Lock();

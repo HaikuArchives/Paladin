@@ -147,7 +147,7 @@ SVNSourceControl::Commit(const char *msg)
 status_t
 SVNSourceControl::Revert(const char *relPath)
 {
-	BPath path(path);
+	BPath path(relPath);
 	if (path.InitCheck() != B_OK)
 		return path.InitCheck();
 	
@@ -178,7 +178,7 @@ SVNSourceControl::GetChangeStatus(BString &out)
 status_t
 SVNSourceControl::GetHistory(BString &out, const char *file)
 {
-	BPath path(path);
+	BPath path(file);
 	if (path.InitCheck() != B_OK)
 		return path.InitCheck();
 	

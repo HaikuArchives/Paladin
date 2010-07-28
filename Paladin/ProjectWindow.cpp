@@ -21,7 +21,7 @@
 #include "AltTabFilter.h"
 #include "AppDebug.h"
 #include "AsciiWindow.h"
-//#include "CodeLibWindow.h"
+#include "CodeLibWindow.h"
 #include "DebugTools.h"
 #include "ErrorParser.h"
 #include "ErrorWindow.h"
@@ -1185,9 +1185,11 @@ ProjectWindow::SetupMenus(void)
 	fProjectMenu->AddSeparatorItem();
 	fProjectMenu->AddItem(new BMenuItem(TR("Change System Libraries…"),
 										new BMessage(M_SHOW_LIBRARIES)));
+	#ifdef BUILD_CODE_LIBRARY
 	fProjectMenu->AddSeparatorItem();
 	fProjectMenu->AddItem(new BMenuItem(TR("Synchronize with Code Library"),
 										new BMessage(M_SYNC_MODULES)));
+	#endif
 	fProjectMenu->AddSeparatorItem();
 	
 	fProjectMenu->AddItem(fSourceMenu);

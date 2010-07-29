@@ -116,11 +116,7 @@ status_t
 HgSourceControl::AddToRepository(const char *path)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; hg ";
-
-	if (GetVerboseMode())
-		command << "-v ";
-	
+	command << "cd '" << GetWorkingDirectory() << "'; hg -v ";
 	command	<< "add -I '" << path << "'";
 	
 	BString out;

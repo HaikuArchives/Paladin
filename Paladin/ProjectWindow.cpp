@@ -74,6 +74,11 @@ enum
 	M_GET_CHECK_IN_MSG = 'gcim',
 	M_CHECK_IN_PROJECT = 'prci',
 	M_REVERT_PROJECT = 'prrv',
+	M_ADD_SELECTION_TO_REPO = 'a2rp',
+	M_REMOVE_SELECTION_FROM_REPO = 'rfrp',
+	M_REVERT_SELECTION = 'rvsl',
+	M_PUSH_PROJECT = 'pshp',
+	M_PULL_PROJECT = 'pulp',
 	
 	M_TOGGLE_DEBUG_MENU = 'sdbm',
 	M_DEBUG_DUMP_DEPENDENCIES = 'dbdd',
@@ -364,6 +369,22 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		case M_REBUILD_FILE:
+		case M_ADD_SELECTION_TO_REPO:
+		case M_REMOVE_SELECTION_FROM_REPO:
+		case M_REVERT_SELECTION:
+		{
+			ActOnSelectedFiles(msg->what);
+			break;
+		}
+		case M_PUSH_PROJECT:
+		{
+			break;
+		}
+		case M_PULL_PROJECT:
+		{
+			break;
+		}
 		case M_CULL_EMPTY_GROUPS:
 		{
 			CullEmptyGroups();
@@ -464,14 +485,15 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-#ifdef BUILD_CODE_LIBRARY
 		case M_SHOW_CODE_LIBRARY:
 		{
+			#ifdef BUILD_CODE_LIBRARY
 			CodeLibWindow *libwin = CodeLibWindow::GetInstance(BRect(100,100,500,350));
 			libwin->Show();
+			#endif
+			
 			break;
 		}
-#endif
 		case M_OPEN_PARTNER:
 		{
 			int32 selection = fProjectList->FullListCurrentSelection();
@@ -769,24 +791,6 @@ ProjectWindow::MessageReceived(BMessage *msg)
 				fProject->Save();
 			break;
 		}
-		case M_REBUILD_FILE:
-		{
-			for (int32 i = 0; i < fProjectList->CountItems(); i++)
-			{
-				SourceFileItem *item = dynamic_cast<SourceFileItem*>(fProjectList->ItemAt(i));
-				if (item && item->IsSelected())
-				{
-					SourceFile *file = item->GetData();
-					if (file->UsesBuild())
-					{
-						file->RemoveObjects(*fProject->GetBuildInfo());
-						item->SetDisplayState(SFITEM_NEEDS_BUILD);
-						fProjectList->InvalidateItem(fProjectList->IndexOf(item));
-					}
-				}
-			}
-			break;
-		}
 		case M_EMPTY_CCACHE:
 		{
 			// We don't do this when forcing a rebuild of the sources because sometimes it
@@ -983,10 +987,12 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		}
 		case M_SYNC_MODULES:
 		{
+			#ifdef BUILD_CODE_LIBRARY
 			thread_id syncID = spawn_thread(SyncThread,"module update thread",
 												B_NORMAL_PRIORITY, this);
 			if (syncID >= 0)
 				resume_thread(syncID);
+			#endif
 			break;
 		}
 		case M_TOGGLE_DEBUG_MENU:
@@ -1150,6 +1156,87 @@ ProjectWindow::RequiresMenuLock(const int32 &command)
 
 
 void
+ProjectWindow::ActOnSelectedFiles(const int32 &command)
+{
+	SCMOutputWindow *win = NULL;
+	switch (command)
+	{
+		case M_ADD_SELECTION_TO_REPO:
+		{
+			if (!fSourceControl)
+				return;
+				
+			win = new SCMOutputWindow(TR("Add to Repository"));
+			win->Show();
+			break;
+		}
+		case M_REMOVE_SELECTION_FROM_REPO:
+		{
+			if (!fSourceControl)
+				return;
+				
+			win = new SCMOutputWindow(TR("Remove from Repository"));
+			win->Show();
+			break;
+		}
+		case M_REVERT_SELECTION:
+		{
+			if (!fSourceControl)
+				return;
+				
+			win = new SCMOutputWindow(TR("Revert"));
+			win->Show();
+			break;
+		}
+		default:
+			break;
+	}
+	
+	for (int32 i = 0; i < fProjectList->CountItems(); i++)
+	{
+		SourceFileItem *item = dynamic_cast<SourceFileItem*>(fProjectList->ItemAt(i));
+		if (item && item->IsSelected())
+		{
+			SourceFile *file = item->GetData();
+			
+			switch (command)
+			{
+				case M_REBUILD_FILE:
+				{
+					if (file->UsesBuild())
+					{
+						file->RemoveObjects(*fProject->GetBuildInfo());
+						item->SetDisplayState(SFITEM_NEEDS_BUILD);
+						fProjectList->InvalidateItem(fProjectList->IndexOf(item));
+					}
+					break;
+				}
+				case M_ADD_SELECTION_TO_REPO:
+				{
+					fSourceControl->AddToRepository(file->GetPath().GetFullPath());
+					break;
+				}
+				case M_REMOVE_SELECTION_FROM_REPO:
+				{
+					fSourceControl->RemoveFromRepository(file->GetPath().GetFullPath());
+					break;
+				}
+				case M_REVERT_SELECTION:
+				{
+					fSourceControl->Revert(file->GetPath().GetFullPath());
+					break;
+				}
+				default:
+				{
+					return;
+				}
+			}
+		}
+	}
+}
+
+
+void
 ProjectWindow::SetupMenus(void)
 {
 	fFileMenu = new BMenu(TR("File"));
@@ -1172,6 +1259,18 @@ ProjectWindow::SetupMenus(void)
 										new BMessage(M_GET_CHECK_IN_MSG)));
 	fSourceMenu->AddItem(new BMenuItem(TR("Revert Project"),
 										new BMessage(M_REVERT_PROJECT)));
+	fSourceMenu->AddSeparatorItem();
+	fSourceMenu->AddItem(new BMenuItem(TR("Add Selected Files to Repository"),
+										new BMessage(M_ADD_SELECTION_TO_REPO)));
+	fSourceMenu->AddItem(new BMenuItem(TR("Remove Selected Files from Repository"),
+										new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
+	fSourceMenu->AddItem(new BMenuItem(TR("Revert Selected Files"),
+										new BMessage(M_REVERT_SELECTION)));
+	fSourceMenu->AddSeparatorItem();
+	fSourceMenu->AddItem(new BMenuItem(TR("Push Changes to Remote Repository"),
+										new BMessage(M_PUSH_PROJECT)));
+	fSourceMenu->AddItem(new BMenuItem(TR("Pull Changes from Remote Repository"),
+										new BMessage(M_PULL_PROJECT)));
 	
 	
 	fProjectMenu = new BMenu(TR("Project"));
@@ -1720,7 +1819,7 @@ ProjectWindow::BackupThread(void *data)
 int32
 ProjectWindow::SyncThread(void *data)
 {
-	/*
+	#ifdef BUILD_CODE_LIBRARY
 	ProjectWindow *parent = (ProjectWindow*)data;
 	
 	parent->Lock();
@@ -1734,8 +1833,8 @@ ProjectWindow::SyncThread(void *data)
 	parent->fStatusBar->SetText("");
 	parent->SetMenuLock(false);
 	parent->Unlock();
+	#endif
 	
-	*/
 	return 0;
 }
 

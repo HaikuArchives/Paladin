@@ -42,6 +42,7 @@ public:
 			bool		AreMenusLocked(void) const { return fMenusLocked; }
 			bool		RequiresMenuLock(const int32 &command);
 private:
+			void		ActOnSelectedFiles(const int32 &command);
 			void		SetupMenus(void);
 			void		SetMenuLock(bool locked);
 			void		MakeGroup(int32 selection);

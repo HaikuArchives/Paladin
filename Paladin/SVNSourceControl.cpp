@@ -1,4 +1,5 @@
 #include "SVNSourceControl.h"
+#include <Directory.h>
 #include <Path.h>
 
 #include "DPath.h"
@@ -36,8 +37,12 @@ SVNSourceControl::CreateRepository(const char *path)
 	DPath repoPath(sRepoPath);
 	repoPath << workingDir.GetFileName();
 	
+	BDirectory dir(sRepoPath.String());
+	if (dir.InitCheck() != B_OK)
+		create_directory(sRepoPath.String(), 0777);
+	
 	BString command("svnadmin create ");
-	command << "'" << repoPath.GetFullPath() << "' '";
+	command << "'" << repoPath.GetFullPath() << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -57,9 +62,28 @@ SVNSourceControl::CreateRepository(const char *path)
 	
 	command = "";
 	command << "cd '" << path << "'; "
-			<< "svn add *";
+			<< "svn add --non-interactive *";
 	RunCommand(command, out);
 	
+	return B_OK;
+}
+
+status_t
+SVNSourceControl::DeleteRepository(const char *path)
+{
+	if (!path || strlen(path) < 1)
+		return B_ERROR;
+	
+	DPath workingDir(path);
+	
+	DPath repoPath(sRepoPath);
+	repoPath << workingDir.GetFileName();
+	
+	BString command("rm -r ");
+	command << "'" << repoPath.GetFullPath() << "'";
+	
+	BString out;
+	RunCommand(command, out);
 	return B_OK;
 }
 
@@ -81,7 +105,7 @@ SVNSourceControl::DetectRepository(const char *path)
 status_t
 SVNSourceControl::CloneRepository(const char *url, const char *dest)
 {
-	BString command("svn co ");
+	BString command("svn co --non-interactive ");
 	command << "'" << url << "' '" << dest << "'";
 	
 	BString out;
@@ -111,13 +135,21 @@ SVNSourceControl::NeedsInit(const char *topDir)
 status_t
 SVNSourceControl::AddToRepository(const char *path)
 {
-	BPath filePath(path);
-	if (filePath.InitCheck() != B_OK)
-		return filePath.InitCheck();
+	// File patterns are not internally supported by SVN. They have to be
+	// expanded by bash. Meh.
+	bool escape = true;
+	BString pattern(path);
+	if (pattern.FindFirst("*.") == 0 || pattern.FindFirst("*") == 0 ||
+		pattern.FindLast("*") == pattern.CountChars() - 1)
+		escape = false;
 	
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; ";
-	command << "svn add'" << filePath.Path() << "' '" << filePath.Path() << "'";
+	command << "svn add --non-interactive ";
+	if (escape)
+		command << "'" << path << "'";
+	else
+		command << path;
 	
 	BString out;
 	RunCommand(command,out);
@@ -128,13 +160,21 @@ SVNSourceControl::AddToRepository(const char *path)
 status_t
 SVNSourceControl::RemoveFromRepository(const char *path)
 {
-	BPath filePath(path);
-	if (filePath.InitCheck() != B_OK)
-		return filePath.InitCheck();
+	// File patterns are not internally supported by SVN. They have to be
+	// expanded by bash. Meh.
+	bool escape = true;
+	BString pattern(path);
+	if (pattern.FindFirst("*.") == 0 || pattern.FindFirst("*") == 0 ||
+		pattern.FindLast("*") == pattern.CountChars() - 1)
+		escape = false;
 	
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; ";
-	command << "svn delete'" << filePath.Path() << "' '" << filePath.Path() << "'";
+	command << "svn delete --non-interactive --keep-local ";
+	if (escape)
+		command << "'" << path << "'";
+	else
+		command << path;
 	
 	BString out;
 	RunCommand(command,out);
@@ -150,7 +190,7 @@ SVNSourceControl::Commit(const char *msg)
 	
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; ";
-	command << "svn ci -m '" << msg << "'";
+	command << "svn update --non-interactive; svn ci --non-interactive -m '" << msg << "'";
 	
 	BString out;
 	RunCommand(command,out);
@@ -167,7 +207,7 @@ SVNSourceControl::Revert(const char *relPath)
 	
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; ";
-	command << "svn revert ";
+	command << "svn revert --non-interactive ";
 	
 	if (relPath)
 		command << " '" << relPath << "'";
@@ -182,7 +222,7 @@ status_t
 SVNSourceControl::GetChangeStatus(BString &out)
 {
 	BString command;
-	command << "svn status '" << GetWorkingDirectory() << "'";
+	command << "svn status --non-interactive '" << GetWorkingDirectory() << "'";
 	
 	RunCommand(command, out);
 	return B_OK;
@@ -198,7 +238,7 @@ SVNSourceControl::GetHistory(BString &out, const char *file)
 	
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; ";
-	command << "svn log '" << file << "'";
+	command << "svn log --non-interactive '" << file << "'";
 	
 	RunCommand(command,out);
 	return B_OK;
@@ -213,7 +253,7 @@ SVNSourceControl::SetRepositoryPath(const char *path)
 
 
 const char *
-SVNSourceControl::GetRepositoryPath(const char *path)
+SVNSourceControl::GetRepositoryPath(void)
 {
 	return sRepoPath.String();
 }

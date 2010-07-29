@@ -11,6 +11,12 @@ public:
 							~SVNSourceControl(void);
 	
 			status_t		CreateRepository(const char *path);
+			
+			// Specific to SVN. This deletes the specified repository. Note
+			// that it does not delete the working copy or remove version control
+			// from it. It only deletes the local repository.
+			status_t		DeleteRepository(const char *path);
+			
 			bool			DetectRepository(const char *path);
 			status_t		CloneRepository(const char *url, const char *dest);
 			
@@ -28,7 +34,7 @@ public:
 	// These are SVN-specific. They are for setting the folder where local
 	// repositories are kept.
 	static	void			SetRepositoryPath(const char *path);
-	static	const char *	GetRepositoryPath(const char *path);
+	static	const char *	GetRepositoryPath(void);
 };
 
 

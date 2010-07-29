@@ -60,7 +60,7 @@ GitSourceControl::CreateRepository(const char *path)
 	
 	SetWorkingDirectory(path);
 	command = "";
-	command << "cd '" << path << "'; git add ";
+	command << "cd '" << path << "'; git add . ";
 	
 	if (GetVerboseMode())
 		command << "-v ";
@@ -108,7 +108,6 @@ GitSourceControl::CloneRepository(const char *url, const char *dest)
 }
 
 
-// untested
 status_t
 GitSourceControl::AddToRepository(const char *path)
 {
@@ -126,15 +125,11 @@ GitSourceControl::AddToRepository(const char *path)
 }
 
 
-// untested
 status_t
 GitSourceControl::RemoveFromRepository(const char *path)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; git rm ";
-	
-	if (GetVerboseMode())
-		command << "-q ";
+	command << "cd '" << GetWorkingDirectory() << "'; git rm --cached ";
 	
 	command	<< "'" << path << "'";
 	
@@ -144,15 +139,11 @@ GitSourceControl::RemoveFromRepository(const char *path)
 }
 
 
-// untested
 status_t
 GitSourceControl::Commit(const char *msg)
 {
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; git commit -a ";
-	
-	if (!GetVerboseMode())
-		command << "-q ";
 	
 	command	<< "-m '" << msg << "'";
 	
@@ -193,7 +184,7 @@ GitSourceControl::Push(const char *url)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "'" << url << "'";
+	command	<< "'" << GetURL() << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -201,7 +192,6 @@ GitSourceControl::Push(const char *url)
 }
 
 
-// untested
 status_t
 GitSourceControl::Pull(const char *url)
 {
@@ -214,7 +204,7 @@ GitSourceControl::Pull(const char *url)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "'" << url << "'";
+	command	<< "'" << GetURL() << "' HEAD";
 	
 	BString out;
 	RunCommand(command, out);
@@ -222,7 +212,6 @@ GitSourceControl::Pull(const char *url)
 }
 
 
-// untested
 status_t
 GitSourceControl::Revert(const char *relPath)
 {
@@ -249,7 +238,6 @@ GitSourceControl::Revert(const char *relPath)
 }
 
 
-// untested
 status_t
 GitSourceControl::Rename(const char *oldname, const char *newname)
 {
@@ -286,7 +274,6 @@ GitSourceControl::GetHistory(BString &out, const char *file)
 }
 
 
-// untested
 status_t
 GitSourceControl::GetChangeStatus(BString &out)
 {

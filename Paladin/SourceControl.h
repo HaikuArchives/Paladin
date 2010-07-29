@@ -43,12 +43,14 @@ public:
 	
 	virtual	bool			NeedsInit(const char *topDir);
 	
-	// Add a file or folder to the repository.
+	// Add a file or folder to the repository. Note that a file pattern can be
+	// specified, but only one. Failure may occur if multiple patterns are
+	// specified and the SCM doesn't support them.
 	virtual	status_t		AddToRepository(const char *path);
 	virtual	status_t		RemoveFromRepository(const char *path);
 	
 	virtual	status_t		Commit(const char *msg);
-	virtual	status_t		Merge(const char *rev);
+	virtual	status_t		Merge(const char *rev = NULL);
 			
 	virtual	status_t		Push(const char *url = NULL);
 	virtual	status_t		Pull(const char *url = NULL);

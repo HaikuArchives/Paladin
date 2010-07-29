@@ -1,5 +1,6 @@
 #include "HgSourceControl.h"
 
+#include <Directory.h>
 #include <Path.h>
 #include <stdio.h>
 
@@ -90,6 +91,10 @@ HgSourceControl::CloneRepository(const char *url, const char *dest)
 	if (!url || !dest)
 		return B_BAD_DATA;
 	
+	BDirectory dir(dest);
+	if (dir.InitCheck() != B_OK)
+		create_directory(dest,0777);
+	
 	BString command;
 	command << "hg ";
 	
@@ -116,7 +121,7 @@ HgSourceControl::AddToRepository(const char *path)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "add '" << path << "'";
+	command	<< "add -I '" << path << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -133,7 +138,7 @@ HgSourceControl::RemoveFromRepository(const char *path)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "remove '" << path << "'";
+	command	<< "remove -Af -I '" << path << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -168,7 +173,10 @@ HgSourceControl::Merge(const char *rev)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "merge '" << rev << "'";
+	command	<< "merge ";
+	
+	if (rev)
+		command	<< "'" << rev << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -189,7 +197,7 @@ HgSourceControl::Push(const char *url)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "push '" << url << "'";
+	command	<< "push '" << GetURL() << "'";
 	
 	BString out;
 	RunCommand(command, out);
@@ -197,7 +205,6 @@ HgSourceControl::Push(const char *url)
 }
 
 
-// untested
 status_t
 HgSourceControl::Pull(const char *url)
 {
@@ -210,7 +217,7 @@ HgSourceControl::Pull(const char *url)
 	if (GetVerboseMode())
 		command << "-v ";
 	
-	command	<< "pull '" << url << "'";
+	command	<< "pull -u '" << GetURL() << "'";
 	
 	BString out;
 	RunCommand(command, out);

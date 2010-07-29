@@ -21,7 +21,7 @@ public:
 	virtual	status_t		RemoveFromRepository(const char *path);
 	
 	virtual	status_t		Commit(const char *msg);
-	virtual	status_t		Merge(const char *rev);
+	virtual	status_t		Merge(const char *rev = NULL);
 			
 	virtual	status_t		Push(const char *url = NULL);
 	virtual	status_t		Pull(const char *url = NULL);

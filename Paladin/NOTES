@@ -1,6 +1,5 @@
 TODO:
 	Exercise and test the SourceControl code for SVN, HG, and Git
-	Investigate command-line project loading -- ensure that it works correctly
 
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window

@@ -228,17 +228,26 @@ App::ArgvReceived(int32 argc,char **argv)
 	int32 refcount = 0;
 
 	// No initialization -- keep the value from the previous loop
-	BEntry projfolder("/boot/home/projects");
+	BEntry projfolder(gProjectPath.GetFullPath());
 	entry_ref projref;
 	projfolder.GetRef(&projref);
 	for (; i < argc; i++)
 	{
-		BEntry entry(argv[i]);
+		// See if the project specified lacks an extension and append it
+		BString projPath(argv[i]);
+		if (projPath.FindLast(".pld") != projPath.CountChars() - 4)
+		{
+			projPath << ".pld";
+			printf("Attempting to open %s\n", projPath.String());
+		}
+		
+		BEntry entry(projPath.String());
+		
 		entry_ref ref;
 		
 		if (!entry.Exists())
 		{
-			ref = FindFile(projref,argv[i]);
+			ref = FindProject(projref,argv[i]);
 			if (!ref.name)
 			{
 				printf(TR("Can't find file %s\n"),argv[i]);
@@ -247,6 +256,7 @@ App::ArgvReceived(int32 argc,char **argv)
 		}
 		else
 			entry.GetRef(&ref);
+		
 		refmsg.AddRef("refs",&ref);
 		refcount++;
 		optind++;

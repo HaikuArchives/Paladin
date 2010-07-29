@@ -82,10 +82,50 @@ FindAndOpenFile(BMessage *msg)
 
 
 entry_ref
-FindFile(entry_ref folder,const char *name)
+FindFile(entry_ref folder, const char *name)
 {
 	entry_ref ref,returnRef;
 	if (!folder.name || !name)
+		return returnRef;
+	
+	BDirectory dir(&folder);
+	if (dir.InitCheck() != B_OK)
+		return returnRef;
+	
+	dir.Rewind();
+	while (dir.GetNextRef(&ref) == B_OK)
+	{
+		struct stat statData;
+		stat(BPath(&ref).Path(),&statData);
+		
+		// Is a directory?
+		if (S_ISDIR(statData.st_mode))
+		{
+			entry_ref innerref = FindFile(ref,name);
+			if (innerref.device != -1 && innerref.directory != -1)
+				return innerref;
+		}
+	}
+	
+	BEntry entry;
+	if (dir.FindEntry(name,&entry) == B_OK)
+		entry.GetRef(&returnRef);
+	return returnRef;
+}
+
+
+entry_ref
+FindProject(entry_ref folder, const char *name)
+{
+printf("Searching for %s in folder %s\n", name, folder.name);
+	entry_ref ref,returnRef;
+	if (!folder.name || !name)
+		return returnRef;
+	
+	// Because projects can now have source control folders, skip the
+	// internal folders for Git, Mercurial, Subversion, and CVS
+	if (strcmp(folder.name, ".hg") == 0 || strcmp(folder.name, ".git") == 0 ||
+		strcmp(folder.name, ".svn") == 0 ||	strcmp(folder.name, "CVS") == 0)
 		return returnRef;
 	
 	BDirectory dir(&folder);

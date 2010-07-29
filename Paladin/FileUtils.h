@@ -8,6 +8,7 @@ class Project;
 
 void				FindAndOpenFile(BMessage *msg);
 entry_ref			FindFile(entry_ref folder,const char *name);
+entry_ref			FindProject(entry_ref folder,const char *name);
 
 void				InitFileTypes(void);
 

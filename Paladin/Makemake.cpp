@@ -104,7 +104,7 @@ MakeMake(Project *proj, DPath outfile)
 	
 	data << "LOCAL_INCLUDE_PATHS=";
 	for (i = 0; i < proj->CountLocalIncludes(); i++)
-		data << " " << proj->LocalIncludeAt(i);
+		data << " " << proj->LocalIncludeAt(i).Relative();
 	data << "\n";
 	
 	data << "OPTIMIZE=";

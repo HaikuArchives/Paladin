@@ -125,7 +125,7 @@ SourceFileRez::Precompile(BuildInfo &info, const char *options)
 	BString pipestr = "gcc -E -x c ";
 	
 	for (int32 i = 0; i < info.includeList.CountItems(); i++)
-		pipestr << "'-I" << info.includeList.ItemAt(i)->String() << "' ";
+		pipestr << "'-I" << info.includeList.ItemAt(i)->Absolute() << "' ";
 	
 	pipestr << "-o '" << GetTempFilePath(info).GetFullPath()
 			<< "' '" << abspath << "' 2>&1";
@@ -163,7 +163,7 @@ SourceFileRez::Compile(BuildInfo &info, const char *options)
 	BString pipestr = "rez -t ";
 	
 	for (int32 i = 0; i < info.includeList.CountItems(); i++)
-		pipestr << "'-I" << info.includeList.ItemAt(i)->String() << "' ";
+		pipestr << "'-I" << info.includeList.ItemAt(i)->Absolute() << "' ";
 	
 	pipestr << "-o '" << GetResourcePath(info).GetFullPath()
 			<< "' '" << GetTempFilePath(info).GetFullPath() << "' 2>&1";

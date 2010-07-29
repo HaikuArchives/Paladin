@@ -13,6 +13,7 @@
 #include "DPath.h"
 #include "ErrorParser.h"
 #include "ObjectList.h"
+#include "ProjectPath.h"
 
 class SourceFile;
 class SourceGroup;
@@ -113,7 +114,7 @@ public:
 			void		RemoveLocalInclude(const char *path);
 			bool		HasLocalInclude(const char *path);
 			int32		CountLocalIncludes(void) const;
-			const char *LocalIncludeAt(const int32 &index);
+			ProjectPath	LocalIncludeAt(const int32 &index);
 			
 			void		AddSystemInclude(const char *path);
 			void		RemoveSystemInclude(const char *path);
@@ -185,8 +186,8 @@ private:
 	BObjectList<SourceFile>		fDirtyFiles;
 	BObjectList<SourceFile>		fLibraryList;
 	
-	BObjectList<BString>		fLocalIncludeList,
-								fSystemIncludeList,
+	BObjectList<ProjectPath>	fLocalIncludeList;
+	BObjectList<BString>		fSystemIncludeList,
 								fAccessList;
 	
 	BObjectList<SourceGroup>	fGroupList;

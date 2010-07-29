@@ -153,7 +153,7 @@ SourceFile::FindDependency(BuildInfo &info, const char *name)
 	int32 count = info.includeList.CountItems();
 	for (int32 i = 0; i < count; i++)
 	{
-		testpath = info.includeList.ItemAt(i)->String();
+		testpath = info.includeList.ItemAt(i)->Absolute().String();
 		testpath.Append(file.GetFileName());
 		
 		BEntry entry(testpath.GetFullPath());

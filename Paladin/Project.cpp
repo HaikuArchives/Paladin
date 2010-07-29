@@ -138,7 +138,10 @@ Project::Load(const char *path)
 					srcfile->fDependencies = value;
 			}
 			else if (entry == "LOCALINCLUDE")
-				AddLocalInclude(value.String());
+			{
+				ProjectPath include(fPath.GetFolder(), value.String());
+				AddLocalInclude(include.Absolute().String());
+			}
 			else if (entry == "SYSTEMINCLUDE")
 				AddSystemInclude(value.String());
 			else if (entry == "LIBRARY")
@@ -287,13 +290,7 @@ Project::Save(const char *path)
 	}
 	
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
-	{
-		BString *string = fLocalIncludeList.ItemAt(i);
-		BString include = *string;
-		if (include[0] == '/')
-			include.RemoveFirst(projectPath.String());
-		data << "LOCALINCLUDE=" << include << "\n";
-	}
+		data << "LOCALINCLUDE=" << fLocalIncludeList.ItemAt(i)->Relative() << "\n";
 	
 	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++)
 	{
@@ -633,18 +630,17 @@ Project::UpdateBuildInfo(void)
 	fBuildInfo.includeString = "";
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 	{
-		BString *item = fLocalIncludeList.ItemAt(i);
-		BString *newitem(new BString( MakeAbsolutePath(item->String()) ));
+		ProjectPath *newitem = new ProjectPath(*fLocalIncludeList.ItemAt(i));
 		fBuildInfo.includeList.AddItem(newitem);
-		fBuildInfo.includeString << " -I '" << *newitem << "'";
+		fBuildInfo.includeString << " -I '" << newitem->Absolute() << "'";
 	}
 	
 	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++)
 	{
 		BString *item = fSystemIncludeList.ItemAt(i);
-		BString *newitem(new BString( MakeAbsolutePath(item->String()) ));
+		ProjectPath *newitem = new ProjectPath("/", MakeAbsolutePath(item->String()).String());
 		fBuildInfo.includeList.AddItem(newitem);
-		fBuildInfo.includeString << " -I '" << *newitem << "'";
+		fBuildInfo.includeString << " -I '" << newitem->Absolute() << "'";
 	}
 	
 	fBuildInfo.errorList.msglist.MakeEmpty();
@@ -688,21 +684,7 @@ Project::CompileFile(SourceFile *file)
 		compileString << fExtraCompilerOptions << " ";
 	
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
-	{
-		BString item = *fLocalIncludeList.ItemAt(i);
-		
-		if (item == ".")
-			item = GetPath().GetFolder();
-		else if (item.CountChars() >= 2 && item[0] == '.' && item[1] == '/')
-			item.ReplaceFirst(".",GetPath().GetFolder());
-		else if (item[0] != '/')
-		{
-			item.Prepend("/");
-			item.Prepend(GetPath().GetFolder());
-		}
-		
-		compileString << "-I '" << item.String() << "' ";
-	}
+		compileString << "-I '" << fLocalIncludeList.ItemAt(i)->Absolute() << "' ";
 
 	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++)
 	{
@@ -950,17 +932,10 @@ Project::AddLocalInclude(const char *path)
 	if (!path)
 		return;
 	
-	BString abspath(path);
-	if (abspath[0] != '/')
-	{
-		abspath.Prepend("/");
-		abspath.Prepend(fPath.GetFolder());
-	}
-	
 	if (!HasLocalInclude(path))
 	{
 		STRACE(1,("%s: Added local include %s\n",GetName(),path));
-		fLocalIncludeList.AddItem(new BString(abspath));
+		fLocalIncludeList.AddItem(new ProjectPath(fPath.GetFolder(), path));
 	}
 }
 
@@ -971,20 +946,16 @@ Project::RemoveLocalInclude(const char *path)
 	if (!path)
 		return;
 	
-	BString abspath(path);
-	abspath.ReplaceFirst("<project>",fPath.GetFolder());
+	BString temp(path);
+	temp.RemoveFirst("<project>");
 	
-	if (abspath[0] != '/')
-	{
-		abspath.Prepend("/");
-		abspath.Prepend(fPath.GetFolder());
-	}
+	ProjectPath remove(fPath.GetFolder(), temp.String());
 	
 	STRACE(1,("%s: Attempting to remove %s\n",GetName(),path));
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 	{
-		BString *str = fLocalIncludeList.ItemAt(i);
-		if (str && str->Compare(abspath) == 0)
+		ProjectPath *str = fLocalIncludeList.ItemAt(i);
+		if (*str == remove)
 		{
 			STRACE(1,("%s:Removed %s\n",GetName(),path));
 			fLocalIncludeList.RemoveItemAt(i);
@@ -1001,19 +972,14 @@ Project::HasLocalInclude(const char *path)
 	if (!path)
 		return false;
 	
+	BString strpath(path);
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 	{
-		BString *str = fLocalIncludeList.ItemAt(i);
+		ProjectPath *str = fLocalIncludeList.ItemAt(i);
 		if (!str)
 			continue;
 		
-		BString abspath(*str);
-		if (abspath[0] != '/')
-		{
-			abspath.Prepend("/");
-			abspath.Prepend(fPath.GetFolder());
-		}
-		if (abspath.Compare(path) == 0)
+		if (strpath.Compare(str->Absolute()) == 0)
 			return true;
 	}
 	return false;
@@ -1027,12 +993,15 @@ Project::CountLocalIncludes(void) const
 }
 
 
-const char *
+ProjectPath
 Project::LocalIncludeAt(const int32 &index)
 {
-	BString *string = fLocalIncludeList.ItemAt(index);
-	
-	return string ? string->String() : NULL;
+	ProjectPath out;
+	ProjectPath *item = fLocalIncludeList.ItemAt(index);
+	if (item)
+		out = *item;
+		
+	return out;
 }
 
 

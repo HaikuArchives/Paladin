@@ -46,6 +46,7 @@ AddNewFileWindow::AddNewFileWindow(const BMessage &msg, const BMessenger &msgr,
 	fNameText->ResizeToPreferred();
 	fNameText->ResizeTo(Bounds().Width() - 20,fNameText->Bounds().Height());
 	fNameText->SetDivider(fNameText->StringWidth(namelabel.String()) + 5);
+	fNameText->DisallowCharacters("/,@\"\\");
 	
 	BRect r = fNameText->Frame();
 	r.OffsetBy(0,r.Height() + 10.0);

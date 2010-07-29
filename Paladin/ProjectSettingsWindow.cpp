@@ -145,19 +145,7 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project *proj)
 	float width = 0.0;
 	for (int32 i = 0; i < fProject->CountLocalIncludes(); i++)
 	{
-		BString string = fProject->LocalIncludeAt(i);
-		char c = string[0];
-		if (c && c == '/')
-		{
-			BString removeString(fProject->GetPath().GetFolder());
-			removeString << "/";
-			string.RemoveFirst(removeString);
-		}
-		else
-			if (string == ".")
-				continue;
-		
-		BStringItem *item = new BStringItem(string.String());
+		BStringItem *item = new BStringItem(fProject->LocalIncludeAt(i).Relative().String());
 		float strwidth = fIncludeList->StringWidth(item->Text());
 		width = MAX(width, strwidth);
 		fIncludeList->AddItem(item);

@@ -28,7 +28,7 @@ DumpIncludes(Project *proj)
 {
 	printf("INCLUDES:\n---------\nLocal:\n");
 	for (int32 i = 0; i < proj->CountLocalIncludes(); i++)
-		printf("\t%s\n",proj->LocalIncludeAt(i));
+		printf("\t%s\n",proj->LocalIncludeAt(i).Relative().String());
 	
 	printf("System:\n");
 	for (int32 i = 0; i < proj->CountSystemIncludes(); i++)

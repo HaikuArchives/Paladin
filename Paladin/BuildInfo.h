@@ -6,6 +6,7 @@
 #include "DPath.h"
 #include "ErrorParser.h"
 #include "ObjectList.h"
+#include "ProjectPath.h"
 
 class BuildInfo
 {
@@ -15,8 +16,8 @@ public:
 	DPath					projectFolder;
 	DPath					objectFolder;
 	
-	BObjectList<BString>	includeList;
-	BString					includeString;
+	BObjectList<ProjectPath>	includeList;
+	BString						includeString;
 	
 	ErrorList				errorList;
 };

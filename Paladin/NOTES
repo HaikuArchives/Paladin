@@ -1,5 +1,18 @@
 TODO:
-	Exercise and test the SourceControl code for SVN, HG, and Git
+	Finish the online import code
+	
+	Add the following items to the right-click context menu:
+		Revert this file
+		Add to the repository
+		Remove from the repository
+	
+	Add the following items to the Project | Source Control menu:
+		Revert selected files
+		Add selected files to the repository
+		Remove selected files to the repository
+		Push changes
+		Pull changes
+		
 
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window

@@ -286,7 +286,7 @@ ProjectList::ShowContextMenu(BPoint pt)
 {
 	BPoint screenpt(pt);
 	ConvertToScreen(&screenpt);
-	screenpt.x -= 5;
+	screenpt.x += 1;
 	screenpt.y -= 5;
 	
 	BStringItem *stringItem = (BStringItem*)ItemAt(IndexOf(pt));

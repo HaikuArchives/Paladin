@@ -319,6 +319,7 @@ ProjectList::ShowContextMenu(BPoint pt)
 											new BMessage(M_REVERT_SELECTION)));
 		
 		menu.AddItem(submenu);
+		submenu->SetTargetForItems(Window());
 		
 		if (fileItem->GetData()->CountActions() > 0)
 		{

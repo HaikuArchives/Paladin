@@ -83,10 +83,10 @@ SCMOutputCallback(const char *text)
 		}
 	}
 	
+	printf("%s",text);
+	
 	if (!win)
 		return;
-	
-	printf("%s",text);
 	
 	BMessage logmsg(M_APPEND_TO_LOG);
 	logmsg.AddString("text", text);

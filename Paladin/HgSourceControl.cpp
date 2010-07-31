@@ -242,10 +242,10 @@ status_t
 HgSourceControl::Revert(const char *relPath)
 {
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	command << "cd '" << GetWorkingDirectory() << "'; hg -v ";
 	
-	if (GetVerboseMode())
-		command << "-v ";
+//	if (GetVerboseMode())
+//		command << "-v ";
 	
 	command	<< "revert";
 	

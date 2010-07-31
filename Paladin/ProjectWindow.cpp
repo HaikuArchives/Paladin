@@ -76,6 +76,7 @@ enum
 	M_REVERT_PROJECT = 'prrv',
 	M_PUSH_PROJECT = 'pshp',
 	M_PULL_PROJECT = 'pulp',
+	M_PROJECT_SCM_STATUS = 'pscs',
 	
 	M_TOGGLE_DEBUG_MENU = 'sdbm',
 	M_DEBUG_DUMP_DEPENDENCIES = 'dbdd',
@@ -374,6 +375,18 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		case M_REVERT_SELECTION:
 		{
 			ActOnSelectedFiles(msg->what);
+			break;
+		}
+		case M_PROJECT_SCM_STATUS:
+		{
+			if (fSourceControl)
+			{
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Project Status"));
+				BString strstatus;
+				fSourceControl->GetChangeStatus(strstatus);
+				win->GetTextView()->SetText(strstatus.String());
+				win->Show();
+			}
 			break;
 		}
 		case M_PUSH_PROJECT:
@@ -1273,6 +1286,8 @@ ProjectWindow::SetupMenus(void)
 	
 	
 	fSourceMenu = new BMenu(TR("Source Control"));
+	fSourceMenu->AddItem(new BMenuItem(TR("Get Project Change Status"),
+										new BMessage(M_PROJECT_SCM_STATUS)));
 	fSourceMenu->AddItem(new BMenuItem(TR("Check Project In"),
 										new BMessage(M_GET_CHECK_IN_MSG)));
 	fSourceMenu->AddItem(new BMenuItem(TR("Revert Project"),

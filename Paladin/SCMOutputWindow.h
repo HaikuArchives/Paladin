@@ -11,8 +11,9 @@ class SCMOutputWindow : public DWindow
 public:
 			SCMOutputWindow(const char *title);
 			
-	void	FrameResized(float w, float h);
-	void	MessageReceived(BMessage *msg);
+	void		FrameResized(float w, float h);
+	void		MessageReceived(BMessage *msg);
+	BTextView *	GetTextView(void);
 	
 private:
 	BTextView	*fLog;

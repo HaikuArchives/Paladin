@@ -67,6 +67,13 @@ SCMOutputWindow::MessageReceived(BMessage *msg)
 }
 
 
+BTextView *
+SCMOutputWindow::GetTextView(void)
+{
+	return fLog;
+}
+
+
 void
 SCMOutputCallback(const char *text)
 {

@@ -251,6 +251,24 @@ GitSourceControl::Rename(const char *oldname, const char *newname)
 }
 
 
+// untested and, knowing git, probably borked
+status_t
+GitSourceControl::Diff(const char *filename, const char *revision)
+{
+	BString command;
+	command << "cd '" << GetWorkingDirectory() << "'; git ";
+	
+	command << "diff --cached '" << filename << "' ";
+	
+	if (revision)
+		command << revision;
+	
+	BString out;
+	RunCommand(command, out);
+	return B_OK;
+}
+
+
 // untested
 status_t
 GitSourceControl::GetHistory(BString &out, const char *file)

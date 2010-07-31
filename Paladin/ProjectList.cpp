@@ -315,6 +315,8 @@ ProjectList::ShowContextMenu(BPoint pt)
 											new BMessage(M_ADD_SELECTION_TO_REPO)));
 		submenu->AddItem(new BMenuItem(TR("Remove Selected Files from Repository"),
 											new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
+		submenu->AddItem(new BMenuItem(TR("Show Changes in Selected Files"),
+											new BMessage(M_DIFF_SELECTION)));
 		submenu->AddItem(new BMenuItem(TR("Revert Selected Files"),
 											new BMessage(M_REVERT_SELECTION)));
 		

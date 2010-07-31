@@ -76,6 +76,7 @@ enum
 	M_REVERT_PROJECT = 'prrv',
 	M_PUSH_PROJECT = 'pshp',
 	M_PULL_PROJECT = 'pulp',
+	M_DIFF_PROJECT = 'dfpj',
 	M_PROJECT_SCM_STATUS = 'pscs',
 	
 	M_TOGGLE_DEBUG_MENU = 'sdbm',
@@ -373,8 +374,19 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		case M_ADD_SELECTION_TO_REPO:
 		case M_REMOVE_SELECTION_FROM_REPO:
 		case M_REVERT_SELECTION:
+		case M_DIFF_SELECTION:
 		{
 			ActOnSelectedFiles(msg->what);
+			break;
+		}
+		case M_DIFF_PROJECT:
+		{
+			if (fSourceControl)
+			{
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Differences"));
+				win->Show();
+				fSourceControl->Diff(NULL);
+			}
 			break;
 		}
 		case M_PROJECT_SCM_STATUS:
@@ -1212,6 +1224,15 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 			win->Show();
 			break;
 		}
+		case M_DIFF_SELECTION:
+		{
+			if (!fSourceControl)
+				return;
+				
+			win = new SCMOutputWindow(TR("Show Changes"));
+			win->Show();
+			break;
+		}
 		default:
 			break;
 	}
@@ -1257,6 +1278,11 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 					fSourceControl->Revert(relPath.String());
 					break;
 				}
+				case M_DIFF_SELECTION:
+				{
+					fSourceControl->Diff(relPath.String());
+					break;
+				}
 				default:
 				{
 					return;
@@ -1286,10 +1312,13 @@ ProjectWindow::SetupMenus(void)
 	
 	
 	fSourceMenu = new BMenu(TR("Source Control"));
-	fSourceMenu->AddItem(new BMenuItem(TR("Get Project Change Status"),
-										new BMessage(M_PROJECT_SCM_STATUS)));
 	fSourceMenu->AddItem(new BMenuItem(TR("Check Project In"),
 										new BMessage(M_GET_CHECK_IN_MSG)));
+	fSourceMenu->AddItem(new BMenuItem(TR("Get Project Change Status"),
+										new BMessage(M_PROJECT_SCM_STATUS)));
+	fSourceMenu->AddItem(new BMenuItem(TR("Show Changes from Last Check-in"),
+										new BMessage(M_DIFF_PROJECT)));
+	fSourceMenu->AddSeparatorItem();
 	fSourceMenu->AddItem(new BMenuItem(TR("Revert Project"),
 										new BMessage(M_REVERT_PROJECT)));
 	fSourceMenu->AddSeparatorItem();

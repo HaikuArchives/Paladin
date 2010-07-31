@@ -37,7 +37,7 @@ HgSourceControl::NeedsInit(const char *topDir)
 	ShellHelper sh;
 	sh << "cd";
 	sh.AddEscapedArg(GetWorkingDirectory());
-	sh << "; hg status";
+	sh << "; hg status > /dev/null";
 	return (sh.Run() != 0);
 }
 
@@ -282,7 +282,26 @@ HgSourceControl::Rename(const char *oldname, const char *newname)
 }
 
 
-// untested
+status_t
+HgSourceControl::Diff(const char *filename, const char *revision)
+{
+	BString command;
+	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	
+	if (GetVerboseMode())
+		command << "-v ";
+	
+	command << "diff '" << filename << "' ";
+	
+	if (revision)
+		command << "-r " << revision;
+	
+	BString out;
+	RunCommand(command, out);
+	return B_OK;
+}
+
+
 status_t
 HgSourceControl::GetHistory(BString &out, const char *file)
 {

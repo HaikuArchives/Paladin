@@ -218,6 +218,24 @@ SVNSourceControl::Revert(const char *relPath)
 }
 
 
+// Untested
+status_t
+SVNSourceControl::Diff(const char *filename, const char *revision)
+{
+	BString command;
+	command << "cd '" << GetWorkingDirectory() << "'; svn ";
+	
+	command << "diff --non-interactive '" << filename << "' ";
+	
+	if (revision)
+		command << "-r " << revision;
+	
+	BString out;
+	RunCommand(command, out);
+	return B_OK;
+}
+
+
 status_t
 SVNSourceControl::GetChangeStatus(BString &out)
 {

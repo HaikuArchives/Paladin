@@ -25,6 +25,7 @@ enum
 	M_ADD_SELECTION_TO_REPO = 'a2rp',
 	M_REMOVE_SELECTION_FROM_REPO = 'rfrp',
 	M_REVERT_SELECTION = 'rvsl',
+	M_DIFF_SELECTION = 'dfsl',
 	
 	PALEDIT_OPEN_FILE  = 'Cmdl',
 	

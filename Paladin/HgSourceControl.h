@@ -33,6 +33,8 @@ public:
 	
 	virtual	status_t		Rename(const char *oldname, const char *newname);
 	
+	virtual	status_t		Diff(const char *file, const char *revision = NULL);
+	
 	virtual	status_t		GetHistory(BString &out, const char *file);
 	virtual	status_t		GetChangeStatus(BString &out);
 

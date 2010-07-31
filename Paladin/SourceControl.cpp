@@ -164,6 +164,13 @@ SourceControl::Rename(const char *oldname, const char *newname)
 
 
 status_t
+SourceControl::Diff(const char *file, const char *revision)
+{
+	return B_OK;
+}
+
+
+status_t
 SourceControl::GetHistory(BString &out, const char *file)
 {
 	return B_OK;
@@ -195,6 +202,13 @@ void
 SourceControl::SetDebugMode(bool value)
 {
 	fDebug = value;
+}
+
+
+bool
+SourceControl::GetDebugMode(void) const
+{
+	return fDebug;
 }
 
 

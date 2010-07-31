@@ -28,8 +28,9 @@ public:
 			status_t		Commit(const char *msg);
 			
 			status_t		Revert(const char *relPath);
-			status_t		GetHistory(BString &out, const char *file);
+			status_t		Diff(const char *filename, const char *revision = NULL);
 			status_t		GetChangeStatus(BString &out);
+			status_t		GetHistory(BString &out, const char *file);
 	
 	// These are SVN-specific. They are for setting the folder where local
 	// repositories are kept.

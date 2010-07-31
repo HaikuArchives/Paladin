@@ -22,6 +22,9 @@ enum
 	M_QUICK_IMPORT = 'qipr',
 	M_ADD_FILES = 'adfl',
 	M_EMPTY_CCACHE = 'emcc',
+	M_ADD_SELECTION_TO_REPO = 'a2rp',
+	M_REMOVE_SELECTION_FROM_REPO = 'rfrp',
+	M_REVERT_SELECTION = 'rvsl',
 	
 	PALEDIT_OPEN_FILE  = 'Cmdl',
 	

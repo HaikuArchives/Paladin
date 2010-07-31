@@ -304,8 +304,21 @@ ProjectList::ShowContextMenu(BPoint pt)
 		menu.AddItem(new BMenuItem(TR("Open Folder for File…"),msg));
 		
 		menu.AddItem(new BMenuItem(TR("Force File Rebuild"),new BMessage(M_REBUILD_FILE)));
+		
 		menu.AddSeparatorItem();
 		menu.AddItem(new BMenuItem(TR("Remove Selected Files"),new BMessage(M_REMOVE_FILES)));
+		
+		menu.AddSeparatorItem();
+		
+		BMenu *submenu = new BMenu("Source Control");
+		submenu->AddItem(new BMenuItem(TR("Add Selected Files to Repository"),
+											new BMessage(M_ADD_SELECTION_TO_REPO)));
+		submenu->AddItem(new BMenuItem(TR("Remove Selected Files from Repository"),
+											new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
+		submenu->AddItem(new BMenuItem(TR("Revert Selected Files"),
+											new BMessage(M_REVERT_SELECTION)));
+		
+		menu.AddItem(submenu);
 		
 		if (fileItem->GetData()->CountActions() > 0)
 		{

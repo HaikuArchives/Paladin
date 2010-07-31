@@ -74,9 +74,6 @@ enum
 	M_GET_CHECK_IN_MSG = 'gcim',
 	M_CHECK_IN_PROJECT = 'prci',
 	M_REVERT_PROJECT = 'prrv',
-	M_ADD_SELECTION_TO_REPO = 'a2rp',
-	M_REMOVE_SELECTION_FROM_REPO = 'rfrp',
-	M_REVERT_SELECTION = 'rvsl',
 	M_PUSH_PROJECT = 'pshp',
 	M_PULL_PROJECT = 'pulp',
 	

@@ -1,9 +1,10 @@
 TODO:
 	Finish the online import code
-	Add an SCM diff command to the menu and the context menu
+	Later: move SCM commands to using ShellHelper class for safety
 
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window
+	File rename command in project window (tied to SCM rename command)
 	Add SymbolLocator to Tools menu
 	Finish Haiku localization when Locale kit settles down
 	Improve library window to handle such a large set of libraries in Haiku

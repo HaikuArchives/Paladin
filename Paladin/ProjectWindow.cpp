@@ -340,8 +340,6 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		}
 		case M_CHECK_IN_PROJECT:
 		{
-if (!fSourceControl)
-	printf("NULL source control");
 			BString commitstr;
 			if (msg->FindString("text", &commitstr) == B_OK && fSourceControl)
 			{
@@ -1210,6 +1208,13 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 		{
 			SourceFile *file = item->GetData();
 			
+			BString relPath = file->GetPath().GetFullPath();
+			if (relPath.FindFirst(fProject->GetPath().GetFolder()) == 0)
+			{
+				relPath.RemoveFirst(fProject->GetPath().GetFolder());
+				relPath.RemoveFirst("/");
+			}
+			
 			switch (command)
 			{
 				case M_REBUILD_FILE:
@@ -1224,17 +1229,17 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 				}
 				case M_ADD_SELECTION_TO_REPO:
 				{
-					fSourceControl->AddToRepository(file->GetPath().GetFullPath());
+					fSourceControl->AddToRepository(relPath.String());
 					break;
 				}
 				case M_REMOVE_SELECTION_FROM_REPO:
 				{
-					fSourceControl->RemoveFromRepository(file->GetPath().GetFullPath());
+					fSourceControl->RemoveFromRepository(relPath.String());
 					break;
 				}
 				case M_REVERT_SELECTION:
 				{
-					fSourceControl->Revert(file->GetPath().GetFullPath());
+					fSourceControl->Revert(relPath.String());
 					break;
 				}
 				default:

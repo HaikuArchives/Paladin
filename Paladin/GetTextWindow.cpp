@@ -22,6 +22,7 @@ GetTextWindow::GetTextWindow(const char *title, const char *text,
 		fMessenger(msgr)
 {
 	AddCommonFilter(new EscapeCancelFilter());
+	AddShortcut(B_ENTER, B_COMMAND_KEY, new BMessage(M_SEND_TEXT));
 	
 	BView *top = GetBackgroundView();
 	
@@ -57,7 +58,6 @@ GetTextWindow::GetTextWindow(const char *title, const char *text,
 	
 	MakeCenteredOnShow(true);
 	
-	fOK->MakeDefault(true);
 	fText->MakeFocus(true);
 	
 	if (fText->Text() && strlen(fText->Text()) > 0)

@@ -1314,7 +1314,7 @@ ProjectWindow::SetupMenus(void)
 	fSourceMenu = new BMenu(TR("Source Control"));
 	fSourceMenu->AddItem(new BMenuItem(TR("Check Project In"),
 										new BMessage(M_GET_CHECK_IN_MSG)));
-	fSourceMenu->AddItem(new BMenuItem(TR("Get Project Change Status"),
+	fSourceMenu->AddItem(new BMenuItem(TR("Show Changed Files from Last Check-in"),
 										new BMessage(M_PROJECT_SCM_STATUS)));
 	fSourceMenu->AddItem(new BMenuItem(TR("Show Changes from Last Check-in"),
 										new BMessage(M_DIFF_PROJECT)));

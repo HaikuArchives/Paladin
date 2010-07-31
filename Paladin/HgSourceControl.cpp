@@ -4,6 +4,8 @@
 #include <Path.h>
 #include <stdio.h>
 
+#include "LaunchHelper.h"
+
 HgSourceControl::HgSourceControl(void)
 {
 	SetShortName("hg");
@@ -28,13 +30,15 @@ HgSourceControl::NeedsInit(const char *topDir)
 	if (!topDir)
 		return false;
 	
-	BPath path(topDir);
-	if (path.InitCheck() != B_OK)
-		return false;
-	
-	path.Append(".hg");
-	BEntry entry(path.Path());
-	return !entry.Exists();
+	// Checking for <project>/.hg won't work because of cases (ironically)
+	// like Paladin's: the project might be under source control as part of
+	// a larger tree. hg status returns 0 if under source control in a
+	// tree, but 255 if not.
+	ShellHelper sh;
+	sh << "cd";
+	sh.AddEscapedArg(GetWorkingDirectory());
+	sh << "; hg status";
+	return (sh.Run() != 0);
 }
 
 

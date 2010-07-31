@@ -97,7 +97,7 @@ ArgList::operator =(const ArgList &list)
 }
 
 
-void
+ArgList &
 ArgList::AddArg(const char *string)
 {
 	if (string && strlen(string) > 0)
@@ -105,11 +105,25 @@ ArgList::AddArg(const char *string)
 		BString *str = new BString(string);
 		fArgList.AddItem(str);
 	}
+	return *this;
+}
+
+
+ArgList &
+ArgList::AddList(const ArgList &list)
+{
+	for (int32 i = 0; i < list.CountArgs(); i++)
+	{
+		BString *arg = list.ArgAt(i);
+		if (arg)
+			AddArg(arg->String());
+	}
+	return *this;
 }
 
 
 BString *
-ArgList::ArgAt(int32 index)
+ArgList::ArgAt(int32 index) const
 {
 	return fArgList.ItemAt(index);
 }
@@ -366,22 +380,6 @@ ShellHelper::ShellHelper(void)
 
 
 ShellHelper &
-ShellHelper::operator +(const char *string)
-{
-	AddEscapedArg(string);
-	return *this;
-}
-
-
-ShellHelper &
-ShellHelper::operator +(const BString &string)
-{
-	AddEscapedArg(string.String());
-	return *this;
-}
-
-
-ShellHelper &
 ShellHelper::operator =(const ShellHelper &from)
 {
 	ArgList::operator =(from);
@@ -391,7 +389,7 @@ ShellHelper::operator =(const ShellHelper &from)
 }
 
 
-void
+ShellHelper &
 ShellHelper::AddEscapedArg(const char *string)
 {
 	if (string && strlen(string) > 0)
@@ -402,6 +400,7 @@ ShellHelper::AddEscapedArg(const char *string)
 		str.Append("'");
 		AddArg(str.String());
 	}
+	return *this;
 }
 
 
@@ -478,4 +477,3 @@ ShellHelper::RunInPipe(BString &out, bool redirectStdErr)
 	
 	return B_OK;
 }
-

@@ -21,13 +21,13 @@ public:
 			ArgList &			operator <<(const char *string);
 			ArgList &			operator <<(const BString &string);
 			ArgList &			operator <<(const long &value);
-			
 			ArgList &			operator =(const char *string);
 			ArgList &			operator =(const BString &string);
 			ArgList &			operator =(const ArgList &list);
 
-			void				AddArg(const char *string);
-			BString *			ArgAt(int32 index);
+			ArgList &			AddArg(const char *string);
+			ArgList &			AddList(const ArgList &list);
+			BString *			ArgAt(int32 index) const;
 			BString *			RemoveArg(int32 index);
 			void				RemoveArg(BString *string);
 			int32				CountArgs(void) const;
@@ -46,6 +46,7 @@ private:
 
 	BObjectList<BString>	fArgList;
 };
+
 
 // This class is for making it easier to launch an app (with arguments) via the Roster
 class LaunchHelper : public ArgList
@@ -84,13 +85,9 @@ class ShellHelper : public ArgList
 public:
 						ShellHelper(void);
 	
-	// The + operator for ShellHelper appends an escaped argument
-	ShellHelper &		operator +(const char *string);
-	ShellHelper &		operator +(const BString &string);
-
 	ShellHelper &		operator =(const ShellHelper &list);
 
-	void				AddEscapedArg(const char *string);
+	ShellHelper	&		AddEscapedArg(const char *string);
 	
 	void				SetUpdateCallback(ShellHelperCallback cb);
 	ShellHelperCallback	GetUpdateCallback(void) const;

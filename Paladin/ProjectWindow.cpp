@@ -111,11 +111,11 @@ ProjectWindow::ProjectWindow(BRect frame, Project *project)
 		if (fSourceControl)
 		{
 fSourceControl->SetDebugMode(true);
-			if (fSourceControl->NeedsInit(fProject->GetPath().GetFolder()))
-				fSourceControl->CreateRepository(fProject->GetPath().GetFolder());
-			
 			fSourceControl->SetUpdateCallback(SCMOutputCallback);
 			fSourceControl->SetWorkingDirectory(fProject->GetPath().GetFolder());
+			
+			if (fSourceControl->NeedsInit(fProject->GetPath().GetFolder()))
+				fSourceControl->CreateRepository(fProject->GetPath().GetFolder());
 		}
 	}
 	

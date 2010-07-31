@@ -1,49 +1,62 @@
 #include "LaunchHelper.h"
 
+#include <File.h>
 #include <Roster.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-LaunchHelper::LaunchHelper(void)
-	:	fArgList(20,true),
-		fTeamID(-1)
+#define HAIKU_PIPE_HACK
+
+ArgList::ArgList(void)
+	:	fArgList(20, true)
 {
 }
 
 
-LaunchHelper::LaunchHelper(const char *type)
-	:	fType(type),
-		fArgList(20,true),
-		fTeamID(-1)
+ArgList::ArgList(const char *string)
+	:	fArgList(20, true)
+{
+	ParseToArgs(string);
+}
+
+
+ArgList::ArgList(const BString &str)
+	:	fArgList(20, true)
+{
+	ParseToArgs(str.String());
+}
+
+
+ArgList::ArgList(const ArgList &list)
+	:	fArgList(20, true)
+{
+	*this = list;
+}
+
+
+ArgList::~ArgList(void)
 {
 }
 
 
-LaunchHelper::LaunchHelper(entry_ref &ref)
-	:	fRef(ref),
-		fArgList(20,true),
-		fTeamID(-1)
-{
-}
-
-
-LaunchHelper &
-LaunchHelper::operator <<(const char *string)
+ArgList &
+ArgList::operator <<(const char *string)
 {
 	AddArg(string);
 	return *this;
 }
 
 
-LaunchHelper &
-LaunchHelper::operator <<(const BString &string)
+ArgList &
+ArgList::operator <<(const BString &string)
 {
 	AddArg(string.String());
 	return *this;
 }
 
 
-LaunchHelper &
-LaunchHelper::operator <<(const long &value)
+ArgList &
+ArgList::operator <<(const long &value)
 {
 	BString string;
 	string << value;
@@ -52,50 +65,40 @@ LaunchHelper::operator <<(const long &value)
 }
 
 
-void
-LaunchHelper::SetRef(const char *path)
+ArgList &
+ArgList::operator =(const char *string)
 {
-	BEntry entry(path);
-	if (entry.InitCheck() == B_OK && entry.Exists())
-	{
-		entry.GetRef(&fRef);
-		fType = "";
-	}
+	ParseToArgs(string);
+	return *this;
 }
 
 
-void
-LaunchHelper::SetRef(entry_ref &ref)
+ArgList &
+ArgList::operator =(const BString &str)
 {
-	fRef = ref;
-	fType = "";
+	ParseToArgs(str.String());
+	return *this;
 }
 
 
-void
-LaunchHelper::SetType(const char *type)
+ArgList &
+ArgList::operator =(const ArgList &list)
 {
-	fType = type;
-	fRef = entry_ref();
-}
-
-
-void
-LaunchHelper::SetTeam(team_id id)
-{
-	fTeamID = id;
-}
-
-
-team_id
-LaunchHelper::GetTeam(void) const
-{
-	return fTeamID;
-}
-
+	fArgList.MakeEmpty();
 	
+	for (int32 i = 0; i < list.fArgList.CountItems(); i++)
+	{
+		BString *item = list.fArgList.ItemAt(i);
+		if (item)
+			fArgList.AddItem(new BString(*item));
+	}
+	
+	return *this;
+}
+
+
 void
-LaunchHelper::AddArg(const char *string)
+ArgList::AddArg(const char *string)
 {
 	if (string && strlen(string) > 0)
 	{
@@ -106,14 +109,14 @@ LaunchHelper::AddArg(const char *string)
 
 
 BString *
-LaunchHelper::ArgAt(int32 index)
+ArgList::ArgAt(int32 index)
 {
 	return fArgList.ItemAt(index);
 }
 
 
 BString *
-LaunchHelper::RemoveArg(int32 index)
+ArgList::RemoveArg(int32 index)
 {
 	BString *item = fArgList.RemoveItemAt(index);
 	return item;
@@ -121,21 +124,28 @@ LaunchHelper::RemoveArg(int32 index)
 
 
 void
-LaunchHelper::RemoveArg(BString *string)
+ArgList::RemoveArg(BString *string)
 {
 	fArgList.RemoveItem(string);
 }
 
 
 int32
-LaunchHelper::CountArgs(void) const
+ArgList::CountArgs(void) const
 {
 	return fArgList.CountItems();
 }
 
 
 void
-LaunchHelper::ParseToArgs(const char *string)
+ArgList::MakeEmpty(void)
+{
+	fArgList.MakeEmpty();
+}
+
+
+void
+ArgList::ParseToArgs(const char *string)
 {
 	if (!string)
 		return;
@@ -207,10 +217,102 @@ LaunchHelper::ParseToArgs(const char *string)
 }
 
 
+BString
+ArgList::AsString(void)
+{
+	BString out;
+	for (int32 i = 0; i < CountArgs(); i++)
+		out << " " << ArgAt(i)->String();
+	
+	return out;
+}
+
+
+void
+ArgList::PrintToStream(void)
+{
+	printf("%s\n",AsString().String());
+}
+
+
+LaunchHelper::LaunchHelper(void)
+	:	fTeamID(-1)
+{
+}
+
+
+LaunchHelper::LaunchHelper(const char *type)
+	:	fType(type),
+		fTeamID(-1)
+{
+}
+
+
+LaunchHelper::LaunchHelper(entry_ref &ref)
+	:	fRef(ref),
+		fTeamID(-1)
+{
+}
+
+
+LaunchHelper &
+LaunchHelper::operator =(const LaunchHelper &from)
+{
+	ArgList::operator =(from);
+	fType = from.fType;
+	fRef = from.fRef;
+	fTeamID = from.fTeamID;
+	
+	return *this;
+}
+
+
+void
+LaunchHelper::SetRef(const char *path)
+{
+	BEntry entry(path);
+	if (entry.InitCheck() == B_OK && entry.Exists())
+	{
+		entry.GetRef(&fRef);
+		fType = "";
+	}
+}
+
+
+void
+LaunchHelper::SetRef(entry_ref &ref)
+{
+	fRef = ref;
+	fType = "";
+}
+
+
+void
+LaunchHelper::SetType(const char *type)
+{
+	fType = type;
+	fRef = entry_ref();
+}
+
+
+void
+LaunchHelper::SetTeam(team_id id)
+{
+	fTeamID = id;
+}
+
+
+team_id
+LaunchHelper::GetTeam(void) const
+{
+	return fTeamID;
+}
+
+	
 void
 LaunchHelper::MakeEmpty(void)
 {
-	fArgList.MakeEmpty();
+	ArgList::MakeEmpty();
 	fRef = entry_ref();
 	fType = "";
 }
@@ -241,6 +343,7 @@ BString
 LaunchHelper::AsString(void)
 {
 	BString out;
+	
 	if (fRef.name)
 	{
 		BPath path(&fRef);
@@ -251,17 +354,128 @@ LaunchHelper::AsString(void)
 	else
 		out << "(null file and type)";
 	
-	for (int32 i = 0; i < CountArgs(); i++)
-		out << " " << ArgAt(i)->String();
+	out << " " << ArgList::AsString();
 	
 	return out;
 }
 
 
-void
-LaunchHelper::PrintToStream(void)
+ShellHelper::ShellHelper(void)
 {
-	printf("%s\n",AsString().String());
 }
 
+
+ShellHelper &
+ShellHelper::operator +(const char *string)
+{
+	AddEscapedArg(string);
+	return *this;
+}
+
+
+ShellHelper &
+ShellHelper::operator +(const BString &string)
+{
+	AddEscapedArg(string.String());
+	return *this;
+}
+
+
+ShellHelper &
+ShellHelper::operator =(const ShellHelper &from)
+{
+	ArgList::operator =(from);
+	fCallback = from.fCallback;
+	
+	return *this;
+}
+
+
+void
+ShellHelper::AddEscapedArg(const char *string)
+{
+	if (string && strlen(string) > 0)
+	{
+		BString str(string);
+		str.CharacterEscape("'", '\\');
+		str.Prepend("'");
+		str.Append("'");
+		AddArg(str.String());
+	}
+}
+
+
+void
+ShellHelper::SetUpdateCallback(ShellHelperCallback cb)
+{
+	fCallback = cb;
+}
+
+
+ShellHelperCallback
+ShellHelper::GetUpdateCallback(void) const
+{
+	return fCallback;
+}
+
+
+int
+ShellHelper::Run(void)
+{
+	return system(AsString().String());
+}
+
+
+status_t
+ShellHelper::RunInPipe(BString &out, bool redirectStdErr)
+{
+	BString in(AsString());
+	
+	if (in.CountChars() < 1)
+		return -1;
+	
+#ifdef HAIKU_PIPE_HACK
+
+	BString tmpfilename("/tmp/ShellHelper.build.tmp.");
+	tmpfilename << real_time_clock_usecs();
+	
+	in << " > " << tmpfilename;
+	
+	if (redirectStdErr)
+		in << " 2>&1";
+	system(in.String());
+	
+	BFile file(tmpfilename.String(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return file.InitCheck();
+	
+	char buffer[1024];
+	while (file.Read(buffer, 1024) > 0)
+		out << buffer;
+	
+	file.Unset();
+	BEntry(tmpfilename.String()).Remove();
+
+#else
+
+	FILE *fd = popen(in.String(),"r");
+	
+	if (!fd)
+		return -2;
+	
+	out = "";
+	char buffer[1024];
+	while (fgets(buffer,1024,fd))
+	{
+		if (fCallback)
+			fCallback(buffer);
+		out += buffer;
+	}
+	
+	pclose(fd);
+
+#endif	
+	
+	return B_OK;
+}
 

@@ -289,7 +289,7 @@ int
 SourceControl::RunCommand(const BString &in, BString &out)
 {
 	if (fDebug)
-		printf("Command: %s: %s\n", GetShortName(), in.String());
+		printf("Command: %s: %s\n", fShortName.String(), in.String());
 	
 	if (in.CountChars() < 1)
 		return -1;

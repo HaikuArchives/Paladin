@@ -16,6 +16,8 @@ SVNSourceControl::SVNSourceControl(void)
 SVNSourceControl::SVNSourceControl(const entry_ref &workingDir)
   :	SourceControl(workingDir)
 {
+	SetShortName("svn");
+	SetLongName("Subversion");
 }
 
 

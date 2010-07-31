@@ -13,6 +13,8 @@ GitSourceControl::GitSourceControl(void)
 GitSourceControl::GitSourceControl(const entry_ref &workingDir)
   :	SourceControl(workingDir)
 {
+	SetShortName("git");
+	SetLongName("Git");
 }
 
 

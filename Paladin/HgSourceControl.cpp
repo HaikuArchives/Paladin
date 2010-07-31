@@ -16,6 +16,8 @@ HgSourceControl::HgSourceControl(void)
 HgSourceControl::HgSourceControl(const entry_ref &workingDir)
   :	SourceControl(workingDir)
 {
+	SetShortName("hg");
+	SetLongName("Mercurial");
 }
 
 

@@ -1,8 +1,10 @@
 #include "SCMImportWindow.h"
 
+#include <Directory.h>
 #include <ScrollView.h>
 #include <String.h>
 
+#include "DPath.h"
 #include "Globals.h"
 #include "GitSourceControl.h"
 #include "HgSourceControl.h"
@@ -164,6 +166,7 @@ SCMImportWindow::MessageReceived(BMessage *msg)
 		case M_TOGGLE_ANONYMOUS:
 		{
 			fUserNameBox->SetEnabled(fAnonymousBox->Value() == B_CONTROL_ON);
+			UpdateCommand();
 			break;
 		}
 		case M_UPDATE_COMMAND:
@@ -173,7 +176,7 @@ SCMImportWindow::MessageReceived(BMessage *msg)
 		}
 		case M_SCM_IMPORT:
 		{
-			
+			DoImport();
 			break;
 		}
 		default:
@@ -307,8 +310,13 @@ SCMImportWindow::UpdateCommand(void)
 	fProvider->SetSCM(scm);
 	
 	
-	command << fProvider->GetImportCommand(fAnonymousBox->Value() == B_CONTROL_OFF);
-	command << " '" << gProjectPath.GetFullPath() << "' ";
+	command << fProvider->GetImportCommand(fAnonymousBox->Value() == B_CONTROL_ON);
+	command << " '" << gProjectPath.GetFullPath();
+	
+	if (fProjectBox->Text())
+		command << "/" << fProjectBox->Text();
+	
+	command << "' ";
 	fCommandView->SetText(command.String());
 }
 
@@ -340,13 +348,27 @@ SCMImportWindow::DoImport(void)
 		}
 	}
 	
+	scm->SetDebugMode(true);
 	scm->SetUpdateCallback(SCMOutputCallback);
 	
 	SCMOutputWindow *win = new SCMOutputWindow("Import from Online");
 	win->Show();
 	
-	scm->RunCustomCommand(fProvider->GetImportCommand(
-						fAnonymousBox->Value() == B_CONTROL_OFF).String());
+	DPath checkoutdir(gProjectPath.GetFullPath());
+	checkoutdir << fProvider->GetProjectName();
+	BDirectory dir(checkoutdir.GetFullPath());
+	if (dir.InitCheck() != B_OK)
+		create_directory(checkoutdir.GetFullPath(), 0777);
+	
+	BString command;
+	command << fProvider->GetImportCommand(fAnonymousBox->Value() == B_CONTROL_ON);
+	command << " '" << gProjectPath.GetFullPath();
+	
+	if (fProjectBox->Text())
+		command << "/" << fProjectBox->Text();
+	
+	command << "' 2>&1";
+	scm->RunCustomCommand(command.String());
 	
 }
 

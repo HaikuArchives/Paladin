@@ -412,6 +412,9 @@ OSDrawerImporter::GetImportCommand(bool readOnly)
 
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";
+			
+			if (GetRepository() && strlen(GetRepository()))
+				command << "/" << GetRepository();
 			break;
 		}
 		default:

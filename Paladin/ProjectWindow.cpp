@@ -340,6 +340,8 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		}
 		case M_CHECK_IN_PROJECT:
 		{
+if (!fSourceControl)
+	printf("NULL source control");
 			BString commitstr;
 			if (msg->FindString("text", &commitstr) == B_OK && fSourceControl)
 			{

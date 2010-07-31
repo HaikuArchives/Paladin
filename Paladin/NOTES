@@ -1,18 +1,6 @@
 TODO:
 	Finish the online import code
-	
-	Add the following items to the right-click context menu:
-		Revert this file
-		Add to the repository
-		Remove from the repository
-	
-	Add the following items to the Project | Source Control menu:
-		Revert selected files
-		Add selected files to the repository
-		Remove selected files to the repository
-		Push changes
-		Pull changes
-		
+	Add an SCM diff command to the menu and the context menu
 
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window

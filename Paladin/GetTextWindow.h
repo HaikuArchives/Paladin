@@ -6,7 +6,6 @@
 #include <Message.h>
 #include <TextView.h>
 
-#include "AutoTextControl.h"
 #include "DWindow.h"
 
 enum
@@ -26,8 +25,7 @@ public:
 	void	MessageReceived(BMessage *msg);
 
 private:
-	AutoTextControl	*fText;
-	BTextView		*fLabel;
+	BTextView		*fText;
 	
 	BMessage		fMessage;
 	BMessenger		fMessenger;

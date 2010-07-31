@@ -1,7 +1,9 @@
 #include "GetTextWindow.h"
 
+#include <Font.h>
 #include <Region.h>
 #include <Screen.h>
+#include <ScrollView.h>
 #include <String.h>
 
 #include "EscapeCancelFilter.h"
@@ -23,40 +25,33 @@ GetTextWindow::GetTextWindow(const char *title, const char *text,
 	
 	BView *top = GetBackgroundView();
 	
-	fLabel = new BTextView(BRect(10, 10, 290, 110), "labelview", BRect(5, 5, 95, 5),
-							B_FOLLOW_ALL);
-	fLabel->SetText(text);
-	fLabel->SetTextRect(fLabel->Bounds().InsetByCopy(5.0, 5.0));
-	fLabel->ResizeTo(fLabel->Bounds().Width(), fLabel->CountLines() *
-												fLabel->LineHeight());
-	fLabel->MakeEditable(false);
-	fLabel->SetViewColor(top->ViewColor());
+	BRect r(10, 10, 360, 210);
+	r.right -= B_V_SCROLL_BAR_WIDTH;
 	
-	fText = new AutoTextControl(BRect(10,10,11,11),"argtext","", "",
-									new BMessage(M_TEXT_CHANGED),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fText);
-	fText->ResizeToPreferred();
-	fText->ResizeTo(Bounds().Width() - 20, fText->Bounds().Height());
-	fText->SetDivider(0);
-	fText->MoveTo(10.0, fLabel->Bounds().bottom + 15.0);
+	fText = new BTextView(r, "labelview", r.OffsetToCopy(0,0).InsetByCopy(5,5),
+							B_FOLLOW_ALL);
+	fText->SetText(text);
+	fText->SetTextRect(fText->Bounds().InsetByCopy(5.0, 5.0));
+	
+	BScrollView *sv = new BScrollView("scroll", fText, B_FOLLOW_ALL, 0,
+										false, true);
 	
 	fOK = new BButton(BRect(0,0,1,1),"ok",TR("OK"),new BMessage(M_SEND_TEXT));
 	fOK->ResizeToPreferred();
 	
-	fOK->MoveTo(Bounds().right - 10 - fOK->Bounds().Width(),
-					fText->Frame().bottom + 10);
+	fOK->MoveTo(sv->Frame().right - fOK->Bounds().Width(),
+					sv->Frame().bottom + 10);
 	
 	fCancel = new BButton(BRect(0,0,1,1),"fCancel",TR("Cancel"),
 						new BMessage(B_QUIT_REQUESTED));
 	fCancel->ResizeToPreferred();
 	
 	fCancel->MoveTo(fOK->Frame().left - 10 - fCancel->Bounds().Width(),
-					fText->Frame().bottom + 10);
+					fOK->Frame().top);
 	
-	ResizeTo(Bounds().Width(),fOK->Frame().bottom + 10);
+	ResizeTo(sv->Frame().right + 10, fOK->Frame().bottom + 10);
 	
-	top->AddChild(fLabel);
+	top->AddChild(sv);
 	top->AddChild(fOK);
 	top->AddChild(fCancel);
 	
@@ -66,9 +61,7 @@ GetTextWindow::GetTextWindow(const char *title, const char *text,
 	fText->MakeFocus(true);
 	
 	if (fText->Text() && strlen(fText->Text()) > 0)
-		fText->TextView()->SelectAll();
-	else
-		fOK->SetEnabled(false);
+		fText->SelectAll();
 }
 
 

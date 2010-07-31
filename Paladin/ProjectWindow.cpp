@@ -376,10 +376,22 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		}
 		case M_PUSH_PROJECT:
 		{
+			if (fSourceControl)
+			{
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Push"));
+				win->Show();
+				fSourceControl->Push(NULL);
+			}
 			break;
 		}
 		case M_PULL_PROJECT:
 		{
+			if (fSourceControl)
+			{
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Push"));
+				win->Show();
+				fSourceControl->Pull(NULL);
+			}
 			break;
 		}
 		case M_CULL_EMPTY_GROUPS:

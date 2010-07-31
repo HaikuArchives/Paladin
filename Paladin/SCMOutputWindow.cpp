@@ -2,6 +2,7 @@
 
 #include <Application.h>
 #include <ScrollView.h>
+#include <stdio.h>
 #include <String.h>
 
 #define M_APPEND_TO_LOG 'matl'
@@ -84,6 +85,8 @@ SCMOutputCallback(const char *text)
 	
 	if (!win)
 		return;
+	
+	printf("%s",text);
 	
 	BMessage logmsg(M_APPEND_TO_LOG);
 	logmsg.AddString("text", text);

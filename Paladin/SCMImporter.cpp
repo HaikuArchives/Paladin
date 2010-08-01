@@ -264,8 +264,7 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 			// Read-only / developer:
 			// svn co https://PROJNAME.svn.sourceforge.net/svnroot/PROJNAME FOLDERNAME
 			command << "co https://" << GetProjectName()
-					<< ".svn.sourceforge.net/svnroot/" << GetProjectName()
-					<< "/" << GetProjectName();
+					<< ".svn.sourceforge.net/svnroot/" << GetProjectName();
 
 			if (GetRepository() && strlen(GetRepository()) > 0)
 				command << "/" << GetRepository();

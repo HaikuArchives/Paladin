@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "BuildInfo.h"
-#include "DebugTools.h"
+#include "../DebugTools.h"
 
 SourceTypeShell::SourceTypeShell(void)
 {

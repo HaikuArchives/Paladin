@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #include "BuildInfo.h"
-#include "Globals.h"
+#include "../Globals.h"
 #include "StatCache.h"
 
 SourceFile::SourceFile(const char *path)

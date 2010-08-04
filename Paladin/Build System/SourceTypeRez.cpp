@@ -4,7 +4,7 @@
 #include <Node.h>
 
 #include "BuildInfo.h"
-#include "DebugTools.h"
+#include "../DebugTools.h"
 
 SourceTypeRez::SourceTypeRez(void)
 {

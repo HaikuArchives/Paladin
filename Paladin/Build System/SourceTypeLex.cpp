@@ -4,8 +4,8 @@
 #include <Node.h>
 
 #include "BuildInfo.h"
-#include "DebugTools.h"
-#include "Globals.h"
+#include "../DebugTools.h"
+#include "../Globals.h"
 
 SourceTypeLex::SourceTypeLex(void)
 {

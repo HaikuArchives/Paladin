@@ -8,14 +8,14 @@
 #include <Roster.h>
 #include <stdlib.h>
 
-#include "DebugTools.h"
+#include "../DebugTools.h"
 #include "ErrorParser.h"
-#include "Globals.h"
+#include "../Globals.h"
 #include "LaunchHelper.h"
-#include "Project.h"
+#include "../Project.h"
 #include "SourceFile.h"
 #include "StatCache.h"
-#include "TerminalWindow.h"
+#include "../TerminalWindow.h"
 
 //#define BUILD_THREAD_TRACING
 

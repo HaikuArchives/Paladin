@@ -1,6 +1,8 @@
 TODO:
 	Finish the online import code
 	Later: move SCM commands to using ShellHelper class for safety
+	Bug: Files dropped from Tracker end up in the group above the one dropped on
+	Ensure that the project directory is included in each source file's include list
 
 Features to implement / consider:
 	Tooltip for errors / warnings in the error window

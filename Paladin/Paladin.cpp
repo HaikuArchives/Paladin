@@ -280,13 +280,14 @@ App::RefsReceived(BMessage *msg)
 	int32 i = 0;
 	while (msg->FindRef("refs",i,&ref) == B_OK)
 	{
-		if (Project::IsProject(ref))
-		{
-			if (fBuildMode)
-				BuildProject(ref);
-			else
-				LoadProject(ref);
-		}
+		bool isPaladin = Project::IsProject(ref);
+		bool isBeIDE = IsBeIDEProject(ref);
+		
+		if (fBuildMode && isPaladin)
+			BuildProject(ref);
+		else
+		if (isPaladin || isBeIDE)
+			LoadProject(ref);
 		else
 			OpenFile(ref);
 		i++;
@@ -743,11 +744,37 @@ App::BuildProject(const entry_ref &ref)
 
 
 void
-App::LoadProject(const entry_ref &ref)
+App::LoadProject(const entry_ref &givenRef)
 {
-	if (!ref.name)
+	if (!givenRef.name)
 		return;
 	
+	entry_ref ref(givenRef);
+	
+	bool isBeIDE = IsBeIDEProject(ref);
+	if (isBeIDE)
+	{
+		// We were given a BeIDE project, so we will see if it has already
+		// been converted to a Paladin project. If it has, open the Paladin
+		// project. If not, convert it and open it, if successful.
+		DPath beidePath(ref);
+		BString palPath = beidePath.GetFolder();
+		palPath << "/" << beidePath.GetBaseName() << ".pld";
+		BEntry entry(palPath.String());
+		if (entry.Exists())
+			entry.GetRef(&ref);
+		else
+		{
+			if (BeIDE2Paladin(beidePath.GetFullPath(), palPath) == B_OK)
+			{
+				entry.SetTo(palPath.String());
+				entry.GetRef(&ref);
+			}
+			else
+				return;
+		}
+	}
+		
 	for (int32 i = 0; i < CountWindows(); i++)
 	{
 		ProjectWindow *win = dynamic_cast<ProjectWindow*>(WindowAt(i));

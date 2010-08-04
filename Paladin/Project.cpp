@@ -1275,6 +1275,20 @@ Project::SetOpLevel(uint8 level)
 }
 
 
+void
+Project::SetPlatform(const platform_t &plat)
+{
+	fPlatform = plat;
+}
+
+
+platform_t
+Project::GetPlatform(void) const
+{
+	return fPlatform;
+}
+
+
 Project *
 Project::CreateProject(const char *projname, const char *target, int32 type, const char *path,
 						bool create_folder)

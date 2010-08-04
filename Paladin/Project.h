@@ -168,6 +168,11 @@ public:
 			void		SetExtraLinkerOptions(const char *opt) { fExtraLinkerOptions = opt; }
 			const char *ExtraLinkerOptions(void) { return fExtraLinkerOptions.String(); }
 			
+			// These shouldn't normally be needed unless constructing one programmatically
+			// or importing from another platform
+			void		SetPlatform(const platform_t &plat);
+			platform_t	GetPlatform(void) const;
+			
 	static	Project *	CreateProject(const char *projname, const char *target,
 									int32 type, const char *path, bool create_folder);
 	static	bool		IsProject(const entry_ref &ref);

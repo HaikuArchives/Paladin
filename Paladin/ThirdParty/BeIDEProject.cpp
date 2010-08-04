@@ -356,6 +356,24 @@ BeIDEProject::LocalIncludeAt(const uint32 &index)
 }
 
 
+int32
+BeIDEProject::CountFiles(void) const
+{
+	return fProjectFiles.size();
+}
+
+
+ProjectFile
+BeIDEProject::FileAt(const uint32 &index)
+{
+	ProjectFile empty;
+	if (index > fProjectFiles.size() - 1)
+		return empty;
+	
+	return fProjectFiles[index];
+}
+
+
 #pragma mark - Private Methods
 
 void

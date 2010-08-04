@@ -8,12 +8,15 @@
 #include <Roster.h>
 #include <stdio.h>
 
+#include "BeIDEProject.h"
 #include "DebugTools.h"
 #include "DPath.h"
+#include "FileFactory.h"
 #include "Globals.h"
 #include "PLocale.h"
 #include "Project.h"
 #include "Settings.h"
+#include "SourceTypeLib.h"
 #include "StatCache.h"
 #include <stdlib.h>
 
@@ -329,3 +332,196 @@ RunPipedCommand(const char *cmdstr, BString &out, bool redirectStdErr)
 		}
 	return B_OK;
 }
+
+
+status_t
+BeIDE2Paladin(const char *path, BString &outpath)
+{
+	status_t returnVal = BEntry(path).InitCheck();
+	if (returnVal != B_OK)
+		return returnVal;
+	
+	BeIDEProject beide(path);
+	if (beide.InitCheck() != B_OK)
+		return beide.InitCheck();
+	
+	DPath dpath(path);
+	Project proj(dpath.GetBaseName(), beide.TargetName());
+	
+	proj.SetPlatform(PLATFORM_R5);
+	
+	BString savepath(dpath.GetFolder());
+	savepath << "/" << dpath.GetBaseName() << ".pld";
+	proj.Save(savepath);
+	
+	for (int32 i = 0; i < beide.CountLocalIncludes(); i++)
+	{
+		BString include = beide.LocalIncludeAt(i);
+		
+		if (include.ICompare("{project}") == 0)
+			continue;
+		
+		include.RemoveFirst("{project}/");
+		proj.AddLocalInclude(include.String());
+	}
+
+	for (int32 i = 0; i < beide.CountSystemIncludes(); i++)
+	{
+		BString include = beide.SystemIncludeAt(i);
+		
+		if (include.ICompare("{project}") == 0)
+			continue;
+		
+		include.RemoveFirst("{project}/");
+		proj.AddSystemInclude(include.String());
+	}
+	
+	SourceGroup *currentGroup = NULL;
+	for (int32 i = 0; i < beide.CountFiles(); i++)
+	{
+		ProjectFile file = beide.FileAt(i);
+		SourceFile *srcFile = gFileFactory.CreateSourceFile(file.path.String());
+		
+		if (!srcFile)
+			continue;
+		
+		if (dynamic_cast<SourceFileLib*>(srcFile))
+		{
+			proj.AddLibrary(srcFile->GetPath().GetFileName());
+			delete srcFile;
+			continue;
+		}
+		
+		if (!proj.HasGroup(file.group.String()))
+			currentGroup = proj.AddGroup(file.group.String());
+		
+		proj.AddFile(srcFile, currentGroup);
+	}
+	
+	uint32 codeFlags = beide.CodeGenerationFlags();
+	if (codeFlags & CODEGEN_DEBUGGING)
+		proj.SetDebug(true);
+	
+	if (codeFlags & CODEGEN_OPTIMIZE_SIZE)
+		proj.SetOpForSize(true);
+	
+	proj.SetOpLevel(beide.OptimizationMode());
+	
+	// Because Paladin doesn't currently support the seemingly 50,000 warning
+	// types, we'll put them in the compiler options for the ones not commonly
+	// used
+	BString options;
+	
+	uint32 warnings = beide.Warnings();
+	if (warnings & WARN_STRICT_ANSI)
+		options << "-pedantic ";
+	
+	if (warnings & WARN_LOCAL_SHADOW)
+		options << "-Wshadow ";
+	
+	if (warnings & WARN_INCOMPATIBLE_CAST)
+		options << "-Wbad-function-cast ";
+	
+	if (warnings & WARN_CAST_QUALIFIERS)
+		options << "-Wcast-qual ";
+	
+	if (warnings & WARN_CONFUSING_CAST)
+		options << "-Wconversion ";
+	
+	if (warnings & WARN_CANT_INLINE)
+		options << "-Winline ";
+	
+	if (warnings & WARN_EXTERN_TO_INLINE)
+		options << "-Wextern-inline ";
+	
+	if (warnings & WARN_OVERLOADED_VIRTUALS)
+		options << "-Woverloaded-virtual ";
+	
+	if (warnings & WARN_C_CASTS)
+		options << "-Wold-style-cast ";
+	
+	if (warnings & WARN_EFFECTIVE_CPP)
+		options << "-Weffc++ ";
+	
+	if (warnings & WARN_MISSING_PARENTHESES)
+		options << "-Wparentheses ";
+	
+	if (warnings & WARN_INCONSISTENT_RETURN)
+		options << "-Wreturn-type ";
+	
+	if (warnings & WARN_MISSING_ENUM_CASES)
+		options << "-Wswitch ";
+	
+	if (warnings & WARN_UNUSED_VARS)
+		options << "-Wunusued ";
+	
+	if (warnings & WARN_UNINIT_AUTO_VARS)
+		options << "-Wuninitialized ";
+	
+	if (warnings & WARN_INIT_REORDERING)
+		options << "-Wreorder ";
+	
+	if (warnings & WARN_NONVIRTUAL_DESTRUCTORS)
+		options << "-Wnon-virtual-dtor ";
+	
+	if (warnings & WARN_UNRECOGNIZED_PRAGMAS)
+		options << "-Wunknown-pragmas ";
+	
+	if (warnings & WARN_SIGNED_UNSIGNED_COMP)
+		options << "-Wsign-compare ";
+	
+	if (warnings & WARN_CHAR_SUBSCRIPTS)
+		options << "-Wchar-subscripts ";
+	
+	if (warnings & WARN_PRINTF_FORMATTING)
+		options << "-Wformat ";
+	
+	if (warnings & WARN_TRIGRAPHS_USED)
+		options << "-Wtrigraphs ";
+	
+	uint32 langopts = beide.LanguageOptions();
+	if (langopts & LANGOPTS_ANSI_C_MODE)
+		options << "-ansi ";
+	
+	if (langopts & LANGOPTS_SUPPORT_TRIGRAPHS)
+		options << "-trigraphs ";
+	
+	if (langopts & LANGOPTS_SIGNED_CHAR)
+		options << "-fsigned-char ";
+	
+	if (langopts & LANGOPTS_UNSIGNED_BITFIELDS)
+		options << "-funsigned-bitfields ";
+	
+	if (langopts & LANGOPTS_CONST_CHAR_LITERALS)
+		options << "-Wwrite-strings ";
+	
+	options << beide.ExtraCompilerOptions();
+	proj.SetExtraCompilerOptions(options.String());
+	proj.SetExtraLinkerOptions(beide.ExtraLinkerOptions());
+	
+	proj.Save();
+	
+	outpath = savepath;
+	
+	return B_OK;
+}
+
+
+bool
+IsBeIDEProject(const entry_ref &ref)
+{
+	DPath dpath(ref);
+	if (!dpath.GetExtension() || strcmp(dpath.GetExtension(), "proj") != 0)
+		return false;
+	
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return false;
+	
+	char magic[5];
+	if (file.Read(magic, 4) < 4)
+		return false;
+	magic[4] = '\0';
+	return (strcmp(magic, "MIDE") == 0);
+}
+

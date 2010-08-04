@@ -213,6 +213,9 @@ public:
 	int32			CountLocalIncludes(void) const;
 	const char *	LocalIncludeAt(const uint32 &index);
 	
+	int32			CountFiles(void) const;
+	ProjectFile		FileAt(const uint32 &index);
+	
 private:
 	void		InitObject(void);
 	

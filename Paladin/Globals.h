@@ -24,6 +24,8 @@ BString		MakeRDefTemplate(void);
 void		SetToolTip(BView *view, const char *text);
 status_t	RunPipedCommand(const char *command, BString &out,
 							bool redirectStdErr);
+status_t	BeIDE2Paladin(const char *path, BString &outpath);
+bool		IsBeIDEProject(const entry_ref &ref);
 
 extern Project *gCurrentProject;
 extern LockableList<Project> *gProjectList;

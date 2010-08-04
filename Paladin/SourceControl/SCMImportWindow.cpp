@@ -5,7 +5,7 @@
 #include <String.h>
 
 #include "DPath.h"
-#include "../Globals.h"
+#include "Globals.h"
 #include "GitSourceControl.h"
 #include "HgSourceControl.h"
 #include "SCMOutputWindow.h"

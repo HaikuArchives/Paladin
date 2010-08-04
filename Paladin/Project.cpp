@@ -628,6 +628,7 @@ Project::UpdateBuildInfo(void)
 	fBuildInfo.includeList.MakeEmpty();
 	
 	fBuildInfo.includeString = "";
+	fBuildInfo.includeList.AddItem(new ProjectPath(fPath.GetFolder()));
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 	{
 		ProjectPath *newitem = new ProjectPath(*fLocalIncludeList.ItemAt(i));
@@ -683,6 +684,7 @@ Project::CompileFile(SourceFile *file)
 	if (fExtraCompilerOptions.CountChars() > 0)
 		compileString << fExtraCompilerOptions << " ";
 	
+	compileString << "-I '" << fPath.GetFolder() << "' ";
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 		compileString << "-I '" << fLocalIncludeList.ItemAt(i)->Absolute() << "' ";
 

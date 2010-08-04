@@ -6,9 +6,9 @@
 #include <Node.h>
 
 #include "BuildInfo.h"
-#include "../DebugTools.h"
-#include "../FileActions.h"
-#include "../Globals.h"
+#include "DebugTools.h"
+#include "FileActions.h"
+#include "Globals.h"
 
 SourceTypeResource::SourceTypeResource(void)
 {

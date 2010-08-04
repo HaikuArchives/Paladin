@@ -7,7 +7,7 @@
 #include <String.h>
 
 #include "EscapeCancelFilter.h"
-#include "../PLocale.h"
+#include "PLocale.h"
 
 #define M_TEXT_CHANGED 'txch'
 #define M_SEND_TEXT 'sntx'

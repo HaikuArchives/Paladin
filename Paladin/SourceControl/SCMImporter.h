@@ -4,7 +4,7 @@
 #include <String.h>
 
 #include "ObjectList.h"
-#include "../Project.h"
+#include "Project.h"
 
 class SCMProjectImporter;
 

@@ -6,7 +6,7 @@
 #include "DPath.h"
 #include "ErrorParser.h"
 #include "ObjectList.h"
-#include "../ProjectPath.h"
+#include "ProjectPath.h"
 
 class BuildInfo
 {

@@ -1,0 +1,409 @@
+BeIDE Project File Format Notes
+version 0.5, 8/4/2010
+DarkWyrm <darkwyrm@gmail.com>
+----------------------------------------
+
+These notes are the result of clean-room reverse engineering. No access to any MetroWerks documentation of any kind was available or desired. While best effort was given to ensure that the information contained herein is correct, it is by no means complete and possibly contains mistakes.
+
+The BeIDE Project format is probably the same as or an extension of the CodeWarrior project format. The first four bytes are always MIDE and the second four are likely some sort of version information.
+
+It is a binary tagged-record format consisting of a series of records. The rest of the file following the header is a series of these tagged records. Many records are of a fixed size, but there are also quite a few which have a dynamic size because of embedded strings.
+
+BeIDE project files consist of two main sections: settings and paths. The settings occupy a large section of the file size because of certain records have a large fixed size to accomodate strings within them. Access paths are one example.
+
+Care should be taken when reading BeIDE projects that some records are not required. Most can be expected to exist, however. The GenB record with the subtag 'mwcx' that is used to hold the target name and type is not always present. If it has not been changed, it may not exist in the file. In these instances, the name is expected to be "BeApp" and the target type 0 for Application.
+
+The rest of this document consists of notes on the different tags found in the file. Tags for which there is no known information may or may not be omitted.
+
+----------------------------------------
+Tag Notes
+----------------------------------------
+
+Tag: 'DPrf' -- currently somewhat unknown tagged data which occupies the last part of a group before the file listing. It might be a preferences tag because it can also be found right after the beginning of a project file starting at byte 9.
+
+At the beginning of the project file, it only occupies 8 bytes, including the tag and signifies the size of all of the file up to the first group 'Sect' tag, but in the group section, it takes up 44.
+struct
+{
+	char[4] tag;
+	int32 unknownData[11];
+};
+
+Tag: 'Sect' -- the name of a group
+Fixed size: 87 bytes (I think)
+struct
+{
+	char[4] tag;
+	int32 unknownData;
+	int32 fileCount;
+	int32[2] unknownData2;
+	char alwaysOne;
+	char[18] groupName;
+	'DPrf' tag data
+};
+
+Tag: 'Fil1' -- the beginning of a file entry, apparently a compilable source file.
+struct
+{
+	char[4] tag;
+	int32 unknownData[7];
+	Mime tag structure
+	Name tag structure
+	SrFl tag structures
+};
+
+Tag: 'Mime' -- the mime type of the file
+Dynamic size
+struct
+{
+	char[4] tag;
+	int32 unknown;
+	int32 lengthOfType; // this includes the NULL terminator
+	char [lengthOfType] type;
+};
+
+Tag: 'Name' -- the name of the file
+Dynamic size
+struct
+{
+	char[4] tag;
+	int32 unknown;
+	int32 lengthOfName; // this includes the NULL terminator
+	char [lengthOfType] name;
+};
+
+Tag: 'SrFl' -- File dependency
+struct
+{
+	char[4] tag;
+	int32[3] unknownData;
+	Name tag structure
+};
+
+Tag: 'PLnk' -- Resource files start with this tag instead of Fil1, but on the surface don't seem to be any different from them otherwise
+struct
+{
+	char[4] tag;
+	int32 unknownData[7];
+	Mime tag structure
+	Name tag structure
+};
+
+Tag: 'IgFl' -- A file to ignore, but otherwise the same as the Fil1 structure
+struct
+{
+	char[4] tag;
+	int32 unknownData[7];
+	Mime tag structure
+	Name tag structure
+};
+
+Tag: 'SbPr' -- a subproject
+struct
+{
+	char[4] tag;
+	int32 unknownData[7];
+	Mime tag structure
+	Name tag structure
+};
+
+Tag: 'Link' -- Apparently a linkable file. Object files, shared libraries, and static libraries use this.
+struct
+{
+	char[4] tag;
+	int32 unknownData[7];
+	Mime tag structure
+	Name tag structure
+};
+
+Tag: 'SPth' -- A system path
+Fixed size: 271 bytes
+struct
+{
+	char[4] tag;
+	int32 unknownData[2];
+	char extraByte;
+	char path[258];
+};
+
+Tag: 'PPth' -- A project path. This often includes the project path {project}.
+Fixed size: 271 bytes
+struct
+{
+	char[4] tag;
+	int32 unknownData;
+	int32 pathType; // 0 for absolute, 1 for project relative, 2 for ide relative
+	unsigned char defaultPath; // 1 for default, 0 for not
+	char path[258];
+};
+
+Tag: 'DAcc' -- Tag for the project file section on access paths.
+struct
+{
+	char[4] tag;
+	int32 unknownData[2];
+	int32 flags; // set to 0x10000000 if treating #include<> as #include ""
+	int32 countSystemPaths;
+	int32 countProjectPaths;
+};
+
+Tag: 'Trgg' -- Starting tag for target information section
+struct
+{
+	char[4] tag;
+	int32 unknownData[2];
+	int32 targetCount;
+	int32 unknownData[1];
+	target list
+};
+
+The target list records are a fixed size -- 139 bytes
+struct
+{
+	int16 buildStage;
+	int16 hasResources
+	char[8] extension;
+	char[63] toolName;
+	char[63] mimeType;
+};
+
+
+Tag: 'PrEn' -- Unknown.
+?Fixed Size: 12 bytes
+struct
+{
+	char[4] tag;
+	int32 unknownData[2];
+}
+
+Tag: 'PrVr' -- Unknown, possibly the version of preferences used
+?Fixed Size: 12 bytes
+struct
+{
+	char[4] tag;
+	int32 unknownData[2];
+}
+
+Tag: 'Priv' -- Unknown, possibly some reserved space
+?Fixed Size: 16 bytes
+struct
+{
+	char[4] tag;
+	int32 unknownData[3];
+}
+
+Tag: 'GPrf' -- tag to probably signal the beginning of the preferences section.
+It just has an int32 of the size following it before the various preferences tags begin.
+
+
+Tag: 'GenB' -- A block of generic bytes. This was probably used for extending the preferences while still supporting legacy
+struct
+{
+	char[4] tag;
+	int32 dataSize;
+	unsigned char[dataSize] data;
+};
+
+GenB Subtags:
+These are just like regular tags, but they are packaged inside a GenB tag and include tag name and length. They look like this:
+struct
+{
+	char[4] subtag;
+	int32 nameSize;
+	char[nameSize] subTagName;
+	<data>
+};
+
+Tag: 'GenB'::'RsDt'::"ResData" -- something resource-related
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 unknownData; // The size isn't the length of the name ResData plus the data which follows. Instead, it's only the size of the data itself, 4 bytes.
+	char[nameSize] subTagName; // ResData + NULL
+	int32 unknownData;
+}
+
+Tag: 'GenB'::'ShDt'::"ShellData" -- something shell-related
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 unknownData; // The size isn't the length of the name ShellData plus the data. Instead it's only the size of the data itself, 260 bytes.
+	char[nameSize] subTagName; // ShellData + NULL
+	unsigned char[260] shellData;
+}
+
+Tag: 'GenB'::'cccg'::"gccLanguage" -- Language options
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	
+	int32 buildFlags;
+	// 0x01000000 for treat all files as C
+	// 0x00010000 for treat all files as C++
+	// 0x00000100 for compile for ANSI C
+	// 0x00000001 for supporting ANSI trigraphs
+
+	int32 buildFlags2;
+	// Default signed char = 0x1000000
+	// Default unsigned bitfields = 0x10000
+};
+
+Values need to be figured out
+Tag: 'GenB'::'cccg'::"gccCommonWarning" -- Common warnings settings
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	int32 ccFlags1;
+	// 0x1000000 = Warn about all common mistakes
+	// 0x0010000 = Warn about missing parentheses
+	// 0x0000100 = Warn about inconsistent return types
+	// 0x0000001 = Warn about enumerated switches missing specific cases
+	
+	int32 ccFlags2;
+	// 0x1000000 = Warn when variable not used
+	// 0x0010000 = Warn about uninitialized auto variables
+	// 0x0000100 = Warn when compiler reorders member initialization
+	// 0x0000001 = Warn about nonvirtual destructors
+
+	int32 ccFlags3;
+	// 0x1000000 = Warn about unrecognized pragmas
+	// 0x0010000 = Warn about signed/unsigned comparisons
+	// 0x0000100 = Warn about subscripts with type char
+	// 0x0000001 = Warn about printf formatting anomalies
+
+	int32 ccFlags4;
+	// 0x1000000 = Warn when trigraphs used
+};
+
+Tag: 'GenB'::'cccg'::"gccWarning" -- C/C++ warnings settings
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	
+	int32 ccFlags1;
+	// 0x1000000 = Warnings are disabled
+	// 0x0010000 = Warnings are treated as errors
+	// 0x0000100 = Issue all warnings demanded by strict ANSI C/C++
+	// 0x0000001 = Warn when one local variable shadows another
+
+	int32 ccFlags2;
+	// 0x1000000 = Warn about casting functions to incompatible types
+	// 0x0010000 = Warn about casts which discard qualifiers
+	// 0x0000100 = Warn about possibly confusing type conversions
+	// 0x0000001 = Warn when an inlined function cannot be inlined
+
+	int32 ccFlags3;
+	// 0x1000000 = Warn when a function is declared extern, then inline
+	// 0x0010000 = Mark literal strings as 'const char *'
+	// 0x0000100 = Warn about overloaded virtual function names
+	// 0x0000001 = Warn if a C-style cast is used in a program
+	
+	char ccFlags4; // 1 to enable warnings about violations of "Effective C++" style rules
+	char[3] unknownData2;
+};
+
+Tag: 'GenB'::'cccg'::"gccCodeGeneration" -- x86 Code Generation
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	
+	int32 opMode;
+	// 0x1000000 = None
+	// 0x0010000 = Some
+	// 0x0000100 = More
+	// 0x0000001 = Full
+	
+	int32 codeGenFlags1;
+	// 0x1000000 = Optimize for size over speed
+	// 0x0010000 = Do not generate position independent code
+	// 0x0000100 = Only emit code for explicit template instantiations
+	// 0x0000001 = Generate code for functions even if fully inlined
+	
+	uint8 genDebugCode; // 1 if enabled
+	uint8 genProfilingCode; // 1 if enabled
+	int16 unknownData2;
+};
+
+Tag: 'GenB'::'cccg'::"AdditionalGCCCompilerOptions" -- 
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	char[1023] extraOptions;
+};
+
+Tag: 'GenB'::'dlcg'::"gccLinker" -- 
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	int8 stripAll; // set to 1 if enabled
+	int8 stripAllLocal; // set to 1 if enabled
+	int16 unknownData2;
+};
+
+Tag: 'GenB'::'dlcg'::"AdditionalGCCLinkerOptions" -- 
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	char[1023] extraOptions;
+};
+
+Tag: 'GenB'::'GNOL'::'UpdateProj'
+This section is at the end of the project file and follows the standard way of piecing together tags as the rest of the file. It only contains 4 bytes after the name before coming to a group tag.
+
+Tag: 'GenB'::'mwcx'::'ProjectPrefsx86' -- corresponds to the x86 ELF Project section
+struct
+{
+	char[4] tag;
+	int32 subtagSize;
+	char[4] subtag;
+	int32 nameSize; // includes NULL terminator
+	char[nameSize] subTagName;
+	int32 unknownData;
+	int32 unknownData;
+	int8 targetType;
+	// 0 = Application
+	// 1 = Shared Library / Add-on
+	// 2 = Static Library
+	// 3 = Kernel Driver
+	char[63] binarySignature; // This is always application/x-vnd.Be-elfexecutable
+	char[66] targetName;
+};
+

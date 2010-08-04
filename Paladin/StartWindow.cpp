@@ -119,7 +119,7 @@ StartWindow::StartWindow(void)
 	SetToolTip(label,TR("Quickly make a project by importing all source files and resource files."));
 	SetToolTip(fQuickImportButton,
 				TR("Quickly make a project by importing all source files and resource files."));
-
+	
 	fOnlineImportButton = MakeButton("onlineimport","OnlineImportButtonUp.png",
 									"OnlineImportButtonDown.png",M_ONLINE_IMPORT);
 	top->AddChild(fOnlineImportButton);
@@ -132,9 +132,21 @@ StartWindow::StartWindow(void)
 	SetToolTip(fQuickImportButton,
 				TR("Import a project from an online repository"));
 
+	
+	#ifdef DISABLE_ONLINE_IMPORT
+	
+	fOnlineImportButton->Hide();
+	SetSizeLimits(scrollView->Frame().left + 110.0,30000,
+				fQuickImportButton->Frame().bottom + 10.0,30000);
+	ResizeTo(scrollView->Frame().left + 160.0,fQuickImportButton->Frame().bottom + 10.0);
+	
+	#else
+	
 	SetSizeLimits(scrollView->Frame().left + 110.0,30000,
 				fOnlineImportButton->Frame().bottom + 10.0,30000);
 	ResizeTo(scrollView->Frame().left + 160.0,fOnlineImportButton->Frame().bottom + 10.0);
+	
+	#endif
 	
 	fProjectFilter = new TypedRefFilter(PROJECT_MIME_TYPE);
 	

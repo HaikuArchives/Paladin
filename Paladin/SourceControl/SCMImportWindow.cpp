@@ -40,9 +40,9 @@ SCMImportWindow::SCMImportWindow(void)
 		menu->AddItem(new BMenuItem(importer->GetName(), msg));
 	}
 	
-	
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Custom", new BMessage(M_USE_CUSTOM_PROVIDER)));
+	// Disable custom commands for now	
+//	menu->AddSeparatorItem();
+//	menu->AddItem(new BMenuItem("Custom", new BMessage(M_USE_CUSTOM_PROVIDER)));
 	
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(0L)->SetMarked(true);
@@ -207,6 +207,7 @@ SCMImportWindow::SetProvider(SCMProjectImporter *importer)
 		fUserNameBox->SetEnabled(true);
 		fRepository->SetEnabled(true);
 		fCommandView->MakeEditable(false);
+		fOK->SetEnabled(false);
 		fProjectBox->MakeFocus(true);
 		fProvider = importer;
 		
@@ -222,6 +223,7 @@ SCMImportWindow::SetProvider(SCMProjectImporter *importer)
 		fCommandView->MakeEditable(true);
 		fCommandView->SetText("");
 		fCommandView->MakeFocus(true);
+		fOK->SetEnabled(true);
 	}
 	
 	fProvider = importer;

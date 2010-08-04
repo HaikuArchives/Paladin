@@ -1,9 +1,9 @@
 TODO:
-	Finish the online import code
 	Later: move SCM commands to using ShellHelper class for safety
 	Bug: Files dropped from Tracker end up in the group above the one dropped on
 
 Features to implement / consider:
+	A finished online import via SCM feature
 	Tooltip for errors / warnings in the error window
 	File rename command in project window (tied to SCM rename command)
 	Add SymbolLocator to Tools menu

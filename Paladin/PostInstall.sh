@@ -1,6 +1,6 @@
 #!/bin/sh
-PLATFORM=`uname -o`
-case $PLATFORM in
+OSTYPE=`uname -o`
+case $OSTYPE in
 "Zeta")
 	mkdir /boot/home/config/ZetaMenu/Software/Development/Paladin/
 	ln -s /boot/apps/Paladin/Paladin /boot/home/config/ZetaMenu/Software/Development/Paladin/

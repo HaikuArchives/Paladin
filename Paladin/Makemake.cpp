@@ -57,6 +57,7 @@ MakeMake(Project *proj, DPath outfile)
 			{
 				BString path = file->GetPath().GetFullPath();
 				path.RemoveFirst(projfolder);
+				path.CharacterEscape("' ",'\\');
 				data << " " << path;
 			}
 		}
@@ -99,12 +100,20 @@ MakeMake(Project *proj, DPath outfile)
 	
 	data << "SYSTEM_INCLUDE_PATHS=";
 	for (i = 0; i < proj->CountSystemIncludes(); i++)
-		data << " " << proj->SystemIncludeAt(i);
+	{
+		BString path = proj->SystemIncludeAt(i);
+		path.CharacterEscape("' ",'\\');
+		data << " " << path;
+	}
 	data << "\n";
 	
 	data << "LOCAL_INCLUDE_PATHS=";
 	for (i = 0; i < proj->CountLocalIncludes(); i++)
-		data << " " << proj->LocalIncludeAt(i).Relative();
+	{
+		BString path = proj->LocalIncludeAt(i).Relative();
+		path.CharacterEscape("' ",'\\');
+		data << " " << path;
+	}
 	data << "\n";
 	
 	data << "OPTIMIZE=";

@@ -89,11 +89,13 @@ InitGlobals(void)
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
 		system("hg > /dev/null 2>&1") == 0)
 		gHgAvailable = true;
-		
+	
+	#ifndef DISABLE_GIT_SUPPORT
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
 		system("git > /dev/null 2>&1") == 1)
 		gGitAvailable = true;
-		
+	#endif
+	
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
 		system("svn > /dev/null 2>&1") == 1)
 		gSvnAvailable = true;

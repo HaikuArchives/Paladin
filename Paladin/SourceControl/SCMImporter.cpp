@@ -1,5 +1,8 @@
 #include "SCMImporter.h"
+
 #include <string.h>
+
+#include "Globals.h"
 
 SCMProjectImporterManager::SCMProjectImporterManager(void)
   :	fImporterList(20,true)
@@ -8,7 +11,10 @@ SCMProjectImporterManager::SCMProjectImporterManager(void)
 	fImporterList.AddItem(new BerliosImporter());
 	fImporterList.AddItem(new OSDrawerImporter());
 	fImporterList.AddItem(new BitbucketImporter());
+	
+	#ifndef DISABLE_GIT_SUPPORT
 	fImporterList.AddItem(new GitoriousImporter());
+	#endif
 }
 
 
@@ -185,11 +191,13 @@ SCMProjectImporter::GetSCMCommand(void)
 			out = "hg";
 			break;
 		}
+		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			out = "git";
 			break;
 		}
+		#endif
 		case SCM_SVN:
 		{
 			out = "svn";
@@ -232,13 +240,11 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 						<< ".hg.sourceforge.net:8000/hgroot/" << GetProjectName()
 						<< "/" << GetProjectName();
 			
-			if (GetRepository() && strlen(GetRepository()) > 0)
-				command << "/" << GetRepository();
-			
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";
 			break;
 		}
+		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			// Read-only: git://PROJNAME.git.sourceforge.net/gitroot/PROJNAME/REPONAME
@@ -246,11 +252,11 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 			if (!readOnly)
 				command << "clone ssh://" << GetUserName() << "@"
 						<< GetProjectName() << ".git.sourceforge.net/gitroot/"
-						<< GetProjectName();
+						<< GetProjectName() << "/" << GetProjectName();
 			else
 				command << "clone git://" << GetProjectName()
 						<< ".git.sourceforge.net/gitroot/"
-						<< GetProjectName();
+						<< GetProjectName() << "/" << GetProjectName();
 				
 			if (GetRepository() && strlen(GetRepository()))
 				command << "/" << GetRepository();
@@ -259,11 +265,12 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
+		#endif
 		case SCM_SVN:
 		{
 			// Read-only / developer:
 			// svn co https://PROJNAME.svn.sourceforge.net/svnroot/PROJNAME FOLDERNAME
-			command << "co https://" << GetProjectName()
+			command << "co --non-interactive --trust-server-cert https://" << GetProjectName()
 					<< ".svn.sourceforge.net/svnroot/" << GetProjectName();
 
 			if (GetRepository() && strlen(GetRepository()) > 0)
@@ -288,8 +295,11 @@ SourceforgeImporter::SupportsSCM(const scm_t &scm) const
 {
 	switch (scm)
 	{
-		case SCM_HG:
+		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
+		#endif
+		
+		case SCM_HG:
 		case SCM_SVN:
 			return true;
 		
@@ -326,6 +336,7 @@ BerliosImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
+		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			// Read-only: git://git.berlios.de/PROJNAME
@@ -343,6 +354,7 @@ BerliosImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
+		#endif
 		case SCM_SVN:
 		{
 			// Read-only: svn://svn.berlios.de/PROJNAME/REPONAME
@@ -374,8 +386,11 @@ BerliosImporter::SupportsSCM(const scm_t &scm) const
 {
 	switch (scm)
 	{
-		case SCM_HG:
+		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
+		#endif
+		
+		case SCM_HG:
 		case SCM_SVN:
 			return true;
 		
@@ -496,11 +511,11 @@ GitoriousImporter::GetImportCommand(bool readOnly)
 			// read-only: http://git.gitorious.org/PROJNAME/REPONAME.git
 			// developer: git://git.gitorious.org/PROJNAME/REPONAME.git
 			if (!readOnly)
-				command << "clone git://git.gitorious.org/" << GetProjectName()
-						<< "/" << GetRepository() << ".git";
+				command << "--no-pager clone git://git.gitorious.org/" << GetProjectName()
+						<< "/" << GetProjectName() << ".git";
 			else
-				command << "clone http://git.gitorious.org/" << GetProjectName()
-						<< "/" << GetRepository() << ".git";
+				command << "--no-pager clone http://git.gitorious.org/" << GetProjectName()
+						<< "/" << GetProjectName() << ".git";
 			
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";

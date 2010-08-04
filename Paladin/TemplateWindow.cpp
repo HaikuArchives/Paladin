@@ -112,6 +112,10 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	menu->AddItem(new BMenuItem("Subversion", new BMessage()));
 	menu->AddItem(new BMenuItem("None", new BMessage()));
 	
+	#ifdef DISABLE_GIT_SUPPORT
+	menu->ItemAt(1)->SetEnabled(false);
+	#endif
+	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fSCMChooser = new BMenuField(r, "scmchooser", "Source Control: ", menu);
 	top->AddChild(fSCMChooser);

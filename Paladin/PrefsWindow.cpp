@@ -138,14 +138,16 @@ PrefsWindow::PrefsWindow(BRect frame)
 								menu);
 	top->AddChild(fSCMChooser);
 	
+	#ifdef DISABLE_GIT_SUPPORT
+	menu->ItemAt(1)->SetEnabled(false);
+	#endif
+	
 	menu->SetLabelFromMarked(true);
 	BMenuItem *marked = menu->ItemAt(gDefaultSCM);
 	if (marked)
 		marked->SetMarked(true);
 	else
 		menu->ItemAt(menu->CountItems() - 1)->SetMarked(true);
-	
-	
 	
 	r.OffsetBy(0.0, r.Height() + 5.0);
 	r.right = r.left + 1.0;

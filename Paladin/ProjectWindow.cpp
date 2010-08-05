@@ -31,6 +31,7 @@
 #include "GetTextWindow.h"
 #include "Globals.h"
 #include "GroupRenameWindow.h"
+#include "LaunchHelper.h"
 #include "LibWindow.h"
 #include "LicenseManager.h"
 #include "Makemake.h"
@@ -59,6 +60,7 @@ enum
 	M_SHOW_RUN_ARGS = 'srag',
 	M_SHOW_LIBRARIES = 'slbw',
 	M_SHOW_PROJECT_FOLDER = 'shpf',
+	M_RUN_TOOL = 'rntl',
 	M_UPDATE_DEPENDENCIES = 'updp',
 	M_BUILD_PROJECT = 'blpj',
 	M_DEBUG_PROJECT = 'PRnD',
@@ -501,6 +503,16 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		{
 			LicenseManager *man = new LicenseManager(fProject->GetPath().GetFolder());
 			man->Show();
+			break;
+		}
+		case M_RUN_TOOL:
+		{
+			BString sig;
+			if (msg->FindString("signature", &sig) == B_OK)
+			{
+				LaunchHelper launcher(sig.String());
+				launcher.Launch();
+			}
 			break;
 		}
 		case M_MAKE_MAKE:
@@ -1389,10 +1401,18 @@ ProjectWindow::SetupMenus(void)
 	fMenuBar->AddItem(fBuildMenu);
 	
 	fToolsMenu = new BMenu(TR("Tools"));
-	//fToolsMenu->AddItem(new BMenuItem(TR("Code Library…"),new BMessage(M_SHOW_CODE_LIBRARY),'L'));
+	
+	#ifdef BUILD_CODE_LIBRARY
+	fToolsMenu->AddItem(new BMenuItem(TR("Code Library…"),new BMessage(M_SHOW_CODE_LIBRARY),'L'));
+	#endif
 	fToolsMenu->AddItem(new BMenuItem(TR("Error Window…"),new BMessage(M_TOGGLE_ERROR_WINDOW),'I'));
 	fToolsMenu->AddItem(new BMenuItem(TR("ASCII Table…"),new BMessage(M_SHOW_ASCII_TABLE)));
 	fToolsMenu->AddItem(new BMenuItem(TR("Regular Expression Tester…"),new BMessage(M_SHOW_VREGEX)));
+	
+	BMessage *msg = new BMessage(M_RUN_TOOL);
+	msg->AddString("signature", "application/x-vnd.dw-SymbolFinder");
+	fToolsMenu->AddItem(new BMenuItem(TR("Symbol Finder…"), msg));
+	fToolsMenu->AddSeparatorItem();
 	fToolsMenu->AddItem(new BMenuItem(TR("Make Backup"),new BMessage(M_BACKUP_PROJECT)));
 	fToolsMenu->AddSeparatorItem();
 	fToolsMenu->AddItem(new BMenuItem(TR("Add Software License…"),new BMessage(M_SHOW_LICENSES)));

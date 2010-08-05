@@ -115,10 +115,11 @@ StartWindow::StartWindow(void)
 	label = MakeLabel(fQuickImportButton,"Import an existing project");
 	top->AddChild(label);
 	label->SetMessage(new BMessage(M_SHOW_IMPORT));
-	SetToolTip(label,TR("Quickly make a project by importing all source files and resource files."));
+	SetToolTip(label,TR("Quickly make a project by importing all source files and resource files.\n"
+						"You can also import a BeIDE project."));
 	SetToolTip(fQuickImportButton,
-				TR("Quickly make a project by importing all source files and resource files."));
-	
+				TR("Quickly make a project by importing all source files and resource files.\n"
+					"You can also import a BeIDE project."));	
 	fOnlineImportButton = MakeButton("onlineimport","OnlineImportButtonUp.png",
 									"OnlineImportButtonDown.png",M_ONLINE_IMPORT);
 	top->AddChild(fOnlineImportButton);

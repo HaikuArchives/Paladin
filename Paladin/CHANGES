@@ -28,3 +28,4 @@ Fixed a bug with duplication of local include paths
 Opening a project from Terminal (like "Paladin myproject") now doesn't need the extension and works faster in some cases
 Made some small fixes to the makefile generator
 A project's directory is now implicitly included in the list of include paths during builds
+BeIDE projects can be opened just like Paladin projects and are converted when opened.

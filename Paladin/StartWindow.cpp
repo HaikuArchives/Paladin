@@ -57,8 +57,7 @@ public:
 
 
 StartWindow::StartWindow(void)
-	:	DWindow(BRect(0,0,400,300),"Paladin",B_DOCUMENT_WINDOW, B_NOT_ZOOMABLE),
-		fProjectFilter(NULL)
+	:	DWindow(BRect(0,0,400,300),"Paladin",B_DOCUMENT_WINDOW, B_NOT_ZOOMABLE)
 {
 	RegisterWindow();
 	AddShortcut('O',B_COMMAND_KEY, new BMessage(M_SHOW_OPEN_PROJECT));
@@ -148,17 +147,12 @@ StartWindow::StartWindow(void)
 	
 	#endif
 	
-	fProjectFilter = new TypedRefFilter(PROJECT_MIME_TYPE);
-	
-	if ((gPlatform != PLATFORM_HAIKU && gPlatform != PLATFORM_HAIKU_GCC4))
-		fProjectFilter = new TypedRefFilter(PROJECT_MIME_TYPE);
-	
 	BMessenger msgr(this);
 	BEntry entry(gProjectPath.GetFullPath());
 	entry_ref ref;
 	entry.GetRef(&ref);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL,&msgr,&ref,B_FILE_NODE,true,
-								new BMessage(M_OPEN_PROJECT),fProjectFilter);
+								new BMessage(M_OPEN_PROJECT));
 	BString titleString(TR("Open Project"));
 	titleString.Prepend("Paladin: ");
 	fOpenPanel->Window()->SetTitle(titleString.String());
@@ -200,7 +194,6 @@ StartWindow::~StartWindow(void)
 {
 	delete fOpenPanel;
 	delete fImportPanel;
-	delete fProjectFilter;
 }
 
 

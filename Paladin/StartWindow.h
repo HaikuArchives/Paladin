@@ -34,7 +34,6 @@ private:
 		BListView		*fListView;
 		BFilePanel		*fOpenPanel;
 		BFilePanel		*fImportPanel;
-		TypedRefFilter	*fProjectFilter;
 };
 
 #endif

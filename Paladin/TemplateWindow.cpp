@@ -112,9 +112,25 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	menu->AddItem(new BMenuItem("Subversion", new BMessage()));
 	menu->AddItem(new BMenuItem("None", new BMessage()));
 	
-	#ifdef DISABLE_GIT_SUPPORT
-	menu->ItemAt(1)->SetEnabled(false);
-	#endif
+	if (!gHgAvailable)
+	{
+		menu->ItemAt(0)->SetEnabled(false);
+		menu->ItemAt(0)->SetLabel("Mercurial Unavailable");
+	}
+	
+	if (!gGitAvailable)
+	{
+		menu->ItemAt(1)->SetEnabled(false);
+		menu->ItemAt(1)->SetLabel("Git Unavailable");
+	}
+	
+	if (!gSvnAvailable)
+	{
+		menu->ItemAt(2)->SetEnabled(false);
+		menu->ItemAt(2)->SetLabel("Subversion Unavailable");
+	}
+	
+	menu->ItemAt(gDefaultSCM)->SetMarked(true);
 	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fSCMChooser = new BMenuField(r, "scmchooser", "Source Control: ", menu);
@@ -122,11 +138,19 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fSCMChooser->SetDivider(divider);
 	
 	menu->SetLabelFromMarked(true);
-	BMenuItem *marked = menu->ItemAt(gDefaultSCM);
-	if (marked)
-		marked->SetMarked(true);
-	else
-		menu->ItemAt(menu->CountItems() - 1)->SetMarked(true);
+	BMenuItem *item = menu->FindMarked();
+	if (!item->IsEnabled())
+	{
+		item->SetMarked(false);
+		for (int32 i = 0; i < menu->CountItems(); i++)
+		{
+			if (menu->ItemAt(i)->IsEnabled())
+			{
+				menu->ItemAt(i)->SetMarked(true);
+				break;
+			}
+		}
+	}
 	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fCreateFolder = new BCheckBox(r,"createfolder",TR("Create Project Folder"),NULL);

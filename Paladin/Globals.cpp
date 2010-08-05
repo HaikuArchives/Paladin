@@ -354,7 +354,7 @@ BeIDE2Paladin(const char *path, BString &outpath)
 	
 	BString savepath(dpath.GetFolder());
 	savepath << "/" << dpath.GetBaseName() << ".pld";
-	proj.Save(savepath);
+	proj.Save(savepath.String());
 	
 	for (int32 i = 0; i < beide.CountLocalIncludes(); i++)
 	{

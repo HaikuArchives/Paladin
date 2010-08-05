@@ -29,7 +29,6 @@
 #include "SourceFile.h"
 #include "StartWindow.h"
 #include "TemplateWindow.h"
-#include "TypedRefFilter.h"
 
 
 BPoint gProjectWindowPoint;
@@ -102,8 +101,7 @@ App::App(void)
 	:	BApplication(APP_SIGNATURE),
 		fBuildMode(false),
 		fBuildCleanMode(false),
-		fBuilder(NULL),
-		fProjectFilter(NULL)
+		fBuilder(NULL)
 {
 	InitFileTypes();
 	InitGlobals();
@@ -111,15 +109,12 @@ App::App(void)
 	gProjectList = new LockableList<Project>(20,true);
 	gProjectWindowPoint.Set(5,24);
 
-	if ((gPlatform != PLATFORM_HAIKU && gPlatform != PLATFORM_HAIKU_GCC4))
-		fProjectFilter = new TypedRefFilter(PROJECT_MIME_TYPE);
-	
 	BMessenger msgr(this);
 	BEntry entry(gLastProjectPath.GetFullPath());
 	entry_ref ref;
 	entry.GetRef(&ref);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL,&msgr,&ref,B_FILE_NODE,true,
-								new BMessage(B_REFS_RECEIVED),fProjectFilter);
+								new BMessage(B_REFS_RECEIVED));
 	fOpenPanel->Window()->SetTitle("Paladin: Open Project");
 }
 
@@ -130,7 +125,6 @@ App::~App(void)
 	
 	delete fBuilder;
 	delete fOpenPanel;
-	delete fProjectFilter;
 }
 
 

@@ -8,7 +8,6 @@
 
 class DelayedMessenger;
 class ProjectBuilder;
-class TypedRefFilter;
 class Project;
 class DPath;
 
@@ -40,7 +39,6 @@ private:
 	bool			fBuildCleanMode;
 	ProjectBuilder	*fBuilder;
 	BFilePanel		*fOpenPanel;
-	TypedRefFilter	*fProjectFilter;
 };
 
 BWindow *	WindowForProject(Project *proj);

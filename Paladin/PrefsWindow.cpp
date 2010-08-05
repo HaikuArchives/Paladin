@@ -142,12 +142,33 @@ PrefsWindow::PrefsWindow(BRect frame)
 	menu->ItemAt(1)->SetEnabled(false);
 	#endif
 	
+	if (gPlatform == PLATFORM_R5 || gPlatform == PLATFORM_ZETA)
+	{
+		menu->ItemAt(0)->SetEnabled(false);
+		menu->ItemAt(0)->SetLabel("Mercurial Unavailable");
+		menu->ItemAt(1)->SetEnabled(false);
+		menu->ItemAt(1)->SetLabel("Git Unavailable");
+	}
+	
 	menu->SetLabelFromMarked(true);
 	BMenuItem *marked = menu->ItemAt(gDefaultSCM);
 	if (marked)
 		marked->SetMarked(true);
 	else
 		menu->ItemAt(menu->CountItems() - 1)->SetMarked(true);
+
+	if (!marked->IsEnabled())
+	{
+		marked->SetMarked(false);
+		for (int32 i = 0; i < menu->CountItems(); i++)
+		{
+			if (menu->ItemAt(i)->IsEnabled())
+			{
+				menu->ItemAt(i)->SetMarked(true);
+				break;
+			}
+		}
+	}
 	
 	r.OffsetBy(0.0, r.Height() + 5.0);
 	r.right = r.left + 1.0;

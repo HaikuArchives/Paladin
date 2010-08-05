@@ -130,7 +130,6 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 		menu->ItemAt(2)->SetLabel("Subversion Unavailable");
 	}
 	
-	menu->ItemAt(gDefaultSCM)->SetMarked(true);
 	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fSCMChooser = new BMenuField(r, "scmchooser", "Source Control: ", menu);
@@ -138,6 +137,8 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fSCMChooser->SetDivider(divider);
 	
 	menu->SetLabelFromMarked(true);
+	menu->ItemAt(gDefaultSCM)->SetMarked(true);
+	
 	BMenuItem *item = menu->FindMarked();
 	if (!item->IsEnabled())
 	{
@@ -151,6 +152,7 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 			}
 		}
 	}
+	menu->SetLabelFromMarked(true);
 	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fCreateFolder = new BCheckBox(r,"createfolder",TR("Create Project Folder"),NULL);

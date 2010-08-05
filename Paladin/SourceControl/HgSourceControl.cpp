@@ -161,6 +161,12 @@ HgSourceControl::Commit(const char *msg)
 	
 	BString out;
 	RunCommand(command, out);
+	
+	// Committing a revision doesn't typically print anything,
+	// so we will print something for feedback.
+	if (out.CountChars() < 1 && GetUpdateCallback())
+		GetUpdateCallback()("Commit completed.\n");
+		
 	return B_OK;
 }
 

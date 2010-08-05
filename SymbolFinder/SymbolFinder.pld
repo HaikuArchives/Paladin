@@ -11,6 +11,7 @@ SOURCEFILE=DWindow.cpp
 DEPENDENCY=	/BeData/projects/Paladin-Related/paladin/SymbolLocator/DWindow.h
 SOURCEFILE=MainWindow.cpp
 DEPENDENCY=	/BeData/projects/Paladin-Related/paladin/SymbolLocator/MainWindow.h|/BeData/projects/Paladin-Related/paladin/SymbolLocator/DWindow.h|/boot/develop/headers/posix/stdlib.h|/boot/develop/headers/posix/alloca.h|/boot/develop/headers/posix/sys/types.h|/boot/develop/headers/os/BeBuild.h|/boot/develop/headers/posix/null.h|/boot/develop/headers/posix/size_t.h|/boot/develop/headers/posix/time.h|/boot/develop/headers/posix/div_t.h|/boot/develop/headers/posix/limits.h|/boot/develop/headers/posix/wchar_t.h|/boot/develop/headers/posix/stdio.h|/boot/develop/headers/posix/stdio_pre.h|/boot/develop/headers/posix/libio.h|/boot/develop/headers/posix/stdio_post.h|/BeData/projects/Paladin-Related/paladin/SymbolLocator/DPath.h
+SOURCEFILE=SymbolFinder.rdef
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp
 SYSTEMINCLUDE=/boot/develop/headers/posix

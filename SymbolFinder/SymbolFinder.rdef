@@ -1,0 +1,24 @@
+resource app_signature "application/x-vnd.dw-SymbolFinder";
+resource app_flags B_SINGLE_LAUNCH;
+
+/*--------------------------------------------------------------------
+	Set the version information about your app here.
+	The variety can be set to one of the following values
+	B_APPV_DEVELOPMENT,
+	B_APPV_ALPHA,
+	B_APPV_BETA,
+	B_APPV_GAMMA,
+	B_APPV_GOLDEN_MASTER,
+	B_APPV_FINAL
+--------------------------------------------------------------------*/
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_FINAL,
+	internal = 0,
+
+	short_info = "A library symbol finder",
+	long_info = "Search for a symbol in one of the system libraries"
+};

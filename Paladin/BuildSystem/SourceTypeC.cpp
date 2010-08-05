@@ -115,6 +115,10 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	}
 	else
 	{
+		// The reason that all of this works is because the absolute paths force
+		// each file to be on a separate line. Going with relative paths is FAR more
+		// of a headache than I want to mess with. Bleah.
+		
 		if (depstr.FindFirst(" warning: ") >= 0)
 		{
 			int32 index, startpos = 0;
@@ -131,7 +135,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 		
 		// The first part of the dependency string should be FileName.o:
 		BString objfilename = GetPath().GetBaseName();
-		objfilename << ".o : ";
+		objfilename << ".o: ";
 		
 		int32 filenamepos = depstr.FindFirst(objfilename.String());
 		if (filenamepos == 0)
@@ -145,6 +149,9 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 		
 		fDependencies.RemoveSet("\\\n");
 		fDependencies.ReplaceAll("  ","|");
+		fDependencies.ReplaceAll("| ","|");
+		if (fDependencies[0] == ' ')
+			fDependencies.RemoveFirst(" ");
 	}
 }
 

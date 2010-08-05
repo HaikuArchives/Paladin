@@ -117,7 +117,7 @@ FindFile(entry_ref folder, const char *name)
 entry_ref
 FindProject(entry_ref folder, const char *name)
 {
-printf("Searching for %s in folder %s\n", name, folder.name);
+	printf("Searching for %s in folder %s\n", name, folder.name);
 	entry_ref ref,returnRef;
 	if (!folder.name || !name)
 		return returnRef;

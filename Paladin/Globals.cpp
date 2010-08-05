@@ -40,6 +40,7 @@ Project *gCurrentProject = NULL;
 LockableList<Project> *gProjectList = NULL;
 CodeLib gCodeLib;
 scm_t gDefaultSCM = SCM_HG;
+bool gUsePipeHack = false;
 
 uint8 gCPUCount = 1;
 
@@ -47,7 +48,6 @@ StatCache gStatCache;
 bool gUseStatCache = true;
 platform_t gPlatform = PLATFORM_R5;
 
-#define HAIKU_PIPE_HACK
 
 void
 InitGlobals(void)
@@ -82,24 +82,30 @@ InitGlobals(void)
 		gCCacheAvailable = true;
 	}
 		
-	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
-		system("fastdep > /dev/null 2>&1") == 0)
-		gFastDepAvailable = true;
+	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
+	{
+		if (system("fastdep > /dev/null 2>&1") == 0)
+			gFastDepAvailable = true;
 		
-	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
-		system("hg > /dev/null 2>&1") == 0)
-		gHgAvailable = true;
+		if (system("hg > /dev/null 2>&1") == 0)
+			gHgAvailable = true;
+		
+		#ifndef DISABLE_GIT_SUPPORT
+		if (system("git > /dev/null 2>&1") == 1)
+			gGitAvailable = true;
+		#endif
+		
+		BString revision;
+		RunPipedCommand("uname -v", revision, false);
+		revision.Truncate(revision.FindFirst(" "));
+		revision = BString(revision).String() + 1;
+		if (revision < "37423")
+			gUsePipeHack = true;
+	}
 	
-	#ifndef DISABLE_GIT_SUPPORT
-	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
-		system("git > /dev/null 2>&1") == 1)
-		gGitAvailable = true;
-	#endif
-	
-	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
-		system("svn > /dev/null 2>&1") == 1)
+	if (system("svn > /dev/null 2>&1") == 1)
 		gSvnAvailable = true;
-		
+	
 	gProjectPath.SetTo(gSettings.GetString("projectpath",PROJECT_PATH));
 	gLastProjectPath.SetTo(gSettings.GetString("lastprojectpath",PROJECT_PATH));
 	gBackupPath.SetTo(gSettings.GetString("backuppath","/boot/home/Desktop"));
@@ -285,53 +291,52 @@ RunPipedCommand(const char *cmdstr, BString &out, bool redirectStdErr)
 	BString command(cmdstr);
 	out = "";
 	
-#ifdef HAIKU_PIPE_HACK
-		if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
+	if (gUsePipeHack)
+	{
+		BString tmpfilename("/tmp/Paladin.build.tmp.");
+		tmpfilename << real_time_clock_usecs();
+		
+		command << " > " << tmpfilename;
+		
+		if (redirectStdErr)
+			command << " 2>&1";
+		system(command.String());
+		
+		BFile file(tmpfilename.String(), B_READ_ONLY);
+		if (file.InitCheck() != B_OK)
 		{
-			BString tmpfilename("/tmp/Paladin.build.tmp.");
-			tmpfilename << real_time_clock_usecs();
-			
-			command << " > " << tmpfilename;
-			
-			if (redirectStdErr)
-				command << " 2>&1";
-			system(command.String());
-			
-			BFile file(tmpfilename.String(), B_READ_ONLY);
-			if (file.InitCheck() != B_OK)
-			{
-				STRACE(1,("Couldn't make temporary file for RunPipedCommand(\"%s\")\n",
-							command.String()));
-				return file.InitCheck();
-			}
-			
-			char buffer[1024];
-			while (file.Read(buffer, 1024) > 0)
-				out << buffer;
-			
-			file.Unset();
-			BEntry(tmpfilename.String()).Remove();
+			STRACE(1,("Couldn't make temporary file for RunPipedCommand(\"%s\")\n",
+						command.String()));
+			return file.InitCheck();
 		}
-		else
-#endif	
+		
+		char buffer[1024];
+		while (file.Read(buffer, 1024) > 0)
+			out << buffer;
+		
+		file.Unset();
+		BEntry(tmpfilename.String()).Remove();
+	}
+	else
+	{
+		if (redirectStdErr)
+			command << " 2>&1";
+		
+		FILE *fd = popen(cmdstr,"r");
+		if (!fd)
 		{
-			if (redirectStdErr)
-				command << " 2>&1";
-			
-			FILE *fd = popen(cmdstr,"r");
-			if (!fd)
-			{
-				STRACE(1,("Bailed out on RunPipedCommand(\"%s\"): NULL pipe descriptor\n",
-							command.String()));
-				return B_BUSTED_PIPE;
-			}
-			
-			char buffer[1024];
-			BString errmsg;
-			while (fgets(buffer,1024,fd))
-				out += buffer;
-			pclose(fd);
+			STRACE(1,("Bailed out on RunPipedCommand(\"%s\"): NULL pipe descriptor\n",
+						command.String()));
+			return B_BUSTED_PIPE;
 		}
+		
+		char buffer[1024];
+		BString errmsg;
+		while (fgets(buffer,1024,fd))
+			out += buffer;
+		pclose(fd);
+	}
+	
 	return B_OK;
 }
 

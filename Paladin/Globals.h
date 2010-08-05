@@ -38,6 +38,7 @@ extern Project *gCurrentProject;
 extern LockableList<Project> *gProjectList;
 extern CodeLib gCodeLib;
 extern scm_t gDefaultSCM;
+extern bool gUsePipeHack;
 
 extern DPath gAppPath;
 extern DPath gBackupPath;

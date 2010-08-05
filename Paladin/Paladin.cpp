@@ -241,7 +241,7 @@ App::ArgvReceived(int32 argc,char **argv)
 		
 		if (!entry.Exists())
 		{
-			ref = FindProject(projref,argv[i]);
+			ref = FindProject(projref,projPath.String());
 			if (!ref.name)
 			{
 				printf(TR("Can't find file %s\n"),argv[i]);

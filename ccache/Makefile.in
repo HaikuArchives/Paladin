@@ -1,0 +1,77 @@
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+mandir = @mandir@
+datarootdir = @datarootdir@
+installcmd = @INSTALL@
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -I.
+LDFLAGS = @LDFLAGS@
+EXEEXT = @EXEEXT@
+
+libs = @LIBS@ -lm
+
+sources = \
+    ccache.c mdfour.c hash.c execute.c util.c args.c stats.c version.c \
+    cleanup.c snprintf.c unify.c manifest.c hashtable.c hashtable_itr.c \
+    murmurhashneutral2.c hashutil.c getopt_long.c
+all_sources = $(sources) @extra_sources@
+
+headers = \
+    ccache.h hashtable.h hashtable_itr.h hashtable_private.h hashutil.h \
+    manifest.h mdfour.h murmurhashneutral2.h getopt_long.h
+
+objs = $(all_sources:.c=.o)
+
+generated_docs = ccache.1 INSTALL.html manual.html NEWS.html README.html
+
+files_to_clean = $(objs) ccache$(EXEEXT) *~
+
+.PHONY: all
+all: ccache$(EXEEXT)
+
+.PHONY: docs
+docs: $(generated_docs)
+
+ccache$(EXEEXT): $(objs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(objs) $(libs)
+
+.PHONY: install
+install: all
+	$(installcmd) -d $(DESTDIR)$(bindir)
+	$(installcmd) -m 755 ccache$(EXEEXT) $(DESTDIR)$(bindir)
+	$(installcmd) -d $(DESTDIR)$(mandir)/man1
+	-$(installcmd) -m 644 $(srcdir)/ccache.1 $(DESTDIR)$(mandir)/man1/
+
+.PHONY: clean
+clean:
+	rm -f $(files_to_clean)
+
+.PHONY: perf
+perf: ccache$(EXEEXT)
+	$(srcdir)/perf.py --ccache ccache$(EXEEXT) $(CC) $(CFLAGS) $(CPPFLAGS) $(srcdir)/ccache.c
+
+.PHONY: test
+test: ccache$(EXEEXT)
+	CC='$(CC)' $(srcdir)/test.sh
+
+.PHONY: check
+check: test
+
+.PHONY: distclean
+distclean: clean
+	rm -rf Makefile dev.mk config.h config.log config.status .deps version.c
+
+.PHONY: installcheck
+installcheck:
+	CCACHE=$(bindir)/ccache $(srcdir)/test.sh
+
+.c.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+@include_dev_mk@

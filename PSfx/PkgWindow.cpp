@@ -274,8 +274,16 @@ PkgWindow::MessageReceived(BMessage *msg)
 			if (msg->FindRef("directory",&ref) == B_OK && 
 				msg->FindString("name",&name) == B_OK)
 			{
-				fFilePath.SetTo(ref);
-				fFilePath << name;
+				DPath tempPath(ref);
+				tempPath << name;
+				if (!tempPath.GetExtension() || strlen(tempPath.GetExtension()) < 1)
+				{
+					BString temp(tempPath.GetFullPath());
+					temp << ".pfx";
+					tempPath.SetTo(temp.String());
+				}
+				
+				fFilePath.SetTo(tempPath);
 				DoSave();
 			}
 			

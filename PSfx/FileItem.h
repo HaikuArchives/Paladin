@@ -26,6 +26,7 @@ class FileItem
 {
 public:
 							FileItem(void);
+							FileItem(const entry_ref &ref);
 							~FileItem(void);
 			
 			const char *	GetName(void) const;

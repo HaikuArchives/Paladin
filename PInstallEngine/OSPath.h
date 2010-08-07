@@ -41,7 +41,8 @@ typedef enum
 	OS_ALL = 0,
 	OS_R5,
 	OS_ZETA,
-	OS_HAIKU
+	OS_HAIKU,
+	OS_HAIKU_GCC4
 } ostype_t;
 
 BString OSTypeToString(ostype_t type);

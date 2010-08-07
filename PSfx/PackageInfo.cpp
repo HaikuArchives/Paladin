@@ -12,6 +12,7 @@
 
 PackageInfo::PackageInfo(void)
 	:	fPackageVersion(1.0),
+		fReleaseDate(real_time_clock()),
 		fPath(B_APPS_DIRECTORY),
 		fShowChooser(false),
 		fFiles(20,true),
@@ -672,6 +673,8 @@ PackageInfo::ParsePackageInfo(BString str)
 				SetAuthorURL(value.String());
 			else if (key.ICompare("RELEASEDATE") == 0)
 				SetReleaseDate(atol(value.String()));
+			else if (key.ICompare("APPVERSION") == 0)
+				SetPackageVersion(atof(value.String()));
 			else if (key.ICompare("APPVERSION") == 0)
 				SetAppVersion(value.String());
 			else if (key.ICompare("FILE") == 0)

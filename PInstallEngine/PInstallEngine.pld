@@ -1,6 +1,6 @@
 NAME=PInstallEngine
 TARGETNAME=PInstallEngine
-PLATFORM=HaikuGCC4
+PLATFORM=Haiku
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=AboutWindow.cpp
@@ -51,7 +51,6 @@ LIBRARY=/boot/develop/lib/x86/libroot.so
 LIBRARY=/boot/develop/lib/x86/libbe.so
 LIBRARY=/boot/develop/lib/x86/libtracker.so
 LIBRARY=/boot/develop/lib/x86/libtranslation.so
-LIBRARY=/boot/develop/lib/x86/libsupc++.so
 RUNARGS=--volume Haiku
 CCDEBUG=no
 CCPROFILE=no

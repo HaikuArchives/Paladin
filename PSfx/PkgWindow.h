@@ -32,11 +32,13 @@ private:
 			void	ItemSelected(int32 item);
 			void	InitFields(void);
 			void	InitEmptyProject(void);
-			void	LoadPackage(entry_ref ref);
+			void	LoadProject(entry_ref ref);
+			void	SaveProject(const char *path);
 			void	SetInstallFolder(const int32 &value, const char *custom = NULL);
 			void	SetReplaceMode(const int32 &value);
 			void	ShowSave(bool force_saveas);
 			void	DoSave(void);
+			void	BuildPackage(ostype_t platform);
 	
 	BMenuBar		*fBar;
 	FileListView	*fListView;
@@ -56,7 +58,9 @@ private:
 	
 	PackageInfo		fPkgInfo;
 	bool			fNeedSave,
-					fQuitAfterSave;
+					fQuitAfterSave,
+					fBuildAfterSave;
+	ostype_t		fBuildType;
 };
 
 class PathMenuItem : public BMenuItem

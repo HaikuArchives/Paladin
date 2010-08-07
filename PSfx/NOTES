@@ -1,6 +1,10 @@
 TODO:
 
-Figure out how files will get into the zip file and how the zip file will get into the package file. Code for this does not exist in the PackageInfo class.
+Add save support for projects
+
+Create icons for PSfx and its project files
+
+Set up MIME handling stuff for project files and sfx files
 
 Add an Alert for failed file opens
 

@@ -131,7 +131,7 @@ static FindData sZetaFindData[] = {
 
 static FindData sHaikuFindData[] = {
 	{ B_DESKTOP_DIRECTORY, "B_DESKTOP_DIRECTORY", "/boot/home/Desktop" },
-	{ B_TRASH_DIRECTORY, "B_TRASH_DIRECTORY", "/boot/home/Desktop/Trash" },
+	{ B_TRASH_DIRECTORY, "B_TRASH_DIRECTORY", "/boot/home/trash" },
 	
 	{ B_BEOS_DIRECTORY, "B_BEOS_DIRECTORY", "/boot/system" },
 	{ B_BEOS_SYSTEM_DIRECTORY, "B_BEOS_SYSTEM_DIRECTORY", "/boot/system" },

@@ -1,11 +1,15 @@
 #include "PkgWindow.h"
+
 #include <Alert.h>
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Box.h>
+#include <File.h>
 #include <Messenger.h>
 #include <Path.h>
+#include <Resources.h>
 #include <Roster.h>
+#include <stdlib.h>
 
 #include "App.h"
 #include "FileListView.h"
@@ -36,7 +40,9 @@ PkgWindow::PkgWindow(entry_ref *ref)
 		fAddPanel(NULL),
 		fSavePanel(NULL),
 		fNeedSave(false),
-		fQuitAfterSave(false)
+		fQuitAfterSave(false),
+		fBuildAfterSave(false),
+		fBuildType(OS_HAIKU)
 {
 	MakeCenteredOnShow(true);
 	RegisterWindow();
@@ -126,7 +132,7 @@ PkgWindow::PkgWindow(entry_ref *ref)
 	fAddPanel = new BFilePanel(B_OPEN_PANEL, &msgr, 0, 0, true, new BMessage(M_ADD_ITEM));
 	
 	if (ref)
-		LoadPackage(*ref);
+		LoadProject(*ref);
 	else
 		InitEmptyProject();
 }
@@ -198,12 +204,29 @@ PkgWindow::BuildMenus(void)
 	fBar->AddItem(menu);
 	
 	menu = new BMenu("Items");
-	menu->AddItem(new BMenuItem("Add…", new BMessage(M_ADD_ITEM), 'A',
+	menu->AddItem(new BMenuItem("Add…", new BMessage(M_SHOW_ADD_ITEM), 'A',
 								B_COMMAND_KEY | B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem("Remove",new BMessage(M_REMOVE_ITEM), 'D'));
 	fBar->AddItem(menu);
 	
+	
 	menu = new BMenu("Installation");
+	
+	BMenu *submenu = new BMenu("Build Package");
+	menu->AddItem(submenu);
+	
+	BMessage *msg = new BMessage(M_BUILD_PACKAGE);
+	msg->AddInt32("type", OS_HAIKU);
+	submenu->AddItem(new BMenuItem("Haiku", msg, 'B'));
+	
+	msg = new BMessage(M_BUILD_PACKAGE);
+	msg->AddInt32("type", OS_HAIKU_GCC4);
+	submenu->AddItem(new BMenuItem("Haiku GCC4", msg, 'B', B_COMMAND_KEY | B_SHIFT_KEY));
+	
+	msg = new BMessage(M_BUILD_PACKAGE);
+	msg->AddInt32("type", OS_ZETA);
+	submenu->AddItem(new BMenuItem("Zeta", msg));
+	
 	fBar->AddItem(menu);
 }
 
@@ -241,7 +264,6 @@ PkgWindow::MessageReceived(BMessage *msg)
 			if (msg->FindRef("directory",&ref) == B_OK && 
 				msg->FindString("name",&name) == B_OK)
 			{
-				debugger("");
 				fFilePath.SetTo(ref);
 				fFilePath << name;
 				DoSave();
@@ -269,6 +291,17 @@ PkgWindow::MessageReceived(BMessage *msg)
 			fAddPanel->Show();
 			break;
 		}
+		case M_ADD_ITEM:
+		{
+			int32 index = 0;
+			entry_ref ref;
+			while (msg->FindRef("refs", index++, &ref) == B_OK)
+			{
+				FileListItem *item = new FileListItem(ref, fListView->GetDefaultDisplayMode());
+				fListView->AddItem(item);
+			}
+			break;
+		}
 		case M_REMOVE_ITEM:
 		{
 			for (int32 i = fListView->CountItems() - 1; i >= 0; i--)
@@ -279,6 +312,23 @@ PkgWindow::MessageReceived(BMessage *msg)
 					fListView->RemoveItem(item);
 					delete item;
 				}
+			}
+			break;
+		}
+		case M_BUILD_PACKAGE:
+		{
+			int32 type;
+			if (msg->FindInt32("type",&type) == B_OK)
+			{
+				if (fFilePath.IsEmpty())
+				{
+					fBuildAfterSave = true;
+					fBuildType = (ostype_t)type;
+					ShowSave(true);
+					break;
+				}
+				
+				BuildPackage((ostype_t)type);
 			}
 			break;
 		}
@@ -566,8 +616,9 @@ PkgWindow::InitEmptyProject(void)
 
 
 void
-PkgWindow::LoadPackage(entry_ref ref)
+PkgWindow::LoadProject(entry_ref ref)
 {
+/*
 	BPath path(&ref);
 	if (fPkgInfo.LoadFromFile(path.Path()) != B_OK)
 	{
@@ -581,13 +632,89 @@ PkgWindow::LoadPackage(entry_ref ref)
 	for (int32 i = 0; i < fPkgInfo.CountFiles(); i++)
 	{
 		FileItem *fileItem = fPkgInfo.FileAt(i);
-		FileListItem *listItem = new FileListItem(entry_ref(), REFITEM_NAME);
+		FileListItem *listItem = new FileListItem(entry_ref(), fListView->GetDefaultDisplayMode());
 		listItem->SetText(fileItem->GetName());
 		listItem->SetData(fileItem);
 		fListView->AddItem(listItem);
 	}
 	
 	fFilePath = path.Path();
+*/
+}
+
+
+void
+PkgWindow::SaveProject(const char *path)
+{
+	BString out;
+	
+	char buffer[32];
+	sprintf(buffer,"%.1f",fPkgInfo.GetPackageVersion());
+	
+	out << "PKGVERSION=" << buffer
+		<< "\nTYPE=SelfExtract"
+		<< "\nINSTALLFOLDER=";
+	
+	if (fPkgInfo.GetPathConstant() == M_CUSTOM_DIRECTORY)
+		 out << fPkgInfo.GetResolvedPath() << "\n";
+	else
+		 out << fPkgInfo.GetPathConstant() << "\n";
+	
+	if (fPkgInfo.GetAuthorName() && strlen(fPkgInfo.GetAuthorName()) > 0)
+		out << "AUTHORNAME=" << fPkgInfo.GetAuthorName() << "\n";
+	if (fPkgInfo.GetAuthorEmail() && strlen(fPkgInfo.GetAuthorEmail()) > 0)
+		out << "CONTACT=" << fPkgInfo.GetAuthorEmail() << "\n";
+	if (fPkgInfo.GetAuthorURL() && strlen(fPkgInfo.GetAuthorURL()) > 0)
+		out << "URL=" << fPkgInfo.GetAuthorURL() << "\n";
+	out << "RELEASEDATE=" << fPkgInfo.GetReleaseDate() << "\n";
+	
+	out << "APPVERSION=";
+	if (fPkgInfo.GetAppVersion() || strlen(fPkgInfo.GetAppVersion()) < 1)
+		out << "0.0.1\n";
+	else
+		out << fPkgInfo.GetAppVersion() << "\n";
+	
+	
+	for (int32 i = 0; i < fListView->CountItems(); i++)
+	{
+		FileListItem *fileListItem = dynamic_cast<FileListItem*>(fListView->ItemAt(i));
+		if (!fileListItem)
+			continue;
+		
+		FileItem *fileItem = fileListItem->GetData();
+		
+		entry_ref ref = fileListItem->GetRef();
+		BPath refPath(&ref);
+		
+		out << "ITEMFILEPATH=" << refPath.Path() << "\n";
+		out << "ITEMNAME=" << fileItem->GetName() << "\n";
+		if (fileItem->GetInstalledName() && strlen(fileItem->GetInstalledName()) > 0)
+			out << "ITEMINSTALLEDNAME=" << fileItem->GetInstalledName() << "\n";
+			
+		if (fileItem->GetReplaceMode() > 0)
+			out << "ITEMREPLACEMODE=" << fileItem->GetReplaceMode() << "\n";
+				
+		if (fileItem->GetPathConstant() == M_CUSTOM_DIRECTORY)
+			 out << "ITEMPATH=" << fileItem->GetResolvedPath() << "\n";
+		else
+			if (fileItem->GetPathConstant() != M_INSTALL_DIRECTORY)
+				out << "ITEMPATH=" << fileItem->GetPathConstant() << "\n";
+		
+		for (int32 i = 0; i < fileItem->CountGroups(); i++)
+			out << "ITEMGROUP=" << fileItem->GroupAt(i) << "\n";
+		
+		for (int32 i = 0; i < fileItem->CountPlatforms(); i++)
+			out << "ITEMPLATFORM=" << fileItem->PlatformAt(i) << "\n";
+		
+		for (int32 i = 0; i < fileItem->CountLinks(); i++)
+			out << "ITEMLINK=" << fileItem->LinkAt(i) << "\n";
+		
+		if (fileItem->CountLinks() > 0)
+			out << "ITEMCATEGORY=" << fileItem->GetCategory() << "\n";
+	}
+	
+	BFile file(path, B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
+	file.Write(out.String(), out.Length());
 }
 
 
@@ -647,10 +774,123 @@ PkgWindow::DoSave(void)
 {
 	fNeedSave = false;
 	
-	fPkgInfo.SaveToFile(fFilePath.GetFullPath());
+	SaveProject(fFilePath.GetFullPath());
 	
 	if (fQuitAfterSave)
 		PostMessage(B_QUIT_REQUESTED);
+	
+	if (fBuildAfterSave)
+	{
+		fBuildAfterSave = false;
+		BuildPackage(fBuildType);
+	}
+}
+
+
+void
+PkgWindow::BuildPackage(ostype_t platform)
+{
+	BString stubName;
+	switch (platform)
+	{
+		case OS_R5:
+		{
+			stubName = "installstub.r5";
+			break;
+		}
+		case OS_ZETA:
+		{
+			stubName = "installstub.zeta";
+			break;
+		}
+		case OS_HAIKU:
+		{
+			stubName = "installstub.haiku.gcc2";
+			break;
+		}
+		case OS_HAIKU_GCC4:
+		{
+			stubName = "installstub.haiku.gcc4";
+			break;
+		}
+		default:
+		{
+			BAlert *alert = new BAlert("PSfx", "A bad platform value was used. This "
+												"should never happen. Please report "
+												"this to DarkWyrm at <darkwyrm@gmail.com.",
+										"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->Go();
+			return;
+			break;
+		}
+	}
+	
+	app_info aInfo;
+	be_app->GetAppInfo(&aInfo);
+	
+	BResources res(&aInfo.ref);
+	size_t stubDataSize;
+	const uint8 *stubData = (uint8 *)res.LoadResource('RAWT', stubName.String(),
+										&stubDataSize);
+	if (!stubData || !stubDataSize)
+	{
+		BAlert *alert = new BAlert("PSfx", "PSfx couldn't find the installer stub "
+											"for this platform and cannot continue. "
+											"Sorry.", "OK");
+		alert->Go();
+		return;
+	}
+	
+	BString pkgPath;
+	pkgPath << fFilePath.GetFolder() << "/" << fFilePath.GetBaseName() << ".sfx";
+	
+	BFile file(pkgPath.String(), B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
+	file.Write(stubData, stubDataSize);
+	file.Unset();
+	
+	// This places the needed package info into the resources of the stub file. It also
+	// has to be done before the archive is generated and concatenated onto the file.
+	fPkgInfo.SaveToFile(pkgPath.String());
+	
+	// Generate the zipfile archive and tack it onto the end of the file. This is how
+	// self-extracting zipfiles are created for use with unzipsfx, too, so this really
+	// does work.
+	BString archiveName("/tmp/PSfx.");
+	archiveName << real_time_clock_usecs() << ".zip";
+	
+	BString command;
+	for (int32 i = 0; i < fListView->CountItems(); i++)
+	{
+		FileListItem *listItem = dynamic_cast<FileListItem*>(fListView->ItemAt(i));
+		if (!listItem)
+			continue;
+		
+		DPath itemPath(listItem->GetRef());
+		
+		BString escapedItemPath(itemPath.GetFullPath());
+		escapedItemPath.CharacterEscape("'", '\\');
+		
+		command = "zip ";
+		command << archiveName << " '" << escapedItemPath << "'";
+		
+		printf("%s\n", command.String());
+		int result = system(command.String());
+		if (result)
+		{
+			// zip returns 0 on success, so there must have been an error
+			printf("zip command '%s' returned %d\n", command.String(), result);
+		}
+
+	}
+	
+	command = "cat ";
+	BString escapedPath(pkgPath.String());
+	escapedPath.CharacterEscape("'",'\\');
+	command << archiveName << " >> '" << escapedPath << "'; chmod +x '"
+			<< escapedPath << "' ";
+	printf("%s\n", command.String());
+	system(command.String());
+		
 }
 
 

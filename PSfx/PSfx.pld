@@ -1,6 +1,6 @@
 NAME=PSfx
 TARGETNAME=PSfx
-PLATFORM=HaikuGCC4
+PLATFORM=Haiku
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=App.cpp
@@ -47,7 +47,7 @@ LIBRARY=/boot/develop/lib/x86/libroot.so
 LIBRARY=/boot/develop/lib/x86/libbe.so
 LIBRARY=/boot/develop/lib/x86/libtranslation.so
 LIBRARY=/boot/develop/lib/x86/libtracker.so
-LIBRARY=/boot/develop/lib/x86/libsupc++.so
+LIBRARY=/boot/develop/lib/x86/libstdc++.r4.so
 RUNARGS=
 CCDEBUG=yes
 CCPROFILE=no

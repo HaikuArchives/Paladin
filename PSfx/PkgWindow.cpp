@@ -18,6 +18,7 @@
 #include "FileListView.h"
 #include "ListItem.h"
 #include "PackageInfo.h"
+#include "PkgInfoWindow.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ enum
 	M_SHOW_OPEN_PACKAGE = 'oppk',
 	M_SAVE_PACKAGE = 'svpk',
 	M_SAVE_PACKAGE_AS = 'sapk',
+	M_SHOW_PACKAGE_INFO = 'shpi',
 	M_ABOUT_REQUESTED = 'abrq',
 	M_SET_INSTALL_PATH = 'sinp',
 	M_SET_REPLACE_MODE = 'strp',
@@ -88,6 +90,7 @@ PkgWindow::PkgWindow(entry_ref *ref)
 	
 	// Create Groups label
 	r.OffsetBy(0.0, r.Height() + 5.0);
+	r.right -= 15;
 	fGroupLabel = new BStringView(r,"grouplabel","Groups: ",
 								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fGroupLabel->GetPreferredSize(&w,&h);
@@ -217,6 +220,8 @@ PkgWindow::BuildMenus(void)
 	
 	menu = new BMenu("Installation");
 	
+	menu->AddItem(new BMenuItem("Package Settings…", new BMessage(M_SHOW_PACKAGE_INFO)));
+	menu->AddSeparatorItem();
 	BMenu *submenu = new BMenu("Build Package");
 	menu->AddItem(submenu);
 	
@@ -274,6 +279,12 @@ PkgWindow::MessageReceived(BMessage *msg)
 				DoSave();
 			}
 			
+			break;
+		}
+		case M_SHOW_PACKAGE_INFO:
+		{
+			PkgInfoWindow *win = new PkgInfoWindow(this, &fPkgInfo);
+			win->Show();
 			break;
 		}
 		case M_ABOUT_REQUESTED:

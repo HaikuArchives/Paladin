@@ -1,7 +1,5 @@
 TODO:
 
-Add save support for projects
-
 Create icons for PSfx and its project files
 
 Set up MIME handling stuff for project files and sfx files
@@ -10,9 +8,7 @@ Add an Alert for failed file opens
 
 Implement custom directory handling in the ItemSelected code in PkgWindow
 
-Test the packaging code -- the dependency on gPkgInfo has been removed. It all compiles, but there may easily be some regressions
-
-The replacement mode code for PSelfExtract seems to be non-existent
+The replacement mode code for PInstallEngine seems to be non-existent
 
 The interface will pretty much be a direct copy of that of PackageBuilder.
 

@@ -720,8 +720,13 @@ PkgWindow::SaveProject(const char *path)
 	char buffer[32];
 	sprintf(buffer,"%.1f",fPkgInfo.GetPackageVersion());
 	
-	out << "PKGVERSION=" << buffer << "\n"
-		<< "PKGNAME=" << fPkgInfo.GetName()
+	out << "PKGVERSION=" << buffer << "\n";
+	
+	DPath filePath(path);
+	if (!fPkgInfo.GetName() || strlen(fPkgInfo.GetName()) < 1)
+		fPkgInfo.SetName(filePath.GetBaseName());
+	
+	out	<< "PKGNAME=" << fPkgInfo.GetName()
 		<< "\nTYPE=SelfExtract\n";
 	
 	if (fPkgInfo.GetPathConstant() == M_CUSTOM_DIRECTORY)

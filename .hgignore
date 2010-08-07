@@ -9,3 +9,5 @@ PalEdit/generated
 PalEdit/rez/rez
 SymbolFinder/SymbolFinder
 *.o
+PSfx/PSfx
+PInstallEngine/PInstallEngine

@@ -1,0 +1,51 @@
+PKGVERSION=1.0			// always 1.0 for now
+TYPE=SelfExtract		// always SelfExtract for now
+INSTALLFOLDERNAME=fooName	// A container folder for all files is created if this exists
+INSTALLFOLDER=B_APPS_DIRECTORY	// this is either an absolute path (i.e. /boot/apps),
+						// a directory_which string equivalent, or askuser,
+						// which will query the user. If omitted, it defaults to askuser
+AUTHORNAME=DarkWyrm		// Name of the author
+CONTACT=darkwyrm@gmail.com			// Contact e-mail for the author
+URL=http://darkwyrm.beemulated.net	// Home page for the package
+RELEASEDATE=1246126221	// Date of package release in UNIX format
+APPVERSION=1.0.0		// A simple string of the file's version
+
+DEPENDENCY=SDL			// Pretty name of the dependency
+	FILENAME=libsdl.so	// name of the file used to determine the dependency's existence
+	TYPE=file		// if the file is a library, the installer will search all of the platform's
+					// library paths for the file. The other choice ATM is file, which requires
+					// the PATH attribute. The installer will search in the location specified
+					// and if not found, alert the user, possibly directing them to the address
+					// specified by URL
+	PATH=/boot/home/config/lib	// Path of a TYPE=file dependency. This can be a find_directory path
+	DEPURL=http://www.libsdl.org/	// Home page or download page of the required dependency
+						
+FILE=calc.x86			// heading for a file entry; the tabs for subentries is required. 
+	INSTALLFOLDER=INSTALL_FOLDER	// Can be a directory_which, a custom path or INSTALL_FOLDER,
+									// which is the default if omitted
+	INSTALLEDNAME=calc	// Name of the file when installed. If omitted, name used is the one from FILE
+	LINK=B_APPS_DIRECTORY	// A directory_which equivalent or an absolute path. If omitted, no link 
+							// will be created
+							
+	CATEGORY=Accessories	// The subdirectory of the deskbar folder for any links placed into
+							// B_USER_DESKBAR_DIRECTORY. It defaults to Software on the Zeta platform
+							// and Applications for R5 and Haiku if omitted. This only affects links
+							// placed in the Deskbar directory.
+							
+	PLATFORM=r5,zeta,haiku	// Platforms on which the file is permitted to install.
+							// Choices: r5, zeta, haiku, all. If omitted, it defaults to all
+							
+	GROUP=all			// Install group. These are specified by the package builder to make
+						// different install types possible. If omitted, defaults to All. 
+	
+	EXISTS=ask			// Action for handling an item existing in the specified path. Options are:
+						ask					ask the user what to do (default)
+						noclobber			never replace
+						rename				rename the existing item
+						asknewerversion		ask the user if the item is a newer version
+						asknewercreation	ask the user if the item has a newer creation time						
+						asknewermod		ask the user if the item has a newer modification time
+						replacenewerversion	replace the file if it is a newer version
+						asknewercreation	replace the file if it has a newer creation time						
+						asknewermod		replace the file if it has a newer modification time
+						clobberonly			install only if the file already exists

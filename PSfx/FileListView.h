@@ -16,6 +16,11 @@ public:
 									int32 mode = REFITEM_FULL_ICON,
 									uint32 level = 0,
 									bool expanded = true);
+						
+						FileListItem(const char *path,
+									int32 mode = REFITEM_FULL_ICON,
+									uint32 level = 0,
+									bool expanded = true);
 						~FileListItem(void);
 						
 		void			SetData(FileItem *item);

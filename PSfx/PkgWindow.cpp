@@ -5,16 +5,21 @@
 #include <Application.h>
 #include <Box.h>
 #include <File.h>
+#include <fstream>
+#include <iostream>
 #include <Messenger.h>
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <stdlib.h>
+#include <string>
 
 #include "App.h"
 #include "FileListView.h"
 #include "ListItem.h"
 #include "PackageInfo.h"
+
+using namespace std;
 
 enum
 {
@@ -618,28 +623,92 @@ PkgWindow::InitEmptyProject(void)
 void
 PkgWindow::LoadProject(entry_ref ref)
 {
-/*
-	BPath path(&ref);
-	if (fPkgInfo.LoadFromFile(path.Path()) != B_OK)
+	DPath path(ref);
+	ifstream file(path.GetFullPath(), ifstream::in);
+	
+	FileItem *item = NULL;
+	while (file.good())
 	{
-		// TODO: complain that we failed.
-		return;
+		string line;
+		getline(file, line);
+		
+		size_t pos = line.find("=");
+		if (pos == string::npos)
+			continue;
+		
+		string key = line.substr(0, pos);
+		string value = line.substr(pos + 1, string::npos);
+		
+		if (key == "ITEMFILEPATH")
+		{
+			FileListItem *listItem = new FileListItem(value.c_str(),
+													fListView->GetDefaultDisplayMode());
+			item = new FileItem();
+			listItem->SetData(item);
+			fListView->AddItem(listItem);
+		}
+		else
+		if (key == "ITEMNAME")
+			item->SetName(value.c_str());
+		else
+		if (key == "ITEMINSTALLEDNAME")
+			item->SetInstalledName(value.c_str());
+		else
+		if (key == "ITEMREPLACEMODE")
+			item->SetReplaceMode(atoi(value.c_str()));
+		else
+		if (key == "ITEMPATH")
+			item->SetPath(value.c_str());
+		else
+		if (key == "ITEMCONSTPATH")
+			item->SetPath(atol(value.c_str()));
+		else
+		if (key == "ITEMGROUP")
+			item->AddGroup(value.c_str());
+		else
+		if (key == "ITEMPLATFORM")
+			item->AddGroup(value.c_str());
+		else
+		if (key == "ITEMLINK")
+			item->AddLink(value.c_str());
+		else
+		if (key == "ITEMCATEGORY=")
+			item->SetCategory(value.c_str());
+		else
+		if (key == "PKGVERSION")
+			fPkgInfo.SetPackageVersion((float)atof(value.c_str()));
+		else
+		if (key == "PKGNAME")
+			fPkgInfo.SetName(value.c_str());
+		else
+		if (key == "AUTHORNAME")
+			fPkgInfo.SetAuthorName(value.c_str());
+		else
+		if (key == "INSTALLFOLDER")
+			fPkgInfo.SetInstallPath(value.c_str());
+		else
+		if (key == "INSTALLCONSTFOLDER")
+			fPkgInfo.SetInstallPath(atol(value.c_str()));
+		else
+		if (key == "CONTACT")
+			fPkgInfo.SetAuthorEmail(value.c_str());
+		else
+		if (key == "URL")
+			fPkgInfo.SetAuthorURL(value.c_str());
+		else
+		if (key == "RELEASEDATE")
+			fPkgInfo.SetReleaseDate(atol(value.c_str()));
+		else
+		if (key == "APPVERSION")
+			fPkgInfo.SetAppVersion(value.c_str());
+		
 	}
+	file.close();
 	
-	// TODO: Load custom paths into field
-	
-	fListView->MakeEmpty();
-	for (int32 i = 0; i < fPkgInfo.CountFiles(); i++)
-	{
-		FileItem *fileItem = fPkgInfo.FileAt(i);
-		FileListItem *listItem = new FileListItem(entry_ref(), fListView->GetDefaultDisplayMode());
-		listItem->SetText(fileItem->GetName());
-		listItem->SetData(fileItem);
-		fListView->AddItem(listItem);
-	}
-	
-	fFilePath = path.Path();
-*/
+	fFilePath.SetTo(ref);
+	BString title("PSfx: ");
+	title << fFilePath.GetFileName();
+	SetTitle(title.String());
 }
 
 
@@ -651,14 +720,14 @@ PkgWindow::SaveProject(const char *path)
 	char buffer[32];
 	sprintf(buffer,"%.1f",fPkgInfo.GetPackageVersion());
 	
-	out << "PKGVERSION=" << buffer
-		<< "\nTYPE=SelfExtract"
-		<< "\nINSTALLFOLDER=";
+	out << "PKGVERSION=" << buffer << "\n"
+		<< "PKGNAME=" << fPkgInfo.GetName()
+		<< "\nTYPE=SelfExtract\n";
 	
 	if (fPkgInfo.GetPathConstant() == M_CUSTOM_DIRECTORY)
-		 out << fPkgInfo.GetResolvedPath() << "\n";
+		 out << "INSTALLFOLDER=" << fPkgInfo.GetResolvedPath() << "\n";
 	else
-		 out << fPkgInfo.GetPathConstant() << "\n";
+		 out << "INTSALLCONSTFOLDER=" << fPkgInfo.GetPathConstant() << "\n";
 	
 	if (fPkgInfo.GetAuthorName() && strlen(fPkgInfo.GetAuthorName()) > 0)
 		out << "AUTHORNAME=" << fPkgInfo.GetAuthorName() << "\n";
@@ -698,7 +767,7 @@ PkgWindow::SaveProject(const char *path)
 			 out << "ITEMPATH=" << fileItem->GetResolvedPath() << "\n";
 		else
 			if (fileItem->GetPathConstant() != M_INSTALL_DIRECTORY)
-				out << "ITEMPATH=" << fileItem->GetPathConstant() << "\n";
+				out << "ITEMCONSTPATH=" << fileItem->GetPathConstant() << "\n";
 		
 		for (int32 i = 0; i < fileItem->CountGroups(); i++)
 			out << "ITEMGROUP=" << fileItem->GroupAt(i) << "\n";
@@ -873,7 +942,6 @@ PkgWindow::BuildPackage(ostype_t platform)
 		command = "zip ";
 		command << archiveName << " '" << escapedItemPath << "'";
 		
-		printf("%s\n", command.String());
 		int result = system(command.String());
 		if (result)
 		{
@@ -888,7 +956,6 @@ PkgWindow::BuildPackage(ostype_t platform)
 	escapedPath.CharacterEscape("'",'\\');
 	command << archiveName << " >> '" << escapedPath << "'; chmod +x '"
 			<< escapedPath << "' ";
-	printf("%s\n", command.String());
 	system(command.String());
 		
 }

@@ -1,9 +1,29 @@
 #include "FileListView.h"
+#include "DPath.h"
 
 FileListItem::FileListItem(entry_ref ref,int32 mode,uint32 level, bool expanded)
 	:	RefListItem(ref,mode,level,expanded),
 		fFileItem(NULL)
 {
+}
+
+
+FileListItem::FileListItem(const char *path,int32 mode,uint32 level, bool expanded)
+	:	RefListItem(entry_ref(),mode,level,expanded),
+		fFileItem(NULL)
+{
+	BEntry entry(path);
+	
+	entry_ref ref;
+	if (entry.GetRef(&ref) == B_OK)
+		SetRef(ref);
+	else
+	{
+		DPath temp(path);
+		BString label;
+		label << temp.GetFileName() << " - missing";
+		SetText(label.String());
+	}
 }
 
 

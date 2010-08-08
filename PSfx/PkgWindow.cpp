@@ -16,6 +16,7 @@
 
 #include "App.h"
 #include "FileListView.h"
+#include "Globals.h"
 #include "ListItem.h"
 #include "PackageInfo.h"
 #include "PkgInfoWindow.h"
@@ -220,7 +221,8 @@ PkgWindow::BuildMenus(void)
 	
 	menu = new BMenu("Installation");
 	
-	menu->AddItem(new BMenuItem("Package Settings…", new BMessage(M_SHOW_PACKAGE_INFO)));
+	menu->AddItem(new BMenuItem("Package Settings…", new BMessage(M_SHOW_PACKAGE_INFO),
+				','));
 	menu->AddSeparatorItem();
 	BMenu *submenu = new BMenu("Build Package");
 	menu->AddItem(submenu);
@@ -529,85 +531,8 @@ PkgWindow::InitFields(void)
 	item->SetMarked(true);
 	
 	menu->AddSeparatorItem();
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_DESKTOP_DIRECTORY).String(),
-									B_DESKTOP_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_DESKBAR_DIRECTORY).String(),
-									B_USER_DESKBAR_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_APPS_DIRECTORY).String(),
-									B_APPS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_PREFERENCES_DIRECTORY).String(),
-									B_PREFERENCES_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_UTILITIES_DIRECTORY).String(),
-									B_UTILITIES_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddSeparatorItem();
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_DIRECTORY).String(),
-									B_USER_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_ADDONS_DIRECTORY).String(),
-									B_USER_ADDONS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_BOOT_DIRECTORY).String(),
-									B_USER_BOOT_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_CACHE_DIRECTORY).String(),
-									B_USER_CACHE_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_CONFIG_DIRECTORY).String(),
-									B_USER_CONFIG_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_DATA_DIRECTORY).String(),
-									B_USER_DATA_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_FONTS_DIRECTORY).String(),
-									B_USER_FONTS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_LIB_DIRECTORY).String(),
-									B_USER_LIB_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_MEDIA_NODES_DIRECTORY).String(),
-									B_USER_MEDIA_NODES_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_PRINTERS_DIRECTORY).String(),
-									B_USER_PRINTERS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_SETTINGS_DIRECTORY).String(),
-									B_USER_SETTINGS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_SOUNDS_DIRECTORY).String(),
-									B_USER_SOUNDS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_USER_TRANSLATORS_DIRECTORY).String(),
-									B_USER_TRANSLATORS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddSeparatorItem();
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_DIRECTORY).String(),
-									B_COMMON_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_ADDONS_DIRECTORY).String(),
-									B_COMMON_ADDONS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_BIN_DIRECTORY).String(),
-									B_COMMON_BIN_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_BOOT_DIRECTORY).String(),
-									B_COMMON_BOOT_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_DATA_DIRECTORY).String(),
-									B_COMMON_DATA_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_DEVELOP_DIRECTORY).String(),
-									B_COMMON_DEVELOP_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_DOCUMENTATION_DIRECTORY).String(),
-									B_COMMON_DOCUMENTATION_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_ETC_DIRECTORY).String(),
-									B_COMMON_ETC_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_FONTS_DIRECTORY).String(),
-									B_COMMON_FONTS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_LIB_DIRECTORY).String(),
-									B_COMMON_LIB_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_LOG_DIRECTORY).String(),
-									B_COMMON_LOG_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_MEDIA_NODES_DIRECTORY).String(),
-									B_COMMON_MEDIA_NODES_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_SERVERS_DIRECTORY).String(),
-									B_COMMON_SERVERS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_SETTINGS_DIRECTORY).String(),
-									B_COMMON_SETTINGS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_SOUNDS_DIRECTORY).String(),
-									B_COMMON_SOUNDS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_SPOOL_DIRECTORY).String(),
-									B_COMMON_SPOOL_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_SYSTEM_DIRECTORY).String(),
-									B_COMMON_SYSTEM_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_TEMP_DIRECTORY).String(),
-									B_COMMON_TEMP_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_TRANSLATORS_DIRECTORY).String(),
-									B_COMMON_TRANSLATORS_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
-	menu->AddItem(new PathMenuItem(GetFriendlyPathConstantName(B_COMMON_VAR_DIRECTORY).String(),
-									B_COMMON_VAR_DIRECTORY,new BMessage(M_SET_INSTALL_PATH)));
 	
+	GeneratePathMenu(menu, M_SET_INSTALL_PATH);
 	
 	menu = fReplaceField->Menu();
 	menu->AddItem(new BMenuItem("Always Ask User",new BMessage(M_SET_REPLACE_MODE)));
@@ -982,26 +907,5 @@ PkgWindow::BuildPackage(ostype_t platform)
 			<< escapedPath << "' ";
 	system(command.String());
 		
-}
-
-
-PathMenuItem::PathMenuItem(const char *label, const int32 &constant, BMessage *msg)
-	:	BMenuItem(label, msg),
-		fPathConstant(constant)
-{
-}
-
-
-int32
-PathMenuItem::GetPath(void) const
-{
-	return fPathConstant;
-}
-
-
-void
-PathMenuItem::SetPath(const int32 &path)
-{
-	fPathConstant = path;
 }
 

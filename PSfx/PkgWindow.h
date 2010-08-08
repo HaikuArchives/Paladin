@@ -63,16 +63,4 @@ private:
 	ostype_t		fBuildType;
 };
 
-class PathMenuItem : public BMenuItem
-{
-public:
-			PathMenuItem(const char *label, const int32 &constant, BMessage *msg);
-	int32	GetPath(void) const;
-	void	SetPath(const int32 &path);
-
-private:
-	int32	fPathConstant;
-};
-
-
 #endif

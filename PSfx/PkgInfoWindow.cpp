@@ -4,6 +4,7 @@
 #include <String.h>
 #include <unistd.h>
 
+#include "Globals.h"
 #include "PackageInfo.h"
 
 enum
@@ -13,11 +14,12 @@ enum
 	M_AUTHOR_NAME_CHANGED = 'anch',
 	M_AUTHOR_EMAIL_CHANGED = 'aemc',
 	M_AUTHOR_URL_CHANGED = 'arlc',
-	M_SHOW_CHOOSER_CHANGED = 'shcc'
+	M_SHOW_CHOOSER_CHANGED = 'shcc',
+	M_INSTALL_PATH_CHANGED = 'chip'
 };
 
 PkgInfoWindow::PkgInfoWindow(BWindow *owner, PackageInfo *info)
-	:	DWindow(BRect(0,0,300,600), "Package Info"),
+	:	DWindow(BRect(0,0,400,600), "Package Info"),
 		fInfo(info),
 		fOwner(owner)
 {
@@ -45,8 +47,29 @@ PkgInfoWindow::PkgInfoWindow(BWindow *owner, PackageInfo *info)
 								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	top->AddChild(fAppVersion);
 	
-//	r.OffsetBy(0.0, r.Height() + 10.0);
-//	BMenu *menu = new BMenu("Install Path");
+	r.OffsetBy(0.0, r.Height() + 10.0);
+	BMenu *menu = new BMenu("Install Path");
+	GeneratePathMenu(menu, M_INSTALL_PATH_CHANGED);
+	menu->SetLabelFromMarked(true);
+	
+	PathMenuItem *marked = NULL;
+	for (int32 i = 0; i < menu->CountItems(); i++)
+	{
+		PathMenuItem *tempItem = (PathMenuItem*)menu->ItemAt(i);
+		if (tempItem->GetPath() == fInfo->GetPathConstant())
+		{
+			marked = tempItem;
+			marked->SetMarked(true);
+			break;
+		}
+	}
+	
+	if (!marked)
+		menu->ItemAt(2)->SetMarked(true);
+	
+	fInstallLocationField = new BMenuField(r, "pathfield", "Install Location: ",
+											menu, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	top->AddChild(fInstallLocationField);
 	
 	r.OffsetBy(0.0, r.Height() + 10.0);
 	fShowChooserBox = new BCheckBox(r, "showchooser", "Show Path Chooser in Installer",
@@ -126,9 +149,17 @@ PkgInfoWindow::MessageReceived(BMessage *msg)
 			fInfo->SetShowChooser(fShowChooserBox->Value() == B_CONTROL_ON);
 			break;
 		}
+		case M_INSTALL_PATH_CHANGED:
+		{
+			PathMenuItem *item = (PathMenuItem*)fInstallLocationField->Menu()->FindMarked();
+			if (item)
+				fInfo->SetInstallPath(item->GetPath());
+			break;
+		}
 		default:
 		{
 			DWindow::MessageReceived(msg);
+			break;
 		}
 	}
 }

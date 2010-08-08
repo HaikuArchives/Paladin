@@ -1,3 +1,4 @@
 #!/bin/sh
-cat PInstallEngine testdata/files.zip > PInstallEngineTest
+cd `dirname $0`
+cat PInstallEngine testdata/calc/files.zip > PInstallEngineTest
 chmod +x PInstallEngineTest

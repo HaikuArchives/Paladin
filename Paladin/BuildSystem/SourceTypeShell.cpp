@@ -62,6 +62,12 @@ SourceFileShell::PostBuild(BuildInfo &info, const char *options)
 		abspath.Prepend(info.projectFolder.GetFullPath());
 	}
 	
+	DPath shellFilePath(abspath.String());
+	BString command = "cd '";
+	command << shellFilePath.GetFolder() << "'; ";
+	
+	STRACE(1,("Running shell script %s\nCommand:%s\n",
+			abspath.String(),command.String()));
 	
 	FILE *fd = popen(abspath.String(),"r");
 	if (!fd)

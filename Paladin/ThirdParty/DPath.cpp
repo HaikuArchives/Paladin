@@ -135,6 +135,36 @@ DPath::SetTo(const entry_ref &ref)
 }
 
 
+void
+DPath::SetBaseName(const char *string)
+{
+	if (IsEmpty())
+	{
+		SetTo(string);
+		return;
+	}
+	
+	BString temp = GetFolder();
+	BString ext = GetExtension();
+	temp << "/" << string << "." << ext;
+}
+
+
+void
+DPath::SetExtension(const char *string)
+{
+	BString ext(GetExtension());
+	if (ext.CountChars() > 0)
+		fFullPath.ReplaceLast(ext.String(), string);
+	else
+	{
+		BString temp(fFullPath);
+		temp << "." << string;
+		SetTo(temp);
+	}
+}
+
+			
 const char *
 DPath::GetFullPath(void) const
 {

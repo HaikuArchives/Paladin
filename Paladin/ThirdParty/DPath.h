@@ -26,7 +26,10 @@ public:
 			void			SetTo(const DPath &path);
 			void			SetTo(const BString &string);
 			void			SetTo(const entry_ref &ref);
-	
+			
+			void			SetBaseName(const char *string);
+			void			SetExtension(const char *string);
+			
 			const char *	GetFullPath(void) const;
 			const char *	GetFolder(void) const;
 			const char *	GetFileName(void) const;

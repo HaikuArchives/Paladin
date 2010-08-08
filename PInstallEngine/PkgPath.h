@@ -3,6 +3,7 @@
 
 #include <FindDirectory.h>
 #include <String.h>
+#include <Volume.h>
 
 #include "OSPath.h"
 
@@ -22,7 +23,8 @@ public:
 	PkgPath &	operator=(const PkgPath &from);
 		
 	void		SetTo(const char *custom);
-	void		SetTo(int32 pathid);
+	void		SetTo(int32 pathid, BVolume *vol = NULL);
+	void		SetVolume(const BVolume &vol);
 	
 	int32		AsConstant(void) const;
 	const char *AsString(void) const;
@@ -31,6 +33,7 @@ public:
 	
 private:
 	OSPath	fOSPath;
+	BVolume	fVolume;
 	
 	BString	fPath;
 	int32	fPathConstant;

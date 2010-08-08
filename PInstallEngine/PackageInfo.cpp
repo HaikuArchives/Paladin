@@ -12,6 +12,8 @@
 
 PackageInfo::PackageInfo(void)
 	:	fPackageVersion(1.0),
+		fReleaseDate(real_time_clock()),
+		fPath(B_APPS_DIRECTORY),
 		fShowChooser(false),
 		fFiles(20,true),
 		fDeps(20,true),
@@ -27,6 +29,7 @@ PackageInfo::PackageInfo(void)
 status_t
 PackageInfo::LoadFromResources(void)
 {
+	MakeEmpty();
 	BResources *res = be_app->AppResources();
 	res->PreloadResourceType();
 	
@@ -58,6 +61,8 @@ PackageInfo::LoadFromFile(const char *path)
 	if (file.InitCheck() != B_OK)
 		return file.InitCheck();
 	
+	MakeEmpty();
+	
 	BResources res(&file);
 	res.PreloadResourceType();
 	
@@ -84,9 +89,12 @@ PackageInfo::LoadFromFile(const char *path)
 
 
 status_t
-PackageInfo::SaveToFile(const char *path)
+PackageInfo::SaveToFile(const char *path, bool clobber)
 {
-	BFile file(path,B_READ_WRITE);
+	int32 fileFlags = B_READ_WRITE | B_CREATE_FILE;
+	if (clobber)
+		fileFlags |= B_ERASE_FILE;
+	BFile file(path,fileFlags);
 	if (file.InitCheck() != B_OK)
 		return file.InitCheck();
 	
@@ -145,7 +153,8 @@ PackageInfo::GetResolvedPath(void) const
 void
 PackageInfo::SetInstallPath(int32 pathid)
 {
-	fPath.SetTo(pathid);
+	BVolume vol(fVolumeDevID);
+	fPath.SetTo(pathid,&vol);
 }
 
 
@@ -383,7 +392,8 @@ PackageInfo::MakeInfo(void)
 	char buffer[32];
 	sprintf(buffer,"%.1f",GetPackageVersion());
 	
-	out << "PKGVERSION=" << buffer
+	out << "PFXPROJECT=Always first line\n"
+		<< "PKGVERSION=" << buffer
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.AsString() << "\n";
 	
@@ -439,26 +449,41 @@ PackageInfo::PrintToStream(void)
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
-	printf("Install Groups: \n");
-	for (int32 i = 0; i < fGroups.CountItems(); i++)
+	if (fGroups.CountItems() > 0)
 	{
-		BString *string = fGroups.ItemAt(i);
-		printf("\t%s\n",string->String());
+		printf("Install Groups: \n");
+		for (int32 i = 0; i < fGroups.CountItems(); i++)
+		{
+			BString *string = fGroups.ItemAt(i);
+			printf("\t%s\n",string->String());
+		}
 	}
+	else
+		printf("All files belong to the same install group\n");
 	
-	printf("Files:\n");
-	for (int32 i = 0; i < fFiles.CountItems(); i++)
+	if (fFiles.CountItems() > 0)
 	{
-		FileItem *fileItem = fFiles.ItemAt(i);
-		printf("\t%s\n",fileItem->GetName());
+		printf("Files:\n");
+		for (int32 i = 0; i < fFiles.CountItems(); i++)
+		{
+			FileItem *fileItem = fFiles.ItemAt(i);
+			printf("\t%s\n",fileItem->GetName());
+		}
 	}
+	else
+		printf("Files: none\n");
 	
-	printf("Dependencies:\n");
-	for (int32 i = 0; i < fDeps.CountItems(); i++)
+	if (fDeps.CountItems() > 0)
 	{
-		DepItem *depItem = fDeps.ItemAt(i);
-		printf("\t%s\n",depItem->GetName());
+		printf("Dependencies:\n");
+		for (int32 i = 0; i < fDeps.CountItems(); i++)
+		{
+			DepItem *depItem = fDeps.ItemAt(i);
+			printf("\t%s\n",depItem->GetName());
+		}
 	}
+	else
+		printf("Dependencies: none\n");
 }
 
 
@@ -491,6 +516,34 @@ PackageInfo::DumpInfo(void)
 		DepItem *depItem = fDeps.ItemAt(i);
 		depItem->PrintToStream();
 	}
+}
+
+
+void
+PackageInfo::MakeEmpty(void)
+{
+	fFiles.MakeEmpty();
+	fDeps.MakeEmpty();
+	fGroups.MakeEmpty();
+	
+	fName = "";
+	fPackageVersion = 0.0;
+	fReleaseDate = 0;
+	fPath = M_INSTALL_DIRECTORY;
+	
+	BVolumeRoster roster;
+	BVolume vol;
+	roster.GetBootVolume(&vol);
+	fVolumeDevID = vol.Device();
+	
+	fInstallFolderName = "";
+	fInstallGroup = "";
+	fShowChooser = false;
+	
+	fAuthorName = "";
+	fAuthorEmail = "";
+	fAuthorURL = "";
+	fAppVersion = "";
 }
 
 
@@ -565,8 +618,6 @@ PackageInfo::CullGroup(const char *group)
 status_t
 PackageInfo::ParsePackageInfo(BString str)
 {
-//	debugger("");
-	
 	char *pkgstr = NULL;
 	char pkgdata[str.Length() + 1];
 	sprintf(pkgdata,"%s",str.String());
@@ -624,6 +675,8 @@ PackageInfo::ParsePackageInfo(BString str)
 			else if (key.ICompare("RELEASEDATE") == 0)
 				SetReleaseDate(atol(value.String()));
 			else if (key.ICompare("APPVERSION") == 0)
+				SetPackageVersion(atof(value.String()));
+			else if (key.ICompare("APPVERSION") == 0)
 				SetAppVersion(value.String());
 			else if (key.ICompare("FILE") == 0)
 			{
@@ -656,6 +709,8 @@ PackageInfo::ParsePackageInfo(BString str)
 			{
 				if (key.ICompare("INSTALLEDNAME") == 0)
 					fileItem->SetInstalledName(value.String());
+				else if (key.ICompare("PATH") == 0)
+					fileItem->ConvertPathFromString(value.String());
 				else if (key.ICompare("INSTALLFOLDER") == 0)
 					fileItem->ConvertPathFromString(value.String());
 				else if (key.ICompare("LINK") == 0)

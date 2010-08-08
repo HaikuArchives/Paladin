@@ -392,7 +392,8 @@ PackageInfo::MakeInfo(void)
 	char buffer[32];
 	sprintf(buffer,"%.1f",GetPackageVersion());
 	
-	out << "PKGVERSION=" << buffer
+	out << "PFXPROJECT=Always first line\n"
+		<< "PKGVERSION=" << buffer
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.AsString() << "\n";
 	

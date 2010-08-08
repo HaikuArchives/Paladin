@@ -18,18 +18,25 @@ public:
 							DPath(const entry_ref &ref);
 							DPath(void);
 	virtual					~DPath(void);
+	
 			DPath &			operator =(const DPath &path);
+			DPath &			operator =(const BString &string);
 			DPath &			operator =(const char *string);
 			void			SetTo(const char *string);
 			void			SetTo(const DPath &path);
 			void			SetTo(const BString &string);
 			void			SetTo(const entry_ref &ref);
-	
+			
+			void			SetBaseName(const char *string);
+			void			SetExtension(const char *string);
+			bool			HasExtension(void) const;
+			
 			const char *	GetFullPath(void) const;
 			const char *	GetFolder(void) const;
 			const char *	GetFileName(void) const;
 			const char *	GetBaseName(void) const;
 			const char *	GetExtension(void) const;
+			entry_ref		GetRef(void) const;
 			
 			DPath &			operator <<(const char *string);
 			DPath &			operator <<(const BString &string);

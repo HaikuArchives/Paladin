@@ -51,6 +51,14 @@ DPath::operator =(const DPath &path)
 
 
 DPath &
+DPath::operator =(const BString &string)
+{
+	SetTo(string.String());
+	return *this;
+}
+
+
+DPath &
 DPath::operator =(const char *string)
 {
 	SetTo(string);
@@ -62,6 +70,9 @@ void
 DPath::SetTo(const char *string)
 {
 	fFullPath = string;
+	
+	if (fFullPath.FindLast("/.") == fFullPath.Length() - 2)
+		fFullPath.RemoveLast("/.");
 	
 	if (!string)
 	{
@@ -124,6 +135,43 @@ DPath::SetTo(const entry_ref &ref)
 }
 
 
+void
+DPath::SetBaseName(const char *string)
+{
+	if (IsEmpty())
+	{
+		SetTo(string);
+		return;
+	}
+	
+	BString temp = GetFolder();
+	BString ext = GetExtension();
+	temp << "/" << string << "." << ext;
+}
+
+
+void
+DPath::SetExtension(const char *string)
+{
+	BString ext(GetExtension());
+	if (ext.CountChars() > 0)
+		fFullPath.ReplaceLast(ext.String(), string);
+	else
+	{
+		BString temp(fFullPath);
+		temp << "." << string;
+		SetTo(temp);
+	}
+}
+
+			
+bool
+DPath::HasExtension(void) const
+{
+	return (fExtensionPos > 0);
+}
+
+
 const char *
 DPath::GetFullPath(void) const
 {
@@ -157,6 +205,16 @@ const char *
 DPath::GetExtension(void) const
 {
 	return (fExtensionPos > 0) ? fFullPath.String() + fExtensionPos : NULL;
+}
+
+
+entry_ref
+DPath::GetRef(void) const
+{
+	entry_ref ref;
+	BEntry entry(fFullPath.String());
+	entry.GetRef(&ref);
+	return ref;
 }
 
 

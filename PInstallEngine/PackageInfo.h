@@ -26,7 +26,7 @@ public:
 							PackageInfo(void);
 	status_t				LoadFromResources(void);
 	status_t				LoadFromFile(const char *path);
-	status_t				SaveToFile(const char *path);
+	status_t				SaveToFile(const char *path, bool clobber = false);
 	
 	// The package name is the name to be displayed to the user and doesn't necessarily
 	// equate with the package's filename
@@ -93,6 +93,8 @@ public:
 	void					PrintInfo(FILE *fd);
 	void					PrintToStream(void);
 	void					DumpInfo(void);
+	
+	void					MakeEmpty(void);
 	
 private:
 	void					AddGroup(const char *group);

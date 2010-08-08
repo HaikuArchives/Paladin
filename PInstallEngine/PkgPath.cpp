@@ -2,25 +2,34 @@
 
 #include <OS.h>
 #include <Path.h>
+#include <VolumeRoster.h>
 
 #include "PackageInfo.h"
 
-extern PackageInfo gPkgInfo;
-
 PkgPath::PkgPath(void)
+	:	fPathConstant(-1)
 {
-	SetTo(B_APPS_DIRECTORY);
+	BVolumeRoster roster;
+	roster.GetBootVolume(&fVolume);
+	
+	SetTo(B_APPS_DIRECTORY, &fVolume);
 }
 
 
 PkgPath::PkgPath(const char *custom)
 {
+	BVolumeRoster roster;
+	roster.GetBootVolume(&fVolume);
+	
 	SetTo(custom);
 }
 
 
 PkgPath::PkgPath(int32 pathid)
 {
+	BVolumeRoster roster;
+	roster.GetBootVolume(&fVolume);
+	
 	SetTo(pathid);
 }
 
@@ -50,7 +59,7 @@ PkgPath::SetTo(const char *custom)
 
 
 void
-PkgPath::SetTo(int32 pathid)
+PkgPath::SetTo(int32 pathid, BVolume *vol)
 {
 	if (pathid == M_CUSTOM_DIRECTORY)
 	{
@@ -64,10 +73,12 @@ PkgPath::SetTo(int32 pathid)
 	if (pathid == M_INSTALL_DIRECTORY)
 		return;
 	
+	if (vol)
+		fVolume = *vol;
+	
 	// Perform the directory resolution here and then all that is required is to make
 	// one call to get a string path. :)
-	BVolume installVol(gPkgInfo.GetInstallVolume());
-	fOSPath.SetVolume(installVol);
+	fOSPath.SetVolume(fVolume);
 	fPath = fOSPath.GetPath(pathid);
 	if (fPath.CountChars() < 1)
 		fPath = fOSPath.GetPath(B_APPS_DIRECTORY);
@@ -77,14 +88,14 @@ PkgPath::SetTo(int32 pathid)
 int32
 PkgPath::AsConstant(void) const
 {
-	return fPathConstant == M_INSTALL_DIRECTORY ? gPkgInfo.GetPathConstant() : fPathConstant;
+	return fPathConstant;
 }
 
 
 const char *
 PkgPath::AsString(void) const
 {
-	return fPathConstant == M_INSTALL_DIRECTORY ? gPkgInfo.GetResolvedPath() : fPath.String();
+	return fPath.String();
 }
 
 

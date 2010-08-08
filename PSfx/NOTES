@@ -1,7 +1,5 @@
 TODO:
 
-Create icons for PSfx and its project files
-
 Set up MIME handling stuff for project files and sfx files
 
 Add an Alert for failed file opens
@@ -9,7 +7,5 @@ Add an Alert for failed file opens
 Implement custom directory handling in the ItemSelected code in PkgWindow
 
 The replacement mode code for PInstallEngine seems to be non-existent
-
-The interface will pretty much be a direct copy of that of PackageBuilder.
 
 Make a better About box

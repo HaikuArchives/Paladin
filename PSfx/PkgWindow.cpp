@@ -278,13 +278,8 @@ PkgWindow::MessageReceived(BMessage *msg)
 			{
 				DPath tempPath(ref);
 				tempPath << name;
-				if (!tempPath.GetExtension() || strlen(tempPath.GetExtension()) < 1)
-				{
-					BString temp(tempPath.GetFullPath());
-					temp << ".pfx";
-					tempPath.SetTo(temp.String());
-				}
-				
+				if (!tempPath.HasExtension())
+					tempPath.SetExtension("pfx");
 				fFilePath.SetTo(tempPath);
 				DoSave();
 			}

@@ -165,6 +165,13 @@ DPath::SetExtension(const char *string)
 }
 
 			
+bool
+DPath::HasExtension(void) const
+{
+	return (fExtensionPos > 0);
+}
+
+
 const char *
 DPath::GetFullPath(void) const
 {

@@ -2,8 +2,6 @@ TODO:
 
 Tack on .pfx extension to project file name when it lacks one
 
-Add methods SetBaseName and SetExtension to DPath class
-
 Create icons for PSfx and its project files
 
 Set up MIME handling stuff for project files and sfx files

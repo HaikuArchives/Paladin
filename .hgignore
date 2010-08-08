@@ -11,3 +11,4 @@ SymbolFinder/SymbolFinder
 *.o
 PSfx/PSfx
 PInstallEngine/PInstallEngine
+*.sfx

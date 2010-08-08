@@ -1,9 +1,44 @@
 #include "Globals.h"
 
+#include <Application.h>
+#include <Mime.h>
+#include <stdlib.h>
+
+#include "Icons.h"
 
 BObjectList<BString> gArgList(20,true);
 bool gCommandLineMode = false;
 int gReturnValue = 0;
+
+void
+InitFileTypes(void)
+{
+	BMimeType mime(PFX_MIME_TYPE);
+	
+	if (mime.IsInstalled())
+		mime.Delete();
+	
+	if (!mime.IsInstalled())
+	{
+		mime.SetShortDescription("PSfx Project");
+		mime.SetLongDescription("Project to build a self-extracting .sfx package");
+		
+		#ifdef __HAIKU__
+		mime.SetIcon(kPFXIconData, sizeof(kPFXIconData));
+		#endif
+		
+		mime.SetSnifferRule("0.50  (\"PFXPROJECT\")");
+		mime.SetPreferredApp(APP_SIGNATURE);
+		
+		BMessage ext;
+		ext.AddString("extensions","pfx");
+		mime.SetFileExtensions(&ext);
+		
+		mime.Install();
+	}
+
+}
+
 
 void
 GeneratePathMenu(BMenu *menu, int32 msgCmd)

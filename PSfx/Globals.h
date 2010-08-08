@@ -12,6 +12,11 @@ extern bool gCommandLineMode;
 extern BObjectList<BString> gArgList;
 extern int gReturnValue;
 
+#define PFX_MIME_TYPE "text/x-vnd.dw-psfx-project"
+#define APP_SIGNATURE "application/x-vnd.dw-PSfx"
+
+void	InitFileTypes(void);
+
 void	GeneratePathMenu(BMenu *menu, int32 msgCmd);
 
 // Items placed into the menu by GeneratePathMenu

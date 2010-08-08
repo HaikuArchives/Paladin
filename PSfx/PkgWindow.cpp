@@ -665,7 +665,8 @@ PkgWindow::SaveProject(const char *path)
 	if (!fPkgInfo.GetName() || strlen(fPkgInfo.GetName()) < 1)
 		fPkgInfo.SetName(filePath.GetBaseName());
 	
-	out	<< "PKGNAME=" << fPkgInfo.GetName()
+	out	<< "PFXPROJECT=Always first\n"
+		<< "PKGNAME=" << fPkgInfo.GetName()
 		<< "\nTYPE=SelfExtract\n";
 	
 	if (fPkgInfo.GetPathConstant() == M_CUSTOM_DIRECTORY)
@@ -728,6 +729,9 @@ PkgWindow::SaveProject(const char *path)
 	
 	BFile file(path, B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
 	file.Write(out.String(), out.Length());
+
+	BNodeInfo nodeInfo(&file);
+	nodeInfo.SetType(PFX_MIME_TYPE);
 }
 
 

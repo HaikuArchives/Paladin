@@ -1,0 +1,28 @@
+
+resource(1, "AppName") "calc";
+
+resource(2, "AppVersion") "1.0.0";
+
+resource(3, "PkgInfo") #'CSTR' array {
+	"PKGVERSION=1.0\nTYPE=SelfExtract\nINSTALLFOLDER=askuser\nINSTALL"
+	"FOLDERNAME=calc\nAUTHORNAME=DarkWyrm\nCONTACT=darkwyrm@gmail.com"
+	"\nURL=http://darkwyrm.beemulated.net\nRELEASEDATE=1246126221\nAP"
+	"PVERSION=1.0.0\nDEPENDENCY=rez\n\tTYPE=file\n\tPATH=/boot/home/c"
+	"onfig/bin\nFILE=calc.x86\n\tINSTALLEDNAME=calc\n\tLINK=B_USER_DE"
+	"SKBAR_DIRECTORY\n\tCATEGORY=Applications\n\tPLATFORM=r5,haiku\n\t"
+	"GROUP=all\nFILE=calc.x86\n\tINSTALLEDNAME=calc\n\tLINK=B_USER_DE"
+	"SKBAR_DIRECTORY\n\tCATEGORY=Applications/Tools\n\tPLATFORM=zeta\n"
+	"\tGROUP=all\nFILE=calc.x86.proj\n\tPLATFORM=r5,zeta,haiku\n\tGRO"
+	"UP=Full Install\nFILE=makefile\n\tPLATFORM=all\n\tGROUP=Full Ins"
+	"tall\nFILE=ReadMe.Calculator.txt\n\tPLATFORM=all\n\tGROUP=Regula"
+	"r Install,Full Install\nFILE=source/CalcEngine.cpp\n\tGROUP=Full"
+	" Install\nFILE=source/CalcEngine.h\n\tGROUP=Full Install\nFILE=s"
+	"ource/Calculator.cpp\n\tGROUP=Full Install\nFILE=source/Calculat"
+	"or_x86.rsrc\n\tGROUP=Full Install\nFILE=source/CalcView.cpp\n\tG"
+	"ROUP=Full Install\nFILE=source/CalcView.h\n\tGROUP=Full Install\n"
+	"FILE=source/CalcWindow.cpp\n\tGROUP=Full Install\nFILE=source/Ca"
+	"lcWindow.h\n\tGROUP=Full Install\nFILE=source/FrameView.cpp\n\tG"
+	"ROUP=Full Install\nFILE=source/FrameView.h\n\tGROUP=Full Install"
+	"\nFILE=source/Prefs.cpp\n\tGROUP=Full Install\nFILE=source/Prefs"
+	".h\n\tGROUP=Full Install\n"
+};

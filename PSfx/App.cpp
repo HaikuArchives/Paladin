@@ -46,8 +46,10 @@ CountRegisteredWindows(void)
 
 
 App::App(void)
-	:	BApplication("application/x-vnd.dw-PSfx")
+	:	BApplication(APP_SIGNATURE)
 {
+	InitFileTypes();
+	
 	if (gCommandLineMode)
 	{
 		DoCommandLine();

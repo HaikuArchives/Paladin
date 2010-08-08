@@ -29,6 +29,7 @@ public:
 			
 			void			SetBaseName(const char *string);
 			void			SetExtension(const char *string);
+			bool			HasExtension(void) const;
 			
 			const char *	GetFullPath(void) const;
 			const char *	GetFolder(void) const;

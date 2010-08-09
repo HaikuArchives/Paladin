@@ -15,9 +15,6 @@ InitFileTypes(void)
 {
 	BMimeType mime(PFX_MIME_TYPE);
 	
-	if (mime.IsInstalled())
-		mime.Delete();
-	
 	if (!mime.IsInstalled())
 	{
 		mime.SetShortDescription("PSfx Project");
@@ -34,7 +31,9 @@ InitFileTypes(void)
 		ext.AddString("extensions","pfx");
 		mime.SetFileExtensions(&ext);
 		
+		#ifndef __HAIKU__
 		mime.Install();
+		#endif
 	}
 
 }

@@ -22,7 +22,8 @@ enum
 	M_SHOW_SET_FOLDER = 'shfl',
 	M_SET_FOLDER = 'stfl',
 	M_START_INSTALL,
-	M_SET_CUSTOM = 'stcs'
+	M_SET_CUSTOM = 'stcs',
+	M_TOGGLE_LINKS_TARGETING = 'tglt'
 };
 
 MainWindow::MainWindow(void)
@@ -105,11 +106,17 @@ MainWindow::MainWindow(void)
 		r = fFolderField->Frame();
 	}
 	
+	r.OffsetBy(0.0, r.Height() + 10.0);
+	fLinksOnTargetVolume = new BCheckBox(r, "linksontarget", "Create Links on Target Volume",
+										new BMessage(M_TOGGLE_LINKS_TARGETING));
+	fLinksOnTargetVolume->ResizeToPreferred();
+	top->AddChild(fLinksOnTargetVolume);
+	
 	BButton *begin = new BButton(BRect(0,0,1,1),"begin","Begin",new BMessage(M_START_INSTALL));
 	begin->ResizeToPreferred();
 	
 	begin->MoveTo(Bounds().right - 10.0 - begin->Frame().Width(),
-				fFolderField ? fFolderField->Frame().top : fVolumeField->Frame().top);
+				fLinksOnTargetVolume->Frame().top);
 	top->AddChild(begin);
 	begin->MakeDefault(true);
 	
@@ -147,7 +154,10 @@ MainWindow::MessageReceived(BMessage *msg)
 		{
 			dev_t dev;
 			if (msg->FindInt32("device",(int32*)&dev) == B_OK)
+			{
+				gNonBootInstall = (dev != gBootVolumeID);
 				gPkgInfo.SetInstallVolume(dev);
+			}
 			break;
 		}
 		case M_SET_FOLDER:
@@ -182,6 +192,11 @@ MainWindow::MessageReceived(BMessage *msg)
 			gPkgInfo.SetInstallPath(path.Path());
 			break;
 		}
+		case M_TOGGLE_LINKS_TARGETING:
+		{
+			gLinksOnTargetVolume = (fLinksOnTargetVolume->Value() == B_CONTROL_ON);
+			break;
+		}	
 		case M_SHOW_SET_FOLDER:
 		{
 			if (!fFilePanel)

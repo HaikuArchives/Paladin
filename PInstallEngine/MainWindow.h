@@ -3,6 +3,7 @@
 
 #include "DWindow.h"
 
+#include <CheckBox.h>
 #include <FilePanel.h>
 #include <MenuField.h>
 #include <Messenger.h>
@@ -30,7 +31,9 @@ private:
 	BMenuField	*fVolumeField,
 				*fFolderField,
 				*fGroupField;
-				
+	
+	BCheckBox	*fLinksOnTargetVolume;
+	
 	BitmapMenuItem	*fCustomItem,
 					*fLastFolderItem;
 	

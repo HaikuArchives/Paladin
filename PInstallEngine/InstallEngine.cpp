@@ -12,6 +12,7 @@
 #include "FileItem.h"
 #include "Globals.h"
 #include "PackageInfo.h"
+#include "PkgPath.h"
 
 extern PackageInfo gPkgInfo;
 extern BResources *gResources;
@@ -522,40 +523,54 @@ void
 InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 {
 	// All link entries are strings, so we have to do a lookup in the global constant map
-	//debugger("");
+//	debugger("");
 	
-	DPath path(item->GetResolvedPath());
+	// Determine the source folder. This only need be done once because we can make
+	// multiple links to the same source file.
+	DPath srcPath;
+	if (item->GetPathConstant() == M_CUSTOM_DIRECTORY)
+		srcPath = item->GetResolvedPath();
+	else if (item->GetPathConstant() == M_INSTALL_DIRECTORY)
+		srcPath = gPkgInfo.GetResolvedPath();
+	else
+	{
+		BPath findPath;
+		find_directory((directory_which)item->GetPathConstant(), &findPath);
+		srcPath = findPath.Path();
+	}
+	
 	if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
-		path.Append(gPkgInfo.GetInstallFolderName());
-	BString pathstr(path.GetFullPath());
-	if (installVolName && strlen(installVolName) > 0)
+		srcPath.Append(gPkgInfo.GetInstallFolderName());
+	
+	BString pathstr(srcPath.GetFullPath());
+	if (gNonBootInstall && installVolName && strlen(installVolName) > 0)
 	{
 		if (pathstr.FindFirst("boot") == 1)
 			pathstr.ReplaceFirst("boot",installVolName);
 	}
-	path.SetTo(pathstr.String());
+	srcPath.SetTo(pathstr.String());
 	
-	OSPath deskbar;
-	if (gNonBootInstall)
+	OSPath targetResolver;
+	if (gNonBootInstall && gLinksOnTargetVolume)
 	{
-		deskbar.SetOS(gTargetPlatform);
+		targetResolver.SetOS(gTargetPlatform);
 		BVolume installVol(gPkgInfo.GetInstallVolume());
-		deskbar.SetVolume(installVol);
+		targetResolver.SetVolume(installVol);
 	}
-
+	else
+		targetResolver.SetOS(gPlatform);
+	
 	for (int32 i = 0; i < item->CountLinks(); i++)
 	{
-		BString linkstr(item->LinkAt(i));
-		if (gNonBootInstall && installVolName && strlen(installVolName) > 0)
-		{
-			if (linkstr.FindFirst("boot") == 1)
-				linkstr.ReplaceFirst("boot",installVolName);
-		}
+		// Instead of starting with a DPath, we'll use a BString to be able
+		// to replace the name "boot" with the name of the install volume
+		BString tempStr(item->LinkAt(i));
 		
-		DPath linkpath(linkstr.String());
-		
-		if (linkstr.FindFirst(deskbar.GetPath(B_USER_DESKBAR_DIRECTORY)) == 0)
+		DPath destPath;
+		if (tempStr.IFindFirst("B_USER_DESKBAR_DIRECTORY") == 0)
 		{
+			destPath = targetResolver.DirToString(B_USER_DESKBAR_DIRECTORY);
+
 			if (item->GetCategory() && strlen(item->GetCategory()) > 0)
 			{
 				BString cat(item->GetCategory());
@@ -564,34 +579,61 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 					// The programs folder in Zeta is actually named Software. Go figure.
 					// If the developer specified Applications (which is proper), then put it
 					// in the right place
-					if (cat.IFindFirst("Applications") == 0)
-						cat.IReplaceFirst("Applications","Software");
+					cat.IReplaceFirst("Applications","Software");
 				}
-				linkpath.Append(cat.String());
-				if (!BEntry(linkpath.GetFullPath()).Exists())
-					create_directory(linkpath.GetFullPath(),0777);
+				destPath.Append(cat.String());
+				if (!BEntry(destPath.GetFullPath()).Exists())
+					create_directory(destPath.GetFullPath(),0777);
 			}
 		}
+		else
+		{
+			BString dirString = item->LinkAt(i);
+			int32 end = dirString.FindFirst("/");
+			if (end >= 0)
+				dirString.Truncate(end);
+			int32 which = targetResolver.StringToDir(dirString.String());
+			if (which == B_ERROR)
+			{
+				if (dirString[0] == '/')
+					destPath = dirString;
+				else
+				{
+					STRACE(("Couldn't create link %s\n", item->LinkAt(i)));
+					return;
+				}
+			}
+			else
+			{
+				BPath findPath;
+				find_directory((directory_which)which, &findPath);
+				destPath = findPath.Path();
+			}
+			
+		}
 		
-		path.Append(item->GetName());
+		srcPath.Append(item->GetName());
 		
 		// Because FileItem::GetName() can be a relative path, we need to make sure that
 		// we get the leaf.
 		BString linkname = item->GetName();
-		int32 slashpos = linkname.FindLast("/");
-		if (slashpos >= 0)
+		if (item->GetInstalledName() && strlen(item->GetInstalledName()) > 0)
+			linkname = item->GetInstalledName();
+		else
 		{
-			if (slashpos < linkname.CountChars() - 1)
-				linkname = item->GetName() + slashpos;
+			linkname = item->GetName();
+			int32 slashpos = linkname.FindLast("/");
+			if (slashpos >= 0)
+			{
+				if (slashpos < linkname.CountChars() - 1)
+					linkname = item->GetName() + slashpos;
+			}
 		}
-		
-		linkpath.Append(linkname);
+		destPath.Append(linkname);
 		
 		BString command;
-		command << "ln -sf '" << path.GetFullPath() << "' '" << linkpath.GetFullPath() << "'";
+		command << "ln -sf '" << srcPath.GetFullPath() << "' '" << destPath.GetFullPath() << "'";
 		STRACE(("Link command: %s\n", command.String()));
 		system(command.String());
 	}
 }
-
-

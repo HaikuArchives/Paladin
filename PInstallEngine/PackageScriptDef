@@ -1,3 +1,7 @@
+This is the definition file for the SFX install script format. The PFX format is
+almost exactly the same, however, having a few extra entries specific to its format.
+
+
 PFXPROJECT=Always first line // always the first line
 PKGVERSION=1.0			// always 1.0 for now
 TYPE=SelfExtract		// always SelfExtract for now

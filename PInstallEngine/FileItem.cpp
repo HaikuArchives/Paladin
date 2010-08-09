@@ -244,10 +244,7 @@ FileItem::AddLink(const char *link)
 	if (!link || strlen(link) < 1)
 		return;
 	
-	PkgPath path;
-	path.ConvertFromString(link);
-	if (!HasLink(path.AsString()))
-		fLinks.AddItem(new BString(path.AsString()));
+	fLinks.AddItem(new BString(link));
 }
 
 

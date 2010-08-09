@@ -120,6 +120,7 @@ PrintUsage(void)
 			"\t-f, --folder <install folder name>: Sets the install folder\n"
 			"\t-c, --clobber <ask, skip, cancel, or overwrite>: Sets the action for file conflicts\n"
 			"\t-p, --platform <r5, zeta, or haiku>: Install for the specified OS\n"
+			"\t-t, --target-links: Create links on target volume instead of boot volume\n"
 			"\t-m, --missing <ask, continue, or cancel>: Sets the action for missing dependencies\n"
 			"\t-i, --info: Prints info about the package\n", gAppName.String());
 }
@@ -134,6 +135,7 @@ IsCommandFlag(const BString &str)
 		str.ICompare("--folder") == 0 || str.ICompare("-f") == 0 ||
 		str.ICompare("--clobber") == 0 || str.ICompare("-c") == 0 ||
 		str.ICompare("--platform") == 0 || str.ICompare("-p") == 0 ||
+		str.ICompare("--target-links") == 0 || str.ICompare("-t") == 0 ||
 		str.ICompare("--missing") == 0 || str.ICompare("-m") == 0 ||
 		str.ICompare("--info") == 0 || str.ICompare("-i") == 0)
 		return true;
@@ -158,6 +160,7 @@ ProcessArgs(int32 argc, char **argv)
 	// -f, --folder <path>
 	// -c, --clobber <ask|skip|overwrite>
 	// -p, --platform <r5|zeta|haiku>	--> sets gNonBootInstall
+	// -t, --target-links --> set gLinkOnTargetVolume
 	// -i, --info --> shows package info and exits
 	
 	gAppName = argv[0];
@@ -250,6 +253,10 @@ ProcessArgs(int32 argc, char **argv)
 			gTargetPlatform = os;
 			gNonBootInstall = true;
 			i++;
+		}
+		else if (arg->ICompare("--target-links") == 0 || arg->ICompare("-t") == 0)
+		{
+			gLinksOnTargetVolume = true;
 		}
 	}
 	return true;

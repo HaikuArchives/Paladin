@@ -4,6 +4,8 @@
 #include <File.h>
 #include <Path.h>
 #include <stdio.h>
+#include <VolumeRoster.h>
+#include <Volume.h>
 
 #include "ResData.h"
 
@@ -21,6 +23,8 @@ int8 gClobberMode = CLOBBER_ASK;
 int8 gDepMissingMode = DEPMISSING_ASK;
 BString gAppName;
 bool gPrintInfoMode = false;
+dev_t gBootVolumeID = 0;
+bool gLinksOnTargetVolume = false;
 
 void InitLogFilePath(void);
 const char *FindStringInBuffer(const char *string, const char *buffer, const size_t &size);
@@ -52,6 +56,11 @@ InitGlobals(void)
 		if (gTargetPlatform == OS_NONE)
 			gTargetPlatform = gPlatform;
 	}
+	
+	BVolumeRoster vRoster;
+	BVolume bootVol;
+	vRoster.GetBootVolume(&bootVol);
+	gBootVolumeID = bootVol.Device();
 }
 
 

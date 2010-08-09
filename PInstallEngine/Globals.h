@@ -3,6 +3,7 @@
 
 #include <FindDirectory.h>
 #include <String.h>
+#include <Volume.h>
 
 #include "InstallEngine.h"
 #include "ObjectList.h"
@@ -37,6 +38,9 @@ extern int8 gClobberMode;
 extern int8 gDepMissingMode;
 extern BString gAppName;
 extern bool gPrintInfoMode;
+extern bool gLinksOnTargetVolume;
+
+extern dev_t gBootVolumeID;
 
 void InitGlobals(void);
 

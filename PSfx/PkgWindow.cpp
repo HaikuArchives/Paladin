@@ -718,7 +718,7 @@ PkgWindow::SaveProject(const char *path)
 			out << "ITEMGROUP=" << fileItem->GroupAt(i) << "\n";
 		
 		for (int32 i = 0; i < fileItem->CountPlatforms(); i++)
-			out << "ITEMPLATFORM=" << fileItem->PlatformAt(i) << "\n";
+			out << "ITEMPLATFORM=" << (int32) fileItem->PlatformAt(i) << "\n";
 		
 		for (int32 i = 0; i < fileItem->CountLinks(); i++)
 			out << "ITEMLINK=" << fileItem->LinkAt(i) << "\n";
@@ -845,7 +845,9 @@ PkgWindow::BuildPackage(ostype_t platform)
 	app_info aInfo;
 	be_app->GetAppInfo(&aInfo);
 	
-	BResources res(&aInfo.ref);
+	BFile rFile(&aInfo.ref, B_READ_ONLY);
+	BResources res(&rFile);
+	
 	size_t stubDataSize;
 	const uint8 *stubData = (uint8 *)res.LoadResource('RAWT', stubName.String(),
 										&stubDataSize);

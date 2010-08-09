@@ -18,6 +18,14 @@ extern BResources *gResources;
 
 using namespace std;
 
+#define TRACE_INSTALL
+
+#ifdef TRACE_INSTALL
+	#define STRACE(x) printf x
+#else
+	#define STRACE(x) /* */
+#endif
+
 InstallEngine::InstallEngine(void)
 	:	fMessenger(be_app_messenger),
 		fInstallThread(-1),
@@ -201,8 +209,13 @@ InstallEngine::DoInstall(void)
 		ospath.SetVolume(installVol);
 		ospath.SetOS(gTargetPlatform);
 	}
+	STRACE(("Platform: %s\nInstall Volume Name: %sInstall Group: %s\n",
+			OSTypeToString(ospath.GetOS()).String(),
+			ospath.GetVolumeName(),
+			gPkgInfo.GetGroup()));
 	
 	// 1) Check Dependencies
+	STRACE(("Checking dependencies...\n"));
 	for (int32 i = 0; i < gPkgInfo.CountDependencies(); i++)
 	{
 		DepItem *dep = gPkgInfo.DependencyAt(i);
@@ -288,7 +301,7 @@ InstallEngine::DoInstall(void)
 	BVolumeRoster volRoster;
 	BVolume bootVol;
 	volRoster.GetBootVolume(&bootVol);
-		
+	
 	BString installVolName;
 	char *buffer = installVolName.LockBuffer(B_OS_NAME_LENGTH);
 	installVol.GetName(buffer);
@@ -314,26 +327,41 @@ InstallEngine::DoInstall(void)
 			
 			// Are we even supposed to install the file? Check both platform and group
 			if (!fileItem->BelongsToPlatform(gTargetPlatform))
+			{
+				STRACE(("%s is not to be installed for this platform. Skipping.\n",
+					fileItem->GetName()));
 				continue;
+			}
 			
 			if (gPkgInfo.GetGroup() && strlen(gPkgInfo.GetGroup()) > 0)
 			{
 				if (!fileItem->BelongsToGroup(gPkgInfo.GetGroup()))
+				{
+					STRACE(("%s doesn't belong to this install group. Skipping.\n",
+						fileItem->GetName()));
 					continue;
+				}
 			}
 			
 			BString cookedPath(gPkgInfo.GetResolvedPath());
 			if (installVol.Device() != bootVol.Device())
 			{
 				if (cookedPath.FindFirst("boot") == 1)
+				{
+					STRACE(("Original file install path: %s\n", cookedPath.String()));
 					cookedPath.ReplaceFirst("boot",installVolName.String());
+					STRACE(("Updated file install path: %s\n", cookedPath.String()));
+				}
 			}
 			
 			// Figure the actual destination path
 			DPath destpath(cookedPath.String());
 			
 			if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
+			{
 				destpath.Append(gPkgInfo.GetInstallFolderName());
+				STRACE(("Final file install path: %s\n", destpath.GetFullPath()));
+			}
 			
 			status = InstallFromZip(zipfilepath.GetFullPath(),fileItem,destpath.GetFullPath());
 			if (status != B_OK)
@@ -415,6 +443,7 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 		{
 			case 1:
 			{
+				STRACE(("Destination exists. Skipped installing %s\n", src->GetName()));
 				msg = "Skipped installing ";
 				msg << src->GetName() << "\n";
 				Log(msg.String());
@@ -423,6 +452,7 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 			}
 			case 2:
 			{
+				STRACE(("Destination %s exists. Aborting install\n", src->GetName()));
 				Log("Canceled installation.\n");
 				fMessenger.SendMessage(M_INSTALL_ABORT);
 				return B_ERROR;
@@ -444,6 +474,7 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	// 3) Extract file to the destination
 	BString command;
 	command << "unzip -o '" << zipfile << "' '" << src->GetName() << "' -d '" << dest << "' > /dev/null";
+	STRACE(("Unzip command: %s\n", command.String()));
 	system(command.String());
 	
 	
@@ -478,6 +509,8 @@ InstallEngine::InstallFolder(const char *path)
 	if (entry.Exists())
 		return;
 	
+	STRACE(("Creating folder %s\n", path));
+	
 	// Need to interatively create and log all folders created
 	create_directory(path,0777);
 
@@ -501,7 +534,6 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 			pathstr.ReplaceFirst("boot",installVolName);
 	}
 	path.SetTo(pathstr.String());
-	
 	
 	OSPath deskbar;
 	if (gNonBootInstall)
@@ -557,6 +589,7 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 		
 		BString command;
 		command << "ln -sf '" << path.GetFullPath() << "' '" << linkpath.GetFullPath() << "'";
+		STRACE(("Link command: %s\n", command.String()));
 		system(command.String());
 	}
 }

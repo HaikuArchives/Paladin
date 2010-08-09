@@ -1,4 +1,4 @@
 TODO:
-	Make sure that the new format (cat selfextractor zipfile > pkg) works for all tools
+	Implement a system-compatible package logging mode for Haiku
 	Hammer-test the parsing code for the package info
 	Hammer-test installing to a non-boot volume

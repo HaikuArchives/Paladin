@@ -1,3 +1,5 @@
+#include "AboutWindow.h"
+
 #include <Application.h>
 #include <AppFileInfo.h>
 #include <Roster.h>
@@ -5,7 +7,6 @@
 #include <stdio.h>
 #include <Screen.h>
 #include <TranslationUtils.h>
-#include "AboutWindow.h"
 
 AboutWindow::AboutWindow(void)
  : BWindow(BRect(100,100,500,400),"Capital Be", B_MODAL_WINDOW_LOOK,
@@ -27,7 +28,7 @@ AboutView::AboutView(BRect frame)
 {
 	SetViewColor(126,126,190);
 	
-	fLogo = BTranslationUtils::GetBitmap('JPG ',"AboutPaladin.jpg");
+	fLogo = BTranslationUtils::GetBitmap('JPEG',"PSfxAbout.jpg");
 	
 	app_info ai;
 	version_info vi;
@@ -69,7 +70,7 @@ AboutView::AboutView(BRect frame)
 	be_plain_font->GetHeight(&height);
 	
 	versionpos.y = fLogo->Bounds().bottom - 5;
-	versionpos.x = fLogo->Bounds().right - StringWidth(version) - 7;
+	versionpos.x = fLogo->Bounds().left + 5;
 	
 	SetDrawingMode(B_OP_OVER);
 	SetFont(be_bold_font);

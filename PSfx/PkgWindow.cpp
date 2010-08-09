@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string>
 
+#include "AboutWindow.h"
 #include "App.h"
 #include "FileListView.h"
 #include "Globals.h"
@@ -399,46 +400,8 @@ PkgWindow::MessageReceived(BMessage *msg)
 void
 PkgWindow::ShowAbout(void)
 {
-	app_info ai;
-	version_info vi;
-	be_app->GetAppInfo(&ai);
-	BFile file(&ai.ref,B_READ_ONLY);
-	BAppFileInfo appinfo(&file);
-	appinfo.GetVersionInfo(&vi,B_APP_VERSION_KIND);
-
-	BString variety;
-	switch(vi.variety)
-	{
-		case 0:
-			variety="d";
-			break;
-		case 1:
-			variety="a";
-			break;
-		case 2:
-			variety="b";
-			break;
-		case 3:
-			variety="g";
-			break;
-		case 4:
-			variety="rc";
-			break;
-		default:
-			variety="Final";
-			break;
-	}
-	
-	char version[128];
-	if(variety != "Final")
-		sprintf(version,"v%lu.%lu %s%lu",vi.major,vi.middle,variety.String(),vi.internal);
-	else
-		sprintf(version,"v%lu.%lu",vi.major,vi.middle);
-	
-	BString aboutstr;
-	aboutstr << "PSfx " << version << "\n©2010 DarkWyrm";
-	BAlert *alert = new BAlert("PSfx",aboutstr.String(),"OK");
-	alert->Go();
+	AboutWindow *win = new AboutWindow();
+	win->Show();
 }
 
 

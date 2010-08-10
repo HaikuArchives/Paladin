@@ -413,55 +413,15 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	destpath.Append(src->GetName());
 	if (BEntry(destpath.GetFullPath()).Exists())
 	{
-		int32 result = -1;
-		switch (gClobberMode)
-		{
-			case CLOBBER_OVERWRITE:
-			{
-				result = 0;
-				break;
-			}
-			case CLOBBER_SKIP:
-			{
-				result = 1;
-				break;
-			}
-			case CLOBBER_CANCEL:
-			{
-				result = 2;
-				break;
-			}
-			default:
-			{
-				msg = destpath.GetFullPath();
-				msg << " exists. Do you want to overwrite it, skip installing this file, or cancel installation?";
-				result = Query(msg.String(), "Overwrite","Skip","Cancel");
-				break;
-			}
-		}
-		
-		switch (result)
-		{
-			case 1:
-			{
-				STRACE(("Destination exists. Skipped installing %s\n", src->GetName()));
-				msg = "Skipped installing ";
-				msg << src->GetName() << "\n";
-				Log(msg.String());
-				return B_OK;
-				break;
-			}
-			case 2:
-			{
-				STRACE(("Destination %s exists. Aborting install\n", src->GetName()));
-				Log("Canceled installation.\n");
-				fMessenger.SendMessage(M_INSTALL_ABORT);
-				return B_ERROR;
-				break;
-			}
-			default:
-				break;
-		}
+		// CheckClobber returns M_ABORT_INSTALL if the install should abort,
+		// B_ERROR if the file should be skipped, and B_OK if it should
+		// be overwritten
+		status_t result = CheckClobber(src, destpath.GetFullPath());
+		if (result == M_INSTALL_ABORT)
+			return B_ERROR;
+		else
+		if (result == B_ERROR)
+		return B_OK;
 	}
 	
 	msg = "Installing ";
@@ -637,3 +597,202 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 		system(command.String());
 	}
 }
+
+
+status_t
+InstallEngine::CheckClobber(FileItem *item, const char *dest)
+{
+	// This handles all the different replacement mode code
+	switch (item->GetReplaceMode())
+	{
+		case PKG_REPLACE_ASK_ALWAYS:
+		{
+			// Do nothing. User will be asked unless the decision has
+			// been saved already.
+			break;
+		}
+		case PKG_REPLACE_NEVER_REPLACE:
+		{
+			return B_ERROR;
+			break;
+		}
+		case PKG_REPLACE_RENAME_EXISTING:
+		{
+			BString newPath(dest);
+			int32 i;
+			for (i = 0; i < 10; i++)
+				if (BEntry(newPath.String()).Exists())
+					newPath << ".old." << real_time_clock();
+			
+			DPath destPath(newPath);
+			BEntry entry(dest);
+			entry.Rename(destPath.GetFileName());
+			return B_OK;
+			break;
+		}
+		case PKG_REPLACE_ASK_NEWER_VERSION:
+		{
+			if (!IsNewerVersion(dest))
+				return B_ERROR;
+			break;
+		}
+		case PKG_REPLACE_ASK_NEWER_CREATION_DATE:
+		{
+			break;
+		}
+		case PKG_REPLACE_ASK_NEWER_MOD_DATE:
+		{
+			break;
+		}
+		case PKG_REPLACE_REPLACE_NEWER_VERSION:
+		{
+			return IsNewerVersion(dest) ? B_OK : B_ERROR;
+			break;
+		}
+		case PKG_REPLACE_REPLACE_NEWER_CREATION_DATE:
+		{
+			break;
+		}
+		case PKG_REPLACE_REPLACE_NEWER_MOD_DATE:
+		{
+			break;
+		}
+/*		This case is present in PackageBuilder, but I don't
+		feel like implementing it. Then again, it may not
+		be necessary.
+		case PKG_REPLACE_MERGE_FOLDER:
+		{
+			break;
+		}
+*/		case PKG_REPLACE_UPGRADE:
+		{
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+
+	int32 result = -1;
+	switch (gClobberMode)
+	{
+		case CLOBBER_OVERWRITE:
+		{
+			result = 0;
+			break;
+		}
+		case CLOBBER_SKIP:
+		{
+			result = 1;
+			break;
+		}
+		case CLOBBER_CANCEL:
+		{
+			result = 2;
+			break;
+		}
+		default:
+		{
+			BString msg(dest);
+			msg << " exists. Do you want to overwrite it, skip installing this file, "
+				<< "or cancel installation?";
+			result = Query(msg.String(), "Overwrite","Skip","Cancel");
+			break;
+		}
+	}
+	
+	int32 returnValue = B_OK;
+	switch (result)
+	{
+		case 1:
+		{
+			STRACE(("Destination exists. Skipped installing %s\n", item->GetName()));
+			BString msg("Skipped installing ");
+			msg << item->GetName() << "\n";
+			Log(msg.String());
+			returnValue = B_ERROR;
+			break;
+		}
+		case 2:
+		{
+			STRACE(("Destination %s exists. Aborting install\n", item->GetName()));
+			Log("Canceled installation.\n");
+			fMessenger.SendMessage(M_INSTALL_ABORT);
+			return M_INSTALL_ABORT;
+			break;
+		}
+		default:
+			break;
+	}
+
+	// Follow the same "remember this decision?" style as Haiku's installer
+	if (result == 1)
+	{
+		int32 val = Query("Do you want to remember this decision for the rest of the install? All "
+				"existing files will be overwritten.", "Replace all", "Ask again");
+		if (val == 0)
+			gClobberMode = CLOBBER_OVERWRITE;
+	}
+	else
+	{
+		// Skip result
+		int32 val = Query("Do you want to remember this decision for the rest of the install? All "
+				"existing files will be skipped.", "Skip all", "Ask again");
+		if (val == 0)
+			gClobberMode = CLOBBER_SKIP;
+	}
+	
+	return returnValue;
+}
+
+
+status_t
+InstallEngine::GetVersion(const entry_ref &ref, version_info &info)
+{
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return file.InitCheck();
+	
+	BAppFileInfo fileInfo(&file);
+	return fileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND);
+}
+
+
+bool
+InstallEngine::IsNewerVersion(const char *dest)
+{
+	app_info appInfo;
+	entry_ref ref;
+	BEntry(dest).GetRef(&ref);
+	be_app->GetAppInfo(&appInfo);
+	
+	version_info destVersion;
+	if (GetVersion(ref, destVersion) != B_OK)
+		return false;
+	
+	version_info appVersion;
+	GetVersion(appInfo.ref, appVersion);
+	
+	if (appVersion.major > destVersion.major ||
+		appVersion.middle > destVersion.middle ||
+		appVersion.minor > destVersion.minor ||
+		appVersion.variety > destVersion.variety ||
+		appVersion.internal > destVersion.internal)
+		return true;
+	
+	return false;
+}
+
+
+bool
+InstallEngine::IsNewerCreation(const char *dest)
+{
+}
+
+
+bool
+InstallEngine::IsNewerModified(const char *dest)
+{
+}
+

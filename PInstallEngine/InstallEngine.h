@@ -1,6 +1,7 @@
 #ifndef INSTALLENGINE_H
 #define INSTALLENGINE_H
 
+#include <AppFileInfo.h>
 #include <Locker.h>
 #include <Messenger.h>
 #include <String.h>
@@ -36,6 +37,12 @@ private:
 			status_t		InstallFromZip(const char *zipfile, FileItem *src, const char *dest);
 			void			InstallFolder(const char *path);
 			void			MakeLinks(FileItem *item, const char *installVolName);
+			status_t		CheckClobber(FileItem *item, const char *dest);
+			status_t		GetVersion(const entry_ref &ref, version_info &info);
+			bool			IsNewerVersion(const char *dest);
+			bool			IsNewerCreation(const char *dest);
+			bool			IsNewerModified(const char *dest);
+			
 	
 	BMessenger	fMessenger;
 	BString		fLogText;

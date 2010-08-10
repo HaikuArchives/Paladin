@@ -19,7 +19,7 @@ extern BResources *gResources;
 
 using namespace std;
 
-#define TRACE_INSTALL
+//#define TRACE_INSTALL
 
 #ifdef TRACE_INSTALL
 	#define STRACE(x) printf x
@@ -29,6 +29,8 @@ using namespace std;
 
 InstallEngine::InstallEngine(void)
 	:	fMessenger(be_app_messenger),
+		fInstalledSize(0),
+		fInstalledCount(0),
 		fInstallThread(-1),
 		fQuitFlag(0)
 {
@@ -59,6 +61,13 @@ const char *
 InstallEngine::GetInstallLog(void) const
 {
 	return fLogText.String();
+}
+
+
+BMessage
+InstallEngine::GetInstallArchive(void) const
+{
+	return fLogMsg;
 }
 
 
@@ -195,6 +204,9 @@ InstallEngine::DoInstall(void)
 {
 //	debugger("");
 	Log("Checking Dependencies.\n");
+	
+	fLogMsg.MakeEmpty();
+	fLogMsg.AddString("package_version", gPkgInfo.GetAppVersion());
 	
 	status_t status = B_OK;
 	
@@ -380,11 +392,55 @@ InstallEngine::DoInstall(void)
 		BString logname(gPkgInfo.GetName());
 		logname << " Install Log";
 		logpath.Append(logname.String());
-		BFile logfile(logpath.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-		if (logfile.InitCheck() == B_OK)
+		
+		if (gNonBootInstall && gLinksOnTargetVolume)
 		{
-			logfile.Write(fLogText.String(),fLogText.Length());
-			logfile.Unset();
+			BString tempPath(logpath.Path());
+			if (tempPath.FindFirst("boot") == 1)
+			{
+				tempPath.ReplaceFirst("boot", installVolName.String());
+				logpath = tempPath.String();
+			}
+		}
+		
+		BFile logfile;
+		
+		if (gTargetPlatform != OS_HAIKU &&
+			gTargetPlatform != OS_HAIKU_GCC4)
+		{
+			logfile.SetTo(logpath.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+			if (logfile.InitCheck() == B_OK)
+			{
+				logfile.Write(fLogText.String(),fLogText.Length());
+				logfile.Unset();
+			}
+		}
+		
+		fLogMsg.AddInt64("package_size", fInstalledSize);
+		fLogMsg.AddInt32("file_count", fInstalledCount);
+		logpath = gLogArchivePath.String();
+		logname = gPkgInfo.GetName();
+		logname << ".pdb";
+		logpath.Append(logname.String());
+		
+		if (gNonBootInstall && gLinksOnTargetVolume)
+		{
+			BString tempPath(logpath.Path());
+			if (tempPath.FindFirst("boot") == 1)
+			{
+				tempPath.ReplaceFirst("boot", installVolName.String());
+				logpath = tempPath.String();
+			}
+		}
+		
+		if (gTargetPlatform == OS_HAIKU || gTargetPlatform == OS_HAIKU_GCC4)
+		{
+			logfile.SetTo(logpath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+			if (logfile.InitCheck() == B_OK)
+			{
+				fLogMsg.Flatten(&logfile);
+				logfile.Unset();
+			}
 		}
 	}
 	
@@ -444,7 +500,8 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	
 	// 3) Extract file to the destination
 	BString command;
-	command << "unzip -o '" << zipfile << "' '" << src->GetName() << "' -d '" << dest << "' > /dev/null";
+	command << "unzip -o '" << zipfile << "' '" << src->GetName() << "' -d '" 
+			<< dest << "' > /dev/null";
 	STRACE(("Unzip command: %s\n", command.String()));
 	system(command.String());
 	
@@ -464,6 +521,10 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 			update_mime_info(destpath.GetFullPath(),0,1,0);
 			nodeInfo.GetType(type);
 		}
+		
+		fInstalledSize += fileSize;
+		fInstalledCount++;
+		fLogMsg.AddString("items", destpath.GetFullPath());
 		
 		fLogText << destpath.GetFullPath() << "\n"
 				<< "\tSize: " << fileSize << " bytes" << "\t\tType: " << type << "\n";

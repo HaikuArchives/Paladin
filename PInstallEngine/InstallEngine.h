@@ -24,6 +24,7 @@ public:
 						
 			void 			SetTarget(BMessenger target);
 			const char *	GetInstallLog(void) const;
+			BMessage		GetInstallArchive(void) const;
 			
 			void			StartInstall(void);
 			void			StopInstall(void);
@@ -47,6 +48,11 @@ private:
 	
 	BMessenger	fMessenger;
 	BString		fLogText;
+	
+	BMessage	fLogMsg;
+	int64		fInstalledSize;
+	int32		fInstalledCount;
+	
 	thread_id	fInstallThread;
 	vint32		fQuitFlag;
 };

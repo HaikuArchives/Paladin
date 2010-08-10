@@ -111,6 +111,7 @@ MainWindow::MainWindow(void)
 										new BMessage(M_TOGGLE_LINKS_TARGETING));
 	fLinksOnTargetVolume->ResizeToPreferred();
 	top->AddChild(fLinksOnTargetVolume);
+	fLinksOnTargetVolume->SetEnabled(false);
 	
 	BButton *begin = new BButton(BRect(0,0,1,1),"begin","Begin",new BMessage(M_START_INSTALL));
 	begin->ResizeToPreferred();
@@ -157,6 +158,8 @@ MainWindow::MessageReceived(BMessage *msg)
 			{
 				gNonBootInstall = (dev != gBootVolumeID);
 				gPkgInfo.SetInstallVolume(dev);
+				
+				fLinksOnTargetVolume->SetEnabled(gNonBootInstall);
 			}
 			break;
 		}

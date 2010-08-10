@@ -21,6 +21,7 @@ BString gGroupName;
 BString gVolumeName;
 BString gInstallPath;
 BString gLogFilePath;
+BString gLogArchivePath;
 
 int8 gClobberMode = CLOBBER_ASK;
 int8 gDepMissingMode = DEPMISSING_ASK;
@@ -34,6 +35,7 @@ bool gLinksOnTargetVolume = false;
 app_info gAppInfo;
 
 void InitLogFilePath(void);
+void InitLogArchivePath(void);
 const char *FindStringInBuffer(const char *string, const char *buffer, const size_t &size);
 
 void
@@ -42,6 +44,15 @@ InitGlobals(void)
 	gResources = be_app->AppResources();
 	
 	InitLogFilePath();
+	
+	BPath bpath;
+	if (find_directory(B_USER_CONFIG_DIRECTORY,&bpath) != B_OK)
+		bpath.SetTo("/boot/home/config/packages");
+	else
+	{
+		gLogArchivePath = bpath.Path();
+		gLogArchivePath << "/packages";
+	}
 	
 	FILE *fd = popen("uname -o 2>&1","r");
 	if (fd)

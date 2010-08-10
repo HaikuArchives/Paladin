@@ -37,6 +37,7 @@ extern BString gGroupName;
 extern BString gVolumeName;
 extern BString gInstallPath;
 extern BString gLogFilePath;
+extern BString gLogArchivePath;
 
 extern int8 gClobberMode;
 extern int8 gDepMissingMode;

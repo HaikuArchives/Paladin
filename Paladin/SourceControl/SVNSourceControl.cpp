@@ -278,3 +278,16 @@ SVNSourceControl::GetRepositoryPath(void)
 	return sRepoPath.String();
 }
 
+
+status_t
+SVNSourceControl::GetCheckinHeader(BString &out)
+{
+	GetChangeStatus(out);
+	
+	out.Prepend("SVN: \nAll lines starting with 'SVN:' will be ignored.\n"
+				"----------------------------------------------------\n");
+	out.ReplaceAll("\n", "\nSVN: ");
+	
+	return B_OK;
+}
+

@@ -312,3 +312,18 @@ GitSourceControl::GetChangeStatus(BString &out)
 	return B_OK;
 }
 
+
+status_t
+GitSourceControl::GetCheckinHeader(BString &out)
+{
+	// TODO: XXX: Totally untested. This may not even work, which is likely
+	// considering how weird git can be.
+	GetChangeStatus(out);
+	
+	out.Prepend("GIT: \nAll lines starting with 'GIT:' will be ignored.\n"
+				"----------------------------------------------------\n");
+	out.ReplaceAll("\n", "\nGIT: ");
+	
+	return B_OK;
+}
+

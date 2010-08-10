@@ -31,6 +31,7 @@ public:
 			status_t		Diff(const char *filename, const char *revision = NULL);
 			status_t		GetChangeStatus(BString &out);
 			status_t		GetHistory(BString &out, const char *file);
+			status_t		GetCheckinHeader(BString &out);
 	
 	// These are SVN-specific. They are for setting the folder where local
 	// repositories are kept.

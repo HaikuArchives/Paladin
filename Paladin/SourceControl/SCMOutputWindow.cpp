@@ -8,7 +8,7 @@
 #define M_APPEND_TO_LOG 'matl'
 
 SCMOutputWindow::SCMOutputWindow(const char *title)
-  :	DWindow(BRect(0,0,300,300), title)
+  :	DWindow(BRect(0,0,400,300), title)
 {
 	SetFlags(B_NOT_CLOSABLE);
 	MakeCenteredOnShow(true);

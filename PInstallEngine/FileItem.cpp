@@ -285,6 +285,20 @@ FileItem::LinkAt(int32 index)
 }
 
 
+void
+FileItem::SetReplaceMode(const int32 &mode)
+{
+	fReplaceMode = mode;
+}
+
+
+int32
+FileItem::GetReplaceMode(void) const
+{
+	return fReplaceMode;
+}
+
+
 BString
 FileItem::MakeInfo(void)
 {

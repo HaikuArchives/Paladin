@@ -1,6 +1,6 @@
 NAME=PInstallEngine
 TARGETNAME=PInstallEngine
-PLATFORM=Zeta
+PLATFORM=Haiku
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=AboutWindow.cpp

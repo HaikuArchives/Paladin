@@ -7,6 +7,21 @@
 #include "ObjectList.h"
 #include "PkgPath.h"
 
+enum
+{
+	PKG_REPLACE_ASK_ALWAYS = 0,
+	PKG_REPLACE_NEVER_REPLACE,
+	PKG_REPLACE_RENAME_EXISTING,
+	PKG_REPLACE_ASK_NEWER_VERSION,
+	PKG_REPLACE_ASK_NEWER_CREATION_DATE,
+	PKG_REPLACE_ASK_NEWER_MOD_DATE,
+	PKG_REPLACE_REPLACE_NEWER_VERSION,
+	PKG_REPLACE_REPLACE_NEWER_CREATION_DATE,
+	PKG_REPLACE_REPLACE_NEWER_MOD_DATE,
+//	PKG_REPLACE_MERGE_FOLDER,
+	PKG_REPLACE_UPGRADE
+};
+
 class FileItem
 {
 public:
@@ -46,6 +61,9 @@ public:
 			int32			CountLinks(void) const;
 			const char *	LinkAt(int32 index);
 			
+			void			SetReplaceMode(const int32 &mode);
+			int32			GetReplaceMode(void) const;
+			
 			BString			MakeInfo(void);
 			void			PrintToStream(int8 indent = 0);
 private:
@@ -53,6 +71,8 @@ private:
 			
 			BString					fName,
 									fInstalledName;
+			
+			int32					fReplaceMode;
 			
 			PkgPath					fPath;
 			

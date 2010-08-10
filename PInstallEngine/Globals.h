@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include <FindDirectory.h>
+#include <Roster.h>
 #include <String.h>
 #include <Volume.h>
 
@@ -25,22 +26,29 @@ enum
 };
 
 extern InstallEngine gInstallEngine;
-extern BString gLogFilePath;
+
 extern ostype_t gPlatform;
 extern ostype_t gTargetPlatform;
 
 extern bool gNonBootInstall;
 extern bool gCommandLineMode;
+
 extern BString gGroupName;
 extern BString gVolumeName;
 extern BString gInstallPath;
+extern BString gLogFilePath;
+
 extern int8 gClobberMode;
 extern int8 gDepMissingMode;
+
 extern BString gAppName;
+
 extern bool gPrintInfoMode;
 extern bool gLinksOnTargetVolume;
 
 extern dev_t gBootVolumeID;
+
+extern app_info gAppInfo;
 
 void InitGlobals(void);
 

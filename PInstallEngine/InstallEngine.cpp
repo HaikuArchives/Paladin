@@ -411,17 +411,27 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	// 1) Check if the file already exists
 	DPath destpath(dest);
 	destpath.Append(src->GetName());
+	
 	if (BEntry(destpath.GetFullPath()).Exists())
 	{
 		// CheckClobber returns M_ABORT_INSTALL if the install should abort,
 		// B_ERROR if the file should be skipped, and B_OK if it should
 		// be overwritten
-		status_t result = CheckClobber(src, destpath.GetFullPath());
-		if (result == M_INSTALL_ABORT)
-			return B_ERROR;
-		else
-		if (result == B_ERROR)
-		return B_OK;
+		if (src->GetReplaceMode() != PKG_REPLACE_UPGRADE)
+		{
+			status_t result = CheckClobber(src, destpath.GetFullPath());
+			if (result == M_INSTALL_ABORT)
+				return B_ERROR;
+			else
+			if (result == B_ERROR)
+				return B_OK;
+		}
+	}
+	else
+	{
+		// This mode requires the file to be overwritten
+		if (src->GetReplaceMode() == PKG_REPLACE_UPGRADE)
+			return B_OK;
 	}
 	
 	msg = "Installing ";
@@ -632,29 +642,35 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 		}
 		case PKG_REPLACE_ASK_NEWER_VERSION:
 		{
-			if (!IsNewerVersion(dest))
+			if (!IsNewerVersion(item->GetName(), dest))
 				return B_ERROR;
 			break;
 		}
 		case PKG_REPLACE_ASK_NEWER_CREATION_DATE:
 		{
+			if (!IsNewerCreation(item->GetName(), dest))
+				return B_ERROR;
 			break;
 		}
 		case PKG_REPLACE_ASK_NEWER_MOD_DATE:
 		{
+			if (!IsNewerModified(item->GetName(), dest))
+				return B_ERROR;
 			break;
 		}
 		case PKG_REPLACE_REPLACE_NEWER_VERSION:
 		{
-			return IsNewerVersion(dest) ? B_OK : B_ERROR;
+			return IsNewerVersion(item->GetName(), dest) ? B_OK : B_ERROR;
 			break;
 		}
 		case PKG_REPLACE_REPLACE_NEWER_CREATION_DATE:
 		{
+			return IsNewerCreation(item->GetName(), dest) ? B_OK : B_ERROR;
 			break;
 		}
 		case PKG_REPLACE_REPLACE_NEWER_MOD_DATE:
 		{
+			return IsNewerModified(item->GetName(), dest) ? B_OK : B_ERROR;
 			break;
 		}
 /*		This case is present in PackageBuilder, but I don't
@@ -664,10 +680,8 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 		{
 			break;
 		}
-*/		case PKG_REPLACE_UPGRADE:
-		{
-			break;
-		}
+*/
+		// The upgrade mode is handled outside of this function
 		default:
 		{
 			break;
@@ -760,25 +774,24 @@ InstallEngine::GetVersion(const entry_ref &ref, version_info &info)
 
 
 bool
-InstallEngine::IsNewerVersion(const char *dest)
+InstallEngine::IsNewerVersion(const char *src, const char *dest)
 {
-	app_info appInfo;
 	entry_ref ref;
 	BEntry(dest).GetRef(&ref);
-	be_app->GetAppInfo(&appInfo);
 	
 	version_info destVersion;
 	if (GetVersion(ref, destVersion) != B_OK)
 		return false;
 	
-	version_info appVersion;
-	GetVersion(appInfo.ref, appVersion);
+	BEntry(src).GetRef(&ref);
+	version_info srcVersion;
+	GetVersion(ref, srcVersion);
 	
-	if (appVersion.major > destVersion.major ||
-		appVersion.middle > destVersion.middle ||
-		appVersion.minor > destVersion.minor ||
-		appVersion.variety > destVersion.variety ||
-		appVersion.internal > destVersion.internal)
+	if (srcVersion.major > destVersion.major ||
+		srcVersion.middle > destVersion.middle ||
+		srcVersion.minor > destVersion.minor ||
+		srcVersion.variety > destVersion.variety ||
+		srcVersion.internal > destVersion.internal)
 		return true;
 	
 	return false;
@@ -786,13 +799,26 @@ InstallEngine::IsNewerVersion(const char *dest)
 
 
 bool
-InstallEngine::IsNewerCreation(const char *dest)
+InstallEngine::IsNewerCreation(const char *src, const char *dest)
 {
+/*
+	time_t srcTime, destTime;
+	
+	BEntry entry(&gAppInfo.ref);
+	entry.GetCreationTime(&appTime);
+	
+	entry.SetTo(dest);
+	entry.GetCreationTime(&destTime);
+	
+	return 
+*/
+	return true;
 }
 
 
 bool
-InstallEngine::IsNewerModified(const char *dest)
+InstallEngine::IsNewerModified(const char *src, const char *dest)
 {
+	return true;
 }
 

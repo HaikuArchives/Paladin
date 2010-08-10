@@ -10,21 +10,28 @@
 #include "ResData.h"
 
 InstallEngine gInstallEngine;
-BString gLogFilePath;
+
 ostype_t gPlatform = OS_NONE;
 ostype_t gTargetPlatform = OS_NONE;
 
 bool gNonBootInstall = false;
 bool gCommandLineMode = false;
+
 BString gGroupName;
 BString gVolumeName;
 BString gInstallPath;
+BString gLogFilePath;
+
 int8 gClobberMode = CLOBBER_ASK;
 int8 gDepMissingMode = DEPMISSING_ASK;
+
 BString gAppName;
 bool gPrintInfoMode = false;
+
 dev_t gBootVolumeID = 0;
 bool gLinksOnTargetVolume = false;
+
+app_info gAppInfo;
 
 void InitLogFilePath(void);
 const char *FindStringInBuffer(const char *string, const char *buffer, const size_t &size);
@@ -61,6 +68,8 @@ InitGlobals(void)
 	BVolume bootVol;
 	vRoster.GetBootVolume(&bootVol);
 	gBootVolumeID = bootVol.Device();
+	
+	be_app->GetAppInfo(&gAppInfo);
 }
 
 

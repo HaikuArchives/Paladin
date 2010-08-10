@@ -3,5 +3,3 @@ TODO:
 Add an Alert for failed file opens
 
 Implement custom directory handling in the ItemSelected code in PkgWindow
-
-The replacement mode code for PInstallEngine seems to be non-existent

@@ -259,7 +259,7 @@ SetPackageInfo(BObjectList<BString> &args)
 			installfolder,
 			createfoldername,
 			url;
-	time_t	releasedate;
+	time_t	releasedate = 0;
 	
 	pkgpath = *args.ItemAt(0);
 	// arg[1] == 'setpkginfo' command

@@ -360,3 +360,16 @@ HgSourceControl::GetChangeStatus(BString &out)
 	return B_OK;
 }
 
+
+status_t
+HgSourceControl::GetCheckinHeader(BString &out)
+{
+	GetChangeStatus(out);
+	
+	out.Prepend("HG: \nAll lines starting with 'HG:' will be ignored.\n"
+				"----------------------------------------------------\n");
+	out.ReplaceAll("\n", "\nHG: ");
+	
+	return B_OK;
+}
+

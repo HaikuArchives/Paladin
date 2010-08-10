@@ -337,12 +337,23 @@ ProjectWindow::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			GetTextWindow *gtw = new GetTextWindow("Paladin",
-													TR("Enter the description "
-														"for the changes in this "
-														"revision."),
+			BString out;
+			fSourceControl->GetCheckinHeader(out);
+			
+			bool select = false;
+			if (out.CountChars() > 1)
+				out.Prepend("\n\n");
+			else
+			{
+				out = TR("Enter the description for the changes in this revision.");
+				select = true;
+			}
+			
+			GetTextWindow *gtw = new GetTextWindow("Paladin", out.String(),
 													BMessage(M_CHECK_IN_PROJECT),
 													BMessenger(this));
+			if (!select)
+				gtw->GetTextView()->Select(0,0);
 			gtw->Show();
 			break;
 		}
@@ -1243,7 +1254,7 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 			if (!fSourceControl)
 				return;
 				
-			win = new SCMOutputWindow(TR("Show Changes"));
+			win = new SCMOutputWindow(TR("Show Differences"));
 			win->Show();
 			break;
 		}
@@ -1327,11 +1338,14 @@ ProjectWindow::SetupMenus(void)
 	
 	fSourceMenu = new BMenu(TR("Source Control"));
 	fSourceMenu->AddItem(new BMenuItem(TR("Check Project In"),
-										new BMessage(M_GET_CHECK_IN_MSG)));
+										new BMessage(M_GET_CHECK_IN_MSG), 'I',
+										B_COMMAND_KEY | B_CONTROL_KEY));
 	fSourceMenu->AddItem(new BMenuItem(TR("Show Changed Files from Last Check-in"),
-										new BMessage(M_PROJECT_SCM_STATUS)));
-	fSourceMenu->AddItem(new BMenuItem(TR("Show Changes from Last Check-in"),
-										new BMessage(M_DIFF_PROJECT)));
+										new BMessage(M_PROJECT_SCM_STATUS), 'S',
+										B_COMMAND_KEY | B_CONTROL_KEY));
+	fSourceMenu->AddItem(new BMenuItem(TR("Show Differences from Last Check-in"),
+										new BMessage(M_DIFF_PROJECT), 'D',
+										B_COMMAND_KEY | B_CONTROL_KEY));
 	fSourceMenu->AddSeparatorItem();
 	fSourceMenu->AddItem(new BMenuItem(TR("Revert Project"),
 										new BMessage(M_REVERT_PROJECT)));

@@ -37,6 +37,7 @@ public:
 	
 	virtual	status_t		GetHistory(BString &out, const char *file);
 	virtual	status_t		GetChangeStatus(BString &out);
+	virtual	status_t		GetCheckinHeader(BString &out);
 
 };
 

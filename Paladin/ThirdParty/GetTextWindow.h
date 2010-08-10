@@ -20,9 +20,10 @@ public:
 							const BMessage &msg,
 							const BMessenger &msgr,
 							const int32 &style = GETTEXT_STYLE_OKCANCEL);
-	void	SetMessage(const BMessage &msg);
-	void	SetTitle(const char *title);
-	void	MessageReceived(BMessage *msg);
+	void			SetMessage(const BMessage &msg);
+	void			SetTitle(const char *title);
+	void			MessageReceived(BMessage *msg);
+	BTextView *		GetTextView(void);
 
 private:
 	BTextView		*fText;

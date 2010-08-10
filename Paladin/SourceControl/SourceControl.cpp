@@ -184,6 +184,13 @@ SourceControl::GetChangeStatus(BString &out)
 }
 
 
+status_t
+SourceControl::GetCheckinHeader(BString &out)
+{
+	return B_OK;
+}
+
+
 void
 SourceControl::SetURL(const char *url)
 {

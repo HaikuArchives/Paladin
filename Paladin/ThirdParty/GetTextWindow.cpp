@@ -91,3 +91,11 @@ GetTextWindow::MessageReceived(BMessage *msg)
 		}
 	}
 }
+
+
+BTextView *
+GetTextWindow::GetTextView(void)
+{
+	return fText;
+}
+

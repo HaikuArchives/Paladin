@@ -6,7 +6,8 @@
 #include "Globals.h"
 
 FileItem::FileItem(void)
-	:	fPath(M_INSTALL_DIRECTORY),
+	:	fReplaceMode(PKG_REPLACE_ASK_ALWAYS),
+		fPath(M_INSTALL_DIRECTORY),
 		fCategory("Applications"),
 		fGroups(20,true),
 		fLinks(20,true),
@@ -67,6 +68,7 @@ FileItem::SetPath(const char *path)
 {
 	fPath.SetTo(path);
 }
+
 
 
 void
@@ -150,6 +152,23 @@ FileItem::GroupAt(int32 index)
 {
 	BString *str = fGroups.ItemAt(index);
 	return str ? str->String() : NULL;
+}
+
+
+BString
+FileItem::GroupString(void)
+{
+	BString out;
+	
+	if (CountGroups() > 0)
+		out << GroupAt(0);
+	else
+		out = "All";
+	
+	for (int32 i = 1; i < CountGroups(); i++)
+		out << "," << GroupAt(i);
+	
+	return out;
 }
 
 
@@ -238,13 +257,35 @@ FileItem::PlatformAt(int32 index)
 }
 
 
+BString
+FileItem::PlatformString(void)
+{
+	BString out;
+	
+	if (CountPlatforms() > 0)
+		out << OSTypeToString(PlatformAt(0));
+	else
+		out = "All";
+	
+	for (int32 i = 1; i < CountPlatforms(); i++)
+		out << "," << OSTypeToString(PlatformAt(i));
+	
+	return out;
+}
+
+
 void
 FileItem::AddLink(const char *link)
 {
 	if (!link || strlen(link) < 1)
 		return;
 	
-	fLinks.AddItem(new BString(link));
+//	PkgPath path;
+//	path.ConvertFromString(link);
+//	if (!HasLink(path.AsString()))
+//		fLinks.AddItem(new BString(path.AsString()));
+	if (!HasLink(link))
+		fLinks.AddItem(new BString(link));
 }
 
 
@@ -286,11 +327,43 @@ FileItem::LinkAt(int32 index)
 
 
 BString
+FileItem::LinkString(void)
+{
+	BString out;
+	
+	OSPath ospath;
+	if (CountLinks() > 0)
+		out << GetFriendlyPathConstantName(ospath.StringToDir(LinkAt(0)));
+	else
+		out = "None";
+	
+	for (int32 i = 1; i < CountLinks(); i++)
+		out << "," << GetFriendlyPathConstantName(ospath.StringToDir(LinkAt(i)));
+	
+	return out;
+}
+
+
+void
+FileItem::SetReplaceMode(const int32 &mode)
+{
+	fReplaceMode = mode;
+}
+
+
+int32
+FileItem::GetReplaceMode(void) const
+{
+	return fReplaceMode;
+}
+
+
+BString
 FileItem::MakeInfo(void)
 {
 	BString out;
 	
-	out << "FILE=%s" << GetName() << "\n";
+	out << "FILE=" << GetName() << "\n";
 	
 	if (fInstalledName.CountChars() > 0)
 		out << "\tINSTALLEDNAME=" << GetInstalledName() << "\n";

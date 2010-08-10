@@ -12,3 +12,4 @@ SymbolFinder/SymbolFinder
 PSfx/PSfx
 PInstallEngine/PInstallEngine
 *.sfx
+libpaladin.so

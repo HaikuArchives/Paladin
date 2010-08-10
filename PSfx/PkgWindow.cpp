@@ -497,16 +497,7 @@ PkgWindow::InitFields(void)
 	menu->AddItem(new BMenuItem("Never Replace",new BMessage(M_SET_REPLACE_MODE)));
 	menu->AddItem(new BMenuItem("Rename Existing",new BMessage(M_SET_REPLACE_MODE)));
 	menu->AddItem(new BMenuItem("Ask user if newer version",new BMessage(M_SET_REPLACE_MODE)));
-	menu->AddItem(new BMenuItem("Ask user if newer creation date",
-								new BMessage(M_SET_REPLACE_MODE)));
-	menu->AddItem(new BMenuItem("Ask user if newer modification date",
-								new BMessage(M_SET_REPLACE_MODE)));
 	menu->AddItem(new BMenuItem("Replace if newer version",new BMessage(M_SET_REPLACE_MODE)));
-	menu->AddItem(new BMenuItem("Replace if newer creation date",
-								new BMessage(M_SET_REPLACE_MODE)));
-	menu->AddItem(new BMenuItem("Replace if newer modification date",
-								new BMessage(M_SET_REPLACE_MODE)));
-//	menu->AddItem(new BMenuItem("Merge with existing folder",new BMessage(M_SET_REPLACE_MODE)));
 	menu->AddItem(new BMenuItem("Install only if item exists",new BMessage(M_SET_REPLACE_MODE)));
 	menu->ItemAt(0)->SetMarked(true);
 }

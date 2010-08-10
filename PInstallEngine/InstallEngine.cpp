@@ -646,41 +646,11 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 				return B_ERROR;
 			break;
 		}
-		case PKG_REPLACE_ASK_NEWER_CREATION_DATE:
-		{
-			if (!IsNewerCreation(item->GetName(), dest))
-				return B_ERROR;
-			break;
-		}
-		case PKG_REPLACE_ASK_NEWER_MOD_DATE:
-		{
-			if (!IsNewerModified(item->GetName(), dest))
-				return B_ERROR;
-			break;
-		}
 		case PKG_REPLACE_REPLACE_NEWER_VERSION:
 		{
 			return IsNewerVersion(item->GetName(), dest) ? B_OK : B_ERROR;
 			break;
 		}
-		case PKG_REPLACE_REPLACE_NEWER_CREATION_DATE:
-		{
-			return IsNewerCreation(item->GetName(), dest) ? B_OK : B_ERROR;
-			break;
-		}
-		case PKG_REPLACE_REPLACE_NEWER_MOD_DATE:
-		{
-			return IsNewerModified(item->GetName(), dest) ? B_OK : B_ERROR;
-			break;
-		}
-/*		This case is present in PackageBuilder, but I don't
-		feel like implementing it. Then again, it may not
-		be necessary.
-		case PKG_REPLACE_MERGE_FOLDER:
-		{
-			break;
-		}
-*/
 		// The upgrade mode is handled outside of this function
 		default:
 		{
@@ -796,29 +766,3 @@ InstallEngine::IsNewerVersion(const char *src, const char *dest)
 	
 	return false;
 }
-
-
-bool
-InstallEngine::IsNewerCreation(const char *src, const char *dest)
-{
-/*
-	time_t srcTime, destTime;
-	
-	BEntry entry(&gAppInfo.ref);
-	entry.GetCreationTime(&appTime);
-	
-	entry.SetTo(dest);
-	entry.GetCreationTime(&destTime);
-	
-	return 
-*/
-	return true;
-}
-
-
-bool
-InstallEngine::IsNewerModified(const char *src, const char *dest)
-{
-	return true;
-}
-

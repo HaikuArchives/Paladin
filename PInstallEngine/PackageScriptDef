@@ -48,9 +48,5 @@ FILE=calc.x86			// heading for a file entry; the tabs for subentries is required
 						noclobber			never replace
 						rename				rename the existing item
 						asknewerversion		ask the user if the item is a newer version
-						asknewercreation	ask the user if the item has a newer creation time						
-						asknewermod		ask the user if the item has a newer modification time
 						replacenewerversion	replace the file if it is a newer version
-						asknewercreation	replace the file if it has a newer creation time						
-						asknewermod		replace the file if it has a newer modification time
 						clobberonly			install only if the file already exists

@@ -43,8 +43,6 @@ private:
 			status_t		GetVersion(const entry_ref &ref, version_info &info);
 			
 			bool			IsNewerVersion(const char *src, const char *dest);
-			bool			IsNewerCreation(const char *src, const char *dest);
-			bool			IsNewerModified(const char *src, const char *dest);
 			
 	
 	BMessenger	fMessenger;

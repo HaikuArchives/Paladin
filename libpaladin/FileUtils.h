@@ -7,7 +7,6 @@
 
 
 entry_ref			FindFile(entry_ref folder, const char *name);
-entry_ref			FindProject(entry_ref folder, const char *name);
 
 status_t			RunPipedCommand(const char *command, BString &out,
 									bool redirectStdErr,

@@ -113,7 +113,9 @@ ProjectWindow::ProjectWindow(BRect frame, Project *project)
 		fSourceControl = GetSCM(fProject->SourceControl());
 		if (fSourceControl)
 		{
-fSourceControl->SetDebugMode(true);
+			if (gPrintDebugMode > 0)
+				fSourceControl->SetDebugMode(true);
+			
 			fSourceControl->SetUpdateCallback(SCMOutputCallback);
 			fSourceControl->SetWorkingDirectory(fProject->GetPath().GetFolder());
 			

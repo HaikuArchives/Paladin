@@ -125,7 +125,7 @@ PkgWindow::PkgWindow(entry_ref *ref)
 	r.top = fBar->Frame().bottom + 10;
 	r.right = Bounds().Width() - 10.0 - B_V_SCROLL_BAR_WIDTH;
 	r.bottom = box->Frame().top - 10.0 - B_H_SCROLL_BAR_HEIGHT;
-	fListView = new FileListView(r,"listview",B_SINGLE_SELECTION_LIST,B_FOLLOW_ALL);
+	fListView = new FileListView(r,"listview",B_MULTIPLE_SELECTION_LIST,B_FOLLOW_ALL);
 	BScrollView *sv = fListView->MakeScrollView("listscrollview",true,true);
 	fListView->SetDefaultDisplayMode(REFITEM_NAME_ICON);
 	fListView->SetSelectionMessage(new BMessage(M_ITEM_SELECTED));

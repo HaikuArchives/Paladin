@@ -72,3 +72,49 @@ HaveSCM(const scm_t &type)
 	}
 }
 
+
+BString
+SCM2LongName(const scm_t &type)
+{
+	switch (type)
+	{
+		case SCM_GIT:
+			return BString("Git");
+		
+		case SCM_HG:
+			return BString("Mercurial");
+			
+		case SCM_SVN:
+			return BString("Subversion");
+		
+		case SCM_NONE:
+			return BString("None");
+		
+		default:
+			return BString("Unknown");
+	}
+}
+
+
+BString
+SCM2ShortName(const scm_t &type)
+{
+	switch (type)
+	{
+		case SCM_GIT:
+			return BString("git");
+		
+		case SCM_HG:
+			return BString("hg");
+			
+		case SCM_SVN:
+			return BString("svn");
+		
+		case SCM_NONE:
+			return BString("none");
+		
+		default:
+			return BString();
+	}
+}
+

@@ -1,6 +1,7 @@
 NAME=PSfx
 TARGETNAME=PSfx
 PLATFORM=Haiku
+SCM=hg
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=AboutWindow.cpp

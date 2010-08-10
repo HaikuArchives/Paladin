@@ -40,6 +40,15 @@ HgSourceControl::NeedsInit(const char *topDir)
 	sh << "cd";
 	sh.AddEscapedArg(GetWorkingDirectory());
 	sh << "; hg status > /dev/null";
+	
+	int result = sh.Run();
+	
+	if (GetDebugMode())
+	{
+		printf("NeedsInit() command: %s\nResult: %s\n",
+				sh.AsString().String(), (result != 0) ? "true" : "false");
+	}
+	
 	return (sh.Run() != 0);
 }
 

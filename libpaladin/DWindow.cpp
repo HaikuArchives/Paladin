@@ -145,27 +145,3 @@ DWindow::ConstrainToScreen(void)
 			MoveTo(25 - Frame().Width(),pt2.y);
 	}
 }
-
-
-void
-DWindow::Zoom(BPoint origin, float width, float height)
-{
-	BWindow::Zoom(origin,width,height);
-	/*
-	BDeskbar bar;
-	deskbar_location loc = bar.Location();
-	BRect barframe(bar.Frame());
-	
-	switch (loc)
-	{
-		case B_DESKBAR_BOTTOM:
-		{
-			if (origin
-			break;
-		}
-		default:
-			break;
-	}
-	*/
-}
-

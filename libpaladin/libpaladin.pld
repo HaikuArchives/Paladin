@@ -1,6 +1,6 @@
 NAME=libpaladin
 TARGETNAME=libpaladin.so
-PLATFORM=Haiku
+PLATFORM=HaikuGCC4
 SCM=hg
 GROUP=libpaladin
 EXPANDGROUP=yes
@@ -52,7 +52,8 @@ SYSTEMINCLUDE=/boot/develop/headers/posix
 SYSTEMINCLUDE=/boot/home/config/include
 LIBRARY=/boot/develop/lib/x86/libroot.so
 LIBRARY=/boot/develop/lib/x86/libbe.so
-LIBRARY=/boot/develop/lib/x86/libstdc++.r4.so
+LIBRARY=/boot/system/lib/libstdc++.so
+LIBRARY=/boot/develop/lib/x86/libsupc++.so
 RUNARGS=
 CCDEBUG=no
 CCPROFILE=no

@@ -364,6 +364,9 @@ HgSourceControl::GetChangeStatus(BString &out)
 	
 	RunCommand(command, out);
 	
+	if (out.CountChars() < 1)
+		out = "Repository is up-to-date.\n";
+	
 	SetUpdateCallback(temp);
 	
 	return B_OK;

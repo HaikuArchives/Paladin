@@ -13,7 +13,7 @@ static PackageInfo sPkgInfo;
 void PrintUsage(void);
 void PrintHelp(void);
 
-void MakePackage(const char *path);
+void MakePackage(BObjectList<BString> &args);
 void SetPackageInfo(BObjectList<BString> &args);
 
 void AddDependency(BObjectList<BString> &args);
@@ -59,7 +59,7 @@ PrintHelp(void)
 		"PSfx <packagepath> <mode> <arguments>\n"
 		"\n"
 		"To create a package or edit a package's general information:\n"
-		"PSfx <packagepath> makepkg\n"
+		"PSfx <packagepath> makepkg [zeta|haiku|haikugcc4]\n"
 		"\n"
 		"To edit a package's general information:\n"
 		"PSfx <packagepath> setpkginfo appname=<name> appversion=<version>\n"
@@ -179,7 +179,7 @@ DoCommandLine(void)
 	
 	if (argtwo->ICompare("makepkg") == 0)
 	{
-		MakePackage(argone->String());
+		MakePackage(gArgList);
 		return;
 	}
 	
@@ -212,13 +212,47 @@ DoCommandLine(void)
 
 
 void
-MakePackage(const char *path)
+MakePackage(BObjectList<BString> &args)
 {
+	BString pkgPath(args.ItemAt(0)->String());
+	
+	BString stubName("installstub");
+	
+	if (args.CountItems() == 2)
+	{
+		// Platform has been specified. If it's not one of the ones
+		// required, bomb out.
+		if (args.ItemAt(1)->ICompare("zeta") == 0)
+			stubName << ".zeta";
+		else
+		if (args.ItemAt(1)->ICompare("haiku") == 0)
+			stubName << ".haiku.gcc2";
+		else
+		if (args.ItemAt(1)->ICompare("HaikuGCC4") == 0)
+			stubName << ".haiku.gcc4";
+		else
+		{
+			printf("Platform must be Zeta, Haiku, or HaikuGCC4\n");
+			return;
+		}
+	}
+	else
+	{
+		if (gPlatformName.ICompare("Zeta") == 0)
+			stubName << ".zeta";
+		else
+		if (gPlatformName.ICompare("haiku") == 0)
+			stubName << ".haiku.gcc2";
+		else
+		if (gPlatformName.ICompare("HaikuGCC4") == 0)
+			stubName << ".haiku.gcc4";
+	}
+	
 	BResources *res = be_app->AppResources();
 	
 	size_t size;
 	int32 id;
-	if (!res->GetResourceInfo(B_RAW_TYPE,"installstub",&id,&size))
+	if (!res->GetResourceInfo(B_RAW_TYPE, stubName.String(), &id, &size))
 	{
 		printf("PSfx has been corrupted and can no longer create new packages. You can, "
 				"however, edit existing ones. Reinstalling PSfx would be a good idea.\n");
@@ -227,7 +261,7 @@ MakePackage(const char *path)
 	}
 	
 	const int8 *installstub = (const int8 *)res->LoadResource(B_RAW_TYPE,id, &size);
-	BFile file(path, B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
+	BFile file(pkgPath.String(), B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
 	if (file.InitCheck() != B_OK)
 	{
 		if (file.InitCheck() == B_FILE_EXISTS)
@@ -240,7 +274,7 @@ MakePackage(const char *path)
 	
 	file.Write(installstub,size);
 	file.Unset();
-	sPkgInfo.SaveToFile(path);
+	sPkgInfo.SaveToFile(pkgPath.String());
 }
 
 

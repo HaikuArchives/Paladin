@@ -2,6 +2,7 @@
 
 #include <Application.h>
 #include <Mime.h>
+#include <Path.h>
 #include <stdlib.h>
 
 #include "Icons.h"
@@ -9,6 +10,33 @@
 BObjectList<BString> gArgList(20,true);
 bool gCommandLineMode = false;
 int gReturnValue = 0;
+BString gPlatformName = "BeOS";
+
+void
+InitGlobals(void)
+{
+	// While, yes, there is a uname() function in sys/utsname.h, we use spawn a shell
+	// so that we can easily avoid the build mess of BONE vs netserver.
+	FILE *fd = popen("uname -o","r");
+	if (fd)
+	{
+		BString osname;
+		char buffer[32];
+		while (fgets(buffer,32,fd))
+			osname += buffer;
+		pclose(fd);
+		
+		if (osname.Compare("Haiku\n") == 0)
+		{
+			BPath libpath;
+			find_directory(B_BEOS_LIB_DIRECTORY,&libpath);
+			libpath.Append("libsupc++.so");
+			gPlatformName =  BEntry(libpath.Path()).Exists() ? "HaikuGCC4" : "Haiku";
+		}
+		else if (osname.Compare("Zeta\n") == 0)
+			gPlatformName = "Zeta";
+	}
+}
 
 void
 InitFileTypes(void)

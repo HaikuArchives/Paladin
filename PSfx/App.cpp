@@ -98,6 +98,8 @@ App::ReadyToRun(void)
 int
 main(int argc, char **argv)
 {
+	InitGlobals();
+	
 	if (!ProcessArgs(argc,argv))
 		return -1;
 	

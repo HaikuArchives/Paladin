@@ -1,0 +1,25 @@
+New in Paladin 1.2
+
+New Features
+
+- Project templates
+- Visual regular expression tester
+- Added a fast Project Import feature to the Start Window
+- Paladin now can use ccache for much faster rebuilds
+
+User Interface
+
+- Labels in the StartWindow are now clickable
+- Added a button to the Error window to copy errors and warnings to the clipboard -- no more hidden functionality here!
+- Added a file count to the status bar when building files
+- Drag and drop reordering of groups (finally!)
+- Library window shows right away even when there are lots of libraries in the system
+
+
+Internal Fixes and Improvements
+
+- Automatically define _ZETA_TS_FIND_DIR_ when building under Zeta to make using find_directory() under Zeta much less of a headache
+- Fixed a bug in Find and Open File when working under Haiku
+- Fixed a redraw problem with items in the Project Window under Haiku
+- The logic for choosing which files to add to the project when dropping folders onto the project - window is a little more sensible
+- Fixed a bug with Paladin sometimes spawning more build threads than necessary on multicore machines

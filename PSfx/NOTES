@@ -1,4 +1,5 @@
 TODO:
+Fix command-line interface to work properly, especially install paths
 
 Add an Alert for failed file opens
 

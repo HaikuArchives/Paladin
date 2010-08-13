@@ -1,34 +1,43 @@
-Changes since 1.2.1
-Added some platform migration assistance -- libstdc++.r4.so, libsupc++.so in Haiku GCC4
-Implemented fastdep dependency checking under Haiku
-Improved error handling with slow dependency update code
-Better feedback when examining sources
-Replaced internal tooltip code with OS-level ones. R5 tooltips are now completely gone.
-The Terminal window now uses a fixed-width font
-Implemented basic Locale support under Zeta and Haiku
-Edit Program Settings context menu action works for resource files under Haiku now
-Worked around a bug in Haiku related to setting the type of a resource file created via Add New File.
-Bring the Error window to the front when starting a build
-Projects can no longer load a project more than once
-Dropping a Paladin project on a project window opens the project
+Changes in Paladin 1.3
+
+New Features
 .rdef files are created with a form that can be filled in
-Tweaked the file filters for folder and project importing to exclude Jamfiles, Makefiles, and system folders for Git and Mercurial.
+Implemented fastdep dependency checking under Haiku
+Source control is (optionally) integrated with projects now: SVN, and Hg
+BeIDE projects can be opened and converted to Paladin projects
+
+
+User Interface
+Bring the Error window to the front when starting a build
+The Terminal window now uses a fixed-width font
+Better feedback when examining sources
+Replaced internal tooltip code with OS-level ones. R5 tooltips are now completely gone. This fixes a few annoyances.
+Dropping a Paladin project on a project window opens the project
 Automatically add libsupc++ to new GUI projects under Haiku GCC4
-Fixed Run in Debugger under Haiku
-Resolved a bug in Haiku which caused hangs for multithreaded builds
-Fixed adding files to a module in the code library via file chooser
 Automatically remove libsupc++ from Haiku GCC4 projects under other platforms
 Preferences window now reports the unavailability of external tools like fastdep and ccache
-Source control is (optionally) integrated with projects now: SVN, and Hg
 Start window has a keyboard shortcut to choose from the list -- Alt + number
 New vector icon for project files
 Removed the unnecessary quit button from start window
+Opening a project from Terminal (like "Paladin myproject") now doesn't need the extension and works faster in some cases
+
+
+Bugfixes
+Edit Program Settings context menu action works for resource files under Haiku now
+Worked around a bug in Haiku related to setting the type of a resource file created via Add New File.
+Projects can no longer load a project more than once
+Fixed Run in Debugger under Haiku
+Resolved a bug in Haiku which caused hangs for multithreaded builds
 Added a MIME sniffer rule to the Paladin project type to work around another MIME bug in Haiku
 Fixed a bug with duplication of local include paths
-Opening a project from Terminal (like "Paladin myproject") now doesn't need the extension and works faster in some cases
 Made some small fixes to the makefile generator
+Paladin no longer bails on a command-line build when warnings are encountered
+
+Internal changes
+Tweaked the file filters for folder and project importing to exclude Jamfiles, Makefiles, and system folders for Git and Mercurial.
+Improved error handling with the slow dependency updating code
+Added some platform migration assistance -- libstdc++.r4.so, libsupc++.so in Haiku GCC4
 A project's directory is now implicitly included in the list of include paths during builds
-BeIDE projects can be opened just like Paladin projects and are converted when opened.
-Updated ccache to 3.0.1
-Added the Symbol Finder to the Tools menu
-Improved dependency parsing
+
+
+

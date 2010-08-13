@@ -17,7 +17,7 @@ if [ "$?" -ne 0 ]
 then
 	PLATFORM="beos"
 fi
-echo "Building for $PLATFORM"
+echo "Platform: $PLATFORM"
 
 # This function creates a temporary project from which we make
 # sure that the target is being built without debugging enabled
@@ -67,7 +67,8 @@ BuildNoDebug ()
 
 # Attempt to build Paladin
 cd Paladin
-rm Paladin Paladin.new
+rm -f Paladin Paladin.new
+echo "Building Paladin"
 if [ "$PLATFORM" == "Haiku" ]
 then
 	if [ -e /boot/system/lib/libsupc++.so ]
@@ -86,18 +87,21 @@ then
 fi
 
 # Make sure there's a link to make calling it easier
-if [ -ne /boot/home/config/Paladin ]
+if [ ! -e /boot/home/config/bin/Paladin ]
 then
-	ln -s Paladin /boot/home/config/bin/
+	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/Paladin"
 fi
 
 cd ../
 
 # Now attempt ccache
+echo "\nBuilding ccache"
 cd ccache
 BuildNoDebug ccache
+cd ..
 
 # fastdep doesn't use a project file to build itself
+echo "\nBuilding fastdep"
 cd fastdep-0.16
 if [ "$MAKECLEAN" -eq 1 ]
 then
@@ -105,6 +109,7 @@ then
 	make clean
 fi
 make
+cd ..
 
 # PalEdit
 cd PalEdit
@@ -117,6 +122,12 @@ cd ..
 
 cd PSfx
 BuildNoDebug PSfx
+
+# Make sure there's a link to make calling it easier
+if [ ! -e /boot/home/config/bin/PSfx ]
+then
+	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/PSfx"
+fi
 cd ..
 
 cd SymbolFinder

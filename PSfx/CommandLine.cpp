@@ -24,6 +24,13 @@ void AddFile(BObjectList<BString> &args);
 void RemoveFile(BObjectList<BString> &args);
 void SetFile(BObjectList<BString> &args, FileItem *item = NULL);
 
+#define USE_TRACE
+#ifdef USE_TRACE
+	#define STRACE(x) printf x
+#else
+	#define STRACE(x) /* */
+#endif
+
 static const char *sModeArgs[] = {
 	"makepkg",
 	"setpkginfo",
@@ -218,7 +225,7 @@ MakePackage(BObjectList<BString> &args)
 	
 	BString stubName("installstub");
 	
-	if (args.CountItems() == 2)
+	if (args.CountItems() == 3)
 	{
 		// Platform has been specified. If it's not one of the ones
 		// required, bomb out.
@@ -540,6 +547,8 @@ AddFile(BObjectList<BString> &args)
 void
 SetFile(BObjectList<BString> &args, FileItem *item)
 {
+	STRACE(("SetFile\n"));
+	
 	if (args.CountItems() < 5)
 	{
 		printf("To edit an existing file entry in the package:\n"
@@ -551,6 +560,8 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	}
 	
 	BString filename(args.ItemAt(2)->String());
+	STRACE(("File name: %s\n", filename.String()));
+	
 	if (!item)
 	{
 		for (int32 i = 0; i < sPkgInfo.CountFiles(); i++)
@@ -603,13 +614,25 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		BString value = arg->String() + pos + 1;
 		
 		if (key.ICompare("category") == 0)
+		{
+			STRACE(("category: %s\n", value.String()));
 			category = value;
+		}
 		else if (key.ICompare("platform") == 0)
+		{
+			STRACE(("platform: %s\n", value.String()));
 			platform = value;
+		}
 		else if (key.ICompare("group") == 0)
+		{
+			STRACE(("group: %s\n", value.String()));
 			group = value;
+		}
 		else if (key.ICompare("link") == 0)
+		{
+			STRACE(("link: %s\n", value.String()));
 			linklist.AddItem(new BString(value));
+		}
 		else
 		{
 			printf("Unrecognized option %s\n",arg->String());
@@ -629,9 +652,15 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	OSPath ospath;
 	int32 dir = ospath.StringToDir(installfolder.String());
 	if (dir != B_ERROR)
+	{
+		STRACE(("Setting path to: %s\n", ospath.DirToString(dir)));
 		item->SetPath(dir);
+	}
 	else
+	{
+		STRACE(("Setting custom path: %s\n", installfolder.String()));
 		item->SetPath(installfolder.String());
+	}
 	
 	if (category.CountChars() > 0)
 		item->SetCategory(category.String());

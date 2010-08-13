@@ -1,4 +1,4 @@
-Paladin 1.2
+Paladin 1.3
 
 From one codemonkey to another, welcome! Hopefully you will find Paladin to be a suitable IDE for your BeOS programming needs. Feedback, good, bad, or otherwise, and feature requests are always welcome. Read on for more info about this project and may your future efforts be fruitful. :-)
 
@@ -12,7 +12,7 @@ Run your project normally, logged in the Terminal, or in the debugger
 Specify run arguments, no matter how you want to run your project
 Group files together
 Include non-source files (to-do lists, etc.) in your projects for better organization
-Interface is a streamlined version of BeIDE
+Interface is similar to BeIDE with more perks and features
 Drag and drop project manipulation
 Alt-Tab header/source file switching
 Expandable source code license manager
@@ -20,17 +20,17 @@ Small window management perks
 Context menu for project items
 Lex and Yacc handling
 Bundled ASCII table
-Code library
+Integrated source control
 One-click project backups
 Shell script and Rez file support
 Resource file integration
 Relative paths for files in the project folder, absolute paths elsewhere else
 Lots of little development helps to make writing code a little easier
-
+Explicit Haiku support
 
 About this version:
 
-This release continues the steady increase in usefulness that Paladin has, going beyond the write-compile-test coding cycle. A visual regular expression tool has been included for helping with what can otherwise be a pain in the neck: constructing a working regular expression. Source groups can FINALLY be reordered with drag and drop manipulation. When working with Paladin under Zeta, it can speed up builds with the well-known build tool ccache. There's a bunch more stuff that has been added, so this is a great follow-up to the 1.1 build.
+Wow. What a difference four months can make. There are so many little changes all over the app and one big change: integrated source control. It hasn't been done in an IDE for BeOS or Haiku yet, as far as I'm aware. This release also brings with it the change of development focus from cross-platform to specifically Haiku. The result has been a dramatically-improved user experience when working in the platform.
 
 Frequently Asked Questions
 
@@ -41,7 +41,7 @@ Because makefiles and jamfiles stink. One major reason why I am able to write co
 
 Why not just use pe?
 
-Pe is a wonderful text editor. In fact, it is the basis for PalEdit, the bundled editor for Paladin. It is a general purpose developer tool. The problem is that by being so generalized, it doesn't provide features that a more specialized editor can. Also, by being quite general purpose, it suffers from the Kitchen Sink Syndrome, where everything that *might* be needed is added to a software product, eventually to the point where it becomes a complicated mess. Pe isn't that far gone, but it's going in that direction.
+Pe is a wonderful text editor. In fact, it is the basis for PalEdit, the bundled editor for Paladin. It is a general-purpose developer tool. The problem is that by being so generalized, it doesn't provide features that a more specialized editor can. Also, by being quite general purpose, it suffers from the Kitchen Sink Syndrome, where everything that *might* be needed is added to a software product, eventually to the point where it becomes a complicated mess. Pe isn't that far gone, but it's going in that direction.
 
 
 What did you do?! You just took Pe, ripped out a few buttons, and called it yours!

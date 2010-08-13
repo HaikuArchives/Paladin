@@ -104,7 +104,8 @@ main(int argc, char **argv)
 		return -1;
 	
 	App app;
-	app.Run();
+	if (!gCommandLineMode)
+		app.Run();
 	
 	return gReturnValue;
 }

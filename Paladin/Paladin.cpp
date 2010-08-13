@@ -451,13 +451,19 @@ App::MessageReceived(BMessage *msg)
 			break;
 		}
 		case M_BUILD_FAILURE:
-		case M_BUILD_WARNINGS:
 		{
 			BString errstr;
 			if (msg->FindString("errstr",&errstr) == B_OK)
 				printf("%s\n",errstr.String());
 			sReturnCode = -1;
 			PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
+		case M_BUILD_WARNINGS:
+		{
+			BString errstr;
+			if (msg->FindString("errstr",&errstr) == B_OK)
+				printf("%s\n",errstr.String());
 			break;
 		}
 		case M_BUILD_SUCCESS:

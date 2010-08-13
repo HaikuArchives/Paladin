@@ -3,7 +3,15 @@
 # ----------------------------------------------------------------------------
 # SETUP
 # ----------------------------------------------------------------------------
-if [ "$1" == "clean" ]
+if [ -z "$1" ]
+then
+	echo "usage: $0 <cpucount>"
+	exit -1;
+else
+	CPUCOUNT=$1
+fi
+
+if [ "$2" == "clean" ]
 then
 	MAKECLEAN=1
 else
@@ -117,7 +125,7 @@ if [ "$MAKECLEAN" == 1 ]
 then
 	jam clean
 fi
-jam -q
+jam -q -j"$CPUCOUNT"
 cd ..
 
 cd PSfx
@@ -132,10 +140,13 @@ cd ..
 
 cd SymbolFinder
 BuildNoDebug SymbolFinder
+cd ..
 
 # ----------------------------------------------------------------------------
 # PACKAGE
 # ----------------------------------------------------------------------------
+APPVERSION=`version -n Paladin/Paladin | sed "s/\([0-9]\) \([0-9]\) [0-9] [a-z] [0-9]/\1.\2/"`
+PKGPATH="/boot/home/Desktop/Paladin.$APPVERSION.sfx"
 
 #Until PSfx gets all the bugs worked out, we'll manually build the .sfx file
 copyattr -d PInstallEngine/PInstallEngine "$PKGPATH"
@@ -145,8 +156,12 @@ rm -f Paladin.sfx.rdef
 echo "resource(1, \"AppName\") \"Paladin\";" > Paladin.sfx.rdef
 echo "resource(2, \"AppVersion\") \"$APPVERSION\";" >> Paladin.sfx.rdef
 echo "resource(3, \"PkgInfo\") #'CSTR' array {" >> Paladin.sfx.rdef
-cat PSfx/PaladinPkgScript.txt | sed 's/^/"/' | sed 's/$/"/' >> Paladin.sfx.rdef
+
+PKGDATE=`date "+%s"`;
+
+cat PSfx/PaladinPkgScript.txt | sed 's/^/"/' | sed 's/$/\\n"/' | sed "s/REPLACEDATE/$PKGDATE/" | sed "s/REPLACEVERSION/$APPVERSION/" >> Paladin.sfx.rdef
 echo "};" >> Paladin.sfx.rdef
+
 rc Paladin.sfx.rdef
 xres -o "$PKGPATH" Paladin.sfx.rsrc
 
@@ -171,3 +186,5 @@ unzip -l PaladinFiles.zip
 cat PaladinFiles.zip >> "$PKGPATH"
 rm Paladin.sfx*
 rm PaladinFiles.zip
+
+chmod 0777 "$PKGPATH"

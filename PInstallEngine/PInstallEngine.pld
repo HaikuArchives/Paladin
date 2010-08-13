@@ -1,6 +1,7 @@
 NAME=PInstallEngine
 TARGETNAME=PInstallEngine
 PLATFORM=Haiku
+SCM=hg
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=AboutWindow.cpp

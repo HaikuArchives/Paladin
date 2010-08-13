@@ -13,3 +13,7 @@ PSfx/PSfx
 PInstallEngine/PInstallEngine
 *.sfx
 libpaladin.so
+*.nodebug.pld
+.depends-all
+ccache/ccache
+fastdep-0.16/fastdep

@@ -136,3 +136,38 @@ BuildNoDebug SymbolFinder
 # ----------------------------------------------------------------------------
 # PACKAGE
 # ----------------------------------------------------------------------------
+
+#Until PSfx gets all the bugs worked out, we'll manually build the .sfx file
+copyattr -d PInstallEngine/PInstallEngine "$PKGPATH"
+
+#Generate an rdef file to create all the necessary resources for the pkg
+rm -f Paladin.sfx.rdef
+echo "resource(1, \"AppName\") \"Paladin\";" > Paladin.sfx.rdef
+echo "resource(2, \"AppVersion\") \"$APPVERSION\";" >> Paladin.sfx.rdef
+echo "resource(3, \"PkgInfo\") #'CSTR' array {" >> Paladin.sfx.rdef
+cat PSfx/PaladinPkgScript.txt | sed 's/^/"/' | sed 's/$/"/' >> Paladin.sfx.rdef
+echo "};" >> Paladin.sfx.rdef
+rc Paladin.sfx.rdef
+xres -o "$PKGPATH" Paladin.sfx.rsrc
+
+cd Paladin
+zip -9 ../PaladinFiles.zip Paladin README WHAT\'S\ NEW
+
+cd ../ccache
+zip -9 -u ../PaladinFiles.zip ccache
+
+cd ../fastdep-0.16
+zip -9 -u ../PaladinFiles.zip fastdep
+
+cd ../PalEdit/generated/distro
+zip -9 -u -r ../../../PaladinFiles.zip Languages Extensions PalEdit
+cd ../../..
+
+cd Documentation
+zip -9 -u ../PaladinFiles.zip Paladin\ Documentation.pdf
+
+cd ..
+unzip -l PaladinFiles.zip
+cat PaladinFiles.zip >> "$PKGPATH"
+rm Paladin.sfx*
+rm PaladinFiles.zip

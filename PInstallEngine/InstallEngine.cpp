@@ -740,9 +740,9 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 		default:
 		{
 			BString msg(dest);
-			msg << " exists. Do you want to overwrite it, skip installing this file, "
+			msg << " exists. Do you want to replace it, skip installing this file, "
 				<< "or cancel installation?";
-			result = Query(msg.String(), "Overwrite","Skip","Cancel");
+			result = Query(msg.String(), "Replace","Skip","Cancel");
 			break;
 		}
 	}
@@ -772,20 +772,22 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 	}
 
 	// Follow the same "remember this decision?" style as Haiku's installer
-	if (result == 1)
+	if (gClobberMode == CLOBBER_ASK)
 	{
-		int32 val = Query("Do you want to remember this decision for the rest of the install? All "
-				"existing files will be overwritten.", "Replace all", "Ask again");
-		if (val == 0)
-			gClobberMode = CLOBBER_OVERWRITE;
-	}
-	else
-	{
-		// Skip result
-		int32 val = Query("Do you want to remember this decision for the rest of the install? All "
-				"existing files will be skipped.", "Skip all", "Ask again");
-		if (val == 0)
-			gClobberMode = CLOBBER_SKIP;
+		if (result == 0)
+		{
+			int32 val = Query("Do you want to remember this decision for the rest of the install? All "
+					"existing files will be overwritten.", "Replace all", "Always ask");
+			
+			gClobberMode = (val == 0) ? CLOBBER_OVERWRITE : CLOBBER_ALWAYS_ASK;
+		}
+		else
+		{
+			// Skip result
+			int32 val = Query("Do you want to remember this decision for the rest of the install? All "
+					"existing files will be skipped.", "Skip all", "Always ask");
+			gClobberMode = (val == 0) ? CLOBBER_SKIP : CLOBBER_ALWAYS_ASK;
+		}
 	}
 	
 	return returnValue;

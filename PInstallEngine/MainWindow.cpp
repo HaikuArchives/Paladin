@@ -40,6 +40,9 @@ MainWindow::MainWindow(void)
 	
 	gPkgInfo.LoadFromResources();
 	
+	if (gDebugMode > 0)
+		gPkgInfo.DumpInfo();
+	
 	BRect r(Bounds());
 	r.bottom = 200;
 	BView *top = GetBackgroundView();

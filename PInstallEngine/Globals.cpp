@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include <Application.h>
+#include <Directory.h>
 #include <File.h>
 #include <Path.h>
 #include <stdio.h>
@@ -53,6 +54,9 @@ InitGlobals(void)
 		gLogArchivePath = bpath.Path();
 		gLogArchivePath << "/packages";
 	}
+	
+	if (!BEntry(gLogArchivePath.String()).Exists())
+		create_directory(gLogArchivePath.String(), 0777);
 	
 	FILE *fd = popen("uname -o 2>&1","r");
 	if (fd)

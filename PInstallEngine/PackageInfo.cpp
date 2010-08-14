@@ -674,10 +674,7 @@ PackageInfo::ParsePackageInfo(BString str)
 			else if (key.ICompare("URL") == 0)
 				SetAuthorURL(value.String());
 			else if (key.ICompare("RELEASEDATE") == 0)
-			{
-				printf("release date: %s\n", value.String());
 				SetReleaseDate(atol(value.String()));
-			}
 			else if (key.ICompare("APPVERSION") == 0)
 				SetPackageVersion(atof(value.String()));
 			else if (key.ICompare("APPVERSION") == 0)

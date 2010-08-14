@@ -122,7 +122,8 @@ PrintUsage(void)
 			"\t-p, --platform <r5, zeta, or haiku>: Install for the specified OS\n"
 			"\t-t, --target-links: Create links on target volume instead of boot volume\n"
 			"\t-m, --missing <ask, continue, or cancel>: Sets the action for missing dependencies\n"
-			"\t-i, --info: Prints info about the package\n", gAppName.String());
+			"\t-i, --info: Prints info about the package\n"
+			"\t-d, --debug: Print debugging info for the install engine\n",gAppName.String());
 }
 
 
@@ -137,7 +138,8 @@ IsCommandFlag(const BString &str)
 		str.ICompare("--platform") == 0 || str.ICompare("-p") == 0 ||
 		str.ICompare("--target-links") == 0 || str.ICompare("-t") == 0 ||
 		str.ICompare("--missing") == 0 || str.ICompare("-m") == 0 ||
-		str.ICompare("--info") == 0 || str.ICompare("-i") == 0)
+		str.ICompare("--info") == 0 || str.ICompare("-i") == 0 ||
+		str.ICompare("--debug") == 0 || str.ICompare("-d") == 0)
 		return true;
 	return false;
 }
@@ -185,6 +187,15 @@ ProcessArgs(int32 argc, char **argv)
 		if (arg->ICompare("--info") == 0 || arg->ICompare("-i") == 0)
 		{
 			gPrintInfoMode = true;
+			break;
+		}
+		
+		if (arg->ICompare("--debug") == 0 || arg->ICompare("-d") == 0)
+		{
+			if (argc == 2)
+				gCommandLineMode = false;
+			
+			gDebugMode = 1;
 			break;
 		}
 		
@@ -258,10 +269,6 @@ ProcessArgs(int32 argc, char **argv)
 		else if (arg->ICompare("--target-links") == 0 || arg->ICompare("-t") == 0)
 		{
 			gLinksOnTargetVolume = true;
-		}
-		else if (arg->ICompare("--debug") == 0 || arg->ICompare("-d") == 0)
-		{
-			gDebugMode = 1;
 		}
 	}
 	return true;

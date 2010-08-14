@@ -655,8 +655,7 @@ PackageInfo::ParsePackageInfo(BString str)
 			status = B_ERROR;
 			break;
 		}
-
-printf("%s\n",key.String());
+		
 		if (level == 0)
 		{
 			if (key.ICompare("INSTALLFOLDER") == 0)

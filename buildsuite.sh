@@ -175,7 +175,7 @@ cd ../fastdep-0.16
 zip -9 -u ../PaladinFiles.zip fastdep
 
 cd ../PalEdit/generated/distro
-zip -9 -u -r ../../../PaladinFiles.zip Languages Extensions PalEdit
+zip -9 -u -r ../../../PaladinFiles.zip Languages Extensions lib PalEdit
 cd ../../..
 
 cd Documentation

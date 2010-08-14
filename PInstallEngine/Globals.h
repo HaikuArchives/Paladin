@@ -10,6 +10,18 @@
 #include "ObjectList.h"
 #include "OSPath.h"
 
+extern int gDebugMode;
+
+#ifndef STRACE
+	#define USE_TRACE_TOOLS
+	
+	#ifdef USE_TRACE_TOOLS
+		#define STRACE(x,y) if (gDebugMode >= x) printf y
+	#else
+		#define STRACE(x,y) /* */
+	#endif
+#endif
+
 enum
 {
 	CLOBBER_ASK = 0,
@@ -53,5 +65,6 @@ extern dev_t gBootVolumeID;
 extern app_info gAppInfo;
 
 void InitGlobals(void);
+
 
 #endif

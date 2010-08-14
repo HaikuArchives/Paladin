@@ -29,6 +29,9 @@ public:
 			void			StartInstall(void);
 			void			StopInstall(void);
 			bool			IsInstalling(void);
+			
+			void			SetDebugMode(bool value);
+			bool			GetDebugMode(void);
 private:
 			void			Log(const char *string);
 			int32			Query(const char *string, const char *first, const char *second = NULL,
@@ -55,6 +58,7 @@ private:
 	
 	thread_id	fInstallThread;
 	vint32		fQuitFlag;
+	bool		fDebugMode;
 };
 
 #endif

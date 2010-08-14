@@ -19,20 +19,13 @@ extern BResources *gResources;
 
 using namespace std;
 
-//#define TRACE_INSTALL
-
-#ifdef TRACE_INSTALL
-	#define STRACE(x) printf x
-#else
-	#define STRACE(x) /* */
-#endif
-
 InstallEngine::InstallEngine(void)
 	:	fMessenger(be_app_messenger),
 		fInstalledSize(0),
 		fInstalledCount(0),
 		fInstallThread(-1),
-		fQuitFlag(0)
+		fQuitFlag(0),
+		fDebugMode(false)
 {
 }
 
@@ -115,6 +108,20 @@ InstallEngine::IsInstalling(void)
 	Unlock();
 	
 	return value;
+}
+
+
+void
+InstallEngine::SetDebugMode(bool value)
+{
+	fDebugMode = value;
+}
+
+
+bool
+InstallEngine::GetDebugMode(void)
+{
+	return fDebugMode;
 }
 
 
@@ -222,13 +229,13 @@ InstallEngine::DoInstall(void)
 		ospath.SetVolume(installVol);
 		ospath.SetOS(gTargetPlatform);
 	}
-	STRACE(("Platform: %s\nInstall Volume Name: %sInstall Group: %s\n",
+	STRACE(1,("Platform: %s\nInstall Volume Name: %sInstall Group: %s\n",
 			OSTypeToString(ospath.GetOS()).String(),
 			ospath.GetVolumeName(),
 			gPkgInfo.GetGroup()));
 	
 	// 1) Check Dependencies
-	STRACE(("Checking dependencies...\n"));
+	STRACE(1,("Checking dependencies...\n"));
 	for (int32 i = 0; i < gPkgInfo.CountDependencies(); i++)
 	{
 		DepItem *dep = gPkgInfo.DependencyAt(i);
@@ -341,7 +348,7 @@ InstallEngine::DoInstall(void)
 			// Are we even supposed to install the file? Check both platform and group
 			if (!fileItem->BelongsToPlatform(gTargetPlatform))
 			{
-				STRACE(("%s is not to be installed for this platform. Skipping.\n",
+				STRACE(1,("%s is not to be installed for this platform. Skipping.\n",
 					fileItem->GetName()));
 				continue;
 			}
@@ -350,7 +357,7 @@ InstallEngine::DoInstall(void)
 			{
 				if (!fileItem->BelongsToGroup(gPkgInfo.GetGroup()))
 				{
-					STRACE(("%s doesn't belong to this install group. Skipping.\n",
+					STRACE(1,("%s doesn't belong to this install group. Skipping.\n",
 						fileItem->GetName()));
 					continue;
 				}
@@ -361,9 +368,9 @@ InstallEngine::DoInstall(void)
 			{
 				if (cookedPath.FindFirst("boot") == 1)
 				{
-					STRACE(("Original file install path: %s\n", cookedPath.String()));
+					STRACE(1,("Original file install path: %s\n", cookedPath.String()));
 					cookedPath.ReplaceFirst("boot",installVolName.String());
-					STRACE(("Updated file install path: %s\n", cookedPath.String()));
+					STRACE(1,("Updated file install path: %s\n", cookedPath.String()));
 				}
 			}
 			
@@ -373,7 +380,7 @@ InstallEngine::DoInstall(void)
 			if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
 			{
 				destpath.Append(gPkgInfo.GetInstallFolderName());
-				STRACE(("Final file install path: %s\n", destpath.GetFullPath()));
+				STRACE(1,("Final file install path: %s\n", destpath.GetFullPath()));
 			}
 			
 			status = InstallFromZip(zipfilepath.GetFullPath(),fileItem,destpath.GetFullPath());
@@ -502,7 +509,7 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	BString command;
 	command << "unzip -o '" << zipfile << "' '" << src->GetName() << "' -d '" 
 			<< dest << "' > /dev/null";
-	STRACE(("Unzip command: %s\n", command.String()));
+	STRACE(1,("Unzip command: %s\n", command.String()));
 	system(command.String());
 	
 	
@@ -541,7 +548,7 @@ InstallEngine::InstallFolder(const char *path)
 	if (entry.Exists())
 		return;
 	
-	STRACE(("Creating folder %s\n", path));
+	STRACE(1,("Creating folder %s\n", path));
 	
 	// Need to interatively create and log all folders created
 	create_directory(path,0777);
@@ -630,7 +637,7 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 					destPath = dirString;
 				else
 				{
-					STRACE(("Couldn't create link %s\n", item->LinkAt(i)));
+					STRACE(1,("Couldn't create link %s\n", item->LinkAt(i)));
 					return;
 				}
 			}
@@ -664,7 +671,7 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 		
 		BString command;
 		command << "ln -sf '" << srcPath.GetFullPath() << "' '" << destPath.GetFullPath() << "'";
-		STRACE(("Link command: %s\n", command.String()));
+		STRACE(1,("Link command: %s\n", command.String()));
 		system(command.String());
 	}
 }
@@ -752,7 +759,7 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 	{
 		case 1:
 		{
-			STRACE(("Destination exists. Skipped installing %s\n", item->GetName()));
+			STRACE(1,("Destination exists. Skipped installing %s\n", item->GetName()));
 			BString msg("Skipped installing ");
 			msg << item->GetName() << "\n";
 			Log(msg.String());
@@ -761,7 +768,7 @@ InstallEngine::CheckClobber(FileItem *item, const char *dest)
 		}
 		case 2:
 		{
-			STRACE(("Destination %s exists. Aborting install\n", item->GetName()));
+			STRACE(1,("Destination %s exists. Aborting install\n", item->GetName()));
 			Log("Canceled installation.\n");
 			fMessenger.SendMessage(M_INSTALL_ABORT);
 			return M_INSTALL_ABORT;

@@ -162,6 +162,7 @@ ProcessArgs(int32 argc, char **argv)
 	// -p, --platform <r5|zeta|haiku>	--> sets gNonBootInstall
 	// -t, --target-links --> set gLinkOnTargetVolume
 	// -i, --info --> shows package info and exits
+	// -d, --debug --> set debug mode
 	
 	gAppName = argv[0];
 	for (int32 i = 0; i < argList.CountItems(); i++)
@@ -257,6 +258,10 @@ ProcessArgs(int32 argc, char **argv)
 		else if (arg->ICompare("--target-links") == 0 || arg->ICompare("-t") == 0)
 		{
 			gLinksOnTargetVolume = true;
+		}
+		else if (arg->ICompare("--debug") == 0 || arg->ICompare("-d") == 0)
+		{
+			gDebugMode = 1;
 		}
 	}
 	return true;

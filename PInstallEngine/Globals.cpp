@@ -10,6 +10,7 @@
 
 #include "ResData.h"
 
+int gDebugMode = 0;
 InstallEngine gInstallEngine;
 
 ostype_t gPlatform = OS_NONE;

@@ -801,6 +801,27 @@ App::LoadProject(const entry_ref &givenRef)
 		return;
 	}
 	
+	// This will be true only if the project file lacks an entry.
+	if (proj->SourceControl() == SCM_INIT && !fBuildMode &&
+		!proj->IsReadOnly())
+	{
+		// No given in the project. Attempt to detect one and if there isn't
+		// any, see if the user would like to use the default SCM. At the same
+		// time, if the user doesn't *want* to use source control, we won't
+		// bother him.
+		scm_t scm = DetectSCM(proj->GetPath().GetFolder());
+		if (scm == SCM_NONE && gDefaultSCM != SCM_NONE)
+		{
+			BString scmMsg;
+			scmMsg << "This project is not under source control. Would you "
+					<< "like to use " << SCM2LongName(gDefaultSCM)
+					<< " for this project?\nYou will only be asked this one time.";
+			BAlert *scmAlert = new BAlert("Paladin", scmMsg.String(), "No", "Yes");
+			if (scmAlert->Go() == 1)
+				proj->SetSourceControl(gDefaultSCM);
+		}
+	}
+	
 	UpdateRecentItems(ref);
 	
 	gCurrentProject = proj;

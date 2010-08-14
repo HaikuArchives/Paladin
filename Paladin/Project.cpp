@@ -41,7 +41,7 @@ Project::Project(const char *name, const char *targetname)
 		fOpSize(false),
 		fOpLevel(0),
 		fTargetType(TARGET_APP),
-		fSCMType(SCM_NONE)
+		fSCMType(gDefaultSCM)
 {
 	if (name)
 	{
@@ -101,7 +101,7 @@ Project::Load(const char *path)
 	
 	// Set this to an out-of-bounds value to detect if
 	// there is no SCM entry in the project
-	fSCMType = (scm_t)255;
+	fSCMType = SCM_INIT;
 	
 	SourceGroup *srcgroup = NULL;
 	SourceFile *srcfile = NULL;
@@ -209,26 +209,6 @@ Project::Load(const char *path)
 		line = file.ReadLine();
 	}
 	
-	// This will be true only if the project file lacks an entry.
-	if (fSCMType > SCM_NONE)
-	{
-		// No given in the project. Attempt to detect one and if there isn't
-		// any, see if the user would like to use the default SCM. At the same
-		// time, if the user doesn't *want* to use source control, we won't
-		// bother him.
-		fSCMType = DetectSCM(fPath.GetFolder());
-		if (fSCMType == SCM_NONE && gDefaultSCM != SCM_NONE)
-		{
-			BString scmMsg;
-			scmMsg << "This project is not under source control. Would you "
-					<< "like to use " << SCM2LongName(gDefaultSCM)
-					<< " for this project?\nYou will only be asked this one time.";
-			BAlert *scmAlert = new BAlert("Paladin", scmMsg.String(), "No", "Yes");
-			if (scmAlert->Go() == 1)
-				fSCMType = gDefaultSCM;
-		}
-	}
-	
 	// Fix one of my pet peeves when changing platforms: having to add libsupc++.so whenever
 	// I change to Haiku GCC4 or GCC4hybrid from any other platform
 	if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform)
@@ -282,6 +262,11 @@ Project::Save(const char *path)
 		case SCM_SVN:
 		{
 			data << "SCM=svn\n";
+			break;
+		}
+		case SCM_NONE:
+		{
+			data << "SCM=none\n";
 			break;
 		}
 		default:

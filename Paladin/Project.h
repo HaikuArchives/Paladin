@@ -52,7 +52,8 @@ typedef enum
 	SCM_HG = 0,
 	SCM_GIT,
 	SCM_SVN,
-	SCM_NONE
+	SCM_NONE,
+	SCM_INIT
 } scm_t;
 
 
@@ -159,7 +160,7 @@ public:
 			void		SetTargetType(int32 type) { fTargetType = type; }
 			int32		TargetType(void) const { return fTargetType; }
 			
-			void		SetSourceControl(int32 type) { fSCMType = (scm_t)type; }
+			void		SetSourceControl(scm_t type) { fSCMType = type; }
 			scm_t		SourceControl(void) const { return fSCMType; }
 			
 			void		SetExtraCompilerOptions(const char *opt) { fExtraCompilerOptions = opt; }

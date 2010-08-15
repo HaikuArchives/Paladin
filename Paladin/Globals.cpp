@@ -95,12 +95,7 @@ InitGlobals(void)
 			gGitAvailable = true;
 		#endif
 		
-		BString revision;
-		RunPipedCommand("uname -v", revision, false);
-		revision.Truncate(revision.FindFirst(" "));
-		revision = BString(revision).String() + 1;
-		if (revision < "37423")
-			gUsePipeHack = true;
+		gUsePipeHack = true;
 	}
 	
 	if (system("svn > /dev/null 2>&1") == 1)
@@ -310,9 +305,22 @@ RunPipedCommand(const char *cmdstr, BString &out, bool redirectStdErr)
 			return file.InitCheck();
 		}
 		
-		char buffer[1024];
-		while (file.Read(buffer, 1024) > 0)
+//		char buffer[1024];
+//		while (file.Read(buffer, 1024) > 0)
+//			out << buffer;
+
+		off_t fileSize;
+		file.GetSize(&fileSize);
+		
+		char buffer[1028];
+		while (fileSize > 0)
+		{
+			size_t bytesRead = file.Read(buffer, fileSize > 1024 ? 1024 : fileSize);
+			if (bytesRead <= 1024)
+				buffer[bytesRead] = '\0';
 			out << buffer;
+			fileSize -= bytesRead;
+		}
 		
 		file.Unset();
 		BEntry(tmpfilename.String()).Remove();

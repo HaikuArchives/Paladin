@@ -1553,6 +1553,13 @@ ProjectWindow::CullEmptyGroups(void)
 void
 ProjectWindow::UpdateDependencies(void)
 {
+	bool toggleHack = false;
+	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
+		toggleHack = true;
+	
+	if (toggleHack)
+		gUsePipeHack = false;
+	
 	fStatusBar->SetText("Updating dependencies");
 	SetMenuLock(true);
 	for (int32 i = 0; i < fProjectList->CountItems(); i++)
@@ -1564,6 +1571,9 @@ ProjectWindow::UpdateDependencies(void)
 	}
 	SetMenuLock(false);
 	fStatusBar->SetText("");
+
+	if (toggleHack)
+		gUsePipeHack = true;
 }
 
 

@@ -128,6 +128,10 @@ fi
 jam -q -j"$CPUCOUNT"
 cd ..
 
+cd PInstallEngine
+BuildNoDebug PInstallEngine
+cd ..
+
 cd PSfx
 BuildNoDebug PSfx
 

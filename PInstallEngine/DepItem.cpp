@@ -38,14 +38,18 @@ DepItem::SetFileName(const char *name)
 const char *
 DepItem::GetResolvedPath(void) const
 {
-	return fPath.AsString();
+//	return fPath.AsString();
+	printf("DepItem::GetResolvedPath unimplemented\n");
+	return NULL;
 }
 
 
 int32
 DepItem::GetPathConstant(void) const
 {
-	return fPath.AsConstant();
+//	return fPath.AsConstant();
+	printf("DepItem::GetPathConstant unimplemented\n");
+	return -1;
 }
 
 
@@ -66,7 +70,8 @@ DepItem::SetPath(int32 path)
 void
 DepItem::ConvertPathFromString(const char *string)
 {
-	fPath.ConvertFromString(string);
+//	fPath.ConvertFromString(string);
+	printf("DepItem::ConvertPathFromString unimplemented\n");
 }
 
 
@@ -124,7 +129,7 @@ DepItem::MakeInfo(void)
 	out << "\tTYPE=" << (fType == DEP_LIBRARY ? "library" : "file") << "\n";
 	
 	if (fType != DEP_LIBRARY)
-		out << "\tPATH=" << fPath.AsString() << "\n";
+		out << "\tPATH=" << fPath.Path() << "\n";
 	if (fURL.CountChars() > 0)
 		out << "\tDEPURL=" << fURL << "\n\n";
 	return out;

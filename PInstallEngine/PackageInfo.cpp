@@ -13,7 +13,7 @@
 PackageInfo::PackageInfo(void)
 	:	fPackageVersion(1.0),
 		fReleaseDate(real_time_clock()),
-		fPath(B_APPS_DIRECTORY),
+		fPath("B_APPS_DIRECTORY"),
 		fShowChooser(false),
 		fFiles(20,true),
 		fDeps(20,true),
@@ -139,14 +139,18 @@ PackageInfo::GetPackageVersion(void) const
 int32
 PackageInfo::GetPathConstant(void) const
 {
-	return fPath.AsConstant();
+//	return fPath.AsConstant();
+	printf("PackageInfo::GetPathConstant unimplemented\n");
+	return -1;
 }
 
 
 const char *
 PackageInfo::GetResolvedPath(void) const
 {
-	return fPath.AsString();
+//	return fPath.AsString();
+	printf("PackageInfo::GetResolvedPath unimplemented\n");
+	return NULL;
 }
 
 
@@ -396,7 +400,7 @@ PackageInfo::MakeInfo(void)
 		<< "PKGVERSION=" << buffer
 		<< "PKGNAME=" << GetName()
 		<< "\nTYPE=SelfExtract"
-		<< "\nINSTALLFOLDER=" << fPath.AsString() << "\n";
+		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
 	
 	if (fAuthorName.CountChars() > 0)
 		out << "AUTHORNAME=" << fAuthorName << "\n";
@@ -446,7 +450,7 @@ PackageInfo::PrintToStream(void)
 			"Author website: %s\n"
 			"App version: %s\n"
 			"Release Date: %s\n",
-			GetName(), GetPackageVersion(),	fPath.AsString(), (GetShowChooser() ? "yes" : "no"),
+			GetName(), GetPackageVersion(),	fPath.Path(), (GetShowChooser() ? "yes" : "no"),
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
@@ -502,7 +506,7 @@ PackageInfo::DumpInfo(void)
 			"Author website: %s\n"
 			"App version: %s\n"
 			"Release Date: %s\n",
-			GetName(), GetPackageVersion(),	fPath.AsString(),  (GetShowChooser() ? "yes" : "no"),
+			GetName(), GetPackageVersion(),	fPath.Path(),  (GetShowChooser() ? "yes" : "no"),
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
@@ -530,7 +534,7 @@ PackageInfo::MakeEmpty(void)
 	fName = "";
 	fPackageVersion = 0.0;
 	fReleaseDate = 0;
-	fPath = M_INSTALL_DIRECTORY;
+	fPath.SetTo("M_INSTALL_DIRECTORY");
 	
 	BVolumeRoster roster;
 	BVolume vol;
@@ -663,7 +667,7 @@ PackageInfo::ParsePackageInfo(BString str)
 				if (value.ICompare("askuser") == 0)
 					SetShowChooser(true);
 				else
-					fPath.ConvertFromString(value.String());
+					fPath.SetTo(value.String());
 			}
 			else if (key.ICompare("INSTALLFOLDERNAME") == 0)
 				SetInstallFolderName(value.String());

@@ -6,7 +6,7 @@
 #include "Globals.h"
 
 FileItem::FileItem(void)
-	:	fPath(M_INSTALL_DIRECTORY),
+	:	fPath("M_INSTALL_DIRECTORY"),
 		fCategory("Applications"),
 		fGroups(20,true),
 		fLinks(20,true),
@@ -51,14 +51,18 @@ FileItem::SetInstalledName(const char *name)
 const char *
 FileItem::GetResolvedPath(void) const
 {
-	return fPath.AsString();
+//	return fPath.AsString();
+	printf("FileItem::GetResolvedPath unimplemented\n");
+	return NULL;
 }
 
 
 int32
 FileItem::GetPathConstant(void) const
 {
-	return fPath.AsConstant();
+//	return fPath.AsConstant();
+	printf("FileItem::GetPathConstant unimplemented\n");
+	return -1;
 }
 
 
@@ -79,7 +83,8 @@ FileItem::SetPath(int32 path)
 void
 FileItem::ConvertPathFromString(const char *string)
 {
-	fPath.ConvertFromString(string);
+//	fPath.ConvertFromString(string);
+	printf("FileItem::ConvertPathFromString unimplemented\n");
 }
 
 
@@ -377,7 +382,7 @@ FileItem::PrintToStream(int8 indent)
 	out << tabstr << "File: " << GetName() << "\n";
 	tabstr << "\t";
 	out << tabstr << "Installed Name: " << GetInstalledName() << "\n"
-		<< tabstr << "Path: " << fPath.AsString() << "\n"
+		<< tabstr << "Path: " << fPath.Path() << "\n"
 		<< tabstr << "Category: " << GetCategory() << "\n";
 	
 	if (CountGroups() == 0)

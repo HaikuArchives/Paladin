@@ -17,8 +17,7 @@ class PkgPath
 {
 public:
 				PkgPath(void);
-				PkgPath(const char *custom);
-				PkgPath(int32 pathid);
+				PkgPath(const char *stringpath);
 				PkgPath(const PkgPath &from);
 	PkgPath &	operator=(const PkgPath &from);
 		
@@ -26,17 +25,18 @@ public:
 	void		SetTo(int32 pathid, BVolume *vol = NULL);
 	void		SetVolume(const BVolume &vol);
 	
-	int32		AsConstant(void) const;
-	const char *AsString(void) const;
-
-	void		ConvertFromString(const char *string);
+	int32		ResolveToConstant(void) const;
+	BString		ResolveToString(void) const;
+	const char *Path(void);
+	
+	static	void		SetPackageInstallDirectory(const char *path);
+	static	const char *GetPackageInstallDirectory(void);
 	
 private:
-	OSPath	fOSPath;
 	BVolume	fVolume;
 	
 	BString	fPath;
-	int32	fPathConstant;
+	
 };
 
 

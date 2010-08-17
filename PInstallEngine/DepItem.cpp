@@ -35,21 +35,10 @@ DepItem::SetFileName(const char *name)
 }
 
 
-const char *
-DepItem::GetResolvedPath(void) const
+PkgPath
+DepItem::GetPath(void) const
 {
-//	return fPath.AsString();
-	printf("DepItem::GetResolvedPath unimplemented\n");
-	return NULL;
-}
-
-
-int32
-DepItem::GetPathConstant(void) const
-{
-//	return fPath.AsConstant();
-	printf("DepItem::GetPathConstant unimplemented\n");
-	return -1;
+	return fPath;
 }
 
 
@@ -61,17 +50,9 @@ DepItem::SetPath(const char *path)
 
 
 void
-DepItem::SetPath(int32 path)
+DepItem::SetPath(const PkgPath &path)
 {
-	fPath.SetTo(path);
-}
-
-
-void
-DepItem::ConvertPathFromString(const char *string)
-{
-//	fPath.ConvertFromString(string);
-	printf("DepItem::ConvertPathFromString unimplemented\n");
+	fPath = path;
 }
 
 
@@ -146,7 +127,7 @@ DepItem::PrintToStream(int8 indent)
 	out << tabstr << "Dependency: " << GetName() << "\n";
 	tabstr << "\t";
 	out << tabstr << "Filename: " << GetFileName() << "\n"
-		<< tabstr << "Path: " << GetResolvedPath() << "\n"
+		<< tabstr << "Path: " << GetPath().Path() << "\n"
 		<< tabstr << "Website: " << GetURL() << "\n"
 		<< tabstr << "Type: " << (GetType() == DEP_LIBRARY ? "library" : "file") << "\n";
 	printf(out.String());

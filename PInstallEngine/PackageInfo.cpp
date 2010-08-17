@@ -772,7 +772,7 @@ PackageInfo::ParsePackageInfo(BString str)
 				else if (key.ICompare("TYPE") == 0)
 					depItem->SetType(value.String());
 				else if (key.ICompare("PATH") == 0)
-					depItem->ConvertPathFromString(value.String());
+					depItem->SetPath(value.String());
 				else if (key.ICompare("DEPURL") == 0)
 					depItem->SetURL(value.String());
 				else

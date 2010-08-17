@@ -268,7 +268,7 @@ InstallEngine::DoInstall(void)
 		}
 		else
 		{
-			BString deppath(dep->GetResolvedPath());
+			BString deppath(dep->GetPath().ResolveToString());
 			if (gNonBootInstall && BString(ospath.GetVolumeName()).CountChars() > 0 && 
 				deppath.FindFirst("boot") == 1)
 			{

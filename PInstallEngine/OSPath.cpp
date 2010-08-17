@@ -434,3 +434,207 @@ StringToOSType(const char *str)
 	return OS_NONE;
 }
 
+
+BString
+GetFriendlyPathConstantName(const int32 &constant)
+{
+	BString string;
+	switch (constant)
+	{
+		case B_DESKTOP_DIRECTORY:
+		{
+			string = "Desktop";
+			break;
+		}
+		case B_USER_DESKBAR_DIRECTORY:
+		{
+			string = "Deskbar";
+			break;
+		}
+		case B_APPS_DIRECTORY:
+		{
+			string = "Apps Directory";
+			break;
+		}
+		case B_PREFERENCES_DIRECTORY:
+		{
+			string = "Preferences Directory";
+			break;
+		}
+		case B_UTILITIES_DIRECTORY:
+		{
+			string = "Utilities Directory";
+			break;
+		}
+		case B_USER_DIRECTORY:
+		{
+			string = "User Directory";
+			break;
+		}
+		case B_USER_ADDONS_DIRECTORY:
+		{
+			string = "User Addons Directory";
+			break;
+		}
+		case B_USER_BOOT_DIRECTORY:
+		{
+			string = "User Boot Directory";
+			break;
+		}
+		case B_USER_CACHE_DIRECTORY:
+		{
+			string = "User Cache Directory";
+			break;
+		}
+		case B_USER_CONFIG_DIRECTORY:
+		{
+			string = "User Config Directory";
+			break;
+		}
+		case B_USER_DATA_DIRECTORY:
+		{
+			string = "User Data Directory";
+			break;
+		}
+		case B_USER_FONTS_DIRECTORY:
+		{
+			string = "User Fonts Directory";
+			break;
+		}
+		case B_USER_LIB_DIRECTORY:
+		{
+			string = "User Lib Directory";
+			break;
+		}
+		case B_USER_MEDIA_NODES_DIRECTORY:
+		{
+			string = "User Media Nodes Directory";
+			break;
+		}
+		case B_USER_PRINTERS_DIRECTORY:
+		{
+			string = "User Printers Directory";
+			break;
+		}
+		case B_USER_SETTINGS_DIRECTORY:
+		{
+			string = "User Settings Directory";
+			break;
+		}
+		case B_USER_SOUNDS_DIRECTORY:
+		{
+			string = "User Sounds Directory";
+			break;
+		}
+		case B_USER_TRANSLATORS_DIRECTORY:
+		{
+			string = "User Translators Directory";
+			break;
+		}
+		case B_COMMON_DIRECTORY:
+		{
+			string = "Common Directory";
+			break;
+		}
+		case B_COMMON_ADDONS_DIRECTORY:
+		{
+			string = "Common Addons Directory";
+			break;
+		}
+		case B_COMMON_BIN_DIRECTORY:
+		{
+			string = "Common Bin Directory";
+			break;
+		}
+		case B_COMMON_BOOT_DIRECTORY:
+		{
+			string = "Common Boot Directory";
+			break;
+		}
+		case B_COMMON_DATA_DIRECTORY:
+		{
+			string = "Common Data Directory";
+			break;
+		}
+		case B_COMMON_DEVELOP_DIRECTORY:
+		{
+			string = "Common Develop Directory";
+			break;
+		}
+		case B_COMMON_DOCUMENTATION_DIRECTORY:
+		{
+			string = "Common Documentation Directory";
+			break;
+		}
+		case B_COMMON_ETC_DIRECTORY:
+		{
+			string = "Common Etc Directory";
+			break;
+		}
+		case B_COMMON_FONTS_DIRECTORY:
+		{
+			string = "Common Fonts Directory";
+			break;
+		}
+		case B_COMMON_LIB_DIRECTORY:
+		{
+			string = "Common Lib Directory";
+			break;
+		}
+		case B_COMMON_LOG_DIRECTORY:
+		{
+			string = "Common Log Directory";
+			break;
+		}
+		case B_COMMON_MEDIA_NODES_DIRECTORY:
+		{
+			string = "Common Media Nodes Directory";
+			break;
+		}
+		case B_COMMON_SERVERS_DIRECTORY:
+		{
+			string = "Common Servers Directory";
+			break;
+		}
+		case B_COMMON_SETTINGS_DIRECTORY:
+		{
+			string = "Common Settings Directory";
+			break;
+		}
+		case B_COMMON_SOUNDS_DIRECTORY:
+		{
+			string = "Common Sounds Directory";
+			break;
+		}
+		case B_COMMON_SPOOL_DIRECTORY:
+		{
+			string = "Common Spool Directory";
+			break;
+		}
+		case B_COMMON_SYSTEM_DIRECTORY:
+		{
+			string = "Common System Directory";
+			break;
+		}
+		case B_COMMON_TEMP_DIRECTORY:
+		{
+			string = "Common Temp Directory";
+			break;
+		}
+		case B_COMMON_TRANSLATORS_DIRECTORY:
+		{
+			string = "Common Translators Directory";
+			break;
+		}
+		case B_COMMON_VAR_DIRECTORY:
+		{
+			string = "Common Var Directory";
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+	return string;
+}

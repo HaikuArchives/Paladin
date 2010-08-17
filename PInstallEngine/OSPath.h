@@ -85,4 +85,6 @@ private:
 			int32			fDataSize;
 };
 
+BString GetFriendlyPathConstantName(const int32 &constant);
+
 #endif

@@ -23,12 +23,10 @@ public:
 			const char *	GetFileName(void) const;
 			void			SetFileName(const char *name);
 			
-			const char *	GetResolvedPath(void) const;
-			int32			GetPathConstant(void) const;
+			PkgPath			GetPath(void) const;
+			void			SetPath(const PkgPath &path);
 			void			SetPath(const char *path);
-			void			SetPath(int32 path);
-			void			ConvertPathFromString(const char *string);
-
+			
 			void			SetURL(const char *url);
 			const char *	GetURL(void) const;
 			

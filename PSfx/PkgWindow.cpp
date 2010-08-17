@@ -423,7 +423,7 @@ PkgWindow::ItemSelected(int32 index)
 		if (!fileItem)
 			return;
 		
-		switch (item->GetData()->GetPathConstant())
+		switch (item->GetData()->GetPath().ResolveToConstant())
 		{
 			case M_INSTALL_DIRECTORY:
 			{
@@ -439,8 +439,8 @@ PkgWindow::ItemSelected(int32 index)
 			default:
 			{
 				BMenuItem *menuItem = fInstallField->Menu()->FindItem(
-													GetFriendlyPathConstantName(
-															fileItem->GetPathConstant()).String());
+												GetFriendlyPathConstantName(
+												fileItem->GetPath().ResolveToConstant()).String());
 				if (menuItem)
 					menuItem->SetMarked(true);
 				break;
@@ -554,7 +554,7 @@ PkgWindow::LoadProject(entry_ref ref)
 			item->SetPath(value.c_str());
 		else
 		if (key == "ITEMCONSTPATH")
-			item->SetPath(atol(value.c_str()));
+			item->SetPath(value.c_str());
 		else
 		if (key == "ITEMGROUP")
 			item->AddGroup(value.c_str());
@@ -578,10 +578,10 @@ PkgWindow::LoadProject(entry_ref ref)
 			fPkgInfo.SetAuthorName(value.c_str());
 		else
 		if (key == "INSTALLFOLDER")
-			fPkgInfo.SetInstallPath(value.c_str());
+			fPkgInfo.SetPath(value.c_str());
 		else
 		if (key == "INSTALLCONSTFOLDER")
-			fPkgInfo.SetInstallPath(atol(value.c_str()));
+			fPkgInfo.SetPath(value.c_str());
 		else
 		if (key == "CONTACT")
 			fPkgInfo.SetAuthorEmail(value.c_str());
@@ -621,12 +621,8 @@ PkgWindow::SaveProject(const char *path)
 	
 	out	<< "PFXPROJECT=Always first\n"
 		<< "PKGNAME=" << fPkgInfo.GetName()
-		<< "\nTYPE=SelfExtract\n";
-	
-	if (fPkgInfo.GetPathConstant() == M_CUSTOM_DIRECTORY)
-		 out << "INSTALLFOLDER=" << fPkgInfo.GetResolvedPath() << "\n";
-	else
-		 out << "INTSALLCONSTFOLDER=" << fPkgInfo.GetPathConstant() << "\n";
+		<< "\nTYPE=SelfExtract\n"
+		<< "INSTALLFOLDER=" << fPkgInfo.GetPath().Path() << "\n";
 	
 	if (fPkgInfo.GetAuthorName() && strlen(fPkgInfo.GetAuthorName()) > 0)
 		out << "AUTHORNAME=" << fPkgInfo.GetAuthorName() << "\n";
@@ -662,11 +658,8 @@ PkgWindow::SaveProject(const char *path)
 		if (fileItem->GetReplaceMode() > 0)
 			out << "ITEMREPLACEMODE=" << fileItem->GetReplaceMode() << "\n";
 				
-		if (fileItem->GetPathConstant() == M_CUSTOM_DIRECTORY)
-			 out << "ITEMPATH=" << fileItem->GetResolvedPath() << "\n";
-		else
-			if (fileItem->GetPathConstant() != M_INSTALL_DIRECTORY)
-				out << "ITEMCONSTPATH=" << fileItem->GetPathConstant() << "\n";
+		if (strcmp(fileItem->GetPath().Path(), "M_INSTALL_DIRECTORY") != 0)
+			 out << "ITEMPATH=" << fileItem->GetPath().Path() << "\n";
 		
 		for (int32 i = 0; i < fileItem->CountGroups(); i++)
 			out << "ITEMGROUP=" << fileItem->GroupAt(i) << "\n";
@@ -702,7 +695,10 @@ PkgWindow::SetInstallFolder(const int32 &value, const char *custom)
 			if (custom)
 				item->GetData()->SetPath(custom);
 			else
-				item->GetData()->SetPath(value);
+			{
+				OSPath osPath;
+				item->GetData()->SetPath(osPath.DirToString(value));
+			}
 		}
 		
 		selection = fListView->CurrentSelection(i++);

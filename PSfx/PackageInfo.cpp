@@ -13,7 +13,7 @@
 PackageInfo::PackageInfo(void)
 	:	fPackageVersion(1.0),
 		fReleaseDate(real_time_clock()),
-		fPath(B_APPS_DIRECTORY),
+		fPath("B_APPS_DIRECTORY"),
 		fShowChooser(false),
 		fFiles(20,true),
 		fDeps(20,true),
@@ -136,30 +136,22 @@ PackageInfo::GetPackageVersion(void) const
 }
 
 
-int32
-PackageInfo::GetPathConstant(void) const
+PkgPath
+PackageInfo::GetPath(void) const
 {
-	return fPath.AsConstant();
-}
-
-
-const char *
-PackageInfo::GetResolvedPath(void) const
-{
-	return fPath.AsString();
+	return fPath;
 }
 
 
 void
-PackageInfo::SetInstallPath(int32 pathid)
+PackageInfo::SetPath(const PkgPath &path)
 {
-	BVolume vol(fVolumeDevID);
-	fPath.SetTo(pathid,&vol);
+	fPath = path;
 }
 
 
 void
-PackageInfo::SetInstallPath(const char *path)
+PackageInfo::SetPath(const char *path)
 {
 	fPath.SetTo(path);
 }
@@ -396,7 +388,7 @@ PackageInfo::MakeInfo(void)
 		<< "PKGVERSION=" << buffer
 		<< "PKGNAME=" << GetName()
 		<< "\nTYPE=SelfExtract"
-		<< "\nINSTALLFOLDER=" << fPath.AsString() << "\n";
+		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
 	
 	if (fAuthorName.CountChars() > 0)
 		out << "AUTHORNAME=" << fAuthorName << "\n";
@@ -446,7 +438,7 @@ PackageInfo::PrintToStream(void)
 			"Author website: %s\n"
 			"App version: %s\n"
 			"Release Date: %s\n",
-			GetName(), GetPackageVersion(),	fPath.AsString(), (GetShowChooser() ? "yes" : "no"),
+			GetName(), GetPackageVersion(),	fPath.Path(), (GetShowChooser() ? "yes" : "no"),
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
@@ -502,7 +494,7 @@ PackageInfo::DumpInfo(void)
 			"Author website: %s\n"
 			"App version: %s\n"
 			"Release Date: %s\n",
-			GetName(), GetPackageVersion(),	fPath.AsString(),  (GetShowChooser() ? "yes" : "no"),
+			GetName(), GetPackageVersion(),	fPath.Path(),  (GetShowChooser() ? "yes" : "no"),
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
@@ -530,7 +522,7 @@ PackageInfo::MakeEmpty(void)
 	fName = "";
 	fPackageVersion = 0.0;
 	fReleaseDate = 0;
-	fPath = M_INSTALL_DIRECTORY;
+	fPath.SetTo("M_INSTALL_DIRECTORY");
 	
 	BVolumeRoster roster;
 	BVolume vol;
@@ -663,7 +655,7 @@ PackageInfo::ParsePackageInfo(BString str)
 				if (value.ICompare("askuser") == 0)
 					SetShowChooser(true);
 				else
-					fPath.ConvertFromString(value.String());
+					fPath.SetTo(value.String());
 			}
 			else if (key.ICompare("INSTALLFOLDERNAME") == 0)
 				SetInstallFolderName(value.String());
@@ -710,10 +702,8 @@ PackageInfo::ParsePackageInfo(BString str)
 			{
 				if (key.ICompare("INSTALLEDNAME") == 0)
 					fileItem->SetInstalledName(value.String());
-				else if (key.ICompare("PATH") == 0)
-					fileItem->ConvertPathFromString(value.String());
 				else if (key.ICompare("INSTALLFOLDER") == 0)
-					fileItem->ConvertPathFromString(value.String());
+					fileItem->SetPath(value.String());
 				else if (key.ICompare("LINK") == 0)
 					fileItem->AddLink(value.String());
 				else if (key.ICompare("CATEGORY") == 0)
@@ -768,7 +758,7 @@ PackageInfo::ParsePackageInfo(BString str)
 				else if (key.ICompare("TYPE") == 0)
 					depItem->SetType(value.String());
 				else if (key.ICompare("PATH") == 0)
-					depItem->ConvertPathFromString(value.String());
+					depItem->SetPath(value.String());
 				else if (key.ICompare("DEPURL") == 0)
 					depItem->SetURL(value.String());
 				else

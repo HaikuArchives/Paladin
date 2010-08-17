@@ -4,37 +4,33 @@
 #include <Path.h>
 #include <VolumeRoster.h>
 
+#include "Globals.h"
 #include "PackageInfo.h"
 
+static PkgPath sPackageInstallDir("B_APPS_DIRECTORY");
+
+
 PkgPath::PkgPath(void)
-	:	fPathConstant(-1)
 {
 	BVolumeRoster roster;
-	roster.GetBootVolume(&fVolume);
-	
-	SetTo(B_APPS_DIRECTORY, &fVolume);
+	BVolume vol;
+	roster.GetBootVolume(&vol);	
+	SetTo(B_APPS_DIRECTORY, &vol);
 }
 
 
-PkgPath::PkgPath(const char *custom)
+PkgPath::PkgPath(const char *stringpath)
+
 {
 	BVolumeRoster roster;
-	roster.GetBootVolume(&fVolume);
-	
-	SetTo(custom);
-}
-
-
-PkgPath::PkgPath(int32 pathid)
-{
-	BVolumeRoster roster;
-	roster.GetBootVolume(&fVolume);
-	
-	SetTo(pathid);
+	BVolume vol;
+	roster.GetBootVolume(&vol);	
+	SetTo(stringpath);
 }
 
 
 PkgPath::PkgPath(const PkgPath &from)
+	:	OSPath(from)
 {
 	*this = from;
 }
@@ -43,79 +39,102 @@ PkgPath::PkgPath(const PkgPath &from)
 PkgPath &
 PkgPath::operator=(const PkgPath &from)
 {
-	fOSPath = from.fOSPath;
 	fPath = from.fPath;
-	fPathConstant = from.fPathConstant;
 	return *this;
 }
 
 
 void
-PkgPath::SetTo(const char *custom)
+PkgPath::SetTo(const char *stringpath)
 {
-	fPathConstant = M_CUSTOM_DIRECTORY;
-	fPath = custom;
+	fPath = stringpath;
 }
 
 
 void
 PkgPath::SetTo(int32 pathid, BVolume *vol)
 {
-	if (pathid == M_CUSTOM_DIRECTORY)
-	{
-		// Setting custom paths is done with the other call
-		debugger("BUG: Setting a custom path is done with SetInstallPath(const char *)");
-		return;
-	}
-	
-	fPathConstant = pathid;
-	
 	if (pathid == M_INSTALL_DIRECTORY)
 		return;
 	
-	if (vol)
-		fVolume = *vol;
+	fPath = DirToString(pathid);
 	
-	// Perform the directory resolution here and then all that is required is to make
-	// one call to get a string path. :)
-	fOSPath.SetVolume(fVolume);
-	fPath = fOSPath.GetPath(pathid);
-	if (fPath.CountChars() < 1)
-		fPath = fOSPath.GetPath(B_APPS_DIRECTORY);
+	if (vol)
+		SetVolume(*vol);
+	else
+	{
+		BVolumeRoster roster;
+		BVolume vol;
+		roster.GetBootVolume(&vol);
+		SetVolume(vol);
+	}
 }
 
 
 int32
-PkgPath::AsConstant(void) const
+PkgPath::ResolveToConstant(void)
 {
-	return fPathConstant;
+	if ((fPath.ByteAt(0) != 'M' && fPath.ByteAt(0) != 'B') || fPath.CountChars() < 1)
+		return B_ERROR;
+	
+	if (fPath[1] != '_')
+		return B_ERROR;
+	
+	BString temp(fPath);
+	
+	int32 slashpos = temp.FindFirst("/");
+	if (slashpos >= 0)
+		return M_CUSTOM_DIRECTORY;
+	
+	return StringToDir(temp.String());
+}
+
+
+BString
+PkgPath::ResolveToString(void)
+{
+	if ((fPath.FindFirst("M_") != 0 && fPath.FindFirst("B_") != 0) || fPath.CountChars() < 1)
+		return fPath;
+	
+	BString temp(fPath);
+	int32 slashpos = temp.FindFirst("/");
+	if (slashpos >= 0)
+		temp.Truncate(slashpos);
+	
+	BString out(fPath);
+	
+	if (temp == "M_INSTALL_DIRECTORY")
+		out.ReplaceFirst("M_INSTALL_DIRECTORY", sPackageInstallDir.ResolveToString().String());
+	else
+	{
+		int32 dirWhich = StringToDir(temp.String());
+		if (dirWhich < 0)
+			return fPath;
+		
+		BString found = GetPath(dirWhich);
+		out.ReplaceFirst(temp.String(), found.String());
+	}
+	return out;
 }
 
 
 const char *
-PkgPath::AsString(void) const
+PkgPath::Path(void)
 {
 	return fPath.String();
 }
 
 
 void
-PkgPath::ConvertFromString(const char *string)
+PkgPath::SetPackageInstallDirectory(const char *path)
 {
-	if (!string)
-		return;
-	
-	BString value(string);
-	
-	if (value.ICompare("INSTALL_FOLDER") == 0 || value.ICompare("INSTALLFOLDER") == 0)
-		SetTo(M_INSTALL_DIRECTORY);
-	else
-	{
-		int32 dir = fOSPath.StringToDir(value.String());
-		if (dir >= 0)
-			SetTo(dir);
-		else
-			SetTo(value.String());
-	}
-
+	sPackageInstallDir.SetTo(path);
 }
+
+
+const char *
+PkgPath::GetPackageInstallDirectory(void)
+{
+	return sPackageInstallDir.Path();
+}
+

@@ -14,6 +14,7 @@ enum
 	PKG_REPLACE_RENAME_EXISTING,
 	PKG_REPLACE_ASK_NEWER_VERSION,
 	PKG_REPLACE_REPLACE_NEWER_VERSION,
+	PKG_REPLACE_REPLACE_NEWER_MOD_DATE,
 	PKG_REPLACE_UPGRADE
 };
 
@@ -21,7 +22,6 @@ class FileItem
 {
 public:
 							FileItem(void);
-							FileItem(const entry_ref &ref);
 							~FileItem(void);
 			
 			const char *	GetName(void) const;
@@ -30,11 +30,9 @@ public:
 			const char *	GetInstalledName(void) const;
 			void			SetInstalledName(const char *name);
 			
-			const char *	GetResolvedPath(void) const;
-			int32			GetPathConstant(void) const;
+			PkgPath			GetPath(ostype_t forPlatform = OS_NONE) const;
 			void			SetPath(const char *path);
-			void			SetPath(int32 path);
-			void			ConvertPathFromString(const char *string);
+			void			SetPath(const PkgPath &path);
 			
 			void			SetCategory(const char *cat);
 			const char *	GetCategory(void) const;

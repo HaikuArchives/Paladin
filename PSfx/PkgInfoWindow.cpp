@@ -56,7 +56,7 @@ PkgInfoWindow::PkgInfoWindow(BWindow *owner, PackageInfo *info)
 	for (int32 i = 0; i < menu->CountItems(); i++)
 	{
 		PathMenuItem *tempItem = (PathMenuItem*)menu->ItemAt(i);
-		if (tempItem->GetPath() == fInfo->GetPathConstant())
+		if (tempItem->GetPath() == fInfo->GetPath().ResolveToConstant())
 		{
 			marked = tempItem;
 			marked->SetMarked(true);
@@ -153,7 +153,10 @@ PkgInfoWindow::MessageReceived(BMessage *msg)
 		{
 			PathMenuItem *item = (PathMenuItem*)fInstallLocationField->Menu()->FindMarked();
 			if (item)
-				fInfo->SetInstallPath(item->GetPath());
+			{
+				OSPath path;
+				fInfo->SetPath(path.DirToString(item->GetPath()));
+			}
 			break;
 		}
 		default:

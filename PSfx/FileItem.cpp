@@ -6,8 +6,7 @@
 #include "Globals.h"
 
 FileItem::FileItem(void)
-	:	fReplaceMode(PKG_REPLACE_ASK_ALWAYS),
-		fPath(M_INSTALL_DIRECTORY),
+	:	fPath("M_INSTALL_DIRECTORY"),
 		fCategory("Applications"),
 		fGroups(20,true),
 		fLinks(20,true),
@@ -49,17 +48,15 @@ FileItem::SetInstalledName(const char *name)
 }
 
 
-const char *
-FileItem::GetResolvedPath(void) const
+PkgPath
+FileItem::GetPath(ostype_t forPlatform) const
 {
-	return fPath.AsString();
-}
-
-
-int32
-FileItem::GetPathConstant(void) const
-{
-	return fPath.AsConstant();
+	if (forPlatform == OS_NONE)
+		return fPath;
+	
+	PkgPath out(fPath);
+	out.SetOS(forPlatform);
+	return out;
 }
 
 
@@ -70,18 +67,10 @@ FileItem::SetPath(const char *path)
 }
 
 
-
 void
-FileItem::SetPath(int32 path)
+FileItem::SetPath(const PkgPath &path)
 {
-	fPath.SetTo(path);
-}
-
-
-void
-FileItem::ConvertPathFromString(const char *string)
-{
-	fPath.ConvertFromString(string);
+	fPath = path;
 }
 
 
@@ -280,12 +269,7 @@ FileItem::AddLink(const char *link)
 	if (!link || strlen(link) < 1)
 		return;
 	
-//	PkgPath path;
-//	path.ConvertFromString(link);
-//	if (!HasLink(path.AsString()))
-//		fLinks.AddItem(new BString(path.AsString()));
-	if (!HasLink(link))
-		fLinks.AddItem(new BString(link));
+	fLinks.AddItem(new BString(link));
 }
 
 
@@ -363,7 +347,7 @@ FileItem::MakeInfo(void)
 {
 	BString out;
 	
-	out << "FILE=" << GetName() << "\n";
+	out << "FILE=%s" << GetName() << "\n";
 	
 	if (fInstalledName.CountChars() > 0)
 		out << "\tINSTALLEDNAME=" << GetInstalledName() << "\n";
@@ -436,7 +420,7 @@ FileItem::PrintToStream(int8 indent)
 	out << tabstr << "File: " << GetName() << "\n";
 	tabstr << "\t";
 	out << tabstr << "Installed Name: " << GetInstalledName() << "\n"
-		<< tabstr << "Path: " << fPath.AsString() << "\n"
+		<< tabstr << "Path: " << fPath.Path() << "\n"
 		<< tabstr << "Category: " << GetCategory() << "\n";
 	
 	if (CountGroups() == 0)

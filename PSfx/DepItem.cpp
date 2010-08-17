@@ -35,17 +35,10 @@ DepItem::SetFileName(const char *name)
 }
 
 
-const char *
-DepItem::GetResolvedPath(void) const
+PkgPath
+DepItem::GetPath(void) const
 {
-	return fPath.AsString();
-}
-
-
-int32
-DepItem::GetPathConstant(void) const
-{
-	return fPath.AsConstant();
+	return fPath;
 }
 
 
@@ -57,16 +50,9 @@ DepItem::SetPath(const char *path)
 
 
 void
-DepItem::SetPath(int32 path)
+DepItem::SetPath(const PkgPath &path)
 {
-	fPath.SetTo(path);
-}
-
-
-void
-DepItem::ConvertPathFromString(const char *string)
-{
-	fPath.ConvertFromString(string);
+	fPath = path;
 }
 
 
@@ -124,7 +110,7 @@ DepItem::MakeInfo(void)
 	out << "\tTYPE=" << (fType == DEP_LIBRARY ? "library" : "file") << "\n";
 	
 	if (fType != DEP_LIBRARY)
-		out << "\tPATH=" << fPath.AsString() << "\n";
+		out << "\tPATH=" << fPath.Path() << "\n";
 	if (fURL.CountChars() > 0)
 		out << "\tDEPURL=" << fURL << "\n\n";
 	return out;
@@ -141,7 +127,7 @@ DepItem::PrintToStream(int8 indent)
 	out << tabstr << "Dependency: " << GetName() << "\n";
 	tabstr << "\t";
 	out << tabstr << "Filename: " << GetFileName() << "\n"
-		<< tabstr << "Path: " << GetResolvedPath() << "\n"
+		<< tabstr << "Path: " << GetPath().Path() << "\n"
 		<< tabstr << "Website: " << GetURL() << "\n"
 		<< tabstr << "Type: " << (GetType() == DEP_LIBRARY ? "library" : "file") << "\n";
 	printf(out.String());

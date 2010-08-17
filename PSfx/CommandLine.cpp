@@ -384,14 +384,7 @@ SetPackageInfo(BObjectList<BString> &args)
 	if (releasedatestr.CountChars() > 0)
 		sPkgInfo.SetReleaseDate(releasedate);
 	if (installfolder.CountChars() > 0)
-	{
-		OSPath ospath;
-		int32 dir = ospath.StringToDir(installfolder.String());
-		if (dir != B_ERROR)
-			sPkgInfo.SetInstallPath(dir);
-		else
-			sPkgInfo.SetInstallPath(installfolder.String());
-	}
+		sPkgInfo.SetPath(installfolder.String());
 	if (createfoldername.CountChars() > 0)
 		sPkgInfo.SetInstallFolderName(createfoldername.String());
 	if (url.CountChars() > 0)
@@ -461,13 +454,7 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 	// arg[1] == 'setdep' or 'adddep' command
 	
 	item->SetType(args.ItemAt(3)->String());
-	
-	OSPath ospath;
-	int32 dir = ospath.StringToDir(args.ItemAt(4)->String());
-	if (dir != B_ERROR)
-		item->SetPath(dir);
-	else
-		item->SetPath(args.ItemAt(4)->String());
+	item->SetPath(args.ItemAt(4)->String());
 	
 	if (args.ItemAt(5))
 		item->SetURL(args.ItemAt(5)->String());
@@ -649,18 +636,8 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	}
 	
 	item->SetName(filepath.String());
-	OSPath ospath;
-	int32 dir = ospath.StringToDir(installfolder.String());
-	if (dir != B_ERROR)
-	{
-		STRACE(("Setting path to: %s\n", ospath.DirToString(dir)));
-		item->SetPath(dir);
-	}
-	else
-	{
-		STRACE(("Setting custom path: %s\n", installfolder.String()));
-		item->SetPath(installfolder.String());
-	}
+	STRACE(("Setting path: %s\n", installfolder.String()));
+	item->SetPath(installfolder.String());
 	
 	if (category.CountChars() > 0)
 		item->SetCategory(category.String());

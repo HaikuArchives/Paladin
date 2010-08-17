@@ -386,7 +386,7 @@ PackageInfo::MakeInfo(void)
 	
 	out << "PFXPROJECT=Always first line\n"
 		<< "PKGVERSION=" << buffer
-		<< "PKGNAME=" << GetName()
+		<< "\nPKGNAME=" << GetName()
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
 	

@@ -1,6 +1,7 @@
 #include "CommandLine.h"
 
 #include <Application.h>
+#include <Mime.h>
 #include <Resources.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -280,8 +281,16 @@ MakePackage(BObjectList<BString> &args)
 	}
 	
 	file.Write(installstub,size);
+	
+	mode_t permissions;
+	file.GetPermissions(&permissions);
+	file.SetPermissions(permissions | S_IXUSR | S_IXGRP | S_IXOTH);
+	
+	update_mime_info(pkgPath.String(), 0, 1, 0);
+	
 	file.Unset();
 	sPkgInfo.SaveToFile(pkgPath.String());
+	
 }
 
 

@@ -469,6 +469,8 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 	
 	if (args.ItemAt(5))
 		item->SetURL(args.ItemAt(5)->String());
+	else
+		item->SetURL("");
 	
 	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
 	{
@@ -525,12 +527,12 @@ RemoveDependency(BObjectList<BString> &args)
 void
 AddFile(BObjectList<BString> &args)
 {
-	if (args.CountItems() < 5 || args.CountItems() > 6)
+	if (args.CountItems() < 3)
 	{
 		printf("To add a file to the package:\n"
-			"PSfx <packagepath> addfile <path> <installfolder> [category=<categoryname>]\n"
-			"[platform=<platformname>] [group=<groupname>]\n"
-			"[link1=<path> [link2=<path>]...]\n");
+			"PSfx <packagepath> addfile <path> [installfolder=<installfolder>] "
+			"[category=<categoryname>] [platform=<platformname>]\n"
+			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -547,12 +549,12 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 {
 	STRACE(("SetFile\n"));
 	
-	if (args.CountItems() < 5)
+	if (args.CountItems() < 3)
 	{
 		printf("To edit an existing file entry in the package:\n"
-			"PSfx <packagepath> setfile <path> <installfolder> [category=<categoryname>]\n"
-			"[platform=<r5|zeta|haiku>] [group=<groupname(s)>]\n"
-			"[link=<path> [link=<path>]...]\n");
+			"PSfx <packagepath> setfile <path> [installfolder=<installfolder>] "
+			"[category=<categoryname>] [platform=<platformname>]\n"
+			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -579,6 +581,8 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 			return;
 		}
 	}
+	else
+		item->SetName(filename.String());
 	
 	BString	pkgpath,
 			filepath,
@@ -592,9 +596,8 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	pkgpath = *args.ItemAt(0);
 	// arg[1] == 'setpkginfo' command
 	filepath = *args.ItemAt(2);
-	installfolder = *args.ItemAt(3);
 	
-	for (int32 i = 4; i < args.CountItems(); i++)
+	for (int32 i = 3; i < args.CountItems(); i++)
 	{
 		BString *arg = args.ItemAt(i);
 		
@@ -611,7 +614,12 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		
 		BString value = arg->String() + pos + 1;
 		
-		if (key.ICompare("category") == 0)
+		if (key.ICompare("installfolder") == 0)
+		{
+			STRACE(("install folder: %s\n", value.String()));
+			installfolder = value;
+		}
+		else if (key.ICompare("category") == 0)
 		{
 			STRACE(("category: %s\n", value.String()));
 			category = value;
@@ -639,9 +647,9 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		}
 	}
 	
-	if (filepath.CountChars() < 1 || installfolder.CountChars() < 1)
+	if (filepath.CountChars() < 1)
 	{
-		printf("File path and install folder are required.\n");
+		printf("File path is required.\n");
 		gReturnValue = -1;
 		return;
 	}

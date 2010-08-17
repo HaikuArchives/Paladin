@@ -1,7 +1,9 @@
 TODO:
-Fix command-line interface to work properly, especially install paths
-
 Add pkgversion to setpkginfo command
+
+Convert addfile-specified paths into proper relative paths in the package info
+
+Fix command-line interface to work properly, especially install paths
 
 Add a bin type for dependencies that will search for a command in one of the standard bin folders
 

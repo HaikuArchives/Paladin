@@ -386,7 +386,7 @@ PackageInfo::MakeInfo(void)
 	
 	out << "PFXPROJECT=Always first line\n"
 		<< "PKGVERSION=" << buffer
-		<< "PKGNAME=" << GetName()
+		<< "\nPKGNAME=" << GetName()
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
 	
@@ -659,6 +659,8 @@ PackageInfo::ParsePackageInfo(BString str)
 			}
 			else if (key.ICompare("INSTALLFOLDERNAME") == 0)
 				SetInstallFolderName(value.String());
+			else if (key.ICompare("PKGNAME") == 0)
+				SetName(value.String());
 			else if (key.ICompare("AUTHORNAME") == 0)
 				SetAuthorName(value.String());
 			else if (key.ICompare("CONTACT") == 0)

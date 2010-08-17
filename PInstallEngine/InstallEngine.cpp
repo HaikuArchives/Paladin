@@ -515,8 +515,8 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *pk
 	// 3) Extract file to the destination
 	BString command;
 	BString escapedName(src->GetName());
-	escapedName.CharacterEscape("'", '\\');
-	command << "unzip -o '" << zipfile << "' '" << escapedName.String() << "' -d '" 
+	escapedName.CharacterEscape("\"$\\`", '\\');
+	command << "unzip -o '" << zipfile << "' \"" << escapedName.String() << "\" -d '" 
 			<< destpath.GetFolder() << "' > /dev/null";
 	STRACE(1,("Unzip command: %s\n", command.String()));
 	system(command.String());
@@ -669,12 +669,12 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 		destPath.Append(linkname);
 		
 		BString escapedSrc(srcPath.GetFullPath());
-		escapedSrc.CharacterEscape("'", '\\');
+		escapedSrc.CharacterEscape("\"$\\`", '\\');
 		BString escapedDest(destPath.GetFullPath());
-		escapedDest.CharacterEscape("'", '\\');
+		escapedDest.CharacterEscape("\"$\\`", '\\');
 		
 		BString command;
-		command << "ln -sf '" << escapedSrc.String() << "' '" << escapedDest.String() << "'";
+		command << "ln -sf \"" << escapedSrc.String() << "\" \"" << escapedDest.String() << "\"";
 		STRACE(1,("Link command: %s\n", command.String()));
 		system(command.String());
 	}

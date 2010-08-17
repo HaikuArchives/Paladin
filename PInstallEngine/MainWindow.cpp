@@ -173,9 +173,9 @@ MainWindow::MessageReceived(BMessage *msg)
 			if (msg->FindString("which", &str) == B_OK)
 			{
 				if (str == "apps")
-					gPkgInfo.SetInstallPath(B_APPS_DIRECTORY);
+					gPkgInfo.SetPath("B_APPS_DIRECTORY");
 				else if (str == "home")
-					gPkgInfo.SetInstallPath(B_USER_DIRECTORY);
+					gPkgInfo.SetPath("B_USER_DIRECTORY");
 			}
 			break;
 		}
@@ -195,7 +195,7 @@ MainWindow::MessageReceived(BMessage *msg)
 			// This is to make sure the menu field label is updated properly
 			fCustomItem->SetMarked(true);
 			
-			gPkgInfo.SetInstallPath(path.Path());
+			gPkgInfo.SetPath(path.Path());
 			break;
 		}
 		case M_TOGGLE_LINKS_TARGETING:
@@ -339,7 +339,7 @@ MainWindow::InitFolderField(BRect frame)
 	// This is the default install folder. The ability to choose the install path is available
 	// to the user, so now we choose a sensible default so that if a user just hits 'Begin' --
 	// pretty likely for a novice user -- the package is installed into a sensible location
-	gPkgInfo.SetInstallPath(B_APPS_DIRECTORY);
+	gPkgInfo.SetPath("B_APPS_DIRECTORY");
 }
 
 

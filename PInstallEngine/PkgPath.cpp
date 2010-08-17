@@ -4,9 +4,10 @@
 #include <Path.h>
 #include <VolumeRoster.h>
 
+#include "Globals.h"
 #include "PackageInfo.h"
 
-static BString sPackageInstallDir = "/boot/apps";
+static PkgPath sPackageInstallDir("B_APPS_DIRECTORY");
 
 
 PkgPath::PkgPath(void)
@@ -56,6 +57,14 @@ PkgPath::SetTo(int32 pathid, BVolume *vol)
 	
 	OSPath os;
 	fPath = os.DirToString(pathid);
+	
+	if (vol)
+		fVolume = *vol;
+	else
+	{
+		BVolumeRoster roster;
+		roster.GetBootVolume(&fVolume);
+	}
 }
 
 
@@ -82,14 +91,10 @@ PkgPath::ResolveToConstant(void) const
 BString
 PkgPath::ResolveToString(void) const
 {
-	if ((fPath.ByteAt(0) != 'M' && fPath.ByteAt(0) != 'B') || fPath.CountChars() < 1)
-		return fPath;
-	
-	if (fPath[1] != '_')
+	if ((fPath.FindFirst("M_") != 0 && fPath.FindFirst("B_") != 0) || fPath.CountChars() < 1)
 		return fPath;
 	
 	BString temp(fPath);
-	
 	int32 slashpos = temp.FindFirst("/");
 	if (slashpos >= 0)
 		temp.Truncate(slashpos);
@@ -97,14 +102,16 @@ PkgPath::ResolveToString(void) const
 	BString out(fPath);
 	
 	if (temp == "M_INSTALL_DIRECTORY")
-		out.ReplaceFirst("M_INSTALL_DIRECTORY", sPackageInstallDir.String());
+		out.ReplaceFirst("M_INSTALL_DIRECTORY", sPackageInstallDir.ResolveToString().String());
 	else
 	{
 		OSPath os;
 		int32 dirWhich = os.StringToDir(temp.String());
 		if (dirWhich < 0)
 			return fPath;
-		out.ReplaceFirst(temp.String(), os.GetPath(dirWhich));
+		
+		BString found = os.GetPath(dirWhich);
+		out.ReplaceFirst(temp.String(), found.String());
 	}
 	return out;
 }
@@ -120,13 +127,13 @@ PkgPath::Path(void)
 void
 PkgPath::SetPackageInstallDirectory(const char *path)
 {
-	sPackageInstallDir = path;
+	sPackageInstallDir.SetTo(path);
 }
 
 
 const char *
 PkgPath::GetPackageInstallDirectory(void)
 {
-	return sPackageInstallDir.String();
+	return sPackageInstallDir.Path();
 }
 

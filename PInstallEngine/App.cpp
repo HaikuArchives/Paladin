@@ -53,7 +53,7 @@ App::App(void)
 			}
 			
 			if (gInstallPath.CountChars() > 0)
-				gPkgInfo.SetInstallPath(gInstallPath.String());
+				gPkgInfo.SetPath(gInstallPath.String());
 			
 			gInstallEngine.SetTarget(be_app_messenger);
 			gInstallEngine.StartInstall();

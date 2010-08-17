@@ -136,34 +136,22 @@ PackageInfo::GetPackageVersion(void) const
 }
 
 
-int32
-PackageInfo::GetPathConstant(void) const
+PkgPath
+PackageInfo::GetPath(void) const
 {
-//	return fPath.AsConstant();
-	printf("PackageInfo::GetPathConstant unimplemented\n");
-	return -1;
-}
-
-
-const char *
-PackageInfo::GetResolvedPath(void) const
-{
-//	return fPath.AsString();
-	printf("PackageInfo::GetResolvedPath unimplemented\n");
-	return NULL;
+	return fPath;
 }
 
 
 void
-PackageInfo::SetInstallPath(int32 pathid)
+PackageInfo::SetPath(const PkgPath &path)
 {
-	BVolume vol(fVolumeDevID);
-	fPath.SetTo(pathid,&vol);
+	fPath = path;
 }
 
 
 void
-PackageInfo::SetInstallPath(const char *path)
+PackageInfo::SetPath(const char *path)
 {
 	fPath.SetTo(path);
 }
@@ -714,10 +702,8 @@ PackageInfo::ParsePackageInfo(BString str)
 			{
 				if (key.ICompare("INSTALLEDNAME") == 0)
 					fileItem->SetInstalledName(value.String());
-				else if (key.ICompare("PATH") == 0)
-					fileItem->ConvertPathFromString(value.String());
 				else if (key.ICompare("INSTALLFOLDER") == 0)
-					fileItem->ConvertPathFromString(value.String());
+					fileItem->SetPath(value.String());
 				else if (key.ICompare("LINK") == 0)
 					fileItem->AddLink(value.String());
 				else if (key.ICompare("CATEGORY") == 0)

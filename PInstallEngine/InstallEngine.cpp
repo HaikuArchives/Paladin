@@ -363,7 +363,7 @@ InstallEngine::DoInstall(void)
 				}
 			}
 			
-			BString cookedPath(gPkgInfo.GetResolvedPath());
+			BString cookedPath(gPkgInfo.GetPath().ResolveToString());
 			if (installVol.Device() != bootVol.Device())
 			{
 				if (cookedPath.FindFirst("boot") == 1)
@@ -565,17 +565,7 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 	
 	// Determine the source folder. This only need be done once because we can make
 	// multiple links to the same source file.
-	DPath srcPath;
-	if (item->GetPathConstant() == M_CUSTOM_DIRECTORY)
-		srcPath = item->GetResolvedPath();
-	else if (item->GetPathConstant() == M_INSTALL_DIRECTORY)
-		srcPath = gPkgInfo.GetResolvedPath();
-	else
-	{
-		BPath findPath;
-		find_directory((directory_which)item->GetPathConstant(), &findPath);
-		srcPath = findPath.Path();
-	}
+	DPath srcPath(item->GetPath().ResolveToString());
 	
 	if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
 		srcPath.Append(gPkgInfo.GetInstallFolderName());

@@ -39,10 +39,9 @@ public:
 	void					SetPackageVersion(float ver);
 	float					GetPackageVersion(void) const;
 	
-	int32					GetPathConstant(void) const;
-	const char *			GetResolvedPath(void) const;
-	void					SetInstallPath(int32 path);
-	void					SetInstallPath(const char *path);
+	PkgPath					GetPath(void) const;
+	void					SetPath(const PkgPath &path);
+	void					SetPath(const char *path);
 	
 	// SetShowChooser isn't normally called but can be. GetShowChooser is true when the user
 	// should be given the option to choose the install folder.

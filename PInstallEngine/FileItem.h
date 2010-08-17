@@ -30,11 +30,9 @@ public:
 			const char *	GetInstalledName(void) const;
 			void			SetInstalledName(const char *name);
 			
-			const char *	GetResolvedPath(void) const;
-			int32			GetPathConstant(void) const;
+			PkgPath			GetPath(void) const;
 			void			SetPath(const char *path);
-			void			SetPath(int32 path);
-			void			ConvertPathFromString(const char *string);
+			void			SetPath(const PkgPath &path);
 			
 			void			SetCategory(const char *cat);
 			const char *	GetCategory(void) const;

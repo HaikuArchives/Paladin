@@ -48,21 +48,10 @@ FileItem::SetInstalledName(const char *name)
 }
 
 
-const char *
-FileItem::GetResolvedPath(void) const
+PkgPath
+FileItem::GetPath(void) const
 {
-//	return fPath.AsString();
-	printf("FileItem::GetResolvedPath unimplemented\n");
-	return NULL;
-}
-
-
-int32
-FileItem::GetPathConstant(void) const
-{
-//	return fPath.AsConstant();
-	printf("FileItem::GetPathConstant unimplemented\n");
-	return -1;
+	return fPath;
 }
 
 
@@ -74,17 +63,9 @@ FileItem::SetPath(const char *path)
 
 
 void
-FileItem::SetPath(int32 path)
+FileItem::SetPath(const PkgPath &path)
 {
-	fPath.SetTo(path);
-}
-
-
-void
-FileItem::ConvertPathFromString(const char *string)
-{
-//	fPath.ConvertFromString(string);
-	printf("FileItem::ConvertPathFromString unimplemented\n");
+	fPath = path;
 }
 
 

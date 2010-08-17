@@ -319,16 +319,6 @@ OSPath::GetVolumeName(void) const
 BString
 OSPath::GetPath(int32 dir)
 {
-if (fOS == OS_HAIKU)
-	printf("GetPath OS: Haiku\n");
-else
-if (fOS == OS_R5)
-	printf("GetPath OS: R5\n");
-else
-if (fOS == OS_ZETA)
-	printf("GetPath OS: Zeta\n");
-else
-	printf("GetPath OS: something else\n");
 	BString out;
 	for (int32 i = 0; i < fDataSize; i++)
 	{

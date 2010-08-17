@@ -266,13 +266,11 @@ OSPath::SetOS(ostype_t os)
 		}
 		case OS_HAIKU:
 		{
-printf("OS set to Haiku\n");
 			fData = sHaikuFindData;
 			break;
 		}
 		default:
 		{
-printf("OS set to R5\n");
 			fData = sR5FindData;
 			break;
 		}

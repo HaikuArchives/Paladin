@@ -11,26 +11,26 @@ static PkgPath sPackageInstallDir("B_APPS_DIRECTORY");
 
 
 PkgPath::PkgPath(void)
-	:	fOS(OS_R5)
 {
 	BVolumeRoster roster;
-	roster.GetBootVolume(&fVolume);
-	
-	SetTo(B_APPS_DIRECTORY, &fVolume);
+	BVolume vol;
+	roster.GetBootVolume(&vol);	
+	SetTo(B_APPS_DIRECTORY, &vol);
 }
 
 
 PkgPath::PkgPath(const char *stringpath)
-	:	fOS(OS_R5)
+
 {
 	BVolumeRoster roster;
-	roster.GetBootVolume(&fVolume);
-	
+	BVolume vol;
+	roster.GetBootVolume(&vol);	
 	SetTo(stringpath);
 }
 
 
 PkgPath::PkgPath(const PkgPath &from)
+	:	OSPath(from)
 {
 	*this = from;
 }
@@ -57,35 +57,22 @@ PkgPath::SetTo(int32 pathid, BVolume *vol)
 	if (pathid == M_INSTALL_DIRECTORY)
 		return;
 	
-	OSPath os(fOS);
-	fPath = os.DirToString(pathid);
+	fPath = DirToString(pathid);
 	
 	if (vol)
-		fVolume = *vol;
+		SetVolume(*vol);
 	else
 	{
 		BVolumeRoster roster;
-		roster.GetBootVolume(&fVolume);
+		BVolume vol;
+		roster.GetBootVolume(&vol);
+		SetVolume(vol);
 	}
 }
 
 
-ostype_t
-PkgPath::GetOS(void) const
-{
-	return fOS;
-}
-
-
-void
-PkgPath::SetOS(ostype_t os)
-{
-	fOS = os;
-}
-
-
 int32
-PkgPath::ResolveToConstant(void) const
+PkgPath::ResolveToConstant(void)
 {
 	if ((fPath.ByteAt(0) != 'M' && fPath.ByteAt(0) != 'B') || fPath.CountChars() < 1)
 		return B_ERROR;
@@ -99,13 +86,12 @@ PkgPath::ResolveToConstant(void) const
 	if (slashpos >= 0)
 		return M_CUSTOM_DIRECTORY;
 	
-	OSPath os(fOS);
-	return os.StringToDir(temp.String());
+	return StringToDir(temp.String());
 }
 
 
 BString
-PkgPath::ResolveToString(void) const
+PkgPath::ResolveToString(void)
 {
 	if ((fPath.FindFirst("M_") != 0 && fPath.FindFirst("B_") != 0) || fPath.CountChars() < 1)
 		return fPath;
@@ -121,12 +107,11 @@ PkgPath::ResolveToString(void) const
 		out.ReplaceFirst("M_INSTALL_DIRECTORY", sPackageInstallDir.ResolveToString().String());
 	else
 	{
-		OSPath os(fOS);
-		int32 dirWhich = os.StringToDir(temp.String());
+		int32 dirWhich = StringToDir(temp.String());
 		if (dirWhich < 0)
 			return fPath;
 		
-		BString found = os.GetPath(dirWhich);
+		BString found = GetPath(dirWhich);
 		out.ReplaceFirst(temp.String(), found.String());
 	}
 	return out;

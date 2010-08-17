@@ -13,7 +13,7 @@ enum
 	M_CUSTOM_DIRECTORY = 9999
 };
 
-class PkgPath
+class PkgPath : public OSPath
 {
 public:
 				PkgPath(void);
@@ -23,23 +23,16 @@ public:
 		
 	void		SetTo(const char *custom);
 	void		SetTo(int32 pathid, BVolume *vol = NULL);
-	void		SetVolume(const BVolume &vol);
 	
-	ostype_t	GetOS(void) const;
-	void		SetOS(ostype_t os);
-			
-	int32		ResolveToConstant(void) const;
-	BString		ResolveToString(void) const;
+	int32		ResolveToConstant(void);
+	BString		ResolveToString(void);
 	const char *Path(void);
 	
 	static	void		SetPackageInstallDirectory(const char *path);
 	static	const char *GetPackageInstallDirectory(void);
 	
 private:
-	BVolume		fVolume;
-	ostype_t	fOS;
 	BString		fPath;
-	
 };
 
 

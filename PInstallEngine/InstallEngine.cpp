@@ -515,7 +515,7 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *pk
 	// 3) Extract file to the destination
 	BString command;
 	command << "unzip -o '" << zipfile << "' '" << src->GetName() << "' -d '" 
-			<< destpath.GetFullPath() << "' > /dev/null";
+			<< destpath.GetFolder() << "' > /dev/null";
 	STRACE(1,("Unzip command: %s\n", command.String()));
 	system(command.String());
 	
@@ -574,8 +574,8 @@ InstallEngine::MakeLinks(FileItem *item, const char *installVolName)
 	// multiple links to the same source file.
 	DPath srcPath(item->GetPath().ResolveToString());
 	
-	if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
-		srcPath.Append(gPkgInfo.GetInstallFolderName());
+//	if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
+//		srcPath.Append(gPkgInfo.GetInstallFolderName());
 	
 	BString pathstr(srcPath.GetFullPath());
 	if (gNonBootInstall && installVolName && strlen(installVolName) > 0)

@@ -458,6 +458,8 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 			return;
 		}
 	}
+	else
+		item->SetName(depname.String());
 	
 	BString pkgpath = *args.ItemAt(0);
 	// arg[1] == 'setdep' or 'adddep' command

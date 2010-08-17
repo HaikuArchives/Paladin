@@ -3,6 +3,8 @@ Fix command-line interface to work properly, especially install paths
 
 Add pkgversion to setpkginfo command
 
+Add a bin type for dependencies that will search for a command in one of the standard bin folders
+
 Add an Alert for failed file opens
 
 Implement custom directory handling in the ItemSelected code in PkgWindow

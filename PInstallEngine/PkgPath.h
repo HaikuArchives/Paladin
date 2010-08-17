@@ -25,6 +25,9 @@ public:
 	void		SetTo(int32 pathid, BVolume *vol = NULL);
 	void		SetVolume(const BVolume &vol);
 	
+	ostype_t	GetOS(void) const;
+	void		SetOS(ostype_t os);
+			
 	int32		ResolveToConstant(void) const;
 	BString		ResolveToString(void) const;
 	const char *Path(void);
@@ -33,9 +36,9 @@ public:
 	static	const char *GetPackageInstallDirectory(void);
 	
 private:
-	BVolume	fVolume;
-	
-	BString	fPath;
+	BVolume		fVolume;
+	ostype_t	fOS;
+	BString		fPath;
 	
 };
 

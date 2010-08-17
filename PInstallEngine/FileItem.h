@@ -30,7 +30,7 @@ public:
 			const char *	GetInstalledName(void) const;
 			void			SetInstalledName(const char *name);
 			
-			PkgPath			GetPath(void) const;
+			PkgPath			GetPath(ostype_t forPlatform = OS_NONE) const;
 			void			SetPath(const char *path);
 			void			SetPath(const PkgPath &path);
 			

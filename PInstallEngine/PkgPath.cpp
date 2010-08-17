@@ -11,6 +11,7 @@ static PkgPath sPackageInstallDir("B_APPS_DIRECTORY");
 
 
 PkgPath::PkgPath(void)
+	:	fOS(OS_R5)
 {
 	BVolumeRoster roster;
 	roster.GetBootVolume(&fVolume);
@@ -20,6 +21,7 @@ PkgPath::PkgPath(void)
 
 
 PkgPath::PkgPath(const char *stringpath)
+	:	fOS(OS_R5)
 {
 	BVolumeRoster roster;
 	roster.GetBootVolume(&fVolume);
@@ -55,7 +57,7 @@ PkgPath::SetTo(int32 pathid, BVolume *vol)
 	if (pathid == M_INSTALL_DIRECTORY)
 		return;
 	
-	OSPath os;
+	OSPath os(fOS);
 	fPath = os.DirToString(pathid);
 	
 	if (vol)
@@ -65,6 +67,20 @@ PkgPath::SetTo(int32 pathid, BVolume *vol)
 		BVolumeRoster roster;
 		roster.GetBootVolume(&fVolume);
 	}
+}
+
+
+ostype_t
+PkgPath::GetOS(void) const
+{
+	return fOS;
+}
+
+
+void
+PkgPath::SetOS(ostype_t os)
+{
+	fOS = os;
 }
 
 
@@ -83,7 +99,7 @@ PkgPath::ResolveToConstant(void) const
 	if (slashpos >= 0)
 		return M_CUSTOM_DIRECTORY;
 	
-	OSPath os;
+	OSPath os(fOS);
 	return os.StringToDir(temp.String());
 }
 
@@ -105,7 +121,7 @@ PkgPath::ResolveToString(void) const
 		out.ReplaceFirst("M_INSTALL_DIRECTORY", sPackageInstallDir.ResolveToString().String());
 	else
 	{
-		OSPath os;
+		OSPath os(fOS);
 		int32 dirWhich = os.StringToDir(temp.String());
 		if (dirWhich < 0)
 			return fPath;

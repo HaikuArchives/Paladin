@@ -1,5 +1,6 @@
 #include "OSPath.h"
 #include <VolumeRoster.h>
+#include <stdio.h>
 
 static FindData sR5FindData[] = {
 	{ B_DESKTOP_DIRECTORY, "B_DESKTOP_DIRECTORY", "/boot/home/Desktop" },
@@ -265,11 +266,13 @@ OSPath::SetOS(ostype_t os)
 		}
 		case OS_HAIKU:
 		{
+printf("OS set to Haiku\n");
 			fData = sHaikuFindData;
 			break;
 		}
 		default:
 		{
+printf("OS set to R5\n");
 			fData = sR5FindData;
 			break;
 		}
@@ -318,6 +321,16 @@ OSPath::GetVolumeName(void) const
 BString
 OSPath::GetPath(int32 dir)
 {
+if (fOS == OS_HAIKU)
+	printf("GetPath OS: Haiku\n");
+else
+if (fOS == OS_R5)
+	printf("GetPath OS: R5\n");
+else
+if (fOS == OS_ZETA)
+	printf("GetPath OS: Zeta\n");
+else
+	printf("GetPath OS: something else\n");
 	BString out;
 	for (int32 i = 0; i < fDataSize; i++)
 	{

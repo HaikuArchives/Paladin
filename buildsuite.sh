@@ -188,7 +188,11 @@ zip -9 -u ../PaladinFiles.zip Paladin\ Documentation.pdf
 cd ..
 unzip -l PaladinFiles.zip
 cat PaladinFiles.zip >> "$PKGPATH"
-rm Paladin.sfx*
-rm PaladinFiles.zip
+
+if [ "$MAKECLEAN" == 1 ]
+then
+	rm Paladin.sfx*
+	rm PaladinFiles.zip
+fi
 
 chmod 0777 "$PKGPATH"

@@ -39,7 +39,7 @@ private:
 			
 	static	int32			InstallThread(void *data);
 			void			DoInstall(void);
-			status_t		InstallFromZip(const char *zipfile, FileItem *src, const char *dest);
+			status_t		InstallFromZip(const char *zipfile, FileItem *src, const char *pkgPath);
 			void			InstallFolder(const char *path);
 			
 			void			MakeLinks(FileItem *item, const char *installVolName);

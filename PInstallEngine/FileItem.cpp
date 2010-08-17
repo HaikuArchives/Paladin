@@ -49,9 +49,14 @@ FileItem::SetInstalledName(const char *name)
 
 
 PkgPath
-FileItem::GetPath(void) const
+FileItem::GetPath(ostype_t forPlatform) const
 {
-	return fPath;
+	if (forPlatform == OS_NONE)
+		return fPath;
+	
+	PkgPath out(fPath);
+	out.SetOS(forPlatform);
+	return out;
 }
 
 

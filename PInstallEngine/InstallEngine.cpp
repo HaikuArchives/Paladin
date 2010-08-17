@@ -341,6 +341,27 @@ InstallEngine::DoInstall(void)
 		be_app->GetAppInfo(&aInfo);
 		DPath zipfilepath(aInfo.ref);
 		
+		BString cookedPath(gPkgInfo.GetPath().ResolveToString());
+		if (installVol.Device() != bootVol.Device())
+		{
+			if (cookedPath.FindFirst("boot") == 1)
+			{
+				STRACE(1,("Original file install path: %s\n", cookedPath.String()));
+				cookedPath.ReplaceFirst("boot",installVolName.String());
+				STRACE(1,("Updated file install path: %s\n", cookedPath.String()));
+			}
+		}
+		
+		// Figure the actual destination path
+		DPath pkgInstallPath(cookedPath.String());
+		
+		if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
+		{
+			pkgInstallPath.Append(gPkgInfo.GetInstallFolderName());
+			STRACE(1,("Final file install path: %s\n", pkgInstallPath.GetFullPath()));
+		}
+		PkgPath::SetPackageInstallDirectory(pkgInstallPath.GetFullPath());
+		
 		for (int32 i = 0; i < gPkgInfo.CountFiles(); i++)
 		{
 			FileItem *fileItem = gPkgInfo.FileAt(i);
@@ -363,27 +384,7 @@ InstallEngine::DoInstall(void)
 				}
 			}
 			
-			BString cookedPath(gPkgInfo.GetPath().ResolveToString());
-			if (installVol.Device() != bootVol.Device())
-			{
-				if (cookedPath.FindFirst("boot") == 1)
-				{
-					STRACE(1,("Original file install path: %s\n", cookedPath.String()));
-					cookedPath.ReplaceFirst("boot",installVolName.String());
-					STRACE(1,("Updated file install path: %s\n", cookedPath.String()));
-				}
-			}
-			
-			// Figure the actual destination path
-			DPath destpath(cookedPath.String());
-			
-			if (gPkgInfo.GetInstallFolderName() && strlen(gPkgInfo.GetInstallFolderName()) > 0)
-			{
-				destpath.Append(gPkgInfo.GetInstallFolderName());
-				STRACE(1,("Final file install path: %s\n", destpath.GetFullPath()));
-			}
-			
-			status = InstallFromZip(zipfilepath.GetFullPath(),fileItem,destpath.GetFullPath());
+			status = InstallFromZip(zipfilepath.GetFullPath(),fileItem,pkgInstallPath.GetFullPath());
 			if (status != B_OK)
 				break;
 			
@@ -464,7 +465,7 @@ InstallEngine::DoInstall(void)
 
 
 status_t
-InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *dest)
+InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *pkgPath)
 {
 	//	3a) Create directory, if needed
 	//	3b) Move File
@@ -472,7 +473,13 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	BString msg;
 	
 	// 1) Check if the file already exists
-	DPath destpath(dest);
+	DPath destpath;
+	
+	if (src->GetPath().ResolveToConstant() == M_INSTALL_DIRECTORY)
+		destpath.SetTo(pkgPath);
+	else
+		destpath.SetTo(src->GetPath(gTargetPlatform).ResolveToString());
+		
 	destpath.Append(src->GetName());
 	
 	if (BEntry(destpath.GetFullPath()).Exists())
@@ -508,7 +515,7 @@ InstallEngine::InstallFromZip(const char *zipfile, FileItem *src, const char *de
 	// 3) Extract file to the destination
 	BString command;
 	command << "unzip -o '" << zipfile << "' '" << src->GetName() << "' -d '" 
-			<< dest << "' > /dev/null";
+			<< destpath.GetFullPath() << "' > /dev/null";
 	STRACE(1,("Unzip command: %s\n", command.String()));
 	system(command.String());
 	

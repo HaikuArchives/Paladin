@@ -1,7 +1,7 @@
 TODO:
-Add pkgversion to setpkginfo command
+Figure out the command-line interface considering how zip doesn't do well with the .sfx format.
 
-Convert addfile-specified paths into proper relative paths in the package info
+Add pkgversion to setpkginfo command
 
 Fix command-line interface to work properly, especially install paths
 

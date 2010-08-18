@@ -1,12 +1,14 @@
 #include "CommandLine.h"
 
 #include <Application.h>
+#include <Entry.h>
 #include <Mime.h>
 #include <Resources.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <TypeConstants.h>
 
+#include "DPath.h"
 #include "Globals.h"
 
 static PackageInfo sPkgInfo;
@@ -290,7 +292,6 @@ MakePackage(BObjectList<BString> &args)
 	
 	file.Unset();
 	sPkgInfo.SaveToFile(pkgPath.String());
-	
 }
 
 
@@ -654,6 +655,21 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		return;
 	}
 	
+	BEntry entry(filepath.String());
+	DPath dpath;
+	if (!entry.Exists())
+	{
+		printf("Can't locate %s\n",filepath.String());
+		return;
+	}
+	else
+	{
+		entry_ref ref;
+		entry.GetRef(&ref);
+		dpath.SetTo(ref);
+		filepath = dpath.GetFileName();
+	}
+	
 	item->SetName(filepath.String());
 	STRACE(("Setting path: %s\n", installfolder.String()));
 	item->SetPath(installfolder.String());
@@ -721,6 +737,8 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		printf("Couldn't update the package info.\n");
 		gReturnValue = -4;
 	}
+	
+	// Add the file to the actual package file
 }
 
 

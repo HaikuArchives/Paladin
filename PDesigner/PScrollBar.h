@@ -1,6 +1,8 @@
 #ifndef PSCROLLBAR_H
 #define PSCROLLBAR_H
 
+#include "PView.h"
+
 /*
 	Scrollbar Properties:
 		LargeStep

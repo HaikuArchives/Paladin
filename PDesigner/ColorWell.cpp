@@ -530,7 +530,7 @@ ColorWellEditor::MessageReceived(BMessage *msg)
 			rgb_color col = fEditor->ValueAsColor();
 			BMessage colormsg(M_SET_COLOR);
 			colormsg.AddData("color",B_RGB_COLOR_TYPE,(const void *)&col,sizeof(rgb_color));
-			fTarget.SendMessage(colormsg);
+			fTarget.SendMessage(&colormsg);
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}

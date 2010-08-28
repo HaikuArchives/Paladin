@@ -240,7 +240,7 @@ PObject::AddProperty(PProperty *p, uint32 flags, int32 index)
 	if (!p)
 		return false;
 	
-	if (FindProperty(p->GetName()) && (FlagsForProperty(p) & PROPERTY_ALLOW_MULTIPLE == 0))
+	if (FindProperty(p->GetName()) && ((FlagsForProperty(p) & PROPERTY_ALLOW_MULTIPLE) == 0))
 		return false;
 	
 	if (index >= 0)

@@ -3,6 +3,8 @@
 #include <Window.h>
 #include <stdio.h>
 
+#include "EnumProperty.h"
+
 /*
 	ScrollBar Properties:
 		LargeStep

@@ -216,7 +216,7 @@ WindowFlagsProperty::Init(void)
 	AddValuePair("Accept First Click",B_WILL_ACCEPT_FIRST_CLICK);
 	AddValuePair("Outline Resize",B_OUTLINE_RESIZE);
 	AddValuePair("Asynchronous Controls",B_ASYNCHRONOUS_CONTROLS);
-	AddValuePair("Views Can Overlap",B_VIEWS_CAN_OVERLAP);
+//	AddValuePair("Views Can Overlap",B_VIEWS_CAN_OVERLAP);
 	AddValuePair("No Workspace Activation",B_NO_WORKSPACE_ACTIVATION);
 	AddValuePair("Not Anchored on Activate",B_NOT_ANCHORED_ON_ACTIVATE);
 }

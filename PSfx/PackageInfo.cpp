@@ -706,6 +706,8 @@ PackageInfo::ParsePackageInfo(BString str)
 					fileItem->SetInstalledName(value.String());
 				else if (key.ICompare("INSTALLFOLDER") == 0)
 					fileItem->SetPath(value.String());
+				else if (key.ICompare("REF") == 0)
+					fileItem->SetRef(value.String());
 				else if (key.ICompare("LINK") == 0)
 					fileItem->AddLink(value.String());
 				else if (key.ICompare("CATEGORY") == 0)

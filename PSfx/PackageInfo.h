@@ -88,7 +88,7 @@ public:
 	int32					CountDependencies(void) const;
 	DepItem *				DependencyAt(int32 index);
 	
-	BString					MakeInfo(void);
+	BString					MakeInfo(bool asPFX = false);
 	void					PrintInfo(FILE *fd);
 	void					PrintToStream(void);
 	void					DumpInfo(void);

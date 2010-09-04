@@ -1,6 +1,7 @@
 #include "FileItem.h"
 
 #include <OS.h>
+#include <Path.h>
 #include <stdio.h>
 
 #include "Globals.h"
@@ -45,6 +46,35 @@ void
 FileItem::SetInstalledName(const char *name)
 {
 	fInstalledName = name;
+}
+
+
+entry_ref
+FileItem::GetRef(void) const
+{
+	return fRef;
+}
+
+
+void
+FileItem::SetRef(const entry_ref &ref)
+{
+	fRef = ref;
+}
+
+
+status_t
+FileItem::SetRef(const char *path)
+{
+	BEntry entry(path);
+	if (!entry.Exists())
+		return B_ERROR;
+	
+	if (entry.InitCheck() != B_OK)
+		return entry.InitCheck();
+	
+	entry.GetRef(&fRef);
+	return B_OK;
 }
 
 
@@ -343,11 +373,17 @@ FileItem::GetReplaceMode(void) const
 
 
 BString
-FileItem::MakeInfo(void)
+FileItem::MakeInfo(bool getRefs)
 {
 	BString out;
 	
 	out << "FILE=%s" << GetName() << "\n";
+	
+	if (getRefs)
+	{
+		BPath path (&fRef);
+		out << "\tREF=" << path.Path() << "\n";
+	}
 	
 	if (fInstalledName.CountChars() > 0)
 		out << "\tINSTALLEDNAME=" << GetInstalledName() << "\n";

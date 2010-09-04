@@ -52,7 +52,7 @@ void
 PrintUsage(void)
 {
 	printf("Usage:\n"
-			"PSfx <packagepath> <mode> <arguments>\n"
+			"PSfx <mode> <packagepath> <arguments>\n"
 			"PSfx --help,-h: Shows this message\n"
 			"PSfx showhelp: Shows comprehensive help information\n");
 }
@@ -66,45 +66,45 @@ PrintHelp(void)
 		"PSfx --help: Shows this message\n"
 		"PSfx -h: Shows this message\n"
 		"PSfx showhelp: Shows comprehensive help information\n"
-		"PSfx <packagepath> <mode> <arguments>\n"
+		"PSfx <mode> <packagepath> <arguments>\n"
 		"\n"
 		"To create a package or edit a package's general information:\n"
-		"PSfx <packagepath> makepkg [zeta|haiku|haikugcc4]\n"
+		"PSfx makepkg <packagepath> [zeta|haiku|haikugcc4]\n"
 		"\n"
 		"To edit a package's general information:\n"
-		"PSfx <packagepath> setpkginfo appname=<name> appversion=<version>\n"
+		"PSfx setpkginfo <packagepath> appname=<name> appversion=<version>\n"
 		"    author=<authorname> [authorcontact=<authoremail>] [releasedate=<date>]\n"
 		"    [installfolder=<path>] [createfoldername=<foldername>] [url=<url>]\n"
 		"\n"
 		"To add a package dependency:\n"
-		"PSfx <packagepath> adddep <depname> file <path> [url]\n"
-		"PSfx <packagepath> adddep <depname> library <libraryname> [url]\n"
+		"PSfx adddep <packagepath> <depname> file <path> [url]\n"
+		"PSfx adddep <packagepath> <depname> library <libraryname> [url]\n"
 		"\n"
 		"To edit an existing package dependency:\n"
-		"PSfx <packagepath> setdep <depname> file <path> [url]\n"
-		"PSfx <packagepath> setdep <depname> library <libraryname> [url]\n"
+		"PSfx setdep <packagepath> <depname> file <path> [url]\n"
+		"PSfx setdep <packagepath> <depname> library <libraryname> [url]\n"
 		"\n"
 		"To remove a package dependency:\n"
-		"PSfx <packagepath> deldep <depname>\n"
+		"PSfx deldep <packagepath> <depname>\n"
 		"\n"
 		"To add a file to the package:\n"
-		"PSfx <packagepath> addfile <path> <installfolder> [category=<categoryname>]\n"
+		"PSfx addfile <packagepath> <path> <installfolder> [category=<categoryname>]\n"
 		"    [platform=<platformname>] [group=<groupname>]\n"
 		"    [link=<path> [link=<path>]...]\n"
 		"\n"
 		"To change information for a file in the package:\n"
-		"PSfx <packagepath> setfile <name> [installfolder=<installfolder>]"
+		"PSfx setfile <packagepath> <filename> [installfolder=<installfolder>]"
 		"    [category=<categoryname>] [platform=<platformname>]\n"
 		"    [group=<groupname>] [link1=<path> [link2=<path>]...]\n"
 		"\n"
 		"To remove a package file:\n"
-		"PSfx <packagepath> delfile <filename>\n"
+		"PSfx delfile <packagepath> <filename>\n"
 		"\n"
 		"To display package information:\n"
-		"PSfx <packagepath> showpkginfo\n"
+		"PSfx showpkginfo <packagepath>\n"
 		"\n"
 		"To display extended package information:\n"
-		"PSfx <packagepath> dumppkg\n"
+		"PSfx dumppkg <packagepath>\n"
 		"\n"
 		"For detailed information on each command, see the PSfx documention\n");
 }
@@ -187,36 +187,36 @@ DoCommandLine(void)
 	BString *argone = gArgList.ItemAt(0);
 	BString *argtwo = gArgList.ItemAt(1);
 	
-	if (argtwo->ICompare("makepkg") == 0)
+	if (argone->ICompare("makepkg") == 0)
 	{
 		MakePackage(gArgList);
 		return;
 	}
 	
-	if (sPkgInfo.LoadFromFile(argone->String()) != B_OK)
+	if (sPkgInfo.LoadFromFile(argtwo->String()) != B_OK)
 	{
 		printf("Couldn't load package %s\n", argone->String());
 		gReturnValue = -1;
 		return;
 	}
 	
-	if (argtwo->ICompare("addfile") == 0)
+	if (argone->ICompare("addfile") == 0)
 		AddFile(gArgList);
-	else if (argtwo->ICompare("setfile") == 0)
+	else if (argone->ICompare("setfile") == 0)
 		SetFile(gArgList);
-	else if (argtwo->ICompare("delfile") == 0)
+	else if (argone->ICompare("delfile") == 0)
 		RemoveFile(gArgList);
-	else if (argtwo->ICompare("adddep") == 0)
+	else if (argone->ICompare("adddep") == 0)
 		AddDependency(gArgList);
-	else if (argtwo->ICompare("setdep") == 0)
+	else if (argone->ICompare("setdep") == 0)
 		SetDependency(gArgList);
-	else if (argtwo->ICompare("deldep") == 0)
+	else if (argone->ICompare("deldep") == 0)
 		RemoveDependency(gArgList);
-	else if (argtwo->ICompare("setpkginfo") == 0)
+	else if (argone->ICompare("setpkginfo") == 0)
 		SetPackageInfo(gArgList);
-	else if (argtwo->ICompare("showpkginfo") == 0)
+	else if (argone->ICompare("showpkginfo") == 0)
 		sPkgInfo.PrintToStream();
-	else if (argtwo->ICompare("dumppkg") == 0)
+	else if (argone->ICompare("dumppkg") == 0)
 		sPkgInfo.DumpInfo();
 }
 
@@ -224,7 +224,7 @@ DoCommandLine(void)
 void
 MakePackage(BObjectList<BString> &args)
 {
-	BString pkgPath(args.ItemAt(0)->String());
+	BString pkgPath(args.ItemAt(1)->String());
 	
 	BString stubName("installstub");
 	
@@ -232,13 +232,13 @@ MakePackage(BObjectList<BString> &args)
 	{
 		// Platform has been specified. If it's not one of the ones
 		// required, bomb out.
-		if (args.ItemAt(1)->ICompare("zeta") == 0)
+		if (args.ItemAt(2)->ICompare("zeta") == 0)
 			stubName << ".zeta";
 		else
-		if (args.ItemAt(1)->ICompare("haiku") == 0)
+		if (args.ItemAt(2)->ICompare("haiku") == 0)
 			stubName << ".haiku.gcc2";
 		else
-		if (args.ItemAt(1)->ICompare("HaikuGCC4") == 0)
+		if (args.ItemAt(2)->ICompare("HaikuGCC4") == 0)
 			stubName << ".haiku.gcc4";
 		else
 		{
@@ -312,7 +312,7 @@ SetPackageInfo(BObjectList<BString> &args)
 			url;
 	time_t	releasedate = 0;
 	
-	pkgpath = *args.ItemAt(0);
+	pkgpath = *args.ItemAt(1);
 	// arg[1] == 'setpkginfo' command
 	for (int32 i = 2; i < args.CountItems(); i++)
 	{
@@ -414,8 +414,8 @@ AddDependency(BObjectList<BString> &args)
 	if (args.CountItems() < 5 || args.CountItems() > 6)
 	{
 		printf("Adding a dependency:\n"
-				"PSfx <packagepath> adddep <depname> file <path> [url]\n"
-				"PSfx <packagepath> adddep <depname> library <libraryname> [url]\n");
+				"PSfx adddep <packagepath> <depname> file <path> [url]\n"
+				"PSfx adddep <packagepath> <depname> library <libraryname> [url]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -433,8 +433,8 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 	if (args.CountItems() < 5 || args.CountItems() > 6)
 	{
 		printf("Editing a dependency:\n"
-				"PSfx <packagepath> setdep <depname> file <path> [url]\n"
-				"PSfx <packagepath> setdep <depname> library <libraryname> [url]\n");
+				"PSfx setdep <packagepath> <depname> file <path> [url]\n"
+				"PSfx setdep <packagepath> <depname> library <libraryname> [url]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -484,10 +484,10 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 void
 RemoveDependency(BObjectList<BString> &args)
 {
-//	"PSfx <packagepath> deldep <depname>\n"
+//	"PSfx deldep <packagepath> <depname>\n"
 	if (args.CountItems() != 3)
 	{
-		printf("Deleting a dependency: PSfx <packagepath> deldep <depname>\n");
+		printf("Deleting a dependency: PSfx deldep <packagepath> <depname>\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -531,7 +531,7 @@ AddFile(BObjectList<BString> &args)
 	if (args.CountItems() < 3)
 	{
 		printf("To add a file to the package:\n"
-			"PSfx <packagepath> addfile <path> [installfolder=<installfolder>] "
+			"PSfx addfile <packagepath> <filepath> [installfolder=<installfolder>] "
 			"[category=<categoryname>] [platform=<platformname>]\n"
 			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
 		gReturnValue = -1;
@@ -553,7 +553,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	if (args.CountItems() < 3)
 	{
 		printf("To edit an existing file entry in the package:\n"
-			"PSfx <packagepath> setfile <path> [installfolder=<installfolder>] "
+			"PSfx setfile <packagepath> <filepath> [installfolder=<installfolder>] "
 			"[category=<categoryname>] [platform=<platformname>]\n"
 			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
 		gReturnValue = -1;
@@ -594,7 +594,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	
 	BObjectList<BString> linklist(20,true);
 	
-	pkgpath = *args.ItemAt(0);
+	pkgpath = *args.ItemAt(1);
 	// arg[1] == 'setpkginfo' command
 	filepath = *args.ItemAt(2);
 	
@@ -745,11 +745,11 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 void
 RemoveFile(BObjectList<BString> &args)
 {
-//	"PSfx <packagepath> delfile <filename>\n"
+//	"PSfx delfile <packagepath> <filename>\n"
 	if (args.CountItems() != 3)
 	{
 		printf("Deleting a file entry:\n"
-				"PSfx <packagepath> delfile <filename>\n");
+				"PSfx delfile <packagepath> <filename>\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -776,7 +776,7 @@ RemoveFile(BObjectList<BString> &args)
 		}
 	}
 	
-	BString pkgpath = *args.ItemAt(0);
+	BString pkgpath = *args.ItemAt(1);
 	sPkgInfo.RemoveFile(item);
 	
 	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)

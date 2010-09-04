@@ -377,7 +377,7 @@ PackageInfo::DependencyAt(int32 index)
 
 
 BString
-PackageInfo::MakeInfo(void)
+PackageInfo::MakeInfo(bool asPFX)
 {
 	BString out;
 	
@@ -408,7 +408,7 @@ PackageInfo::MakeInfo(void)
 	for (int32 i = 0; i < fFiles.CountItems(); i++)
 	{
 		FileItem *fileItem = fFiles.ItemAt(i);
-		out << fileItem->MakeInfo();
+		out << fileItem->MakeInfo(asPFX);
 	}
 	return out;
 }

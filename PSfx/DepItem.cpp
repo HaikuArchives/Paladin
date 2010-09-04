@@ -112,7 +112,7 @@ DepItem::MakeInfo(void)
 	if (fType != DEP_LIBRARY)
 		out << "\tPATH=" << fPath.Path() << "\n";
 	if (fURL.CountChars() > 0)
-		out << "\tDEPURL=" << fURL << "\n\n";
+		out << "\tDEPURL=" << fURL << "\n";
 	return out;
 }
 

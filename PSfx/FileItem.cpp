@@ -377,11 +377,11 @@ FileItem::MakeInfo(bool getRefs)
 {
 	BString out;
 	
-	out << "FILE=%s" << GetName() << "\n";
+	out << "FILE=" << GetName() << "\n";
 	
 	if (getRefs)
 	{
-		if (strlen(fRef.name) > 0)
+		if (fRef.name && strlen(fRef.name) > 0)
 		{
 			BPath path (&fRef);
 			out << "\tREF=" << path.Path() << "\n";
@@ -390,7 +390,7 @@ FileItem::MakeInfo(bool getRefs)
 	
 	if (fInstalledName.CountChars() > 0)
 		out << "\tINSTALLEDNAME=" << GetInstalledName() << "\n";
-	if (fCategory.CountChars() > 0)
+	if (fCategory.CountChars() > 0 && CountLinks() > 0)
 		out << "\tCATEGORY=" << GetCategory() << "\n";
 	
 	int32 i;
@@ -458,8 +458,19 @@ FileItem::PrintToStream(int8 indent)
 	BString out;
 	out << tabstr << "File: " << GetName() << "\n";
 	tabstr << "\t";
-	out << tabstr << "Installed Name: " << GetInstalledName() << "\n"
-		<< tabstr << "Path: " << fPath.Path() << "\n"
+	
+	if (GetInstalledName() && strlen(GetInstalledName()) > 0)
+		out << tabstr << "Installed Name: " << GetInstalledName() << "\n";
+	else
+		out << tabstr << "Installed Name: " << GetName() << "\n";
+	
+	if (fRef.name && strlen(fRef.name) > 0)
+	{
+		BPath path(&fRef);
+		out << tabstr << "Ref Path: " << path.Path() << "\n";
+	}
+	
+	out << tabstr << "Path: " << fPath.Path() << "\n"
 		<< tabstr << "Category: " << GetCategory() << "\n";
 	
 	if (CountGroups() == 0)

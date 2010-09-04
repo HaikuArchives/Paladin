@@ -448,7 +448,6 @@ PackageInfo::MakeInfo(bool asPFX)
 
 	for (int32 i = 0; i < fFiles.CountItems(); i++)
 	{
-printf("index %d\n", i);
 		FileItem *fileItem = fFiles.ItemAt(i);
 		if (fileItem)
 			out << fileItem->MakeInfo(asPFX);
@@ -541,16 +540,16 @@ PackageInfo::DumpInfo(void)
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
-	for (int32 i = 0; i < fFiles.CountItems(); i++)
-	{
-		FileItem *fileItem = fFiles.ItemAt(i);
-		fileItem->PrintToStream();
-	}
-	
 	for (int32 i = 0; i < fDeps.CountItems(); i++)
 	{
 		DepItem *depItem = fDeps.ItemAt(i);
 		depItem->PrintToStream();
+	}
+	
+	for (int32 i = 0; i < fFiles.CountItems(); i++)
+	{
+		FileItem *fileItem = fFiles.ItemAt(i);
+		fileItem->PrintToStream();
 	}
 }
 

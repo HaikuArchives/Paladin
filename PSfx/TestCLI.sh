@@ -8,6 +8,7 @@ PKGPATH=/boot/home/Desktop/calc.sfx
 PFXPATH=/boot/home/Desktop/calc.pfx
 
 rm -f $PFXPATH
+rm -f $PKGPATH
 
 # Set some information for the package
 PSfx setpkginfo $PFXPATH appname="Calc" appversion="1.0.0" author="CalcAuthor" authorcontact="authoremail@foo.com" releasedate="August 17, 2010" installfolder="/boot/apps" createfoldername="calc" url="http://darkwyrm.beemulated.net"
@@ -29,4 +30,10 @@ PSfx addfile $PFXPATH ../PInstallEngine/testdata/calc/calc.x86.proj
 PSfx addfile $PFXPATH ../PInstallEngine/testdata/calc/makefile
 PSfx addfile $PFXPATH ../PInstallEngine/testdata/calc/ReadMe.Calculator.txt
 
+PSfx setfile $PFXPATH calc.x86 installfolder=B_USER_DIRECTORY installedname=calc category=Accessories platform=Zeta group=Minimal,Full link=calc
+
+PSfx delfile $PFXPATH ReadMe.Calculator.txt
+
 PSfx dumppkg $PFXPATH
+
+PSfx makepkg $PFXPATH $PKGPATH

@@ -3,6 +3,7 @@
 #include <Application.h>
 #include <Entry.h>
 #include <Mime.h>
+#include <Path.h>
 #include <Resources.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,7 +70,7 @@ PrintHelp(void)
 		"PSfx <mode> <packagepath> <arguments>\n"
 		"\n"
 		"To create a package or edit a package's general information:\n"
-		"PSfx makepkg <packagepath> [zeta|haiku|haikugcc4]\n"
+		"PSfx makepkg <pfxpath> <packagepath> [zeta|haiku|haikugcc4]\n"
 		"\n"
 		"To edit a package's general information:\n"
 		"PSfx setpkginfo <pfxpath> appname=<name> appversion=<version>\n"
@@ -88,14 +89,16 @@ PrintHelp(void)
 		"PSfx deldep <pfxpath> <depname>\n"
 		"\n"
 		"To add a file to the package:\n"
-		"PSfx addfile <pfxpath> <path> <installfolder> [category=<categoryname>]\n"
+		"PSfx addfile <pfxpath> <filename> [installfolder=<installfolder>]"
+		"    [installedname=<installedname>] [category=<categoryname>]\n"
 		"    [platform=<platformname>] [group=<groupname>]\n"
-		"    [link=<path> [link=<path>]...]\n"
+		"    [link1=<path> [link2=<path>]...]\n"
 		"\n"
 		"To change information for a file in the package:\n"
 		"PSfx setfile <pfxpath> <filename> [installfolder=<installfolder>]"
-		"    [category=<categoryname>] [platform=<platformname>]\n"
-		"    [group=<groupname>] [link1=<path> [link2=<path>]...]\n"
+		"    [installedname=<installedname>] [category=<categoryname>]\n"
+		"    [platform=<platformname>] [group=<groupname>]\n"
+		"    [link1=<path> [link2=<path>]...]\n"
 		"\n"
 		"To remove a package file:\n"
 		"PSfx delfile <pfxpath> <filename>\n"
@@ -187,12 +190,6 @@ DoCommandLine(void)
 	BString *argone = gArgList.ItemAt(0);
 	BString *argtwo = gArgList.ItemAt(1);
 	
-	if (argone->ICompare("makepkg") == 0)
-	{
-		MakePackage(gArgList);
-		return;
-	}
-	
 	if (sPkgInfo.LoadFromFile(argtwo->String()) != B_OK)
 	{
 		if (argone->ICompare("setpkginfo") != 0)
@@ -219,6 +216,8 @@ DoCommandLine(void)
 		SetPackageInfo(gArgList);
 	else if (argone->ICompare("showpkginfo") == 0)
 		sPkgInfo.PrintToStream();
+	else if (argone->ICompare("makepkg") == 0)
+		MakePackage(gArgList);
 	else if (argone->ICompare("dumppkg") == 0)
 		sPkgInfo.DumpInfo();
 }
@@ -330,7 +329,7 @@ SetPackageInfo(BObjectList<BString> &args)
 	if (url.CountChars() > 0)
 		sPkgInfo.SetAuthorURL(url.String());
 	
-	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
+	if (sPkgInfo.SaveToFile(pkgpath.String(), true) != B_OK)
 	{
 		printf("Couldn't update the package info.\n");
 		gReturnValue = -4;
@@ -403,7 +402,7 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 	else
 		item->SetURL("");
 	
-	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
+	if (sPkgInfo.SaveToFile(pkgpath.String(), true) != B_OK)
 	{
 		printf("Couldn't update the package info.\n");
 		gReturnValue = -4;
@@ -447,7 +446,7 @@ RemoveDependency(BObjectList<BString> &args)
 	BString pkgpath = *args.ItemAt(1);
 	sPkgInfo.RemoveDependency(item);
 	
-	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
+	if (sPkgInfo.SaveToFile(pkgpath.String(), true) != B_OK)
 	{
 		printf("Couldn't update the package info.\n");
 		gReturnValue = -4;
@@ -485,7 +484,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		printf("To edit an existing file entry in the package:\n"
 			"PSfx setfile <pfxpath> <filepath> [installfolder=<installfolder>] "
 			"[category=<categoryname>] [platform=<platformname>]\n"
-			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
+			"[group=<groupname>] [link=<path> [link=<path>]...]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -493,8 +492,10 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	BString filename(args.ItemAt(2)->String());
 	STRACE(("File name: %s\n", filename.String()));
 	
+	bool setmode = false;
 	if (!item)
 	{
+		setmode = true;
 		for (int32 i = 0; i < sPkgInfo.CountFiles(); i++)
 		{
 			FileItem *file = sPkgInfo.FileAt(i);
@@ -518,6 +519,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	BString	pkgpath,
 			filepath,
 			installfolder,
+			installedname,
 			category,
 			platform,
 			group;
@@ -549,6 +551,11 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		{
 			STRACE(("install folder: %s\n", value.String()));
 			installfolder = value;
+		}
+		else if (key.ICompare("installedname") == 0)
+		{
+			STRACE(("installed name: %s\n", value.String()));
+			installedname = value;
 		}
 		else if (key.ICompare("category") == 0)
 		{
@@ -585,9 +592,10 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		return;
 	}
 	
-	BEntry entry(filepath.String());
+	BPath resolvedPath(filepath.String());
+	BEntry entry(resolvedPath.Path());
 	DPath dpath;
-	if (!entry.Exists())
+	if (!entry.Exists() && !setmode)
 	{
 		printf("Can't locate %s\n",filepath.String());
 		return;
@@ -601,9 +609,12 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	}
 	
 	item->SetName(filepath.String());
-	STRACE(("Setting path: %s\n", installfolder.String()));
-	item->SetRef(filepath.String());
+	STRACE(("Setting install path: %s\n", installfolder.String()));
+	item->SetRef(args.ItemAt(2)->String());
 	item->SetPath(installfolder.String());
+	
+	if (installedname.CountChars() > 0)
+		item->SetInstalledName(installedname.String());
 	
 	if (category.CountChars() > 0)
 		item->SetCategory(category.String());
@@ -663,7 +674,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 		}
 	}
 	
-	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
+	if (sPkgInfo.SaveToFile(pkgpath.String(), true) != B_OK)
 	{
 		printf("Couldn't update the package info.\n");
 		gReturnValue = -4;
@@ -707,10 +718,10 @@ RemoveFile(BObjectList<BString> &args)
 		}
 	}
 	
-	BString pkgpath = *args.ItemAt(1);
 	sPkgInfo.RemoveFile(item);
-	
-	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
+		
+	BString pkgpath = *args.ItemAt(1);
+	if (sPkgInfo.SaveToFile(pkgpath.String(), true) != B_OK)
 	{
 		printf("Couldn't update the package info.\n");
 		gReturnValue = -4;
@@ -721,11 +732,12 @@ RemoveFile(BObjectList<BString> &args)
 void
 MakePackage(BObjectList<BString> &args)
 {
-	BString pkgPath(args.ItemAt(1)->String());
+	BString pfxPath(args.ItemAt(1)->String());
+	BString pkgPath(args.ItemAt(2)->String());
 	
 	BString stubName("installstub");
 	
-	if (args.CountItems() == 3)
+	if (args.CountItems() == 4)
 	{
 		// Platform has been specified. If it's not one of the ones
 		// required, bomb out.
@@ -761,8 +773,8 @@ MakePackage(BObjectList<BString> &args)
 	int32 id;
 	if (!res->GetResourceInfo(B_RAW_TYPE, stubName.String(), &id, &size))
 	{
-		printf("PSfx has been corrupted and can no longer create new packages. You can, "
-				"however, edit existing ones. Reinstalling PSfx would be a good idea.\n");
+		printf("PSfx has been corrupted and can no longer create new packages. "
+				"Reinstalling PSfx would be a good idea at this point.\n");
 		gReturnValue = -2;
 		return;
 	}
@@ -779,15 +791,58 @@ MakePackage(BObjectList<BString> &args)
 		return;
 	}
 	
+	// Start package by saving the executable installer stub to the specified location
 	file.Write(installstub,size);
 	
 	mode_t permissions;
 	file.GetPermissions(&permissions);
 	file.SetPermissions(permissions | S_IXUSR | S_IXGRP | S_IXOTH);
 	
-	update_mime_info(pkgPath.String(), 0, 1, 0);
+	update_mime_info(pfxPath.String(), 0, 1, 0);
 	
 	file.Unset();
-	sPkgInfo.SaveToFile(pkgPath.String());
+	
+	// Now save the package info to the resources of the stub
+	sPkgInfo.SaveToResources(pfxPath.String(), true);
+	
+	// Now to generate the zip file for the package
+	printf("Processing package files\n");
+	BString zippath = "/tmp/PSfxFiles.";
+	zippath << real_time_clock_usecs() << ".zip";
+	BString command = "zip -9 -j ";
+	command << zippath << " ";
+	for (int32 i = 0; i < sPkgInfo.CountFiles(); i++)
+	{
+		FileItem *file = sPkgInfo.FileAt(i);
+		entry_ref ref = file->GetRef();
+		if (!ref.name || strlen(ref.name) < 1 || !BEntry(&ref).Exists())
+		{
+			printf("%s is missing. Aborting.\n", file->GetName());
+			BEntry entry(pfxPath.String());
+			entry.Remove();
+			return;
+		}
+		
+		BPath path(&ref);
+		BString escapedPath = path.Path();
+		escapedPath.CharacterEscape("'", '\\');
+		command << "\"" << escapedPath << "\" ";
+	}
+	
+	printf("Zip command: %s\n", command.String());
+	system(command.String());
+	
+	BString escapedPath = pfxPath.String();
+	escapedPath.CharacterEscape("'", '\\');
+	command = "cat ";
+	command << zippath << " >> ";
+	command << "\"" << escapedPath << "\"";
+	
+	// Finally, tack the zip file's contents onto the end of the package file. This
+	// is how a self-extracting zipfile is created under Haiku and *NIX.
+	printf("Append command: %s\n", command.String());
+	system(command.String());
+	
+	BEntry(zippath.String()).Remove();
 }
 

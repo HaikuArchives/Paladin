@@ -1,10 +1,10 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#include <iostream.h>
+#include <iostream>
 #include <ctype.h>
 #include <string.h>
-
 #include <Alert.h>
 #include <Button.h>
+#include <Clipboard.h>
 #include <StringView.h>
 #include <Beep.h>
 #include <Dragger.h>
@@ -13,7 +13,6 @@
 
 #include "CalcView.h"
 #include "FrameView.h"
-
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	const int border = 8;
@@ -394,7 +393,7 @@ void CalcView::KeyDown(const char *bytes, int32 numBytes)
 			snooze(100000);
 			button->SetValue(0);
 			snooze(20000);
-			BMessage msg = button->Message();
+			BMessage msg(*button->Message());
 			SendKeystroke(msg.what);
 		}
 		else

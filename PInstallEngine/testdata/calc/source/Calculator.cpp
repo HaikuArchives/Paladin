@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#include <iostream.h>
+#include <iostream>
 
 #include <Alert.h>
 #include <Window.h>

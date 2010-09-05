@@ -1,7 +1,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #include <StorageKit.h>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 
 #include "Prefs.h"
 

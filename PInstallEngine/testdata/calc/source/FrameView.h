@@ -5,7 +5,7 @@
 #include <View.h>
 #endif
 
-class _EXPORT FrameView : public BView
+class FrameView : public BView
 {
 
 public:
@@ -14,12 +14,12 @@ public:
 
 				FrameView(BMessage *data);
 virtual status_t Archive(BMessage *msg, bool deep) const;
-static BArchivable *FrameView::Instantiate(BMessage *archive);
+static BArchivable *Instantiate(BMessage *archive);
 
 virtual	void	Draw(BRect updateRect);
 virtual	void	FrameResized(float new_width, float new_height);
 virtual void	AttachedToWindow();
-void FrameView::MouseDown(BPoint where);
+		void	MouseDown(BPoint where);
 
 void 			ColoringBasis(rgb_color view_color);
 

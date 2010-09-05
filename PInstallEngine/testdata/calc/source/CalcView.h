@@ -4,12 +4,13 @@
 
 #include <View.h>
 #include <Message.h>
+#include <StringView.h>
 #include "FrameView.h"
 #include "CalcEngine.h"
 
 
 
-class _EXPORT CalcView : public BView
+class CalcView : public BView
 {
 
 public:

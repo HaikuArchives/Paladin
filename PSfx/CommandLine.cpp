@@ -741,19 +741,35 @@ MakePackage(BObjectList<BString> &args)
 	BString pfxPath(args.ItemAt(1)->String());
 	BString pkgPath(args.ItemAt(2)->String());
 	
-	BString stubName("installstub");
+	BString platform;
 	
 	if (args.CountItems() == 4)
+		platform = args.ItemAt(3)->String();
+	
+	BuildPackage(pfxPath.String(), pkgPath.String(), platform.String());
+}
+
+
+void
+BuildPackage(const char *pfxpath, const char *pkgpath, const char *platformName)
+{
+	BString pfxPath(pfxpath);
+	BString pkgPath(pkgpath);
+	BString platform(platformName);
+	
+	BString stubName("installstub");
+	
+	if (platform.CountChars() > 0)
 	{
 		// Platform has been specified. If it's not one of the ones
 		// required, bomb out.
-		if (args.ItemAt(2)->ICompare("zeta") == 0)
+		if (platform.ICompare("zeta") == 0)
 			stubName << ".zeta";
 		else
-		if (args.ItemAt(2)->ICompare("haiku") == 0)
+		if (platform.ICompare("haiku") == 0)
 			stubName << ".haiku.gcc2";
 		else
-		if (args.ItemAt(2)->ICompare("HaikuGCC4") == 0)
+		if (platform.ICompare("HaikuGCC4") == 0)
 			stubName << ".haiku.gcc4";
 		else
 		{
@@ -851,4 +867,3 @@ MakePackage(BObjectList<BString> &args)
 	
 	BEntry(zippath.String()).Remove();
 }
-

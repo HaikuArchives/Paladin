@@ -125,6 +125,13 @@ MainWindow::MainWindow(void)
 	begin->MakeDefault(true);
 	
 	ResizeTo(Frame().Width(), begin->Frame().bottom + 10.0);
+
+	if (fGroupField)
+	{
+		BMenu *groupmenu = fGroupField->Menu();
+		if (groupmenu && groupmenu->FindMarked())
+			gPkgInfo.SetGroup(groupmenu->FindMarked()->Label());
+	}
 }
 
 

@@ -24,8 +24,10 @@ class PackageInfo
 {
 public:
 							PackageInfo(void);
-	status_t				LoadFromResources(void);
+	status_t				LoadFromSelf(void);
+	status_t				LoadFromResources(const char *path);
 	status_t				LoadFromFile(const char *path);
+	status_t				SaveToResources(const char *path, bool clobber = false);
 	status_t				SaveToFile(const char *path, bool clobber = false);
 	
 	// The package name is the name to be displayed to the user and doesn't necessarily

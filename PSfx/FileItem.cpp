@@ -381,8 +381,11 @@ FileItem::MakeInfo(bool getRefs)
 	
 	if (getRefs)
 	{
-		BPath path (&fRef);
-		out << "\tREF=" << path.Path() << "\n";
+		if (strlen(fRef.name) > 0)
+		{
+			BPath path (&fRef);
+			out << "\tREF=" << path.Path() << "\n";
+		}
 	}
 	
 	if (fInstalledName.CountChars() > 0)

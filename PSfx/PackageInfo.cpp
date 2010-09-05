@@ -27,7 +27,7 @@ PackageInfo::PackageInfo(void)
 
 
 status_t
-PackageInfo::LoadFromResources(void)
+PackageInfo::LoadFromSelf(void)
 {
 	MakeEmpty();
 	BResources *res = be_app->AppResources();
@@ -55,7 +55,7 @@ PackageInfo::LoadFromResources(void)
 }
 
 status_t
-PackageInfo::LoadFromFile(const char *path)
+PackageInfo::LoadFromResources(const char *path)
 {
 	BFile file(path,B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
@@ -89,7 +89,31 @@ PackageInfo::LoadFromFile(const char *path)
 
 
 status_t
-PackageInfo::SaveToFile(const char *path, bool clobber)
+PackageInfo::LoadFromFile(const char *path)
+{
+	BFile file(path,B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return file.InitCheck();
+	
+	MakeEmpty();
+	
+	off_t fileSize;
+	file.GetSize(&fileSize);
+	if (fileSize < 1)
+		return B_OK;
+	
+	BString stringData;
+	char *buffer = stringData.LockBuffer(fileSize + 1);
+	file.Read(buffer, fileSize);
+	buffer[fileSize] = '\0';
+	stringData.UnlockBuffer(fileSize + 1);
+	
+	return ParsePackageInfo(stringData);
+}
+
+
+status_t
+PackageInfo::SaveToResources(const char *path, bool clobber)
 {
 	int32 fileFlags = B_READ_WRITE | B_CREATE_FILE;
 	if (clobber)
@@ -105,6 +129,22 @@ PackageInfo::SaveToFile(const char *path, bool clobber)
 	BString info(MakeInfo());
 	res.AddResource(B_STRING_TYPE, 3, info.String(), info.Length(), "PkgInfo");
 	return res.Sync();
+}
+
+
+status_t
+PackageInfo::SaveToFile(const char *path, bool clobber)
+{
+	int32 fileFlags = B_READ_WRITE | B_CREATE_FILE;
+	if (clobber)
+		fileFlags |= B_ERASE_FILE;
+	BFile file(path,fileFlags);
+	if (file.InitCheck() != B_OK)
+		return file.InitCheck();
+	
+	BString info(MakeInfo(true));
+	file.Write(info.String(), info.Length());
+	return B_OK;
 }
 
 
@@ -402,13 +442,16 @@ PackageInfo::MakeInfo(bool asPFX)
 	for (int32 i = 0; i < fDeps.CountItems(); i++)
 	{
 		DepItem *depItem = fDeps.ItemAt(i);
-		out << depItem->MakeInfo();
+		if (depItem)
+			out << depItem->MakeInfo();
 	}
 
 	for (int32 i = 0; i < fFiles.CountItems(); i++)
 	{
+printf("index %d\n", i);
 		FileItem *fileItem = fFiles.ItemAt(i);
-		out << fileItem->MakeInfo(asPFX);
+		if (fileItem)
+			out << fileItem->MakeInfo(asPFX);
 	}
 	return out;
 }

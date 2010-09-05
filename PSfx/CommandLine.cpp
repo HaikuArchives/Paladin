@@ -72,39 +72,39 @@ PrintHelp(void)
 		"PSfx makepkg <packagepath> [zeta|haiku|haikugcc4]\n"
 		"\n"
 		"To edit a package's general information:\n"
-		"PSfx setpkginfo <packagepath> appname=<name> appversion=<version>\n"
+		"PSfx setpkginfo <pfxpath> appname=<name> appversion=<version>\n"
 		"    author=<authorname> [authorcontact=<authoremail>] [releasedate=<date>]\n"
 		"    [installfolder=<path>] [createfoldername=<foldername>] [url=<url>]\n"
 		"\n"
 		"To add a package dependency:\n"
-		"PSfx adddep <packagepath> <depname> file <path> [url]\n"
-		"PSfx adddep <packagepath> <depname> library <libraryname> [url]\n"
+		"PSfx adddep <pfxpath> <depname> file <path> [url]\n"
+		"PSfx adddep <pfxpath> <depname> library <libraryname> [url]\n"
 		"\n"
 		"To edit an existing package dependency:\n"
-		"PSfx setdep <packagepath> <depname> file <path> [url]\n"
-		"PSfx setdep <packagepath> <depname> library <libraryname> [url]\n"
+		"PSfx setdep <pfxpath> <depname> file <path> [url]\n"
+		"PSfx setdep <pfxpath> <depname> library <libraryname> [url]\n"
 		"\n"
 		"To remove a package dependency:\n"
-		"PSfx deldep <packagepath> <depname>\n"
+		"PSfx deldep <pfxpath> <depname>\n"
 		"\n"
 		"To add a file to the package:\n"
-		"PSfx addfile <packagepath> <path> <installfolder> [category=<categoryname>]\n"
+		"PSfx addfile <pfxpath> <path> <installfolder> [category=<categoryname>]\n"
 		"    [platform=<platformname>] [group=<groupname>]\n"
 		"    [link=<path> [link=<path>]...]\n"
 		"\n"
 		"To change information for a file in the package:\n"
-		"PSfx setfile <packagepath> <filename> [installfolder=<installfolder>]"
+		"PSfx setfile <pfxpath> <filename> [installfolder=<installfolder>]"
 		"    [category=<categoryname>] [platform=<platformname>]\n"
 		"    [group=<groupname>] [link1=<path> [link2=<path>]...]\n"
 		"\n"
 		"To remove a package file:\n"
-		"PSfx delfile <packagepath> <filename>\n"
+		"PSfx delfile <pfxpath> <filename>\n"
 		"\n"
 		"To display package information:\n"
-		"PSfx showpkginfo <packagepath>\n"
+		"PSfx showpkginfo <pfxpath>\n"
 		"\n"
 		"To display extended package information:\n"
-		"PSfx dumppkg <packagepath>\n"
+		"PSfx dumppkg <pfxpath>\n"
 		"\n"
 		"For detailed information on each command, see the PSfx documention\n");
 }
@@ -145,7 +145,7 @@ ProcessArgs(int argc, char **argv)
 		return false;
 	}
 	
-	arg = gArgList.ItemAt(1);
+	arg = gArgList.ItemAt(0);
 	
 	bool found = false;
 	i = 0;
@@ -195,9 +195,12 @@ DoCommandLine(void)
 	
 	if (sPkgInfo.LoadFromFile(argtwo->String()) != B_OK)
 	{
-		printf("Couldn't load package %s\n", argone->String());
-		gReturnValue = -1;
-		return;
+		if (argone->ICompare("setpkginfo") != 0)
+		{
+			printf("Couldn't load package %s\n", argtwo->String());
+			gReturnValue = -1;
+			return;
+		}
 	}
 	
 	if (argone->ICompare("addfile") == 0)
@@ -222,83 +225,9 @@ DoCommandLine(void)
 
 
 void
-MakePackage(BObjectList<BString> &args)
-{
-	BString pkgPath(args.ItemAt(1)->String());
-	
-	BString stubName("installstub");
-	
-	if (args.CountItems() == 3)
-	{
-		// Platform has been specified. If it's not one of the ones
-		// required, bomb out.
-		if (args.ItemAt(2)->ICompare("zeta") == 0)
-			stubName << ".zeta";
-		else
-		if (args.ItemAt(2)->ICompare("haiku") == 0)
-			stubName << ".haiku.gcc2";
-		else
-		if (args.ItemAt(2)->ICompare("HaikuGCC4") == 0)
-			stubName << ".haiku.gcc4";
-		else
-		{
-			printf("Platform must be Zeta, Haiku, or HaikuGCC4\n");
-			return;
-		}
-	}
-	else
-	{
-		if (gPlatformName.ICompare("Zeta") == 0)
-			stubName << ".zeta";
-		else
-		if (gPlatformName.ICompare("haiku") == 0)
-			stubName << ".haiku.gcc2";
-		else
-		if (gPlatformName.ICompare("HaikuGCC4") == 0)
-			stubName << ".haiku.gcc4";
-	}
-	
-	BResources *res = be_app->AppResources();
-	
-	size_t size;
-	int32 id;
-	if (!res->GetResourceInfo(B_RAW_TYPE, stubName.String(), &id, &size))
-	{
-		printf("PSfx has been corrupted and can no longer create new packages. You can, "
-				"however, edit existing ones. Reinstalling PSfx would be a good idea.\n");
-		gReturnValue = -2;
-		return;
-	}
-	
-	const int8 *installstub = (const int8 *)res->LoadResource(B_RAW_TYPE,id, &size);
-	BFile file(pkgPath.String(), B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
-	if (file.InitCheck() != B_OK)
-	{
-		if (file.InitCheck() == B_FILE_EXISTS)
-			printf("PSfx couldn't create a package because the file already exists.\n");
-		else
-			printf("PSfx couldn't create the package. Sorry.\n");
-		gReturnValue = -3;
-		return;
-	}
-	
-	file.Write(installstub,size);
-	
-	mode_t permissions;
-	file.GetPermissions(&permissions);
-	file.SetPermissions(permissions | S_IXUSR | S_IXGRP | S_IXOTH);
-	
-	update_mime_info(pkgPath.String(), 0, 1, 0);
-	
-	file.Unset();
-	sPkgInfo.SaveToFile(pkgPath.String());
-}
-
-
-void
 SetPackageInfo(BObjectList<BString> &args)
 {
-//		"PSfx setpkginfo <packagepath> appname=<name> appversion=<version>\n"
+//		"PSfx setpkginfo <pfxpath> appname=<name> appversion=<version>\n"
 //		"    author=<authorname> [authorcontact=<authoremail>] [releasedate=<date>]\n"
 //		"    [installfolder=<path>] [createfoldername=<foldername>] [url=<url>]\n"
 	BString	pkgpath,
@@ -312,8 +241,9 @@ SetPackageInfo(BObjectList<BString> &args)
 			url;
 	time_t	releasedate = 0;
 	
+	// arg[0] == 'setpkginfo' command
 	pkgpath = *args.ItemAt(1);
-	// arg[1] == 'setpkginfo' command
+	
 	for (int32 i = 2; i < args.CountItems(); i++)
 	{
 		BString *arg = args.ItemAt(i);
@@ -414,8 +344,8 @@ AddDependency(BObjectList<BString> &args)
 	if (args.CountItems() < 5 || args.CountItems() > 6)
 	{
 		printf("Adding a dependency:\n"
-				"PSfx adddep <packagepath> <depname> file <path> [url]\n"
-				"PSfx adddep <packagepath> <depname> library <libraryname> [url]\n");
+				"PSfx adddep <pfxpath> <depname> file <path> [url]\n"
+				"PSfx adddep <pfxpath> <depname> library <libraryname> [url]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -433,8 +363,8 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 	if (args.CountItems() < 5 || args.CountItems() > 6)
 	{
 		printf("Editing a dependency:\n"
-				"PSfx setdep <packagepath> <depname> file <path> [url]\n"
-				"PSfx setdep <packagepath> <depname> library <libraryname> [url]\n");
+				"PSfx setdep <pfxpath> <depname> file <path> [url]\n"
+				"PSfx setdep <pfxpath> <depname> library <libraryname> [url]\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -462,8 +392,8 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 	else
 		item->SetName(depname.String());
 	
-	BString pkgpath = *args.ItemAt(0);
-	// arg[1] == 'setdep' or 'adddep' command
+	// arg[0] == 'setdep' or 'adddep' command
+	BString pkgpath = *args.ItemAt(1);
 	
 	item->SetType(args.ItemAt(3)->String());
 	item->SetPath(args.ItemAt(4)->String());
@@ -484,10 +414,10 @@ SetDependency(BObjectList<BString> &args, DepItem *item)
 void
 RemoveDependency(BObjectList<BString> &args)
 {
-//	"PSfx deldep <packagepath> <depname>\n"
+//	"PSfx deldep <pfxpath> <depname>\n"
 	if (args.CountItems() != 3)
 	{
-		printf("Deleting a dependency: PSfx deldep <packagepath> <depname>\n");
+		printf("Deleting a dependency: PSfx deldep <pfxpath> <depname>\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -514,7 +444,7 @@ RemoveDependency(BObjectList<BString> &args)
 		}
 	}
 	
-	BString pkgpath = *args.ItemAt(0);
+	BString pkgpath = *args.ItemAt(1);
 	sPkgInfo.RemoveDependency(item);
 	
 	if (sPkgInfo.SaveToFile(pkgpath.String()) != B_OK)
@@ -531,7 +461,7 @@ AddFile(BObjectList<BString> &args)
 	if (args.CountItems() < 3)
 	{
 		printf("To add a file to the package:\n"
-			"PSfx addfile <packagepath> <filepath> [installfolder=<installfolder>] "
+			"PSfx addfile <pfxpath> <filename> [installfolder=<installfolder>] "
 			"[category=<categoryname>] [platform=<platformname>]\n"
 			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
 		gReturnValue = -1;
@@ -553,7 +483,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	if (args.CountItems() < 3)
 	{
 		printf("To edit an existing file entry in the package:\n"
-			"PSfx setfile <packagepath> <filepath> [installfolder=<installfolder>] "
+			"PSfx setfile <pfxpath> <filepath> [installfolder=<installfolder>] "
 			"[category=<categoryname>] [platform=<platformname>]\n"
 			"[group=<groupname>] [link1=<path> [link2=<path>]...]\n");
 		gReturnValue = -1;
@@ -594,8 +524,8 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	
 	BObjectList<BString> linklist(20,true);
 	
+	// arg[0] == 'setpkginfo' command
 	pkgpath = *args.ItemAt(1);
-	// arg[1] == 'setpkginfo' command
 	filepath = *args.ItemAt(2);
 	
 	for (int32 i = 3; i < args.CountItems(); i++)
@@ -672,6 +602,7 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 	
 	item->SetName(filepath.String());
 	STRACE(("Setting path: %s\n", installfolder.String()));
+	item->SetRef(filepath.String());
 	item->SetPath(installfolder.String());
 	
 	if (category.CountChars() > 0)
@@ -745,11 +676,11 @@ SetFile(BObjectList<BString> &args, FileItem *item)
 void
 RemoveFile(BObjectList<BString> &args)
 {
-//	"PSfx delfile <packagepath> <filename>\n"
+//	"PSfx delfile <pfxpath> <filename>\n"
 	if (args.CountItems() != 3)
 	{
 		printf("Deleting a file entry:\n"
-				"PSfx delfile <packagepath> <filename>\n");
+				"PSfx delfile <pfxpath> <filename>\n");
 		gReturnValue = -1;
 		return;
 	}
@@ -785,3 +716,78 @@ RemoveFile(BObjectList<BString> &args)
 		gReturnValue = -4;
 	}
 }
+
+
+void
+MakePackage(BObjectList<BString> &args)
+{
+	BString pkgPath(args.ItemAt(1)->String());
+	
+	BString stubName("installstub");
+	
+	if (args.CountItems() == 3)
+	{
+		// Platform has been specified. If it's not one of the ones
+		// required, bomb out.
+		if (args.ItemAt(2)->ICompare("zeta") == 0)
+			stubName << ".zeta";
+		else
+		if (args.ItemAt(2)->ICompare("haiku") == 0)
+			stubName << ".haiku.gcc2";
+		else
+		if (args.ItemAt(2)->ICompare("HaikuGCC4") == 0)
+			stubName << ".haiku.gcc4";
+		else
+		{
+			printf("Platform must be Zeta, Haiku, or HaikuGCC4\n");
+			return;
+		}
+	}
+	else
+	{
+		if (gPlatformName.ICompare("Zeta") == 0)
+			stubName << ".zeta";
+		else
+		if (gPlatformName.ICompare("haiku") == 0)
+			stubName << ".haiku.gcc2";
+		else
+		if (gPlatformName.ICompare("HaikuGCC4") == 0)
+			stubName << ".haiku.gcc4";
+	}
+	
+	BResources *res = be_app->AppResources();
+	
+	size_t size;
+	int32 id;
+	if (!res->GetResourceInfo(B_RAW_TYPE, stubName.String(), &id, &size))
+	{
+		printf("PSfx has been corrupted and can no longer create new packages. You can, "
+				"however, edit existing ones. Reinstalling PSfx would be a good idea.\n");
+		gReturnValue = -2;
+		return;
+	}
+	
+	const int8 *installstub = (const int8 *)res->LoadResource(B_RAW_TYPE,id, &size);
+	BFile file(pkgPath.String(), B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
+	if (file.InitCheck() != B_OK)
+	{
+		if (file.InitCheck() == B_FILE_EXISTS)
+			printf("PSfx couldn't create a package because the file already exists.\n");
+		else
+			printf("PSfx couldn't create the package. Sorry.\n");
+		gReturnValue = -3;
+		return;
+	}
+	
+	file.Write(installstub,size);
+	
+	mode_t permissions;
+	file.GetPermissions(&permissions);
+	file.SetPermissions(permissions | S_IXUSR | S_IXGRP | S_IXOTH);
+	
+	update_mime_info(pkgPath.String(), 0, 1, 0);
+	
+	file.Unset();
+	sPkgInfo.SaveToFile(pkgPath.String());
+}
+

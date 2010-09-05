@@ -76,6 +76,7 @@ PrintHelp(void)
 		"PSfx setpkginfo <pfxpath> appname=<name> appversion=<version>\n"
 		"    author=<authorname> [authorcontact=<authoremail>] [releasedate=<date>]\n"
 		"    [installfolder=<path>] [createfoldername=<foldername>] [url=<url>]\n"
+		"    [pkgversion=<version>]\n"
 		"\n"
 		"To add a package dependency:\n"
 		"PSfx adddep <pfxpath> <depname> file <path> [url]\n"
@@ -229,6 +230,7 @@ SetPackageInfo(BObjectList<BString> &args)
 //		"PSfx setpkginfo <pfxpath> appname=<name> appversion=<version>\n"
 //		"    author=<authorname> [authorcontact=<authoremail>] [releasedate=<date>]\n"
 //		"    [installfolder=<path>] [createfoldername=<foldername>] [url=<url>]\n"
+//		"	 [pkgversion=<version>]\n"
 	BString	pkgpath,
 			appname,
 			appversion,
@@ -237,7 +239,8 @@ SetPackageInfo(BObjectList<BString> &args)
 			releasedatestr,
 			installfolder,
 			createfoldername,
-			url;
+			url,
+			pkgversion;
 	time_t	releasedate = 0;
 	
 	// arg[0] == 'setpkginfo' command
@@ -299,6 +302,8 @@ SetPackageInfo(BObjectList<BString> &args)
 			createfoldername = value;
 		else if (key.ICompare("url") == 0)
 			url = value;
+		else if (key.ICompare("pkgversion") == 0)
+			pkgversion = value;
 		else
 		{
 			printf("Unrecognized option %s\n",arg->String());
@@ -328,6 +333,8 @@ SetPackageInfo(BObjectList<BString> &args)
 		sPkgInfo.SetInstallFolderName(createfoldername.String());
 	if (url.CountChars() > 0)
 		sPkgInfo.SetAuthorURL(url.String());
+	if (pkgversion.CountChars() > 0)
+		sPkgInfo.SetPackageVersion(pkgversion.String());
 	
 	if (sPkgInfo.SaveToFile(pkgpath.String(), true) != B_OK)
 	{
@@ -348,7 +355,6 @@ AddDependency(BObjectList<BString> &args)
 		gReturnValue = -1;
 		return;
 	}
-	
 	DepItem *item = new DepItem();
 	sPkgInfo.AddDependency(item);
 	
@@ -803,7 +809,7 @@ MakePackage(BObjectList<BString> &args)
 	file.Unset();
 	
 	// Now save the package info to the resources of the stub
-	sPkgInfo.SaveToResources(pfxPath.String(), true);
+	sPkgInfo.SaveToResources(pkgPath.String(), false);
 	
 	// Now to generate the zip file for the package
 	printf("Processing package files\n");
@@ -832,7 +838,7 @@ MakePackage(BObjectList<BString> &args)
 	printf("Zip command: %s\n", command.String());
 	system(command.String());
 	
-	BString escapedPath = pfxPath.String();
+	BString escapedPath = pkgPath.String();
 	escapedPath.CharacterEscape("'", '\\');
 	command = "cat ";
 	command << zippath << " >> ";

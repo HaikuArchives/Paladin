@@ -38,7 +38,7 @@ MainWindow::MainWindow(void)
 {
 	MakeCenteredOnShow(true);
 	
-	gPkgInfo.LoadFromResources();
+	gPkgInfo.LoadFromSelf();
 	
 	if (gDebugMode > 0)
 		gPkgInfo.DumpInfo();

@@ -38,8 +38,8 @@ public:
 	// This is a number set by the package maintainer, not from the resource data in the embedded
 	// app. This comes in particularly handy for those C libraries which have none of that useful
 	// version information nonsense
-	void					SetPackageVersion(float ver);
-	float					GetPackageVersion(void) const;
+	void					SetPackageVersion(const char *ver);
+	const char *			GetPackageVersion(void) const;
 	
 	PkgPath					GetPath(void) const;
 	void					SetPath(const PkgPath &path);
@@ -106,7 +106,7 @@ private:
 	status_t				ParsePackageInfo(BString str);
 	
 	BString					fName;
-	float					fPackageVersion;
+	BString					fPackageVersion;
 	time_t					fReleaseDate;
 	
 	PkgPath					fPath;

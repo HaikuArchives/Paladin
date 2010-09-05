@@ -11,7 +11,7 @@ rm -f $PFXPATH
 rm -f $PKGPATH
 
 # Set some information for the package
-PSfx setpkginfo $PFXPATH appname="Calc" appversion="1.0.0" author="CalcAuthor" authorcontact="authoremail@foo.com" releasedate="August 17, 2010" installfolder="/boot/apps" createfoldername="calc" url="http://darkwyrm.beemulated.net"
+PSfx setpkginfo $PFXPATH appname="Calc" appversion="1.0.0" author="CalcAuthor" authorcontact="authoremail@foo.com" releasedate="August 17, 2010" installfolder="/boot/apps" createfoldername="calc" url="http://darkwyrm.beemulated.net" pkgversion=1.1
 
 # We'll use rez and libcurl as fake dependencies for testing
 PSfx adddep $PFXPATH rez file /boot/home/config/bin foourl

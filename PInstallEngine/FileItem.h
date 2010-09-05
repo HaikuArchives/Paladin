@@ -1,6 +1,7 @@
 #ifndef FILEITEM_H
 #define FILEITEM_H
 
+#include <Entry.h>
 #include <stdio.h>
 #include <String.h>
 
@@ -30,6 +31,10 @@ public:
 			const char *	GetInstalledName(void) const;
 			void			SetInstalledName(const char *name);
 			
+			entry_ref		GetRef(void) const;
+			void			SetRef(const entry_ref &ref);
+			status_t		SetRef(const char *path);
+			
 			PkgPath			GetPath(ostype_t forPlatform = OS_NONE) const;
 			void			SetPath(const char *path);
 			void			SetPath(const PkgPath &path);
@@ -42,23 +47,26 @@ public:
 			bool			BelongsToGroup(const char *group);
 			int32			CountGroups(void) const;
 			const char *	GroupAt(int32 index);
+			BString			GroupString(void);
 
 			void			AddPlatform(ostype_t plat);
 			void			RemovePlatform(ostype_t plat);
 			bool			BelongsToPlatform(ostype_t plat);
 			int32			CountPlatforms(void) const;
 			ostype_t 		PlatformAt(int32 index);
+			BString			PlatformString(void);
 
 			void			AddLink(const char *link);
 			void			RemoveLink(const char *link);
 			bool			HasLink(const char *link);
 			int32			CountLinks(void) const;
 			const char *	LinkAt(int32 index);
+			BString			LinkString(void);
 			
 			void			SetReplaceMode(const int32 &mode);
 			int32			GetReplaceMode(void) const;
 			
-			BString			MakeInfo(void);
+			BString			MakeInfo(bool getRefs = false);
 			void			PrintToStream(int8 indent = 0);
 private:
 			BString *		FindItem(BObjectList<BString> &list,const char *string);
@@ -67,6 +75,8 @@ private:
 									fInstalledName;
 			
 			int32					fReplaceMode;
+			
+			entry_ref				fRef;
 			
 			PkgPath					fPath;
 			

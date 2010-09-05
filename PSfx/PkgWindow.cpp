@@ -569,7 +569,7 @@ PkgWindow::LoadProject(entry_ref ref)
 			item->SetCategory(value.c_str());
 		else
 		if (key == "PKGVERSION")
-			fPkgInfo.SetPackageVersion((float)atof(value.c_str()));
+			fPkgInfo.SetPackageVersion(value.c_str());
 		else
 		if (key == "PKGNAME")
 			fPkgInfo.SetName(value.c_str());
@@ -610,10 +610,7 @@ PkgWindow::SaveProject(const char *path)
 {
 	BString out;
 	
-	char buffer[32];
-	sprintf(buffer,"%.1f",fPkgInfo.GetPackageVersion());
-	
-	out << "PKGVERSION=" << buffer << "\n";
+	out << "PKGVERSION=" << fPkgInfo.GetPackageVersion() << "\n";
 	
 	DPath filePath(path);
 	if (!fPkgInfo.GetName() || strlen(fPkgInfo.GetName()) < 1)

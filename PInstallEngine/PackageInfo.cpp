@@ -11,7 +11,7 @@
 #include "Globals.h"
 
 PackageInfo::PackageInfo(void)
-	:	fPackageVersion(1.0),
+	:	fPackageVersion("1.0"),
 		fReleaseDate(real_time_clock()),
 		fPath("B_APPS_DIRECTORY"),
 		fShowChooser(false),
@@ -27,7 +27,7 @@ PackageInfo::PackageInfo(void)
 
 
 status_t
-PackageInfo::LoadFromResources(void)
+PackageInfo::LoadFromSelf(void)
 {
 	MakeEmpty();
 	BResources *res = be_app->AppResources();
@@ -55,7 +55,7 @@ PackageInfo::LoadFromResources(void)
 }
 
 status_t
-PackageInfo::LoadFromFile(const char *path)
+PackageInfo::LoadFromResources(const char *path)
 {
 	BFile file(path,B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
@@ -89,7 +89,31 @@ PackageInfo::LoadFromFile(const char *path)
 
 
 status_t
-PackageInfo::SaveToFile(const char *path, bool clobber)
+PackageInfo::LoadFromFile(const char *path)
+{
+	BFile file(path,B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return file.InitCheck();
+	
+	MakeEmpty();
+	
+	off_t fileSize;
+	file.GetSize(&fileSize);
+	if (fileSize < 1)
+		return B_OK;
+	
+	BString stringData;
+	char *buffer = stringData.LockBuffer(fileSize + 1);
+	file.Read(buffer, fileSize);
+	buffer[fileSize] = '\0';
+	stringData.UnlockBuffer(fileSize + 1);
+	
+	return ParsePackageInfo(stringData);
+}
+
+
+status_t
+PackageInfo::SaveToResources(const char *path, bool clobber)
 {
 	int32 fileFlags = B_READ_WRITE | B_CREATE_FILE;
 	if (clobber)
@@ -108,6 +132,22 @@ PackageInfo::SaveToFile(const char *path, bool clobber)
 }
 
 
+status_t
+PackageInfo::SaveToFile(const char *path, bool clobber)
+{
+	int32 fileFlags = B_READ_WRITE | B_CREATE_FILE;
+	if (clobber)
+		fileFlags |= B_ERASE_FILE;
+	BFile file(path,fileFlags);
+	if (file.InitCheck() != B_OK)
+		return file.InitCheck();
+	
+	BString info(MakeInfo(true));
+	file.Write(info.String(), info.Length());
+	return B_OK;
+}
+
+
 void
 PackageInfo::SetName(const char *name)
 {
@@ -123,16 +163,16 @@ PackageInfo::GetName(void) const
 
 
 void
-PackageInfo::SetPackageVersion(float ver)
+PackageInfo::SetPackageVersion(const char *ver)
 {
-	fPackageVersion = ver;
+	fPackageVersion = ver ? ver : "0.0";
 }
 
 
-float
+const char *
 PackageInfo::GetPackageVersion(void) const
 {
-	return fPackageVersion;
+	return fPackageVersion.String();
 }
 
 
@@ -377,15 +417,12 @@ PackageInfo::DependencyAt(int32 index)
 
 
 BString
-PackageInfo::MakeInfo(void)
+PackageInfo::MakeInfo(bool asPFX)
 {
 	BString out;
 	
-	char buffer[32];
-	sprintf(buffer,"%.1f",GetPackageVersion());
-	
 	out << "PFXPROJECT=Always first line\n"
-		<< "PKGVERSION=" << buffer
+		<< "PKGVERSION=" << GetPackageVersion()
 		<< "\nPKGNAME=" << GetName()
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
@@ -402,13 +439,15 @@ PackageInfo::MakeInfo(void)
 	for (int32 i = 0; i < fDeps.CountItems(); i++)
 	{
 		DepItem *depItem = fDeps.ItemAt(i);
-		out << depItem->MakeInfo();
+		if (depItem)
+			out << depItem->MakeInfo();
 	}
 
 	for (int32 i = 0; i < fFiles.CountItems(); i++)
 	{
 		FileItem *fileItem = fFiles.ItemAt(i);
-		out << fileItem->MakeInfo();
+		if (fileItem)
+			out << fileItem->MakeInfo(asPFX);
 	}
 	return out;
 }
@@ -430,7 +469,7 @@ PackageInfo::PrintToStream(void)
 	printf("Package:\n"
 			"----------------\n"
 			"Name : %s\n"
-			"Package Version: %.1f\n"
+			"Package Version: %s\n"
 			"Install Path: %s\n"
 			"User can change install path: %s\n"
 			"Author Name: %s\n"
@@ -486,7 +525,7 @@ PackageInfo::DumpInfo(void)
 	printf("Package:\n"
 			"----------------\n"
 			"Name : %s\n"
-			"Package Version: %.1f\n"
+			"Package Version: %s\n"
 			"Install Path: %s\n"
 			"Show install path chooser: %s\n"
 			"Author Name: %s\n"
@@ -498,16 +537,16 @@ PackageInfo::DumpInfo(void)
 			GetAuthorName(), GetAuthorEmail(), GetAuthorURL(), GetAppVersion(),
 			GetPrettyReleaseDate().String());
 	
-	for (int32 i = 0; i < fFiles.CountItems(); i++)
-	{
-		FileItem *fileItem = fFiles.ItemAt(i);
-		fileItem->PrintToStream();
-	}
-	
 	for (int32 i = 0; i < fDeps.CountItems(); i++)
 	{
 		DepItem *depItem = fDeps.ItemAt(i);
 		depItem->PrintToStream();
+	}
+	
+	for (int32 i = 0; i < fFiles.CountItems(); i++)
+	{
+		FileItem *fileItem = fFiles.ItemAt(i);
+		fileItem->PrintToStream();
 	}
 }
 
@@ -520,7 +559,7 @@ PackageInfo::MakeEmpty(void)
 	fGroups.MakeEmpty();
 	
 	fName = "";
-	fPackageVersion = 0.0;
+	fPackageVersion = "0.0";
 	fReleaseDate = 0;
 	fPath.SetTo("M_INSTALL_DIRECTORY");
 	
@@ -661,6 +700,8 @@ PackageInfo::ParsePackageInfo(BString str)
 				SetInstallFolderName(value.String());
 			else if (key.ICompare("PKGNAME") == 0)
 				SetName(value.String());
+			else if (key.ICompare("PKGVERSION") == 0)
+				SetPackageVersion(value.String());
 			else if (key.ICompare("AUTHORNAME") == 0)
 				SetAuthorName(value.String());
 			else if (key.ICompare("CONTACT") == 0)
@@ -669,8 +710,6 @@ PackageInfo::ParsePackageInfo(BString str)
 				SetAuthorURL(value.String());
 			else if (key.ICompare("RELEASEDATE") == 0)
 				SetReleaseDate(atol(value.String()));
-			else if (key.ICompare("APPVERSION") == 0)
-				SetPackageVersion(atof(value.String()));
 			else if (key.ICompare("APPVERSION") == 0)
 				SetAppVersion(value.String());
 			else if (key.ICompare("FILE") == 0)
@@ -706,6 +745,8 @@ PackageInfo::ParsePackageInfo(BString str)
 					fileItem->SetInstalledName(value.String());
 				else if (key.ICompare("INSTALLFOLDER") == 0)
 					fileItem->SetPath(value.String());
+				else if (key.ICompare("REF") == 0)
+					fileItem->SetRef(value.String());
 				else if (key.ICompare("LINK") == 0)
 					fileItem->AddLink(value.String());
 				else if (key.ICompare("CATEGORY") == 0)

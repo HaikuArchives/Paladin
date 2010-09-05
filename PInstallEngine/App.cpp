@@ -19,7 +19,7 @@ App::App(void)
 	
 	if (gCommandLineMode)
 	{
-		if (gPkgInfo.LoadFromResources() != B_OK)
+		if (gPkgInfo.LoadFromSelf() != B_OK)
 		{
 			printf("Can't load package information -- it is either corrupted or missing.\n");
 			PostMessage(B_QUIT_REQUESTED);

@@ -1,6 +1,7 @@
 #include "FileItem.h"
 
 #include <OS.h>
+#include <Path.h>
 #include <stdio.h>
 
 #include "Globals.h"
@@ -45,6 +46,35 @@ void
 FileItem::SetInstalledName(const char *name)
 {
 	fInstalledName = name;
+}
+
+
+entry_ref
+FileItem::GetRef(void) const
+{
+	return fRef;
+}
+
+
+void
+FileItem::SetRef(const entry_ref &ref)
+{
+	fRef = ref;
+}
+
+
+status_t
+FileItem::SetRef(const char *path)
+{
+	BEntry entry(path);
+	if (!entry.Exists())
+		return B_ERROR;
+	
+	if (entry.InitCheck() != B_OK)
+		return entry.InitCheck();
+	
+	entry.GetRef(&fRef);
+	return B_OK;
 }
 
 
@@ -144,6 +174,23 @@ FileItem::GroupAt(int32 index)
 }
 
 
+BString
+FileItem::GroupString(void)
+{
+	BString out;
+	
+	if (CountGroups() > 0)
+		out << GroupAt(0);
+	else
+		out = "All";
+	
+	for (int32 i = 1; i < CountGroups(); i++)
+		out << "," << GroupAt(i);
+	
+	return out;
+}
+
+
 void
 FileItem::AddPlatform(ostype_t plat)
 {
@@ -229,6 +276,23 @@ FileItem::PlatformAt(int32 index)
 }
 
 
+BString
+FileItem::PlatformString(void)
+{
+	BString out;
+	
+	if (CountPlatforms() > 0)
+		out << OSTypeToString(PlatformAt(0));
+	else
+		out = "All";
+	
+	for (int32 i = 1; i < CountPlatforms(); i++)
+		out << "," << OSTypeToString(PlatformAt(i));
+	
+	return out;
+}
+
+
 void
 FileItem::AddLink(const char *link)
 {
@@ -276,6 +340,24 @@ FileItem::LinkAt(int32 index)
 }
 
 
+BString
+FileItem::LinkString(void)
+{
+	BString out;
+	
+	OSPath ospath;
+	if (CountLinks() > 0)
+		out << GetFriendlyPathConstantName(ospath.StringToDir(LinkAt(0)));
+	else
+		out = "None";
+	
+	for (int32 i = 1; i < CountLinks(); i++)
+		out << "," << GetFriendlyPathConstantName(ospath.StringToDir(LinkAt(i)));
+	
+	return out;
+}
+
+
 void
 FileItem::SetReplaceMode(const int32 &mode)
 {
@@ -291,15 +373,24 @@ FileItem::GetReplaceMode(void) const
 
 
 BString
-FileItem::MakeInfo(void)
+FileItem::MakeInfo(bool getRefs)
 {
 	BString out;
 	
-	out << "FILE=%s" << GetName() << "\n";
+	out << "FILE=" << GetName() << "\n";
+	
+	if (getRefs)
+	{
+		if (fRef.name && strlen(fRef.name) > 0)
+		{
+			BPath path (&fRef);
+			out << "\tREF=" << path.Path() << "\n";
+		}
+	}
 	
 	if (fInstalledName.CountChars() > 0)
 		out << "\tINSTALLEDNAME=" << GetInstalledName() << "\n";
-	if (fCategory.CountChars() > 0)
+	if (fCategory.CountChars() > 0 && CountLinks() > 0)
 		out << "\tCATEGORY=" << GetCategory() << "\n";
 	
 	int32 i;
@@ -367,8 +458,19 @@ FileItem::PrintToStream(int8 indent)
 	BString out;
 	out << tabstr << "File: " << GetName() << "\n";
 	tabstr << "\t";
-	out << tabstr << "Installed Name: " << GetInstalledName() << "\n"
-		<< tabstr << "Path: " << fPath.Path() << "\n"
+	
+	if (GetInstalledName() && strlen(GetInstalledName()) > 0)
+		out << tabstr << "Installed Name: " << GetInstalledName() << "\n";
+	else
+		out << tabstr << "Installed Name: " << GetName() << "\n";
+	
+	if (fRef.name && strlen(fRef.name) > 0)
+	{
+		BPath path(&fRef);
+		out << tabstr << "Ref Path: " << path.Path() << "\n";
+	}
+	
+	out << tabstr << "Path: " << fPath.Path() << "\n"
 		<< tabstr << "Category: " << GetCategory() << "\n";
 	
 	if (CountGroups() == 0)

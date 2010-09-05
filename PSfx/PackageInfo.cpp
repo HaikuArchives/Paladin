@@ -11,7 +11,7 @@
 #include "Globals.h"
 
 PackageInfo::PackageInfo(void)
-	:	fPackageVersion(1.0),
+	:	fPackageVersion("1.0"),
 		fReleaseDate(real_time_clock()),
 		fPath("B_APPS_DIRECTORY"),
 		fShowChooser(false),
@@ -163,16 +163,16 @@ PackageInfo::GetName(void) const
 
 
 void
-PackageInfo::SetPackageVersion(float ver)
+PackageInfo::SetPackageVersion(const char *ver)
 {
-	fPackageVersion = ver;
+	fPackageVersion = ver ? ver : "0.0";
 }
 
 
-float
+const char *
 PackageInfo::GetPackageVersion(void) const
 {
-	return fPackageVersion;
+	return fPackageVersion.String();
 }
 
 
@@ -421,11 +421,8 @@ PackageInfo::MakeInfo(bool asPFX)
 {
 	BString out;
 	
-	char buffer[32];
-	sprintf(buffer,"%.1f",GetPackageVersion());
-	
 	out << "PFXPROJECT=Always first line\n"
-		<< "PKGVERSION=" << buffer
+		<< "PKGVERSION=" << GetPackageVersion()
 		<< "\nPKGNAME=" << GetName()
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
@@ -472,7 +469,7 @@ PackageInfo::PrintToStream(void)
 	printf("Package:\n"
 			"----------------\n"
 			"Name : %s\n"
-			"Package Version: %.1f\n"
+			"Package Version: %s\n"
 			"Install Path: %s\n"
 			"User can change install path: %s\n"
 			"Author Name: %s\n"
@@ -528,7 +525,7 @@ PackageInfo::DumpInfo(void)
 	printf("Package:\n"
 			"----------------\n"
 			"Name : %s\n"
-			"Package Version: %.1f\n"
+			"Package Version: %s\n"
 			"Install Path: %s\n"
 			"Show install path chooser: %s\n"
 			"Author Name: %s\n"
@@ -562,7 +559,7 @@ PackageInfo::MakeEmpty(void)
 	fGroups.MakeEmpty();
 	
 	fName = "";
-	fPackageVersion = 0.0;
+	fPackageVersion = "0.0";
 	fReleaseDate = 0;
 	fPath.SetTo("M_INSTALL_DIRECTORY");
 	
@@ -703,6 +700,8 @@ PackageInfo::ParsePackageInfo(BString str)
 				SetInstallFolderName(value.String());
 			else if (key.ICompare("PKGNAME") == 0)
 				SetName(value.String());
+			else if (key.ICompare("PKGVERSION") == 0)
+				SetPackageVersion(value.String());
 			else if (key.ICompare("AUTHORNAME") == 0)
 				SetAuthorName(value.String());
 			else if (key.ICompare("CONTACT") == 0)
@@ -711,8 +710,6 @@ PackageInfo::ParsePackageInfo(BString str)
 				SetAuthorURL(value.String());
 			else if (key.ICompare("RELEASEDATE") == 0)
 				SetReleaseDate(atol(value.String()));
-			else if (key.ICompare("APPVERSION") == 0)
-				SetPackageVersion(atof(value.String()));
 			else if (key.ICompare("APPVERSION") == 0)
 				SetAppVersion(value.String());
 			else if (key.ICompare("FILE") == 0)

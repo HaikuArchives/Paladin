@@ -24,8 +24,10 @@ class PackageInfo
 {
 public:
 							PackageInfo(void);
-	status_t				LoadFromResources(void);
+	status_t				LoadFromSelf(void);
+	status_t				LoadFromResources(const char *path);
 	status_t				LoadFromFile(const char *path);
+	status_t				SaveToResources(const char *path, bool clobber = false);
 	status_t				SaveToFile(const char *path, bool clobber = false);
 	
 	// The package name is the name to be displayed to the user and doesn't necessarily
@@ -36,8 +38,8 @@ public:
 	// This is a number set by the package maintainer, not from the resource data in the embedded
 	// app. This comes in particularly handy for those C libraries which have none of that useful
 	// version information nonsense
-	void					SetPackageVersion(float ver);
-	float					GetPackageVersion(void) const;
+	void					SetPackageVersion(const char *ver);
+	const char *			GetPackageVersion(void) const;
 	
 	PkgPath					GetPath(void) const;
 	void					SetPath(const PkgPath &path);
@@ -88,7 +90,7 @@ public:
 	int32					CountDependencies(void) const;
 	DepItem *				DependencyAt(int32 index);
 	
-	BString					MakeInfo(void);
+	BString					MakeInfo(bool asPFX = false);
 	void					PrintInfo(FILE *fd);
 	void					PrintToStream(void);
 	void					DumpInfo(void);
@@ -104,7 +106,7 @@ private:
 	status_t				ParsePackageInfo(BString str);
 	
 	BString					fName;
-	float					fPackageVersion;
+	BString					fPackageVersion;
 	time_t					fReleaseDate;
 	
 	PkgPath					fPath;

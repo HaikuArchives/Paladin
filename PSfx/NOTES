@@ -1,8 +1,4 @@
 TODO:
-Figure out the command-line interface considering how zip doesn't do well with the .sfx format.
-
-Add pkgversion to setpkginfo command
-
 Fix command-line interface to work properly, especially install paths
 
 Add a bin type for dependencies that will search for a command in one of the standard bin folders

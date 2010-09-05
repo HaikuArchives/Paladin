@@ -11,6 +11,7 @@
 bool ProcessArgs(int32 argc, char **argv);
 bool IsCommandFlag(const BString &str);
 void PrintUsage(void);
+void PrintVersionInfo(void);
 
 App::App(void)
 	:	BApplication("application/x-vnd.dw-PInstallEngine")
@@ -139,7 +140,8 @@ IsCommandFlag(const BString &str)
 		str.ICompare("--target-links") == 0 || str.ICompare("-t") == 0 ||
 		str.ICompare("--missing") == 0 || str.ICompare("-m") == 0 ||
 		str.ICompare("--info") == 0 || str.ICompare("-i") == 0 ||
-		str.ICompare("--debug") == 0 || str.ICompare("-d") == 0)
+		str.ICompare("--debug") == 0 || str.ICompare("-d") == 0 ||
+		str.ICompare("--version") == 0)
 		return true;
 	return false;
 }
@@ -165,6 +167,7 @@ ProcessArgs(int32 argc, char **argv)
 	// -t, --target-links --> set gLinkOnTargetVolume
 	// -i, --info --> shows package info and exits
 	// -d, --debug --> set debug mode
+	//     --version --> print version information
 	
 	gAppName = argv[0];
 	for (int32 i = 0; i < argList.CountItems(); i++)
@@ -181,6 +184,12 @@ ProcessArgs(int32 argc, char **argv)
 		if (arg->ICompare("--help") == 0 || arg->ICompare("-h") == 0)
 		{
 			PrintUsage();
+			return false;
+		}
+		
+		if (arg->ICompare("--version") == 0)
+		{
+			PrintVersionInfo();
 			return false;
 		}
 		
@@ -272,5 +281,13 @@ ProcessArgs(int32 argc, char **argv)
 		}
 	}
 	return true;
+}
+
+
+void
+PrintVersionInfo(void)
+{
+	BString timestamp = __TIMESTAMP__;
+	printf("Build time: %s\n", timestamp.String());
 }
 

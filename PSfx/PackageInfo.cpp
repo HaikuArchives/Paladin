@@ -427,6 +427,8 @@ PackageInfo::MakeInfo(bool asPFX)
 		<< "\nTYPE=SelfExtract"
 		<< "\nINSTALLFOLDER=" << fPath.Path() << "\n";
 	
+	if (fInstallFolderName.CountChars() > 0)
+		out << "INSTALLFOLDERNAME=" << fInstallFolderName << "\n";
 	if (fAuthorName.CountChars() > 0)
 		out << "AUTHORNAME=" << fAuthorName << "\n";
 	if (fAuthorEmail.CountChars() > 0)

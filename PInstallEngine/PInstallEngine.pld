@@ -28,7 +28,6 @@ SOURCEFILE=PackageInfo.cpp
 DEPENDENCY=/BeData/projects/Paladin-Related/paladin/PInstallEngine/PackageInfo.cpp|/BeData/projects/Paladin-Related/paladin/PInstallEngine/PackageInfo.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/ObjectList.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/DepItem.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/PkgPath.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/OSPath.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/FileItem.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/Globals.h|/BeData/projects/Paladin-Related/paladin/PInstallEngine/InstallEngine.h
 SOURCEFILE=ResData.cpp
 DEPENDENCY=/BeData/projects/Paladin-Related/paladin/PInstallEngine/ResData.cpp|/BeData/projects/Paladin-Related/paladin/PInstallEngine/ResData.h
-SOURCEFILE=PostBuild.sh
 GROUP=Resources
 EXPANDGROUP=yes
 SOURCEFILE=Resources.rsrc

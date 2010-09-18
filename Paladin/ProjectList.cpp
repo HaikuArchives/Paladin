@@ -176,6 +176,9 @@ ProjectList::InitiateDrag(BPoint pt, int32 index, bool selected)
 	int32 cookie = 0;
 	int32 selection = FullListCurrentSelection(cookie++);
 	
+	if (selection >= 0)
+		msg.AddPointer("owner",this);
+	
 	while (selection >= 0)
 	{
 		BStringItem *item = dynamic_cast<BStringItem*>(FullListItemAt(selection));
@@ -382,6 +385,9 @@ ProjectList::HandleDragAndDrop(BPoint droppt, const BMessage *msg)
 	SourceGroupItem *srcGroupItem;
 	SourceFileItem *srcFileItem;
 	int32 index = 0;
+	ProjectList *ownerList;
+	if (msg->FindPointer("owner",(void**)&ownerList) != B_OK)
+		ownerList = this;	
 	
 	while (msg->FindPointer("items",index,(void**)&srcStringItem) == B_OK)
 	{
@@ -390,7 +396,7 @@ ProjectList::HandleDragAndDrop(BPoint droppt, const BMessage *msg)
 		srcFileItem = dynamic_cast<SourceFileItem*>(srcStringItem);
 		if (srcFileItem)
 		{
-			srcGroupItem = dynamic_cast<SourceGroupItem*>(Superitem(srcStringItem));
+			srcGroupItem = dynamic_cast<SourceGroupItem*>(ownerList->Superitem(srcStringItem));
 			if (!srcGroupItem)
 			{
 				debugger("BUG: NULL superitem for source file item");
@@ -402,19 +408,35 @@ ProjectList::HandleDragAndDrop(BPoint droppt, const BMessage *msg)
 			// items ends up with some serious order issues
 			if (srcGroupItem != destStringItem)
 			{
-				RemoveItem(srcFileItem);
-				AddItem(srcFileItem,listindex);
-			
-				// Find the group item index relative to its siblings so
-				// we can add its corresponding SourceFile to the proper
-				// place in its SourceGroup
-				int32 groupindex = UnderIndexOf(srcFileItem);
-							
-				srcGroupItem->GetData()->filelist.RemoveItem(srcFileItem->GetData(),false);
-				if (groupindex >= 0)
-					destGroupItem->GetData()->filelist.AddItem(srcFileItem->GetData(),groupindex);
+				if (ownerList == this)
+				{
+					RemoveItem(srcFileItem);
+					AddItem(srcFileItem,listindex);
+					
+					// Find the group item index relative to its siblings so
+					// we can add its corresponding SourceFile to the proper
+					// place in its SourceGroup
+					int32 groupindex = UnderIndexOf(srcFileItem);
+								
+					srcGroupItem->GetData()->filelist.RemoveItem(srcFileItem->GetData(),false);
+					if (groupindex >= 0)
+						destGroupItem->GetData()->filelist.AddItem(srcFileItem->GetData(),groupindex);
+					else
+						destGroupItem->GetData()->filelist.AddItem(srcFileItem->GetData());
+				}
 				else
-					destGroupItem->GetData()->filelist.AddItem(srcFileItem->GetData());
+				{
+					// Dragging from one project to another, so we'll copy the item instead of
+					// moving it. Very BeOS-like, if I do say so myself. ;) We'll accomplish
+					// this by converting the path for the SourceItem's file into a ref and
+					// posting a message to the Window so that each file is properly added to
+					// the project.
+					DPath itemPath = srcFileItem->GetData()->GetPath();
+					BMessage msg(B_SIMPLE_DATA);
+					entry_ref ref = itemPath.GetRef();
+					msg.AddRef("refs",&ref);
+					Window()->PostMessage(&msg);
+				}
 			}
 		}
 		else
@@ -444,21 +466,6 @@ ProjectList::HandleDragAndDrop(BPoint droppt, const BMessage *msg)
 	}
 	
 	Window()->PostMessage(M_CULL_EMPTY_GROUPS);
-	
-/*
-	// Now that we've finished all the moving around, cull out empty groups
-	for (int32 i = 0; i < CountItems(); i++)
-	{
-		SourceGroupItem *groupitem = dynamic_cast<SourceGroupItem*>(ItemAt(i));
-		if (groupitem && groupitem->GetData()->filelist.CountItems() == 0)
-		{
-			fProject->RemoveGroup(groupitem->GetData(),true);
-			RemoveItem(groupitem);
-		}
-	}
-
-	fProject->Save();
-*/
 }
 
 

@@ -1120,7 +1120,10 @@ ProjectWindow::AddFile(const entry_ref &ref, BPoint *pt)
 	BPath path(&ref);
 	
 	if (fProject->HasFileName(path.Path()))
+	{
+		STRACE(1,("%s is already part of the project\n", path.Path()));
 		return;
+	}
 	
 	SourceFile *file = gFileFactory.CreateSourceFile(path.Path());
 	SourceFileItem *item = new SourceFileItem(file,1);
@@ -1155,7 +1158,7 @@ ProjectWindow::AddFile(const entry_ref &ref, BPoint *pt)
 //			if (pt)
 //				index++;
 			fProject->AddFile(file,groupItem->GetData(),index);
-
+			STRACE(1,("Added file %s to project\n",path.Path()));
 		}
 		else
 		{
@@ -1170,6 +1173,7 @@ ProjectWindow::AddFile(const entry_ref &ref, BPoint *pt)
 										fProjectList->FullListCountItems());
 				
 				fProject->AddFile(file,groupItem->GetData(),-1);
+				STRACE(1,("Added file %s to project\n",path.Path()));
 			}
 			else
 			{

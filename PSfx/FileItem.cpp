@@ -7,7 +7,8 @@
 #include "Globals.h"
 
 FileItem::FileItem(void)
-	:	fPath("M_INSTALL_DIRECTORY"),
+	:	fReplaceMode(PKG_REPLACE_ASK_ALWAYS),
+		fPath("M_INSTALL_DIRECTORY"),
 		fCategory("Applications"),
 		fGroups(20,true),
 		fLinks(20,true),

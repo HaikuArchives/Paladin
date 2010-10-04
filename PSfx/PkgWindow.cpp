@@ -370,7 +370,6 @@ PkgWindow::MessageReceived(BMessage *msg)
 			BMenuItem *item = fReplaceField->Menu()->FindMarked();
 			if (!item)
 				break;
-			
 			SetReplaceMode(fReplaceField->Menu()->IndexOf(item));
 			fNeedSave = true;
 			break;
@@ -542,7 +541,6 @@ PkgWindow::LoadProject(entry_ref ref)
 		
 		if (key == "ITEMFILEPATH")
 		{
-printf("adding item %s\n", value.c_str());
 			listItem = new FileListItem(value.c_str(),
 										fListView->GetDefaultDisplayMode());
 			item = new FileItem();

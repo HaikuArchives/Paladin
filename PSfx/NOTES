@@ -1,6 +1,10 @@
 TODO:
 Bug: double clicking on a .pfx results in an empty window being shown
 
+Bug: Drop a file onto project. Package install path menu is not set. Haiku bug?
+
+Bug: Add a file via Alt-Shift-A. Package install path is not marked. Haiku bug?
+
 Fix: If there is only one window open and a project is opened, the blank window should be replaced by the opened one.
 
 Fix command-line interface to work properly, especially install paths

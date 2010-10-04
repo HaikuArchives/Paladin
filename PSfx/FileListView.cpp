@@ -5,6 +5,21 @@ FileListItem::FileListItem(entry_ref ref,int32 mode,uint32 level, bool expanded)
 	:	RefListItem(ref,mode,level,expanded),
 		fFileItem(NULL)
 {
+	BEntry entry(&ref);
+
+	if (entry.InitCheck() == B_OK)
+		SetRef(ref);
+	else
+	{
+		if (ref.name)
+		{
+			BString label;
+			label << ref.name << " - missing";
+			SetText(label.String());
+		}
+		else
+			SetText("Invalid file entry");
+	}
 }
 
 

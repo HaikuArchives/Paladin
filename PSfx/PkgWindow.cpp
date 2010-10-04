@@ -651,6 +651,12 @@ PkgWindow::SaveProject(const char *path)
 		
 		FileItem *fileItem = fileListItem->GetData();
 		
+		if (!fileItem)
+		{
+			printf("Skipping NULL fileItem for fileListItem %s\n", fileListItem->Text());
+			continue;
+		}
+		
 		entry_ref ref = fileListItem->GetRef();
 		BPath refPath(&ref);
 		

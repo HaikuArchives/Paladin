@@ -1,5 +1,11 @@
 TODO:
+Bug: double clicking on a .pfx results in an empty window being shown
+
 Fix command-line interface to work properly, especially install paths
+
+Save some of the package info once entered -- Contact name, e-mail, and website.
+
+App Version in PkgInfoWindow should probably default to 0.1 if not already available
 
 Add a bin type for dependencies that will search for a command in one of the standard bin folders
 

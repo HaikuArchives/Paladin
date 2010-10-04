@@ -38,7 +38,7 @@ private:
 			void	SetReplaceMode(const int32 &value);
 			void	ShowSave(bool force_saveas);
 			void	DoSave(void);
-			void	BuildPackage(ostype_t platform);
+			void	Build(ostype_t platform);
 	
 	BMenuBar		*fBar;
 	FileListView	*fListView;

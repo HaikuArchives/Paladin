@@ -16,6 +16,7 @@
 
 #include "AboutWindow.h"
 #include "App.h"
+#include "CommandLine.h"
 #include "FileListView.h"
 #include "Globals.h"
 #include "ListItem.h"
@@ -350,7 +351,7 @@ PkgWindow::MessageReceived(BMessage *msg)
 					break;
 				}
 				
-				BuildPackage((ostype_t)type);
+				Build((ostype_t)type);
 			}
 			break;
 		}
@@ -453,7 +454,13 @@ PkgWindow::ItemSelected(int32 index)
 	if (menuItem)
 		menuItem->SetMarked(false);
 	if (fileItem)
-		fReplaceField->Menu()->ItemAt(fileItem->GetReplaceMode())->SetMarked(true);
+	{
+		BMenuItem *newReplaceItem = fReplaceField->Menu()->ItemAt(fileItem->GetReplaceMode());
+		if (newReplaceItem)
+			newReplaceItem->SetMarked(true);
+		else
+			fReplaceField->Menu()->ItemAt(0L)->SetMarked(true);
+	}
 	
 	// get groups
 	BString label = "Groups: ";
@@ -506,7 +513,7 @@ PkgWindow::InitFields(void)
 void
 PkgWindow::InitEmptyProject(void)
 {
-	BString title("Untitled ");
+	BString title("PSfx: Untitled ");
 	sUntitled++;
 	title << sUntitled;
 	SetTitle(title.String());
@@ -746,114 +753,18 @@ PkgWindow::DoSave(void)
 	if (fBuildAfterSave)
 	{
 		fBuildAfterSave = false;
-		BuildPackage(fBuildType);
+		Build(fBuildType);
 	}
 }
 
 
 void
-PkgWindow::BuildPackage(ostype_t platform)
+PkgWindow::Build(ostype_t platform)
 {
-	BString stubName;
-	switch (platform)
-	{
-		case OS_R5:
-		{
-			stubName = "installstub.r5";
-			break;
-		}
-		case OS_ZETA:
-		{
-			stubName = "installstub.zeta";
-			break;
-		}
-		case OS_HAIKU:
-		{
-			stubName = "installstub.haiku.gcc2";
-			break;
-		}
-		case OS_HAIKU_GCC4:
-		{
-			stubName = "installstub.haiku.gcc4";
-			break;
-		}
-		default:
-		{
-			BAlert *alert = new BAlert("PSfx", "A bad platform value was used. This "
-												"should never happen. Please report "
-												"this to DarkWyrm at <darkwyrm@gmail.com.",
-										"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-			alert->Go();
-			return;
-			break;
-		}
-	}
-	
-	app_info aInfo;
-	be_app->GetAppInfo(&aInfo);
-	
-	BFile rFile(&aInfo.ref, B_READ_ONLY);
-	BResources res(&rFile);
-	
-	size_t stubDataSize;
-	const uint8 *stubData = (uint8 *)res.LoadResource('RAWT', stubName.String(),
-										&stubDataSize);
-	if (!stubData || !stubDataSize)
-	{
-		BAlert *alert = new BAlert("PSfx", "PSfx couldn't find the installer stub "
-											"for this platform and cannot continue. "
-											"Sorry.", "OK");
-		alert->Go();
-		return;
-	}
-	
 	BString pkgPath;
 	pkgPath << fFilePath.GetFolder() << "/" << fFilePath.GetBaseName() << ".sfx";
 	
-	BFile file(pkgPath.String(), B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
-	file.Write(stubData, stubDataSize);
-	file.Unset();
-	
-	// This places the needed package info into the resources of the stub file. It also
-	// has to be done before the archive is generated and concatenated onto the file.
-	fPkgInfo.SaveToFile(pkgPath.String());
-	
-	// Generate the zipfile archive and tack it onto the end of the file. This is how
-	// self-extracting zipfiles are created for use with unzipsfx, too, so this really
-	// does work.
-	BString archiveName("/tmp/PSfx.");
-	archiveName << real_time_clock_usecs() << ".zip";
-	
-	BString command;
-	for (int32 i = 0; i < fListView->CountItems(); i++)
-	{
-		FileListItem *listItem = dynamic_cast<FileListItem*>(fListView->ItemAt(i));
-		if (!listItem)
-			continue;
-		
-		DPath itemPath(listItem->GetRef());
-		
-		BString escapedItemPath(itemPath.GetFullPath());
-		escapedItemPath.CharacterEscape("'", '\\');
-		
-		command = "zip ";
-		command << archiveName << " '" << escapedItemPath << "'";
-		
-		int result = system(command.String());
-		if (result)
-		{
-			// zip returns 0 on success, so there must have been an error
-			printf("zip command '%s' returned %d\n", command.String(), result);
-		}
-
-	}
-	
-	command = "cat ";
-	BString escapedPath(pkgPath.String());
-	escapedPath.CharacterEscape("'",'\\');
-	command << archiveName << " >> '" << escapedPath << "'; chmod +x '"
-			<< escapedPath << "' ";
-	system(command.String());
-		
+	BuildPackage(fFilePath.GetFullPath(), pkgPath.String(),
+					OSTypeToString(platform).String());
 }
 

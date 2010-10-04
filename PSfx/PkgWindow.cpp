@@ -527,6 +527,7 @@ PkgWindow::LoadProject(entry_ref ref)
 	ifstream file(path.GetFullPath(), ifstream::in);
 	
 	FileItem *item = NULL;
+	FileListItem *listItem = NULL;
 	while (file.good())
 	{
 		string line;
@@ -541,15 +542,21 @@ PkgWindow::LoadProject(entry_ref ref)
 		
 		if (key == "ITEMFILEPATH")
 		{
-			FileListItem *listItem = new FileListItem(value.c_str(),
-													fListView->GetDefaultDisplayMode());
+printf("adding item %s\n", value.c_str());
+			listItem = new FileListItem(value.c_str(),
+										fListView->GetDefaultDisplayMode());
 			item = new FileItem();
 			listItem->SetData(item);
 			fListView->AddItem(listItem);
 		}
 		else
 		if (key == "ITEMNAME")
-			item->SetName(value.c_str());
+		{
+			if (listItem)
+				listItem->SetText(value.c_str());
+			if (item)
+				item->SetName(value.c_str());
+		}
 		else
 		if (key == "ITEMINSTALLEDNAME")
 			item->SetInstalledName(value.c_str());

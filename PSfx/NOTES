@@ -1,6 +1,8 @@
 TODO:
 Bug: double clicking on a .pfx results in an empty window being shown
 
+Fix: If there is only one window open and a project is opened, the blank window should be replaced by the opened one.
+
 Fix command-line interface to work properly, especially install paths
 
 Save some of the package info once entered -- Contact name, e-mail, and website.

@@ -1,45 +1,64 @@
 #include "PScrollBar.h"
 
+#include <Application.h>
+#include <ScrollBar.h>
 #include <Window.h>
 #include <stdio.h>
 
 #include "EnumProperty.h"
+#include "MsgDefs.h"
+#include "PObjectBroker.h"
 
 /*
 	ScrollBar Properties:
 		LargeStep
 		Min
 		Max
-		Orientation (read-only)
+		Orientation
 		Proportion
 		SmallStep
 		Target
 		Value
 */
 
+class PScrollBarBackend : public BScrollBar
+{
+public:
+			PScrollBarBackend(PObject *owner, orientation posture);
+	void	MakeFocus(bool value);
+	void	MouseUp(BPoint pt);
+
+private:
+	PObject	*fOwner;
+};
+
 PScrollBar::PScrollBar(void)
-	:	PView()
+	:	PView(),
+		fPViewTarget(NULL)
 {
 	InitPScrollBar();
 }
 
 
 PScrollBar::PScrollBar(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg),
+		fPViewTarget(NULL)
 {
 	InitPScrollBar();
 }
 
 
 PScrollBar::PScrollBar(const char *name)
-	:	PView(name)
+	:	PView(name),
+		fPViewTarget(NULL)
 {
 	InitPScrollBar();
 }
 
 
 PScrollBar::PScrollBar(const PScrollBar &from)
-	:	PView(from)
+	:	PView(from),
+		fPViewTarget(from.fPViewTarget)
 {
 	InitPScrollBar();
 }
@@ -77,7 +96,6 @@ PScrollBar::Duplicate(void) const
 status_t
 PScrollBar::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
-/*
 	if (!name || !value)
 		return B_ERROR;
 	
@@ -88,25 +106,62 @@ PScrollBar::GetProperty(const char *name, PValue *value, const int32 &index) con
 	
 	BScrollBar *viewAsScrollBar = (BScrollBar*)fView;
 	
-	if (str.ICompare("Enabled") == 0)
-		((BoolProperty*)prop)->SetValue(viewAsScrollBar->IsEnabled());
-	else if (str.ICompare("Label") == 0)
-		((StringProperty*)prop)->SetValue(viewAsScrollBar->Label());
-	else if (str.ICompare("Value") == 0)
-		((IntProperty*)prop)->SetValue(viewAsScrollBar->Value());
+	if (str.ICompare("Value") == 0)
+		((FloatProperty*)prop)->SetValue(viewAsScrollBar->Value());
+	else if (str.ICompare("Target") == 0)
+	{
+		if (fPViewTarget)
+			((IntProperty*)prop)->SetValue(fPViewTarget->GetID());
+		else
+		{
+			// 0 is just as much an invalid object handle as it is an
+			// officially invalid pointer value.
+			((IntProperty*)prop)->SetValue(0LL);
+		}
+	}
+	else if (str.ICompare("Min") == 0)
+	{
+		float min, max;
+		viewAsScrollBar->GetRange(&min, &max);
+		
+		((FloatProperty*)prop)->SetValue(min);
+	}
+	else if (str.ICompare("Max") == 0)
+	{
+		float min, max;
+		viewAsScrollBar->GetRange(&min, &max);
+		
+		((FloatProperty*)prop)->SetValue(max);
+	}
+	else if (str.ICompare("LargeStep") == 0)
+	{
+		float big, small;
+		viewAsScrollBar->GetSteps(&small, &big);
+		
+		((FloatProperty*)prop)->SetValue(big);
+	}
+	else if (str.ICompare("SmallStep") == 0)
+	{
+		float big, small;
+		viewAsScrollBar->GetSteps(&small, &big);
+		
+		((FloatProperty*)prop)->SetValue(small);
+	}
+	else if (str.ICompare("Orientation") == 0)
+		((IntProperty*)prop)->SetValue(viewAsScrollBar->Orientation());
+	else if (str.ICompare("Proportion") == 0)
+		((FloatProperty*)prop)->SetValue(viewAsScrollBar->Proportion());
 	else
 		return PView::GetProperty(name,value,index);
 	
 	return prop->GetValue(value);
-*/ return B_ERROR;
 }
 
 
 status_t
 PScrollBar::SetProperty(const char *name, PValue *value, const int32 &index)
 {
-/*
-	// Modal, Front, and Floating properties are missing because they are read-only
+	// Orientation property is missing because it is read-only
 	if (!name || !value)
 		return B_ERROR;
 	
@@ -121,23 +176,127 @@ PScrollBar::SetProperty(const char *name, PValue *value, const int32 &index)
 	
 	BScrollBar *viewAsScrollBar = (BScrollBar*)fView;
 	
-	BoolValue bv;
 	IntValue iv;
-	StringValue sv;
+	FloatValue fv;
 	
 	if (viewAsScrollBar->Window())
 		viewAsScrollBar->Window()->Lock();
 	
-	if (str.ICompare("Enabled") == 0)
+/*
+	ScrollBar Properties:
+		LargeStep
+		Min
+		Max
+		Orientation (read-only)
+		Proportion
+		SmallStep
+		Target
+		Value
+*/
+	if (str.ICompare("LargeStep") == 0)
 	{
-		prop->GetValue(&bv);
-		viewAsScrollBar->SetEnabled(bv.value);
+		prop->GetValue(&fv);
+		
+		float small, big;
+		viewAsScrollBar->GetSteps(&small, &big);
+		viewAsScrollBar->SetSteps(small, *fv.value);
 	}
-	else if (str.ICompare("Label") == 0)
+	else if (str.ICompare("SmallStep") == 0)
 	{
-		prop->GetValue(&sv);
-		viewAsScrollBar->SetLabel(sv.value->String());
-		viewAsScrollBar->Invalidate();
+		prop->GetValue(&fv);
+		
+		float small, big;
+		viewAsScrollBar->GetSteps(&small, &big);
+		viewAsScrollBar->SetSteps(*fv.value, big);
+	}
+	else if (str.ICompare("Min") == 0)
+	{
+		prop->GetValue(&fv);
+		
+		float min, max;
+		viewAsScrollBar->GetRange(&min, &max);
+		viewAsScrollBar->SetRange(*fv.value, max);
+	}
+	else if (str.ICompare("Max") == 0)
+	{
+		prop->GetValue(&fv);
+		
+		float min, max;
+		viewAsScrollBar->GetRange(&min, &max);
+		viewAsScrollBar->SetRange(min, *fv.value);
+	}
+	else if (str.ICompare("Proportion") == 0)
+	{
+		prop->GetValue(&fv);
+		viewAsScrollBar->SetProportion(*fv.value);
+	}
+	else if (str.ICompare("Orientation") == 0)
+	{
+		// Here is an instance where PDesigner's object system removes
+		// limitations in the API. A PScrollBar's orientation can be changed,
+		// unlike BScrollBar. Nice. :)
+		prop->GetValue(&iv);
+		
+		if (*iv.value == viewAsScrollBar->Orientation())
+			return B_OK;
+		
+		float min, max, big, small;
+		
+		viewAsScrollBar->GetRange(&min, &max);
+		viewAsScrollBar->GetSteps(&small, &big);
+		
+		PScrollBarBackend *newBar = new PScrollBarBackend(this, (orientation)*iv.value);
+		newBar->MoveTo(viewAsScrollBar->Frame().LeftTop());
+		newBar->ResizeTo(viewAsScrollBar->Frame().Width(), viewAsScrollBar->Frame().Height());
+		newBar->SetRange(min, max);
+		newBar->SetSteps(small, big);
+		newBar->SetProportion(viewAsScrollBar->Proportion());
+		newBar->SetValue(viewAsScrollBar->Value());
+		
+		if (viewAsScrollBar->Target())
+		{
+			BView *targetView = viewAsScrollBar->Target();
+			viewAsScrollBar->SetTarget((BView*)NULL);
+			newBar->SetTarget(targetView);
+		}
+		
+		if (viewAsScrollBar->Parent())
+		{
+			BView *parent = viewAsScrollBar->Parent();
+			viewAsScrollBar->RemoveSelf();
+			parent->AddChild(newBar);
+		}
+		else if (viewAsScrollBar->Window())
+		{
+			BWindow *win = viewAsScrollBar->Window();
+			viewAsScrollBar->RemoveSelf();
+			win->AddChild(newBar);
+		}
+		delete viewAsScrollBar;
+		
+		return B_OK;
+	}
+	else if (str.ICompare("Target") == 0)
+	{
+		// To properly set a scrollbar target via an object handle like this,
+		// we need to get a pointer from the broker via the handle, make sure it
+		// will work properly, and then update values for the PScrollBar accordingly
+		prop->GetValue(&iv);
+		PObject *pobj = BROKER->FindObject(*iv.value);
+		if (!pobj)
+			return B_BAD_INDEX;
+		
+		PView *pview = dynamic_cast<PView*>(pobj);
+		if (pobj->GetType().Compare("PView") != 0 || !pview)
+			return B_BAD_DATA;
+		
+		BView *target = pview->GetView();
+		if (target->ScrollBar(viewAsScrollBar->Orientation()))
+			return B_BUSY;
+		
+		viewAsScrollBar->SetTarget(target);
+		fPViewTarget = pview;
+		return B_OK;
 	}
 	else
 	{
@@ -150,14 +309,18 @@ PScrollBar::SetProperty(const char *name, PValue *value, const int32 &index)
 		viewAsScrollBar->Window()->Unlock();
 	
 	return prop->GetValue(value);
-*/ return B_ERROR;
 }
 
 
 void
 PScrollBar::InitBackend(BView *view)
 {
-	// This will be handled by child classes
+	fView = (view == NULL) ? new PScrollBarBackend(this, B_VERTICAL) : view;
+	StringValue sv("A scroll bar.");
+	SetProperty("Description", &sv);
+	
+	PProperty *prop = FindProperty("Value");
+	SetFlagsForProperty(prop,PROPERTY_HIDE_IN_EDITOR);
 }
 
 
@@ -205,3 +368,33 @@ PScrollBar::InitProperties(void)
 	AddProperty(new IntProperty("Target",0));
 	AddProperty(new FloatProperty("Value",0.0));
 }
+
+
+PScrollBarBackend::PScrollBarBackend(PObject *owner, orientation posture)
+	:	BScrollBar(BRect(0,0,1,1), "", NULL, 0.0, 0.0, posture),
+		fOwner(owner)
+{
+}
+
+
+void
+PScrollBarBackend::MakeFocus(bool value)
+{
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",fOwner->GetID());
+	be_app->PostMessage(&msg);
+	
+	BScrollBar::MakeFocus(value);
+}
+
+
+void
+PScrollBarBackend::MouseUp(BPoint pt)
+{
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",fOwner->GetID());
+	be_app->PostMessage(&msg);
+	
+	BScrollBar::MouseUp(pt);
+}
+

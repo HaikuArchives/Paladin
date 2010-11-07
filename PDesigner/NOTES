@@ -1,6 +1,8 @@
-Finish PScrollBar and P[HV]ScrollBar
+Test and fix PScrollBar
 
-Add a UsePreferredSize method to the interface, if possible
+Come up with a way to set the target for a scrollbar
+
+Add a UsePreferredSize property to controls
 
 Add a ScrollView property
 

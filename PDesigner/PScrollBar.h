@@ -40,6 +40,8 @@ protected:
 private:
 	void					InitPScrollBar(void);
 	void					InitProperties(void);
+
+	PView					*fPViewTarget;
 };
 
 class PVScrollBar : public PView

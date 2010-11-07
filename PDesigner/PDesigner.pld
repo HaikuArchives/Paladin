@@ -91,7 +91,6 @@ LOCALINCLUDE=ProjectModules/AutoTextControl
 LOCALINCLUDE=boot/develop/projects/Paladin-Related/PDesigner/ProjectModules/AutoTextControl
 LOCALINCLUDE=boot/home/projects/PDesigner/ProjectModules/AutoTextControl
 LOCALINCLUDE=boot/home/Desktop/PDesigner/ProjectModules/AutoTextControl
-LOCALINCLUDE=
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp
 SYSTEMINCLUDE=/boot/develop/headers/posix

@@ -9,6 +9,7 @@
 #include "PButton.h"
 #include "PCheckBox.h"
 #include "PListView.h"
+#include "PScrollBar.h"
 #include "PTextControl.h"
 
 static PObjectBroker *sBroker = NULL;
@@ -50,6 +51,8 @@ PObjectBroker::PObjectBroker(void)
 	fObjInfoList->AddItem(new PObjectInfo("PBox","Box",PBox::Instantiate,PBox::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PControl","Generic Control",PControl::Instantiate,
 											PControl::Create));
+	fObjInfoList->AddItem(new PObjectInfo("PScrollBar","ScrollBar",PScrollBar::Instantiate,
+											PScrollBar::Create));
 /*	fObjInfoList->AddItem(new PObjectInfo("PListView",PListView::Instantiate,PListView::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PListItem",PListItem::Instantiate,PListItem::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PStringItem",PStringItem::Instantiate,PStringItem::Create));

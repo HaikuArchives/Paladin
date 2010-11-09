@@ -20,7 +20,7 @@ class StatCache;
 
 // This disables the online import feature, which is a good
 // thing right now.
-#define DISABLE_ONLINE_IMPORT
+//#define DISABLE_ONLINE_IMPORT
 
 void		InitGlobals(void);
 entry_ref	MakeProjectFile(DPath folder, const char *name,

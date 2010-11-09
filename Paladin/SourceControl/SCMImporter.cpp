@@ -422,7 +422,7 @@ OSDrawerImporter::GetImportCommand(bool readOnly)
 			if (!readOnly)
 				command << "--username " << GetUserName();
 				
-			command << "http://svn.osdrawer.net/" << GetProjectName();
+			command << " http://svn.osdrawer.net/" << GetProjectName();
 
 			if (GetPath() && strlen(GetPath()))
 				command << " '" << GetPath() << "'";

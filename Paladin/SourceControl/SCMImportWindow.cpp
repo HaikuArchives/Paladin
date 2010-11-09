@@ -165,7 +165,7 @@ SCMImportWindow::MessageReceived(BMessage *msg)
 		}
 		case M_TOGGLE_ANONYMOUS:
 		{
-			fUserNameBox->SetEnabled(fAnonymousBox->Value() == B_CONTROL_ON);
+			fUserNameBox->SetEnabled(fAnonymousBox->Value() != B_CONTROL_ON);
 			UpdateCommand();
 			break;
 		}

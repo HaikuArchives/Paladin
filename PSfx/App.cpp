@@ -74,6 +74,14 @@ App::MessageReceived(BMessage *msg)
 void
 App::RefsReceived(BMessage *msg)
 {
+	PkgWindow *closeBlank = NULL;
+	if (CountRegisteredWindows() == 1)
+	{
+		PkgWindow *win = dynamic_cast<PkgWindow*>(WindowAt(0L));
+		if (win && win->IsEmpty())
+			closeBlank = win;
+	}
+	
 	int32 i = 0;
 	entry_ref ref;
 	while (msg->FindRef("refs",i++,&ref) == B_OK)
@@ -81,6 +89,9 @@ App::RefsReceived(BMessage *msg)
 		PkgWindow *win = new PkgWindow(&ref);
 		win->Show();
 	}
+	
+	if (closeBlank)
+		closeBlank->PostMessage(B_QUIT_REQUESTED);
 }
 
 

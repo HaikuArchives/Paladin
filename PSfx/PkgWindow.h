@@ -26,6 +26,8 @@ public:
 					~PkgWindow(void);
 			bool	QuitRequested(void);
 			void	MessageReceived(BMessage *msg);
+			bool	IsEmpty(void) const;
+			
 private:
 			void	BuildMenus(void);
 			void	ShowAbout(void);

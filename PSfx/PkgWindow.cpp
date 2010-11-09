@@ -397,6 +397,13 @@ PkgWindow::MessageReceived(BMessage *msg)
 }
 
 
+bool
+PkgWindow::IsEmpty(void) const
+{
+	return (!fNeedSave && fFilePath.IsEmpty());
+}
+
+
 void
 PkgWindow::ShowAbout(void)
 {

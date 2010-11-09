@@ -9,7 +9,6 @@ class App : public BApplication
 {
 public:
 			App(void);
-	void	MessageReceived(BMessage *msg);
 	void	RefsReceived(BMessage *msg);
 	void	ReadyToRun(void);
 };

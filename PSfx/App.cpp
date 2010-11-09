@@ -48,25 +48,10 @@ CountRegisteredWindows(void)
 App::App(void)
 	:	BApplication(APP_SIGNATURE)
 {
-	InitFileTypes();
-	
 	if (gCommandLineMode)
 	{
 		DoCommandLine();
 		PostMessage(B_QUIT_REQUESTED);
-	}
-}
-
-
-void
-App::MessageReceived(BMessage *msg)
-{
-	switch (msg->what)
-	{
-		default:
-		{
-			BApplication::MessageReceived(msg);
-		}
 	}
 }
 
@@ -110,6 +95,7 @@ int
 main(int argc, char **argv)
 {
 	InitGlobals();
+	InitFileTypes();
 	
 	if (!ProcessArgs(argc,argv))
 		return -1;

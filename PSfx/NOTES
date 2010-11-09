@@ -1,5 +1,5 @@
 TODO:
-Bug: double clicking on a .pfx results in an empty window being shown
+Bug: double clicking on a .pfx results in an empty window being shown. It appears that BApplication::RefsReceived is not getting called when the program is started.
 
 Bug: Drop a file onto project. Package install path menu is not set. Haiku bug?
 

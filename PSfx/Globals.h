@@ -13,7 +13,7 @@ extern BObjectList<BString> gArgList;
 extern int gReturnValue;
 extern BString gPlatformName;
 
-#define PFX_MIME_TYPE "text/x-vnd.dw-psfx-project"
+#define PFX_MIME_TYPE "text/x-vnd.dw-psfx.project"
 #define APP_SIGNATURE "application/x-vnd.dw-PSfx"
 
 void	InitFileTypes(void);

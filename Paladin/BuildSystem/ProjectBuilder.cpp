@@ -28,6 +28,7 @@
 ProjectBuilder::ProjectBuilder(void)
 	:	fIsLinking(false),
 		fIsBuilding(false),
+		fTotalFilesToBuild(0L),
 		fManager(gCPUCount)
 {
 }
@@ -37,6 +38,7 @@ ProjectBuilder::ProjectBuilder(const BMessenger &target)
 	:	fMsgr(target),
 		fIsLinking(false),
 		fIsBuilding(false),
+		fTotalFilesToBuild(0L),
 		fManager(gCPUCount)
 {
 }
@@ -139,6 +141,7 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 		threadcount = MIN(gCPUCount,fProject->CountDirtyFiles());
 	}
 	
+	fTotalFilesToBuild = proj->CountDirtyFiles();
 	for (int32 i = 0; i < threadcount; i++)
 		fManager.SpawnThread(BuildThread,this);
 }
@@ -284,7 +287,6 @@ ProjectBuilder::BuildThread(void *data)
 	proj->Lock();
 	proj->SortDirtyList();
 	
-	int32 fileCount = proj->CountDirtyFiles();
 	int32 filesBuilt = 0;
 	
 	SourceFile *file = proj->GetNextDirtyFile();
@@ -308,7 +310,7 @@ ProjectBuilder::BuildThread(void *data)
 		msg.what = M_BUILDING_FILE;
 		msg.AddPointer("sourcefile",file);
 		msg.AddInt32("count",filesBuilt);
-		msg.AddInt32("total",fileCount);
+		msg.AddInt32("total",parent->fTotalFilesToBuild);
 		parent->fMsgr.SendMessage(&msg);
 		
 		BTRACE(("Thread %ld is building file %s\n",thisThread,file->GetPath().GetFileName()));

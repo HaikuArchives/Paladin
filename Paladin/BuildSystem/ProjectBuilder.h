@@ -78,6 +78,7 @@ private:
 	Project				*fProject;
 	bool				fIsLinking;
 	bool				fIsBuilding;
+	int32				fTotalFilesToBuild;
 	
 	int32				fPostBuildAction;
 	

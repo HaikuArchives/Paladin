@@ -169,6 +169,22 @@ PScrollBar::GetProperty(const char *name, PValue *value, const int32 &index) con
 		((IntProperty*)prop)->SetValue(viewAsScrollBar->Orientation());
 	else if (str.ICompare("Proportion") == 0)
 		((FloatProperty*)prop)->SetValue(viewAsScrollBar->Proportion());
+	else if (str.ICompare("PreferredWidth") == 0)
+	{
+		float pwidth,pheight;
+		viewAsScrollBar->GetPreferredSize(&pwidth,&pheight);
+		if (pwidth < 5)
+			pwidth = 100;
+		((FloatProperty*)prop)->SetValue(pwidth);
+	}
+	else if (str.ICompare("PreferredHeight") == 0)
+	{
+		float pwidth,pheight;
+		viewAsScrollBar->GetPreferredSize(&pwidth,&pheight);
+		if (pheight < 5)
+			pheight = 100;
+		((FloatProperty*)prop)->SetValue(pheight);
+	}
 	else
 		return PView::GetProperty(name,value,index);
 	

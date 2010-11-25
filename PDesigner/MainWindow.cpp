@@ -225,8 +225,20 @@ MainWindow::AddControl(const BString &type)
 	BString name(pview->GetType());
 	name << pview->GetID();
 	pview->AddProperty(new StringProperty("Name",name.String(),"The name for this view"),0,0);
-	pview->SetFloatProperty("Width",100);
-	pview->SetFloatProperty("Height",100);
+	
+	FloatValue pw, ph;
+	pview->GetProperty("PreferredWidth", &pw);
+	pview->GetProperty("PreferredHeight", &ph);
+	
+	if (*pw.value > 0.0)
+		pview->SetFloatProperty("Width",*pw.value);
+	else
+		pview->SetFloatProperty("Width",100);
+	
+	if (*ph.value > 0.0)
+		pview->SetFloatProperty("Height",*ph.value);
+	else
+		pview->SetFloatProperty("Height",100);
 	
 	// If we have a PWindow selected in the window, we will add the view as a child of the
 	// selected window. If there is no selection, we will add the item at the end with no

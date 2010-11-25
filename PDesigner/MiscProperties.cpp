@@ -369,8 +369,8 @@ ResizeModeProperty::Init(void)
 	AddValuePair("Follow Bottom",B_FOLLOW_BOTTOM);
 	AddValuePair("Follow Top + Bottom",B_FOLLOW_TOP_BOTTOM);
 	AddValuePair("Follow V Center",B_FOLLOW_V_CENTER);
-	AddValuePair("Follow All",B_FOLLOW_ALL);
-	AddValuePair("Follow None",B_FOLLOW_NONE);
+//	AddValuePair("Follow All",B_FOLLOW_ALL);
+//	AddValuePair("Follow None",B_FOLLOW_NONE);
 }
 
 

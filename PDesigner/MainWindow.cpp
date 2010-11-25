@@ -246,16 +246,16 @@ MainWindow::AddControl(const BString &type)
 				pwin->RunMethod("CountChildren",args,out) == B_OK)
 			{
 				int32 count;
-				if (out.FindInt32("count",&count) == B_OK)
+				if (out.FindInt32("count",&count) == B_OK && count == 0)
 				{
 					float winWidth, winHeight;
 					pwin->GetFloatProperty("Width",winWidth);
 					pwin->GetFloatProperty("Height",winHeight);
 					pview->SetFloatProperty("Width",winWidth);
 					pview->SetFloatProperty("Height",winHeight);
+					pview->SetIntProperty("ResizingMode",B_FOLLOW_ALL);
 				}
 				pview->SetColorProperty("BackColor",ui_color(B_PANEL_BACKGROUND_COLOR));
-				pview->SetIntProperty("ResizingMode",B_FOLLOW_ALL);
 			}
 			
 			args.AddInt64("id",item->GetObject()->GetID());

@@ -36,7 +36,12 @@ PScrollBar::PScrollBar(void)
 	:	PView(),
 		fPViewTarget(NULL)
 {
-	InitPScrollBar();
+	fType = "PScrollBar";
+	fFriendlyType = "ScrollBar";
+	AddInterface("PScrollBar");
+
+	InitProperties();
+	InitBackend();
 }
 
 
@@ -44,7 +49,12 @@ PScrollBar::PScrollBar(BMessage *msg)
 	:	PView(msg),
 		fPViewTarget(NULL)
 {
-	InitPScrollBar();
+	fType = "PScrollBar";
+	fFriendlyType = "ScrollBar";
+	AddInterface("PScrollBar");
+
+	
+	InitBackend();
 }
 
 
@@ -52,7 +62,11 @@ PScrollBar::PScrollBar(const char *name)
 	:	PView(name),
 		fPViewTarget(NULL)
 {
-	InitPScrollBar();
+	fType = "PScrollBar";
+	fFriendlyType = "ScrollBar";
+	AddInterface("PScrollBar");
+
+	InitBackend();
 }
 
 
@@ -60,7 +74,11 @@ PScrollBar::PScrollBar(const PScrollBar &from)
 	:	PView(from),
 		fPViewTarget(from.fPViewTarget)
 {
-	InitPScrollBar();
+	fType = "PScrollBar";
+	fFriendlyType = "ScrollBar";
+	AddInterface("PScrollBar");
+
+	InitBackend();
 }
 
 
@@ -325,17 +343,6 @@ PScrollBar::InitBackend(BView *view)
 
 
 void
-PScrollBar::InitPScrollBar(void)
-{
-	fType = "PScrollBar";
-	fFriendlyType = "Generic ScrollBar";
-	AddInterface("PScrollBar");
-
-	InitProperties();
-}
-
-
-void
 PScrollBar::InitProperties(void)
 {
 /*
@@ -349,7 +356,7 @@ PScrollBar::InitProperties(void)
 		Target
 		Value
 */
-	StringValue sv("A scrollbar class. It is not used directly.");
+	StringValue sv("A scrollbar class.");
 	SetProperty("Description",&sv);
 	
 	AddProperty(new FloatProperty("LargeStep",10.0));

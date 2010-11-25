@@ -38,7 +38,6 @@ protected:
 	virtual void			InitBackend(BView *view = NULL);
 	
 private:
-	void					InitPScrollBar(void);
 	void					InitProperties(void);
 
 	PView					*fPViewTarget;

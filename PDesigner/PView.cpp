@@ -537,7 +537,7 @@ PView::InitBackend(BView *view)
 	fView->SetPenSize(*fv.value);
 	
 	PObject::GetProperty("ResizingMode",&iv);
-	fView->SetFlags(*iv.value);
+	fView->SetResizingMode(*iv.value);
 	
 //	PObject::GetProperty("Scale",&fv);
 //	fView->SetScale(*fv.value);
@@ -704,8 +704,6 @@ PViewBackend::MouseDown(BPoint pt)
 void
 PViewBackend::Draw(BRect update)
 {
-	// This is never called despite the B_WILL_DRAW flag. What's up???!!
-	debugger("");
 	if (IsFocus())
 	{
 		SetPenSize(5.0);

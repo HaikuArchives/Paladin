@@ -15,6 +15,11 @@ enum
 };
 
 
+enum
+{
+	METHOD_SHOW_IN_EDITOR		= 0x00000001
+};
+
 class PropertyData
 {
 public:
@@ -22,6 +27,15 @@ public:
 	~PropertyData(void) { delete value; }
 	
 	PProperty 	*value;
+	uint32 		flags;
+};
+
+class MethodData
+{
+public:
+	MethodData(const char *n, uint32 f) { name = n; flags = f; }
+	
+	BString		name;
 	uint32 		flags;
 };
 
@@ -85,6 +99,8 @@ public:
 	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
 			BString			MethodAt(const int32 &index) const;
 			int32			CountMethods(void) const;
+	virtual	void			SetFlagsForMethod(const char *name, const uint32 &flags);
+			uint32			FlagsForMethod(const char *name) const;
 		
 			BString			GetType(void) const;
 			BString			GetFriendlyType(void) const;
@@ -100,7 +116,7 @@ protected:
 			void			AddInterface(const char *name);
 			void			RemoveInterface(const char *name);
 	
-	virtual	status_t		AddMethod(const char *name);
+	virtual	status_t		AddMethod(const char *name, const uint32 &flags = 0);
 	virtual	status_t		RemoveMethod(const char *name);
 	
 	BString					fType;
@@ -110,8 +126,8 @@ private:
 	friend class PObjectBroker;
 	uint64						fObjectID;
 	BObjectList<PropertyData>	*fPropertyList;
-	BObjectList<BString>		*fInterfaceList,
-								*fMethodList;
+	BObjectList<MethodData>		*fMethodList;
+	BObjectList<BString>		*fInterfaceList;
 };
 
 // Convenience functions

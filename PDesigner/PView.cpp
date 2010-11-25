@@ -281,7 +281,7 @@ PView::GetProperty(const char *name, PValue *value, const int32 &index) const
 	// The scale of a BView is write-only?! What's up with that?! Oh well. We'll end up
 	// keeping the value in sync, so no big deal.
 	
-	else if (str.ICompare("") == 0)
+	else if (str.ICompare("BackColor") == 0)
 		((ColorProperty*)prop)->SetValue(fView->ViewColor());
 	else if (str.ICompare("Visible") == 0)
 		((BoolProperty*)prop)->SetValue(!fView->IsHidden());

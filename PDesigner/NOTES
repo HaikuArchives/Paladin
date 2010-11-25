@@ -1,5 +1,7 @@
 Test and fix PScrollBar
 
+Resizing mode stuff doesn't work -- fix.
+
 Come up with a way to set the target for a scrollbar
 
 Add a UsePreferredSize property to controls

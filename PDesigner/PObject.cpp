@@ -12,6 +12,9 @@ PObject::PObject(void)
 	fMethodList = new BObjectList<MethodData>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
+	
+	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
+				PROPERTY_READ_ONLY);
 }
 
 
@@ -38,6 +41,10 @@ PObject::PObject(BMessage *msg)
 		if (p)
 			AddProperty(p);
 	}
+	
+	RemoveProperty(FindProperty("ObjectID"));
+	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
+				PROPERTY_READ_ONLY);
 }
 
 
@@ -49,6 +56,8 @@ PObject::PObject(const char *name)
 	fMethodList = new BObjectList<MethodData>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
+	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
+				PROPERTY_READ_ONLY);
 	AddProperty(new StringProperty("Name",name));
 }
 
@@ -62,6 +71,9 @@ PObject::PObject(const PObject &from)
 	
 	PObjectBroker::RegisterObject(this);
 	*this = from;
+	RemoveProperty(FindProperty("ObjectID"));
+	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
+				PROPERTY_READ_ONLY);
 }
 
 
@@ -72,6 +84,9 @@ PObject::operator=(const PObject &from)
 	for (int32 i = 0; i < from.CountProperties(); i++)
 		AddProperty(from.PropertyAt(i)->Duplicate());
 	fType = from.fType;
+	RemoveProperty(FindProperty("ObjectID"));
+	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
+				PROPERTY_READ_ONLY);
 	return *this;
 }
 

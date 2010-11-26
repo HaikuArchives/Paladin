@@ -24,6 +24,10 @@ PropertyWindow::PropertyWindow(void)
 	fTop = new BView(Bounds(),"top",B_FOLLOW_ALL,B_WILL_DRAW);
 	fTop->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fTop);
+	
+	fIDView = new BStringView(BRect(10,10,11,11), "idview", NULL,
+										B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fTop->AddChild(fIDView);
 }
 
 
@@ -93,7 +97,12 @@ PropertyWindow::SetObject(const uint64 &id)
 	
 	DisableUpdates();
 	
-	BPoint addPoint(0.0,0.0);
+	BString label;
+	label << "ID: " << fObject->GetID();
+	fIDView->SetText(label.String());
+	fIDView->ResizeToPreferred();
+	
+	BPoint addPoint(0.0,fIDView->Frame().bottom + 5.0);
 	for (int32 i = 0; i < obj->CountProperties(); i++)
 	{
 		PProperty *prop = obj->PropertyAt(i);

@@ -1,6 +1,7 @@
 #ifndef PROPERTYWINDOW_H
 #define PROPERTYWINDOW_H
 
+#include <StringView.h>
 #include <Window.h>
 
 class AutoTextControl;
@@ -24,7 +25,7 @@ private:
 	void				UpdateEditor(const uint64 &id, const BString &name);
 	
 	BView				*fTop;
-	AutoTextControl		*fNameBox;
+	BStringView			*fIDView;
 	float				fTextBoxHeight;
 	PObject				*fObject;
 };

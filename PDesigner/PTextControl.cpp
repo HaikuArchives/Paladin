@@ -212,6 +212,25 @@ PTextControl::Duplicate(void) const
 	return new PTextControl(*this);
 }
 
+
+status_t
+PTextControl::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
+{
+	// Methods:
+	// SetPreferredDivider
+	
+	if (!name || strlen(name) < 1)
+		return B_NAME_NOT_FOUND;
+	
+	BString str(name);
+	
+	if (str.ICompare("SetPreferredDivider") == 0)
+		return DoSetPreferredDivider();
+	else
+		return PObject::RunMethod(name,args,outdata);
+}
+
+
 void
 PTextControl::InitBackend(BView *view)
 {
@@ -225,12 +244,30 @@ void
 PTextControl::InitProperties(void)
 {
 	AddProperty(new StringProperty("Text",""));
-	AddProperty(new FloatProperty("Divider",0.0));
+	AddProperty(new FloatProperty("Divider",20.0));
 	AddProperty(new IntProperty("LabelAlignment",B_ALIGN_LEFT));
 	AddProperty(new IntProperty("TextAlignment",B_ALIGN_LEFT));
 	
 	PProperty *prop = FindProperty("Value");
 	SetFlagsForProperty(prop,PROPERTY_HIDE_IN_EDITOR);
+	
+	AddMethod("SetPreferredDivider", METHOD_SHOW_IN_EDITOR);
+}
+
+
+status_t
+PTextControl::DoSetPreferredDivider(void)
+{
+	AutoTextControl *control = dynamic_cast<AutoTextControl*>(fView);
+	if (!fView)
+		return B_ERROR;
+	
+	if (strlen(control->Label()) > 0)
+		control->SetDivider(control->StringWidth(control->Label()));
+	else
+		control->SetDivider(0.0);
+	
+	return B_OK;
 }
 
 

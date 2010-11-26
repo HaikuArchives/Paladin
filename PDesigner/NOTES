@@ -2,8 +2,6 @@ Test and fix PScrollBar
 
 Resizing mode stuff doesn't work -- fix.
 
-Come up with a way to set the target for a scrollbar
-
 Create resize / move handles for each control that has focus, windows excepted
 
 Will need to create a window for managing the application/project settings

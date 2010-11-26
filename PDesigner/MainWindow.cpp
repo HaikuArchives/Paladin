@@ -226,6 +226,16 @@ MainWindow::AddControl(const BString &type)
 	name << pview->GetID();
 	pview->AddProperty(new StringProperty("Name",name.String(),"The name for this view"),0,0);
 	
+	if (pview->GetType().Compare("PTextControl") == 0)
+	{
+		// Create each text control with some more useful defaults for the GUI
+		pview->SetStringProperty("Text", "Text");
+		pview->SetStringProperty("Label", "Label");
+		
+		BMessage in, out;
+		pview->RunMethod("SetPreferredDivider", in, out);
+	}
+	
 	FloatValue pw, ph;
 	pview->GetProperty("PreferredWidth", &pw);
 	pview->GetProperty("PreferredHeight", &ph);

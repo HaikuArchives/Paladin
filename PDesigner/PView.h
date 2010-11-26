@@ -40,6 +40,15 @@
 
 class PView;
 
+enum
+{
+	RESIZE_NONE = 0,
+	RESIZE_FIRST,
+	RESIZE_SECOND,
+	RESIZE_BOTH,
+	RESIZE_CENTER
+};
+
 class ViewItem : public ObjectItem
 {
 public:
@@ -78,6 +87,11 @@ protected:
 	status_t				DoAddChild(const BMessage &args, BMessage &outdata);
 	status_t				DoRemoveChild(const BMessage &args, BMessage &outdata);
 	status_t				DoChildAt(const BMessage &args, BMessage &outdata);
+	
+	void					SetHResizingMode(const int32 &value);
+	void					SetVResizingMode(const int32 &value);
+	int32					GetHResizingMode(void) const;
+	int32					GetVResizingMode(void) const;
 	
 	BView					*fView;
 	

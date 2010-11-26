@@ -8,6 +8,17 @@
 #include "PWindow.h"
 #include "MiscProperties.h"
 
+static const uint32 ksFollowNone = 0;
+static const uint32 ksFollowAll = B_FOLLOW_ALL;
+static const uint32 ksFollowLeft = B_FOLLOW_LEFT;
+static const uint32 ksFollowRight = B_FOLLOW_RIGHT;
+static const uint32 ksFollowLeftRight = B_FOLLOW_LEFT_RIGHT;
+static const uint32 ksFollowHCenter = B_FOLLOW_H_CENTER;
+static const uint32 ksFollowTop = B_FOLLOW_TOP;
+static const uint32 ksFollowBottom = B_FOLLOW_BOTTOM;
+static const uint32 ksFollowTopBottom = B_FOLLOW_TOP_BOTTOM;
+static const uint32 ksFollowVCenter = B_FOLLOW_V_CENTER;
+
 class PViewBackend : public BView
 {
 public:
@@ -275,8 +286,10 @@ PView::GetProperty(const char *name, PValue *value, const int32 &index) const
 		fView->GetPreferredSize(&pwidth,&pheight);
 		((FloatProperty*)prop)->SetValue(pheight);
 	}
-	else if (str.ICompare("ResizingMode") == 0)
-		((IntProperty*)prop)->SetValue(fView->ResizingMode());
+	else if (str.ICompare("HResizingMode") == 0)
+		((IntProperty*)prop)->SetValue(GetHResizingMode());
+	else if (str.ICompare("VResizingMode") == 0)
+		((IntProperty*)prop)->SetValue(GetVResizingMode());
 	
 	// The scale of a BView is write-only?! What's up with that?! Oh well. We'll end up
 	// keeping the value in sync, so no big deal.
@@ -395,10 +408,15 @@ PView::SetProperty(const char *name, PValue *value, const int32 &index)
 		prop->GetValue(&fv);
 		fView->SetPenSize(*fv.value);
 	}
-	else if (str.ICompare("ResizingMode") == 0)
+	else if (str.ICompare("HResizingMode") == 0)
 	{
 		prop->GetValue(&iv);
-		fView->SetResizingMode(*iv.value);
+		SetHResizingMode(*iv.value);
+	}
+	else if (str.ICompare("VResizingMode") == 0)
+	{
+		prop->GetValue(&iv);
+		SetVResizingMode(*iv.value);
 	}
 	else if (str.ICompare("Scale") == 0)
 	{
@@ -490,7 +508,32 @@ PView::InitProperties(void)
 				PROPERTY_HIDE_IN_EDITOR);
 	AddProperty(new FloatProperty("PreferredHeight",1.0),PROPERTY_READ_ONLY);
 	AddProperty(new FloatProperty("PreferredWidth",1.0),PROPERTY_READ_ONLY);
-	AddProperty(new ResizeModeProperty("ResizingMode",B_FOLLOW_LEFT | B_FOLLOW_TOP));
+	
+	// HResizingMode = RESIZE_FIRST => B_FOLLOW_LEFT
+	EnumProperty *prop = new EnumProperty();
+	prop->SetName("HResizingMode");
+	prop->AddValuePair("Follow None", RESIZE_NONE);
+	prop->AddValuePair("Follow Left", RESIZE_FIRST);
+	prop->AddValuePair("Follow Right", RESIZE_SECOND);
+	prop->AddValuePair("Follow Both", RESIZE_BOTH);
+	prop->AddValuePair("Follow Center", RESIZE_CENTER);
+	prop->SetDescription("The view's horizontal resizing mode.");
+	prop->SetValue((int32)RESIZE_FIRST);
+	AddProperty(prop);
+	
+	// VResizingMode = RESIZE_FIRST => B_FOLLOW_TOP
+	prop = new EnumProperty();
+	prop->SetName("VResizingMode");
+	prop->AddValuePair("Follow None", RESIZE_NONE);
+	prop->AddValuePair("Follow Top", RESIZE_FIRST);
+	prop->AddValuePair("Follow Bottom", RESIZE_SECOND);
+	prop->AddValuePair("Follow Both", RESIZE_BOTH);
+	prop->AddValuePair("Follow Center", RESIZE_CENTER);
+	prop->SetDescription("The view's vertical resizing mode.");
+	prop->SetValue((int32)RESIZE_FIRST);
+	AddProperty(prop);
+	
+	
 	AddProperty(new FloatProperty("Scale",1.0),PROPERTY_HIDE_IN_EDITOR);
 	AddProperty(new ColorProperty("BackColor", 255,255,255, "The view's background color"));
 	AddProperty(new BoolProperty("Visible",true));
@@ -664,6 +707,120 @@ ViewItem::ViewItem(PView *view)
 {
 	if (view)
 		SetName(view->GetFriendlyType().String());
+}
+
+
+void
+PView::SetHResizingMode(const int32 &value)
+{
+	int32 mode = 0;
+	
+	switch (value)
+	{
+		case RESIZE_FIRST:
+		{
+			mode = B_FOLLOW_LEFT;
+			break;
+		}
+		case RESIZE_SECOND:
+		{
+			mode = B_FOLLOW_RIGHT;
+			break;
+		}
+		case RESIZE_BOTH:
+		{
+			mode = B_FOLLOW_LEFT_RIGHT;
+			break;
+		}
+		case RESIZE_CENTER:
+		{
+			mode = B_FOLLOW_H_CENTER;
+			break;
+		}
+		default:
+			break;
+	}
+	
+	// Zero out the old horizontal follow mode while still keeping
+	// the vertical one.
+	int32 oldmode = fView->ResizingMode();
+	oldmode &= _rule_(0xFFFFFFFFUL, 0, 0xFFFFFFFFUL, 0);
+	
+	fView->SetResizingMode(oldmode | mode);
+}
+
+
+void
+PView::SetVResizingMode(const int32 &value)
+{
+	int32 mode = 0;
+	
+	switch (value)
+	{
+		case RESIZE_FIRST:
+		{
+			mode = B_FOLLOW_TOP;
+			break;
+		}
+		case RESIZE_SECOND:
+		{
+			mode = B_FOLLOW_BOTTOM;
+			break;
+		}
+		case RESIZE_BOTH:
+		{
+			mode = B_FOLLOW_TOP_BOTTOM;
+			break;
+		}
+		case RESIZE_CENTER:
+		{
+			mode = B_FOLLOW_V_CENTER;
+			break;
+		}
+		default:
+			break;
+	}
+	
+	// Zero out the old vertical follow mode while still keeping
+	// the horizontal one.
+	int32 oldmode = fView->ResizingMode();
+	oldmode &= _rule_(0, 0xFFFFFFFFUL, 0, 0xFFFFFFFFUL);
+	
+	fView->SetResizingMode(oldmode | mode);
+}
+
+
+int32
+PView::GetHResizingMode(void) const
+{
+	uint32 mode = fView->ResizingMode() & _rule_(0xFFFFFFFFUL, 0, 0xFFFFFFFFUL, 0);
+	if (mode == ksFollowLeft)
+		return RESIZE_FIRST;
+	else if (mode == ksFollowRight)
+		return RESIZE_SECOND;
+	else if (mode == ksFollowLeftRight)
+		return RESIZE_BOTH;
+	else if (mode == ksFollowHCenter)
+		return RESIZE_CENTER;
+	
+	return RESIZE_NONE;
+}
+
+
+int32
+PView::GetVResizingMode(void) const
+{
+	uint32 mode = fView->ResizingMode() & _rule_(0, 0xFFFFFFFFUL, 0, 0xFFFFFFFFUL);
+	if (mode == ksFollowTop)
+		return RESIZE_FIRST;
+	else if (mode == ksFollowBottom)
+		return RESIZE_SECOND;
+	else if (mode == ksFollowTopBottom)
+		return RESIZE_BOTH;
+	else if (mode == ksFollowVCenter)
+		return RESIZE_CENTER;
+	
+	return RESIZE_NONE;
 }
 
 

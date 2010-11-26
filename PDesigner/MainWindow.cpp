@@ -275,7 +275,8 @@ MainWindow::AddControl(const BString &type)
 					pwin->GetFloatProperty("Height",winHeight);
 					pview->SetFloatProperty("Width",winWidth);
 					pview->SetFloatProperty("Height",winHeight);
-					pview->SetIntProperty("ResizingMode",B_FOLLOW_ALL);
+					pview->SetIntProperty("HResizingMode",RESIZE_BOTH);
+					pview->SetIntProperty("VResizingMode",RESIZE_BOTH);
 				}
 				pview->SetColorProperty("BackColor",ui_color(B_PANEL_BACKGROUND_COLOR));
 			}

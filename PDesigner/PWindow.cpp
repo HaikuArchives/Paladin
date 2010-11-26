@@ -1,5 +1,7 @@
 #include "PWindow.h"
 
+#include <stdio.h>
+
 #include "App.h"
 #include "MsgDefs.h"
 #include "PView.h"
@@ -18,6 +20,7 @@ public:
 	void		MessageReceived(BMessage *msg);
 	void		WindowActivated(bool active);
 	void		FrameMoved(BPoint pt);
+	void		FrameResized(float w, float h);
 	
 	void		SetCodeFeel(window_feel feel);
 	window_feel	CodeFeel(void) const;
@@ -642,6 +645,17 @@ PWindowBackend::FrameMoved(BPoint pt)
 	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
 	msg.AddInt64("id",fOwner->GetID());
 	msg.AddString("name","Location");
+	be_app->PostMessage(&msg);
+}
+
+
+void
+PWindowBackend::FrameResized(float w, float h)
+{
+	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
+	msg.AddInt64("id",fOwner->GetID());
+	msg.AddString("name","Width");
+	msg.AddString("name","Height");
 	be_app->PostMessage(&msg);
 }
 

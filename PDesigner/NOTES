@@ -1,3 +1,5 @@
 Create resize / move handles for each control that has focus, windows excepted
 
+Resizing a window doesn't update its values. The Update() method for the editor is called by the PropertyWindow, but it ends up getting the old value for the property instead of the new one. At that point, the value for Frame() doesn't return the right values. Is this a Haiku bug?
+
 Will need to create a window for managing the application/project settings

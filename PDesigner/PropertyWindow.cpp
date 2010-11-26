@@ -66,16 +66,29 @@ PropertyWindow::MessageReceived(BMessage *msg)
 		{
 			uint64 id;
 			BString name;
-			if (msg->FindInt64("id",(int64*)&id) == B_OK &&
-				msg->FindString("name",&name) == B_OK)
-				UpdateEditor(id,name);
-		}
-/*
-		case M_PROPERTY_EDITED:
-		{
+			if (msg->FindInt64("id",(int64*)&id) == B_OK)
+			{
+				int32 i = 0;
+				while (msg->FindString("name",i++, &name) == B_OK)
+					UpdateEditor(id,name);
+			}
 			break;
 		}
-*/
+		case M_OWNER_CHANGED:
+		{
+			uint64 id;
+			BString name, ownerType;
+			if (msg->FindInt64("id",(int64*)&id) == B_OK &&
+				msg->FindString("ownertype", &ownerType) == B_OK)
+			{
+				if (fObject->GetID() != id)
+					break;
+				
+				int32 i = 0;
+				while (msg->FindString("name",i++, &name) == B_OK)
+					UpdateEditor(id,name);
+			}
+		}
 		default:
 		{
 			BWindow::MessageReceived(msg);

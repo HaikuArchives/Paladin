@@ -53,10 +53,8 @@ PObjectBroker::PObjectBroker(void)
 											PControl::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PScrollBar","ScrollBar",PScrollBar::Instantiate,
 											PScrollBar::Create));
-/*	fObjInfoList->AddItem(new PObjectInfo("PListView",PListView::Instantiate,PListView::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PListItem",PListItem::Instantiate,PListItem::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PStringItem",PStringItem::Instantiate,PStringItem::Create));
-*/	
+	fObjInfoList->AddItem(new PObjectInfo("PListView","List",
+											PListView::Instantiate,PListView::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PTextControl","Text Control",PControl::Instantiate,
 											PTextControl::Create));
 	

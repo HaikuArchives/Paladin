@@ -1,5 +1,8 @@
 #include "Floater.h"
+#include <TranslatorFormats.h>
 #include <TranslationUtils.h>
+
+#include <stdio.h>
 
 Floater::Floater(void)
 	:	fAction(FLOATER_NONE)
@@ -60,28 +63,82 @@ Floater::GetAction(void) const
 
 
 HandleFloater::HandleFloater(const char *bitmapName, const int32 &action)
+	:	Floater(action)
+{
+	
+	fWindow = new HandleWindow(bitmapName, action);
+}
+
+
+HandleFloater::~HandleFloater(void)
+{
+	fWindow->Lock();
+	fWindow->Quit();
+}
+
+
+void
+HandleFloater::SetBitmap(BBitmap *bitmap)
+{
+	fWindow->SetBitmap(bitmap);
+}
+
+
+BBitmap *
+HandleFloater::GetBitmap(void)
+{
+	return fWindow->GetBitmap();
+}
+
+
+void
+HandleFloater::FloaterAttached(PView *pview)
+{
+	fWindow->FloaterAttached(pview);
+}
+
+
+void
+HandleFloater::FloaterDetached(void)
+{
+	fWindow->FloaterDetached();
+}
+
+
+void
+HandleFloater::Update(PView *pview, const int32 &action)
+{
+	fWindow->Update(pview, action);
+}
+
+
+#pragma mark HandleWindow -
+
+
+HandleWindow::HandleWindow(const char *bitmapName, const int32 &action)
 	:	BWindow(BRect(0,0,31,31), "", B_NO_BORDER_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
-				B_AVOID_FOCUS),
-		Floater(action)
+				B_AVOID_FOCUS)
 {
 	fView = new HandleView(Bounds(), action);
 	AddChild(fView);
 	
 	if (bitmapName)
 	{
-		BBitmap *bitmap = BTranslationUtils::GetBitmap(bitmapName);
+		BBitmap *bitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, bitmapName);
 		SetBitmap(bitmap);
 	}
+	Hide();
+	Show();
 }
 
 
-HandleFloater::~HandleFloater(void)
+HandleWindow::~HandleWindow(void)
 {
 }
 
 
 void
-HandleFloater::SetBitmap(BBitmap *bitmap)
+HandleWindow::SetBitmap(BBitmap *bitmap)
 {
 	Lock();
 	
@@ -96,56 +153,76 @@ HandleFloater::SetBitmap(BBitmap *bitmap)
 
 
 BBitmap *
-HandleFloater::GetBitmap(void)
+HandleWindow::GetBitmap(void)
 {
 	return fView->fBitmap;
 }
 
 
 void
-HandleFloater::FloaterAttached(PView *pview)
+HandleWindow::FloaterAttached(PView *pview)
 {
 	if (pview)
 	{
 		BView *view = pview->GetView();
 		
 		fView->fTarget = BMessenger(view);
+		
+		if (view->Window())
+			view->Window()->Lock();
+		
 		BRect rect = view->ConvertToScreen(view->Bounds());
-		if (GetAction() == FLOATER_MOVE)
+		
+		if (view->Window())
+			view->Window()->Unlock();
+		
+		Lock();
+		if (fView->fAction == FLOATER_MOVE)
 			MoveTo(rect.right + 5.0, rect.top);
-		else if (GetAction() == FLOATER_RESIZE)
+		else if (fView->fAction == FLOATER_RESIZE)
 			MoveTo(rect.right - 8.0, rect.bottom - 8.0);
+		Unlock();
+		
+		if (IsHidden())
+			Show();
 	}
 	else
 		fView->fTarget = BMessenger();
-	Show();
 }
 
 
 void
-HandleFloater::FloaterDetached(void)
+HandleWindow::FloaterDetached(void)
 {
 	fView->fTarget = BMessenger();
-	Hide();
+	if (!IsHidden())
+		Hide();
 }
 
 
 void
-HandleFloater::Update(PView *pview, const int32 &action)
+HandleWindow::Update(PView *pview, const int32 &action)
 {
 	BView *view = pview->GetView();
+	BWindow *window = view->Window();
+	
+	if (window)
+		window->Lock();
 	BRect rect = view->ConvertToScreen(view->Bounds());
+	if (window)
+		window->Unlock();
+	
 	switch (action)
 	{
 		case FLOATER_RESIZE:
 		{
-			if (GetAction() == FLOATER_MOVE)
+			if (fView->fAction == FLOATER_MOVE)
 				MoveTo(rect.right + 5.0, rect.top);
 			break;
 		}
 		case FLOATER_MOVE:
 		{
-			if (GetAction() == FLOATER_RESIZE)
+			if (fView->fAction == FLOATER_RESIZE)
 				MoveTo(rect.right - 8.0, rect.bottom - 8.0);
 			break;
 		}
@@ -177,7 +254,8 @@ HandleView::Draw(BRect rect)
 {
 	if (fBitmap)
 		DrawBitmap(fBitmap, BPoint(0,0));
-	StrokeRect(Bounds());
+	else
+		StrokeRect(Bounds());
 }
 
 

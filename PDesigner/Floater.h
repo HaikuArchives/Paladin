@@ -43,15 +43,35 @@ private:
 };
 
 
+class HandleWindow;
 class HandleView;
 
 // The HandleFloater class is for floaters which are meant to be dragged, like
 // move and resize operations.
-class HandleFloater : public BWindow, public Floater
+class HandleFloater : public Floater
 {
 public:
 						HandleFloater(const char *bitmapName, const int32 &action);
 						~HandleFloater(void);
+						
+			void		SetBitmap(BBitmap *bitmap);
+			BBitmap *	GetBitmap(void);
+
+			void		FloaterAttached(PView *view);
+			void		FloaterDetached(void);
+			
+	virtual	void		Update(PView *view, const int32 &action);
+	
+private:
+			HandleWindow	*fWindow;
+};
+
+
+class HandleWindow : public BWindow
+{
+public:
+						HandleWindow(const char *bitmapName, const int32 &action);
+						~HandleWindow(void);
 						
 			void		SetBitmap(BBitmap *bitmap);
 			BBitmap *	GetBitmap(void);
@@ -78,7 +98,7 @@ public:
 			void		SetMessenger(BMessenger &msgr) { fTarget = msgr; }
 			void		SendMessage(BMessage &msg) { fTarget.SendMessage(&msg); }
 private:
-	friend class HandleFloater;
+	friend class HandleWindow;
 	
 	BBitmap		*fBitmap;
 	BMessenger	fTarget;

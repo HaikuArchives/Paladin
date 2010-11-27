@@ -148,8 +148,8 @@ MainWindow::MessageReceived(BMessage *msg)
 		}
 		case M_OBJECT_SELECTED:
 		{
-			UpdateProperties();
 			UpdateFloaters();
+			UpdateProperties();
 			break;
 		}
 		case M_ACTIVATE_OBJECT:
@@ -360,13 +360,14 @@ MainWindow::UpdateFloaters(void)
 {
 	ViewItem *item = dynamic_cast<ViewItem*>(fListView->FullListItemAt(
 											fListView->FullListCurrentSelection()));
-	if (!item)
-		return;
-	
-	PView *view = item->GetView();
 	
 	FloaterBroker *broker = FloaterBroker::GetInstance();
 	broker->DetachAllFloaters();
-	broker->AttachAllFloaters(view);
+	
+	if (item)
+	{
+		PView *view = item->GetView();
+		broker->AttachAllFloaters(view);
+	}
 }
 

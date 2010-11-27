@@ -33,7 +33,7 @@ public:
 							PData(BMessage *msg);
 							PData(const char *name);
 							PData(const PData &from);
-			PData &		operator=(const PData &from);
+			PData &			operator=(const PData &from);
 			PProperty *		operator[](const char *name);
 			PProperty *		operator[](const BString &name);
 	virtual					~PData(void);

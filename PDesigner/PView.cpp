@@ -361,11 +361,17 @@ PView::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		prop->GetValue(&fv);
 		fView->ResizeTo(*fv.value,fView->Frame().Height());
+		
+		FloaterBroker *broker = FloaterBroker::GetInstance();
+		broker->NotifyFloaters(this, FLOATER_INTERNAL_RESIZE);
 	}
 	else if (str.ICompare("Height") == 0)
 	{
 		prop->GetValue(&fv);
 		fView->ResizeTo(fView->Frame().Width(),*fv.value);
+		
+		FloaterBroker *broker = FloaterBroker::GetInstance();
+		broker->NotifyFloaters(this, FLOATER_INTERNAL_RESIZE);
 	}
 	else if (str.ICompare("Location") == 0)
 	{

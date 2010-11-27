@@ -1,5 +1,6 @@
 #include "PTextControl.h"
 
+#include "CommonMethods.h"
 #include "Floater.h"
 #include "FloaterBroker.h"
 #include "MsgDefs.h"
@@ -9,6 +10,7 @@
 #include <TextControl.h>
 #include <Window.h>
 
+status_t	SetPreferredDivider(PObject *object, BMessage &in, BMessage &out);
 
 class PTextControlBackend : public AutoTextControl
 {
@@ -259,7 +261,8 @@ PTextControl::InitProperties(void)
 	PProperty *prop = FindProperty("Value");
 	SetFlagsForProperty(prop,PROPERTY_HIDE_IN_EDITOR);
 	
-	AddMethod("SetPreferredDivider", METHOD_SHOW_IN_EDITOR);
+	AddMethod(new PMethod("SetPreferredDivider", SetPreferredDivider,
+							METHOD_SHOW_IN_EDITOR));
 }
 
 
@@ -355,3 +358,32 @@ PTextControlBackend::MessageReceived(BMessage *msg)
 	}
 }
 
+
+status_t
+SetPreferredDivider(PObject *object, BMessage &in, BMessage &out)
+{
+	if (!object)
+		return B_ERROR;
+	
+	PTextControl *pcontrol = dynamic_cast<PTextControl*>(object);
+	
+	if (!object->UsesInterface("PTextControl") || !pcontrol)
+		return B_BAD_TYPE;
+	
+	BTextControl *control = dynamic_cast<BTextControl*>(pcontrol->GetView());
+	if (!control)
+		return B_BAD_TYPE;
+	
+	if (control->Window())
+		control->Window()->Lock();
+	
+	if (strlen(control->Label()) > 0)
+		control->SetDivider(control->StringWidth(control->Label()));
+	else
+		control->SetDivider(0.0);
+	
+	if (control->Window())
+		control->Window()->Unlock();
+	
+	return B_OK;
+}

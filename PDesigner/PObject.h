@@ -6,12 +6,8 @@
 #include <String.h>
 #include "ObjectList.h"
 #include "PData.h"
+#include "PMethod.h"
 #include "PProperty.h"
-
-enum
-{
-	METHOD_SHOW_IN_EDITOR		= 0x00000001
-};
 
 class MethodData
 {
@@ -45,11 +41,10 @@ public:
 			uint64			GetID(void) const;
 	
 	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
-			BString			MethodAt(const int32 &index) const;
+			PMethod *		FindMethod(const char *name);
+			PMethod *		MethodAt(const int32 &index) const;
 			int32			CountMethods(void) const;
-	virtual	void			SetFlagsForMethod(const char *name, const uint32 &flags);
-			uint32			FlagsForMethod(const char *name) const;
-		
+			
 			BString			GetType(void) const;
 			BString			GetFriendlyType(void) const;
 			
@@ -64,7 +59,7 @@ protected:
 			void			AddInterface(const char *name);
 			void			RemoveInterface(const char *name);
 	
-	virtual	status_t		AddMethod(const char *name, const uint32 &flags = 0);
+	virtual	status_t		AddMethod(PMethod *method);
 	virtual	status_t		RemoveMethod(const char *name);
 	
 	BString					fType;
@@ -74,7 +69,7 @@ private:
 	friend class PObjectBroker;
 	uint64						fObjectID;
 	BObjectList<PropertyData>	*fPropertyList;
-	BObjectList<MethodData>		*fMethodList;
+	BObjectList<PMethod>		*fMethodList;
 	BObjectList<BString>		*fInterfaceList;
 };
 

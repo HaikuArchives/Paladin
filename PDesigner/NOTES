@@ -1,5 +1,6 @@
-Test and fix PTextControl
+Convert PWindow to use PMethods instead of the old method architecture
 
+Test and fix PTextControl
 
 Resizing a window doesn't update its values. The Update() method for the editor is called by the PropertyWindow, but it ends up getting the old value for the property instead of the new one. At that point, the value for Frame() doesn't return the right values. Is this a Haiku bug?
 

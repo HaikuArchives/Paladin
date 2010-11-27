@@ -177,10 +177,23 @@ HandleWindow::FloaterAttached(PView *pview)
 			view->Window()->Unlock();
 		
 		Lock();
-		if (fView->fAction == FLOATER_MOVE)
-			MoveTo(rect.right + 5.0, rect.top);
-		else if (fView->fAction == FLOATER_RESIZE)
-			MoveTo(rect.right - 8.0, rect.bottom - 8.0);
+		switch (fView->fAction)
+		{
+			case FLOATER_MOVE:
+			{
+				MoveTo(rect.right + 5.0, rect.top);
+				break;
+			}
+			case FLOATER_RESIZE:
+			{
+				MoveTo(rect.right - 8.0, rect.bottom - 8.0);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
 		Unlock();
 		
 		if (IsHidden())
@@ -214,6 +227,15 @@ HandleWindow::Update(PView *pview, const int32 &action)
 	
 	switch (action)
 	{
+		case FLOATER_INTERNAL_MOVE:
+		case FLOATER_INTERNAL_RESIZE:
+		{
+			if (fView->fAction == FLOATER_MOVE)
+				MoveTo(rect.right + 5.0, rect.top);
+			else if (fView->fAction == FLOATER_RESIZE)
+				MoveTo(rect.right - 8.0, rect.bottom - 8.0);
+			break;
+		}
 		case FLOATER_RESIZE:
 		{
 			if (fView->fAction == FLOATER_MOVE)

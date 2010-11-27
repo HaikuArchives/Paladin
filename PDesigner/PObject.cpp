@@ -1,7 +1,8 @@
 #include "PObject.h"
 #include "PObjectBroker.h"
-#include <stdio.h>
+
 #include <ClassInfo.h>
+#include <stdio.h>
 
 PObject::PObject(void)
 	:	fType("PObject"),
@@ -9,7 +10,7 @@ PObject::PObject(void)
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
-	fMethodList = new BObjectList<MethodData>(20,true);
+	fMethodList = new BObjectList<PMethod>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	
@@ -23,7 +24,7 @@ PObject::PObject(BMessage *msg)
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
-	fMethodList = new BObjectList<MethodData>(20,true);
+	fMethodList = new BObjectList<PMethod>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	if (msg->FindString("type",&fType) != B_OK)
@@ -52,7 +53,7 @@ PObject::PObject(const char *name)
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
-	fMethodList = new BObjectList<MethodData>(20,true);
+	fMethodList = new BObjectList<PMethod>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
@@ -66,7 +67,7 @@ PObject::PObject(const PObject &from)
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
-	fMethodList = new BObjectList<MethodData>(20,true);
+	fMethodList = new BObjectList<PMethod>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	*this = from;
@@ -181,11 +182,26 @@ PObject::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
 }
 
 
-BString
+PMethod *
+PObject::FindMethod(const char *name)
+{
+	if (!name)
+		return NULL;
+	
+	for (int32 i = 0; i < fMethodList->CountItems(); i++)
+	{
+		PMethod *item = fMethodList->ItemAt(i);
+		if (item->GetName().ICompare(name) == 0)
+			return item;
+	}
+	return NULL;
+}
+
+
+PMethod *
 PObject::MethodAt(const int32 &index) const
 {
-	MethodData *data = fMethodList->ItemAt(index);
-	return data ? data->name : BString();
+	return fMethodList->ItemAt(index);
 }
 
 
@@ -193,54 +209,6 @@ int32
 PObject::CountMethods(void) const
 {
 	return fMethodList->CountItems();
-}
-
-
-void
-PObject::SetFlagsForMethod(const char *name, const uint32 &flags)
-{
-	if (!name)
-		return;
-	
-	MethodData *data = NULL;
-	for (int32 i = 0; i < fMethodList->CountItems(); i++)
-	{
-		MethodData *item = fMethodList->ItemAt(i);
-		if (item->name.ICompare(name) == 0)
-		{
-			data = item;
-			break;
-		}
-	}
-	
-	if (!data)
-		return;
-	
-	data->flags = flags;
-}
-
-
-uint32
-PObject::FlagsForMethod(const char *name) const
-{
-	if (!name)
-		return 0;
-	
-	MethodData *data = NULL;
-	for (int32 i = 0; i < fMethodList->CountItems(); i++)
-	{
-		MethodData *item = fMethodList->ItemAt(i);
-		if (item->name.ICompare(name) == 0)
-		{
-			data = item;
-			break;
-		}
-	}
-	
-	if (!data)
-		return 0;
-	
-	return data->flags;
 }
 
 
@@ -342,19 +310,15 @@ PObject::RemoveInterface(const char *name)
 
 
 status_t
-PObject::AddMethod(const char *name, const uint32 &flags)
+PObject::AddMethod(PMethod *method)
 {
-	if (!name)
+	if (!method)
 		return B_ERROR;
 	
-	for (int32 i = 0; i < fMethodList->CountItems(); i++)
-	{
-		MethodData *item = fMethodList->ItemAt(i);
-		if (item->name.ICompare(name) == 0)
-			return B_NAME_IN_USE;
-	}
+	if (FindMethod(method->GetName()))
+		return B_NAME_IN_USE;
 	
-	fMethodList->AddItem(new MethodData(name, flags));
+	fMethodList->AddItem(method);
 	
 	return B_OK;
 }
@@ -368,8 +332,8 @@ PObject::RemoveMethod(const char *name)
 	
 	for (int32 i = 0; i < fMethodList->CountItems(); i++)
 	{
-		MethodData *item = fMethodList->ItemAt(i);
-		if (item->name.ICompare(name) == 0)
+		PMethod *item = fMethodList->ItemAt(i);
+		if (item->GetName().ICompare(name) == 0)
 		{
 			fMethodList->RemoveItemAt(i);
 			return B_OK;

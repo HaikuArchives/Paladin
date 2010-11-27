@@ -3,6 +3,8 @@
 #include <Application.h>
 #include <stdio.h>
 
+#include "Floater.h"
+#include "FloaterBroker.h"
 #include "MsgDefs.h"
 
 class PButtonBackend : public BButton
@@ -11,7 +13,8 @@ public:
 			PButtonBackend(PObject *owner);
 	void	MakeFocus(bool value);
 	void	MouseUp(BPoint pt);
-
+	void	MessageReceived(BMessage *msg);
+	
 private:
 	PObject	*fOwner;
 };
@@ -132,3 +135,47 @@ PButtonBackend::MouseUp(BPoint pt)
 	BButton::MouseUp(pt);
 }
 
+
+void
+PButtonBackend::MessageReceived(BMessage *msg)
+{
+	switch (msg->what)
+	{
+		case M_FLOATER_ACTION:
+		{
+			int32 action;
+			if (msg->FindInt32("action", &action) != B_OK)
+				break;
+			
+			float dx, dy;
+			msg->FindFloat("dx", &dx);
+			msg->FindFloat("dy", &dy);
+			
+			FloaterBroker *broker = FloaterBroker::GetInstance();
+			
+			switch (action)
+			{
+				case FLOATER_MOVE:
+				{
+					MoveBy(dx, dy);
+					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
+					break;
+				}
+				case FLOATER_RESIZE:
+				{
+					ResizeBy(dx, dy);
+					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
+					break;
+				}
+				default:
+					break;
+			}
+			break;
+		}
+		default:
+		{
+			BButton::MessageReceived(msg);
+			break;
+		}
+	}
+}

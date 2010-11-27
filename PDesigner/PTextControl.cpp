@@ -1,15 +1,23 @@
 #include "PTextControl.h"
 
+#include "Floater.h"
+#include "FloaterBroker.h"
+#include "MsgDefs.h"
+
+#include <Application.h>
 #include <stdio.h>
+#include <TextControl.h>
 #include <Window.h>
 
-#include <TextControl.h>
 
 class PTextControlBackend : public AutoTextControl
 {
 public:
 			PTextControlBackend(PObject *owner);
 	void	AttachedToWindow(void);
+	void	MakeFocus(bool value);
+	void	MouseUp(BPoint pt);
+	void	MessageReceived(BMessage *msg);
 
 private:
 	PObject 	*fOwner;
@@ -281,5 +289,69 @@ void
 PTextControlBackend::AttachedToWindow(void)
 {
 	SetDivider(0.0);
+}
+
+
+void
+PTextControlBackend::MakeFocus(bool value)
+{
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",fOwner->GetID());
+	be_app->PostMessage(&msg);
+}
+
+
+void
+PTextControlBackend::MouseUp(BPoint pt)
+{
+	MakeFocus(true);
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",fOwner->GetID());
+	be_app->PostMessage(&msg);
+}
+
+
+void
+PTextControlBackend::MessageReceived(BMessage *msg)
+{
+	switch (msg->what)
+	{
+		case M_FLOATER_ACTION:
+		{
+			int32 action;
+			if (msg->FindInt32("action", &action) != B_OK)
+				break;
+			
+			float dx, dy;
+			msg->FindFloat("dx", &dx);
+			msg->FindFloat("dy", &dy);
+			
+			FloaterBroker *broker = FloaterBroker::GetInstance();
+			
+			switch (action)
+			{
+				case FLOATER_MOVE:
+				{
+					MoveBy(dx, dy);
+					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
+					break;
+				}
+				case FLOATER_RESIZE:
+				{
+					ResizeBy(dx, dy);
+					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
+					break;
+				}
+				default:
+					break;
+			}
+			break;
+		}
+		default:
+		{
+			BTextControl::MessageReceived(msg);
+			break;
+		}
+	}
 }
 

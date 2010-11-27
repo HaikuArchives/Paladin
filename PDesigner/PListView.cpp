@@ -1,6 +1,25 @@
 #include "PListView.h"
+
+#include <Application.h>
 #include <Window.h>
+
 #include "EnumProperty.h"
+#include "Floater.h"
+#include "FloaterBroker.h"
+#include "MsgDefs.h"
+
+class PListViewBackend : public BListView
+{
+public:
+			PListViewBackend(PObject *owner);
+	void	MakeFocus(bool value);
+	void	MouseUp(BPoint pt);
+	void	MessageReceived(BMessage *msg);
+	
+private:
+	PObject	*fOwner;
+};
+
 
 PListView::PListView(void)
 	:	PView()
@@ -180,7 +199,7 @@ PListView::InitBackend(BView *view)
 {
 	if (fView)
 		delete fView;
-	fView = (view == NULL) ? new BListView(BRect(0,0,1,1),"") : view;
+	fView = (view == NULL) ? new PListViewBackend(this) : view;
 }
 
 
@@ -209,3 +228,76 @@ PListView::InitProperties(void)
 	AddProperty(prop);
 }
 
+
+PListViewBackend::PListViewBackend(PObject *owner)
+	:	BListView(BRect(0,0,1,1),"", B_SINGLE_SELECTION_LIST),
+		fOwner(owner)
+{
+}
+
+
+void
+PListViewBackend::MakeFocus(bool value)
+{
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",fOwner->GetID());
+	be_app->PostMessage(&msg);
+	
+	BListView::MakeFocus(value);
+}
+
+
+void
+PListViewBackend::MouseUp(BPoint pt)
+{
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",fOwner->GetID());
+	be_app->PostMessage(&msg);
+	
+	BListView::MouseUp(pt);
+}
+
+
+void
+PListViewBackend::MessageReceived(BMessage *msg)
+{
+	switch (msg->what)
+	{
+		case M_FLOATER_ACTION:
+		{
+			int32 action;
+			if (msg->FindInt32("action", &action) != B_OK)
+				break;
+			
+			float dx, dy;
+			msg->FindFloat("dx", &dx);
+			msg->FindFloat("dy", &dy);
+			
+			FloaterBroker *broker = FloaterBroker::GetInstance();
+			
+			switch (action)
+			{
+				case FLOATER_MOVE:
+				{
+					MoveBy(dx, dy);
+					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
+					break;
+				}
+				case FLOATER_RESIZE:
+				{
+					ResizeBy(dx, dy);
+					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
+					break;
+				}
+				default:
+					break;
+			}
+			break;
+		}
+		default:
+		{
+			BView::MessageReceived(msg);
+			break;
+		}
+	}
+}

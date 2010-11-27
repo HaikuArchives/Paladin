@@ -1,6 +1,6 @@
 #include "App.h"
+#include "FloaterBroker.h"
 #include "MainWindow.h"
-
 #include "MsgDefs.h"
 #include "PObjectBroker.h"
 
@@ -8,6 +8,8 @@ App::App(void)
 	:	BApplication("application/x-vnd.dw-PDesigner")
 {
 	InitObjectSystem();
+	InitFloaterSystem();
+	
 	fMainWin = new MainWindow();
 	fMainWin->Show();
 }
@@ -16,6 +18,7 @@ App::App(void)
 bool
 App::QuitRequested(void)
 {
+	ShutdownFloaterSystem();
 	ShutdownObjectSystem();
 	return true;
 }

@@ -6,6 +6,8 @@
 #include <View.h>
 #include <Window.h>
 
+#include "PView.h"
+
 enum
 {
 	M_FLOATER_ACTION = 'flac'
@@ -28,10 +30,10 @@ public:
 						Floater(const int32 &action);
 	virtual				~Floater(void);
 	
-	virtual	void		FloaterAttached(BView *handler);
-	virtual	void		FloaterDetached(BView *handler);
+	virtual	void		FloaterAttached(PView *view);
+	virtual	void		FloaterDetached(void);
 	
-	virtual	void		UpdateFloaterPosition(const BRect &rect, const int32 &action);
+	virtual	void		Update(PView *view, const int32 &action);
 	
 	virtual	void		SetAction(const int32 &action);
 			int32		GetAction(void) const;
@@ -54,10 +56,10 @@ public:
 			void		SetBitmap(BBitmap *bitmap);
 			BBitmap *	GetBitmap(void);
 
-			void		FloaterAttached(BView *handler);
-			void		FloaterDetached(BView *handler);
+			void		FloaterAttached(PView *view);
+			void		FloaterDetached(void);
 			
-	virtual	void		UpdateFloaterPosition(const BRect &rect, const int32 &action);
+	virtual	void		Update(PView *view, const int32 &action);
 	
 private:
 			HandleView	*fView;

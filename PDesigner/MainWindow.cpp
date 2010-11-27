@@ -7,6 +7,7 @@
 #include <ScrollView.h>
 #include <View.h>
 
+#include "FloaterBroker.h"
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "ObjectWindow.h"
@@ -148,6 +149,7 @@ MainWindow::MessageReceived(BMessage *msg)
 		case M_OBJECT_SELECTED:
 		{
 			UpdateProperties();
+			UpdateFloaters();
 			break;
 		}
 		case M_ACTIVATE_OBJECT:
@@ -350,5 +352,21 @@ MainWindow::UpdateProperties(void)
 	}
 	
 	msgr.SendMessage(&msg);
+}
+
+
+void
+MainWindow::UpdateFloaters(void)
+{
+	ViewItem *item = dynamic_cast<ViewItem*>(fListView->FullListItemAt(
+											fListView->FullListCurrentSelection()));
+	if (!item)
+		return;
+	
+	PView *view = item->GetView();
+	
+	FloaterBroker *broker = FloaterBroker::GetInstance();
+	broker->DetachAllFloaters();
+	broker->AttachAllFloaters(view);
 }
 

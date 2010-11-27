@@ -2,6 +2,7 @@
 #define FLOATERBROKER_H
 
 #include "ObjectList.h"
+#include "PView.h"
 
 class Floater;
 
@@ -11,8 +12,12 @@ public:
 							FloaterBroker(void);
 							~FloaterBroker(void);
 							
-	static	FloaterBroker *	GetBrokerInstance(void);
-
+	static	FloaterBroker *	GetInstance(void);
+	
+			void			AttachAllFloaters(PView *view);
+			void			DetachAllFloaters(void);
+			void			NotifyFloaters(PView *view, const int32 &action);
+			
 private:
 	BObjectList<Floater>	fList;
 };

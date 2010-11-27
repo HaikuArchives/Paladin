@@ -19,19 +19,19 @@ Floater::~Floater(void)
 
 
 void
-Floater::FloaterAttached(BView *handler)
+Floater::FloaterAttached(PView *view)
 {
 }
 
 
 void
-Floater::FloaterDetached(BView *handler)
+Floater::FloaterDetached(void)
 {
 }
 
 
 void
-Floater::UpdateFloaterPosition(const BRect &rect, const int32 &action)
+Floater::Update(PView *view, const int32 &action)
 {
 	/*
 		Action List:
@@ -103,10 +103,12 @@ HandleFloater::GetBitmap(void)
 
 
 void
-HandleFloater::FloaterAttached(BView *view)
+HandleFloater::FloaterAttached(PView *pview)
 {
-	if (view)
+	if (pview)
 	{
+		BView *view = pview->GetView();
+		
 		fView->fTarget = BMessenger(view);
 		BRect rect = view->ConvertToScreen(view->Bounds());
 		if (GetAction() == FLOATER_MOVE)
@@ -121,7 +123,7 @@ HandleFloater::FloaterAttached(BView *view)
 
 
 void
-HandleFloater::FloaterDetached(BView *view)
+HandleFloater::FloaterDetached(void)
 {
 	fView->fTarget = BMessenger();
 	Hide();
@@ -129,8 +131,10 @@ HandleFloater::FloaterDetached(BView *view)
 
 
 void
-HandleFloater::UpdateFloaterPosition(const BRect &rect, const int32 &action)
+HandleFloater::Update(PView *pview, const int32 &action)
 {
+	BView *view = pview->GetView();
+	BRect rect = view->ConvertToScreen(view->Bounds());
 	switch (action)
 	{
 		case FLOATER_RESIZE:

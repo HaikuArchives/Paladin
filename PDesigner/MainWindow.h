@@ -19,6 +19,7 @@ private:
 			void	AddControl(const BString &type);
 			void	MakeEmpty(void);
 			void	UpdateProperties(void);
+			void	UpdateFloaters(void);
 			
 			BOutlineListView	*fListView;
 			Project				*fProject;

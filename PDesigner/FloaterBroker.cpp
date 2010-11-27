@@ -17,9 +17,42 @@ FloaterBroker::~FloaterBroker(void)
 
 							
 FloaterBroker *
-FloaterBroker::GetBrokerInstance(void)
+FloaterBroker::GetInstance(void)
 {
 	return sFloaterBroker;
+}
+
+
+void
+FloaterBroker::AttachAllFloaters(PView *view)
+{
+	for (int32 i = 0; i < fList.CountItems(); i++)
+	{
+		Floater *f = fList.ItemAt(i);
+		f->FloaterAttached(view);
+	}
+}
+
+
+void
+FloaterBroker::DetachAllFloaters(void)
+{
+	for (int32 i = 0; i < fList.CountItems(); i++)
+	{
+		Floater *f = fList.ItemAt(i);
+		f->FloaterDetached();
+	}
+}
+
+
+void
+FloaterBroker::NotifyFloaters(PView *view, const int32 &action)
+{
+	for (int32 i = 0; i < fList.CountItems(); i++)
+	{
+		Floater *f = fList.ItemAt(i);
+		f->Update(view, action);
+	}
 }
 
 

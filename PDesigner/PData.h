@@ -1,48 +1,50 @@
-#ifndef POBJECT_H
-#define POBJECT_H
+#ifndef PDATA_H
+#define PDATA_H
+
 
 #include <Archivable.h>
 #include <Message.h>
 #include <String.h>
 #include "ObjectList.h"
-#include "PData.h"
 #include "PProperty.h"
 
 enum
 {
-	METHOD_SHOW_IN_EDITOR		= 0x00000001
+	PROPERTY_READ_ONLY			= 0x00000001,
+	PROPERTY_ALLOW_MULTIPLE		= 0x00000010,
+	PROPERTY_HIDE_IN_EDITOR		= 0x00000100
 };
 
-class MethodData
+
+class PropertyData
 {
 public:
-	MethodData(const char *n, uint32 f) { name = n; flags = f; }
+	PropertyData(PProperty *p, uint32 f) { value = p; flags = f; }
+	~PropertyData(void) { delete value; }
 	
-	BString		name;
+	PProperty 	*value;
 	uint32 		flags;
 };
 
-
-class PObject : public BArchivable
+class PData : public BArchivable
 {
 public:
-							PObject(void);
-							PObject(BMessage *msg);
-							PObject(const char *name);
-							PObject(const PObject &from);
-			PObject &		operator=(const PObject &from);
+							PData(void);
+							PData(BMessage *msg);
+							PData(const char *name);
+							PData(const PData &from);
+			PData &		operator=(const PData &from);
 			PProperty *		operator[](const char *name);
 			PProperty *		operator[](const BString &name);
-	virtual					~PObject(void);
+	virtual					~PData(void);
 	
 	// Create() is needed for the object broker's use. Always uses a class' default constructor
-	static	PObject *		Create(void);
-	virtual	PObject *		Duplicate(void) const;
+	static	PData *			Create(void);
+	virtual	PData *			Duplicate(void) const;
 	
 	static	BArchivable *	Instantiate(BMessage *data);
 	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
 	
-			uint64			GetID(void) const;
 			int32			CountProperties(const char *name = NULL) const;
 			PProperty *		PropertyAt(const int32 &index) const;
 			int32			IndexOfProperty(PProperty *p) const;
@@ -79,43 +81,18 @@ public:
 	virtual	status_t		GetPointProperty(const char *name, BPoint &value, const int32 &index = 0);
 	virtual	status_t		GetColorProperty(const char *name, rgb_color &value, const int32 &index = 0);
 	
-	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
-			BString			MethodAt(const int32 &index) const;
-			int32			CountMethods(void) const;
-	virtual	void			SetFlagsForMethod(const char *name, const uint32 &flags);
-			uint32			FlagsForMethod(const char *name) const;
-		
 			BString			GetType(void) const;
 			BString			GetFriendlyType(void) const;
 			
-			bool			UsesInterface(const char *name);
-			bool			UsesInterface(const BString &name);
-			BString			InterfaceAt(const int32 &index) const;
-			int32			CountInterfaces(void) const;
-	
 	virtual	void			PrintToStream(void);
 	
 protected:
-			void			AddInterface(const char *name);
-			void			RemoveInterface(const char *name);
-	
-	virtual	status_t		AddMethod(const char *name, const uint32 &flags = 0);
-	virtual	status_t		RemoveMethod(const char *name);
-	
 	BString					fType;
 	BString					fFriendlyType;
 	
 private:
-	friend class PObjectBroker;
-	uint64						fObjectID;
 	BObjectList<PropertyData>	*fPropertyList;
-	BObjectList<MethodData>		*fMethodList;
-	BObjectList<BString>		*fInterfaceList;
 };
 
-// Convenience functions
-PObject *			NewObject(const char *type);
-
-PObject *			UnflattenObject(BMessage *msg);
 
 #endif

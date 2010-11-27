@@ -5,6 +5,7 @@
 #include <Message.h>
 #include <String.h>
 
+#include "ObjectList.h"
 #include "PValue.h"
 
 class PObject;
@@ -267,5 +268,28 @@ private:
 	MessageValue				fMessageValue;
 };
 
+
+class PMetaProperty;
+
+typedef BArchivable * (*MakeFromArchiveFunc)(BMessage *msg);
+typedef PProperty *	(*MakePropertyFunc)(void);
+
+class PropertyRoster
+{
+public:
+						PropertyRoster(void);
+						~PropertyRoster(void);
+	
+	PProperty *			MakeProperty(const char *type, BMessage *msg = NULL) const;
+	int32				CountProperties(void) const;
+	BString				PropertyAt(const int32 &index) const;
+	
+private:
+	PMetaProperty *		FindProperty(const char *type);
+	
+	BObjectList<PMetaProperty>	fPropertyList;
+};
+
+extern PropertyRoster gPropertyRoster;
 
 #endif

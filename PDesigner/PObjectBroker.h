@@ -7,9 +7,7 @@
 #include "PProperty.h"
 #include "PObject.h"
 
-typedef BArchivable * (*MakeFromArchiveFunc)(BMessage *msg);
 typedef PObject *	(*MakeObjectFunc)(void);
-typedef PProperty *	(*MakePropertyFunc)(void);
 
 void InitObjectSystem(void);
 void ShutdownObjectSystem(void);
@@ -32,16 +30,6 @@ public:
 	BString friendlytype;
 };
 
-class PPropertyInfo
-{
-public:
-	PPropertyInfo(const char *typestr, MakeFromArchiveFunc objfunc,
-				MakePropertyFunc func) { type = typestr; arcfunc = objfunc; createfunc = func; }
-	
-	MakeFromArchiveFunc arcfunc;
-	MakePropertyFunc createfunc;
-	BString type;
-};
 
 class PObjectBroker
 {
@@ -56,10 +44,6 @@ public:
 	
 	PObject *			FindObject(const uint64 &id);
 	
-	PProperty *			MakeProperty(const char *type, BMessage *msg = NULL) const;
-	int32				CountProperties(void) const;
-	BString				PropertyAt(const int32 &index) const;
-	
 	static	PObjectBroker *	GetBrokerInstance(void);
 	static	void		RegisterObject(PObject *obj);
 			void		UnregisterObject(PObject *obj);
@@ -68,10 +52,8 @@ private:
 	
 	BObjectList<PObject>		*fObjectList;
 	BObjectList<PObjectInfo>	*fObjInfoList;
-	BObjectList<PPropertyInfo>	*fPropertyList;
 	
 	PObjectInfo *		FindObjectInfo(const char *type);
-	PPropertyInfo *		FindProperty(const char *type);
 	
 	bool						fQuitting;
 };

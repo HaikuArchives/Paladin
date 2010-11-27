@@ -3,6 +3,8 @@
 #include "PObject.h"
 #include "PObjectBroker.h"
 
+PropertyRoster gPropertyRoster;
+
 PProperty::PProperty(void)
 	:	fReadOnly(false),
 		fEnabled(true)
@@ -1171,3 +1173,102 @@ MessageProperty::GetValueAsString(void) const
 {
 	return BString("BMessage()");
 }
+
+class PMetaProperty
+{
+public:
+	PMetaProperty(const char *typestr, MakeFromArchiveFunc objfunc,
+				MakePropertyFunc func) { type = typestr; arcfunc = objfunc; createfunc = func; }
+	
+	MakeFromArchiveFunc arcfunc;
+	MakePropertyFunc createfunc;
+	BString type;
+};
+
+
+PropertyRoster::PropertyRoster(void)
+	:	fPropertyList(20, true)
+{
+	fPropertyList.AddItem(new PMetaProperty("PProperty",PProperty::Instantiate,PProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("StringProperty",StringProperty::Instantiate,
+												StringProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("BoolProperty",BoolProperty::Instantiate,
+												BoolProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("IntProperty",IntProperty::Instantiate,
+												IntProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("FloatProperty",FloatProperty::Instantiate,
+												FloatProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("ColorProperty",ColorProperty::Instantiate,
+												ColorProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("RectProperty",RectProperty::Instantiate,
+												RectProperty::Create));
+	fPropertyList.AddItem(new PMetaProperty("PointProperty",PointProperty::Instantiate,
+												PointProperty::Create));
+}
+
+
+PropertyRoster::~PropertyRoster(void)
+{
+}
+
+
+PProperty *
+PropertyRoster::MakeProperty(const char *type, BMessage *msg) const
+{
+	if (!type)
+		return NULL;
+	
+	PMetaProperty *info = NULL;
+	for (int32 i = 0; i < fPropertyList.CountItems(); i++)
+	{
+		PMetaProperty *temp = fPropertyList.ItemAt(i);
+		if (temp->type.ICompare(type) == 0)
+		{
+			info = temp;
+			break;
+		}
+	}
+	
+	if (info)
+	{
+		if (msg)
+			return (PProperty*)info->arcfunc(msg);
+		else
+			return info->createfunc();
+	}
+	
+	return NULL;
+}
+
+
+int32
+PropertyRoster::CountProperties(void) const
+{
+	return fPropertyList.CountItems();
+}
+
+
+BString
+PropertyRoster::PropertyAt(const int32 &index) const
+{
+	BString str;
+	PMetaProperty *info = fPropertyList.ItemAt(index);
+	if (info)
+		str = info->type;
+	return str;
+}
+
+
+PMetaProperty *
+PropertyRoster::FindProperty(const char *type)
+{
+	for (int32 i = 0; i < fPropertyList.CountItems(); i++)
+	{
+		PMetaProperty *pinfo = fPropertyList.ItemAt(i);
+		if (pinfo->type == type)
+			return pinfo;
+	}
+	
+	return NULL;
+}
+

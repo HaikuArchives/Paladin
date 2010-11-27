@@ -31,13 +31,12 @@ PObject::PObject(BMessage *msg)
 	
 	int32 i = 0; 
 	BMessage propmsg;
-	PObjectBroker const *owner = PObjectBroker::GetBrokerInstance();
 	while (msg->FindMessage("property",i++,&propmsg) == B_OK)
 	{
 		BString ptype;
 		if (propmsg.FindString("type",&ptype) != B_OK)
 			continue;
-		PProperty *p = owner->MakeProperty(ptype.String(),&propmsg);
+		PProperty *p = gPropertyRoster.MakeProperty(ptype.String(),&propmsg);
 		if (p)
 			AddProperty(p);
 	}
@@ -696,13 +695,6 @@ NewObject(const char *type)
 {
 	PObjectBroker *owner = PObjectBroker::GetBrokerInstance();
 	return owner->MakeObject(type);
-}
-
-
-PProperty *	NewProperty(const char *type)
-{
-	PObjectBroker *owner = PObjectBroker::GetBrokerInstance();
-	return owner->MakeProperty(type);
 }
 
 

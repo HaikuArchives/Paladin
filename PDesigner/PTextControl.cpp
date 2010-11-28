@@ -1,6 +1,5 @@
 #include "PTextControl.h"
 
-#include "CommonMethods.h"
 #include "Floater.h"
 #include "FloaterBroker.h"
 #include "MsgDefs.h"
@@ -10,7 +9,7 @@
 #include <TextControl.h>
 #include <Window.h>
 
-status_t	SetPreferredDivider(PObject *object, BMessage &in, BMessage &out);
+status_t	PTextControlSetPreferredDivider(PObject *object, BMessage &in, BMessage &out);
 
 class PTextControlBackend : public AutoTextControl
 {
@@ -223,24 +222,6 @@ PTextControl::Duplicate(void) const
 }
 
 
-status_t
-PTextControl::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
-{
-	// Methods:
-	// SetPreferredDivider
-	
-	if (!name || strlen(name) < 1)
-		return B_NAME_NOT_FOUND;
-	
-	BString str(name);
-	
-	if (str.ICompare("SetPreferredDivider") == 0)
-		return DoSetPreferredDivider();
-	else
-		return PObject::RunMethod(name,args,outdata);
-}
-
-
 void
 PTextControl::InitBackend(BView *view)
 {
@@ -261,7 +242,7 @@ PTextControl::InitProperties(void)
 	PProperty *prop = FindProperty("Value");
 	SetFlagsForProperty(prop,PROPERTY_HIDE_IN_EDITOR);
 	
-	AddMethod(new PMethod("SetPreferredDivider", SetPreferredDivider,
+	AddMethod(new PMethod("SetPreferredDivider", PTextControlSetPreferredDivider,
 							METHOD_SHOW_IN_EDITOR));
 }
 
@@ -360,7 +341,7 @@ PTextControlBackend::MessageReceived(BMessage *msg)
 
 
 status_t
-SetPreferredDivider(PObject *object, BMessage &in, BMessage &out)
+PTextControlSetPreferredDivider(PObject *object, BMessage &in, BMessage &out)
 {
 	if (!object)
 		return B_ERROR;

@@ -176,8 +176,13 @@ PObject::GetID(void) const
 
 
 status_t
-PObject::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
+PObject::RunMethod(const char *name, BMessage &args, BMessage &outdata)
 {
+	PMethod *method = FindMethod(name);
+	if (!method)
+		return B_NAME_NOT_FOUND;
+	
+	method->Run(this, args, outdata);
 	return B_OK;
 }
 
@@ -315,7 +320,7 @@ PObject::AddMethod(PMethod *method)
 	if (!method)
 		return B_ERROR;
 	
-	if (FindMethod(method->GetName()))
+	if (FindMethod(method->GetName().String()))
 		return B_NAME_IN_USE;
 	
 	fMethodList->AddItem(method);

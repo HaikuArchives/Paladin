@@ -40,7 +40,7 @@ public:
 	
 			uint64			GetID(void) const;
 	
-	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
+	virtual	status_t		RunMethod(const char *name, BMessage &args, BMessage &outdata);
 			PMethod *		FindMethod(const char *name);
 			PMethod *		MethodAt(const int32 &index) const;
 			int32			CountMethods(void) const;

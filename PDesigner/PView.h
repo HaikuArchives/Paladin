@@ -64,15 +64,12 @@ public:
 							PView(const char *name);
 							PView(const PView &from);
 							~PView(void);
-//			PView &			operator=(const PView &from);
 			
 	static	BArchivable *	Instantiate(BMessage *data);
 	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
 	
 	static	PObject *		Create(void);
 	virtual	PObject *		Duplicate(void) const;
-	
-	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
 	
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
@@ -83,10 +80,6 @@ public:
 protected:
 	virtual	void			InitBackend(BView *view = NULL);
 	virtual	void			InitMethods(void);
-	
-	status_t				DoAddChild(const BMessage &args, BMessage &outdata);
-	status_t				DoRemoveChild(const BMessage &args, BMessage &outdata);
-	status_t				DoChildAt(const BMessage &args, BMessage &outdata);
 	
 	void					SetHResizingMode(const int32 &value);
 	void					SetVResizingMode(const int32 &value);

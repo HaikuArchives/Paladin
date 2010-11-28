@@ -219,11 +219,12 @@ HandleWindow::Update(PView *pview, const int32 &action)
 	BView *view = pview->GetView();
 	BWindow *window = view->Window();
 	
-	if (window)
-		window->Lock();
+	if (!window)
+		return;
+	
+	window->Lock();
 	BRect rect = view->ConvertToScreen(view->Bounds());
-	if (window)
-		window->Unlock();
+	window->Unlock();
 	
 	switch (action)
 	{
@@ -284,7 +285,6 @@ HandleView::Draw(BRect rect)
 void
 HandleView::MouseDown(BPoint pt)
 {
-	BRect bounds = Bounds();
 	uint32 buttons;
 	
 	BPoint point(ConvertToScreen(pt)), lastPoint(ConvertToScreen(pt));

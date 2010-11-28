@@ -31,8 +31,6 @@ public:
 	static	PObject *		Create(void);
 	virtual	PObject *		Duplicate(void) const;
 	
-	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
-	
 protected:
 	virtual void			InitBackend(BView *view = NULL);
 

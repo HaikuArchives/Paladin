@@ -21,6 +21,10 @@ static const uint32 ksFollowBottom = B_FOLLOW_BOTTOM;
 static const uint32 ksFollowTopBottom = B_FOLLOW_TOP_BOTTOM;
 static const uint32 ksFollowVCenter = B_FOLLOW_V_CENTER;
 
+status_t PViewAddChild(PObject *obj, BMessage &args, BMessage &outdata);
+status_t PViewRemoveChild(PObject *obj, BMessage &args, BMessage &outdata);
+status_t PViewChildAt(PObject *obj, BMessage &args, BMessage &outdata);
+
 class PViewBackend : public BView
 {
 public:
@@ -42,6 +46,7 @@ PView::PView(void)
 	AddInterface("PView");
 	
 	// This one starts with an empty PView, so we need to initialize it with some properties
+	InitMethods();
 	InitProperties();
 	InitBackend();
 }
@@ -71,6 +76,7 @@ PView::PView(const char *name)
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
+	InitMethods();
 	InitBackend();
 }
 
@@ -82,6 +88,7 @@ PView::PView(const PView &from)
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
+	InitMethods();
 	InitBackend();
 }
 
@@ -96,8 +103,8 @@ PView::~PView(void)
 	// corresponding objects are
 	while (fView->CountChildren() > 0)
 	{
-			BView *child = fView->ChildAt(0);
-			child->RemoveSelf();
+		BView *child = fView->ChildAt(0);
+		child->RemoveSelf();
 	}
 	
 	if (parent)
@@ -105,27 +112,6 @@ PView::~PView(void)
 	delete fView;
 }
 
-/*
-PView &
-PView::operator=(const PView &from)
-{
-	PObject::operator=(from);
-	if (from.fView)
-	{
-		BMessage msg;
-		if (from.fView->Archive(&msg) == B_OK)
-		{
-			if (fView)
-			{
-				SafeRemoveSelf(fView);
-				delete fView;
-				fView = (BView*)BView::Instantiate(&msg);
-			}
-		}
-	}
-	return *this;
-}
-*/
 
 BArchivable *
 PView::Instantiate(BMessage *data)
@@ -192,31 +178,6 @@ PObject *
 PView::Duplicate(void) const
 {
 	return new PView(*this);
-}
-
-
-status_t
-PView::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
-{
-	// Methods:
-	// AddChild
-	// RemoveChild
-	// ChildAt
-	// CountChildren
-	
-	if (!name || strlen(name) < 1)
-		return B_NAME_NOT_FOUND;
-	
-	BString str(name);
-	
-	if (str.ICompare("AddChild") == 0)
-		return DoAddChild(args,outdata);
-	else if (str.ICompare("RemoveChild") == 0)
-		return DoRemoveChild(args,outdata);
-	else if (str.ICompare("ChildAt") == 0)
-		return DoChildAt(args,outdata);
-	else
-		return PObject::RunMethod(name,args,outdata);
 }
 
 
@@ -606,110 +567,11 @@ PView::InitBackend(BView *view)
 void
 PView::InitMethods(void)
 {
+	AddMethod(new PMethod("AddChild", PViewAddChild));
+	AddMethod(new PMethod("RemoveChild", PViewRemoveChild));
+	AddMethod(new PMethod("ChildAt", PViewChildAt));
 }
 
-
-status_t
-PView::DoAddChild(const BMessage &args, BMessage &outdata)
-{
-	outdata.MakeEmpty();
-	
-	uint64 id;
-	if (args.FindInt64("id",(int64*)&id) != B_OK)
-	{
-		outdata.AddInt32("error",B_ERROR);
-		return B_ERROR;
-	}
-	
-	bool unlock = false;
-	if (fView->Window())
-	{
-		fView->Window()->Lock();
-		unlock = true;
-	}
-	
-	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
-	
-	PObject *obj = broker->FindObject(id);
-	PView *pview = dynamic_cast<PView*>(obj);
-	
-	if (pview)
-		fView->AddChild(pview->GetView());
-	
-	if (unlock);
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
-
-
-status_t
-PView::DoRemoveChild(const BMessage &args, BMessage &outdata)
-{
-	outdata.MakeEmpty();
-	
-	uint64 id;
-	if (args.FindInt64("id",(int64*)&id) != B_OK)
-	{
-		outdata.AddInt32("error",B_ERROR);
-		return B_ERROR;
-	}
-	
-	bool unlock = false;
-	if (fView->Window())
-	{
-		unlock = true;
-		fView->Window()->Lock();
-	}
-	
-	int32 count = fView->CountChildren();
-	for (int32 i = 0; i < count; i++)
-	{
-		PView *pview = dynamic_cast<PView*>(fView->ChildAt(i));
-		if (pview && pview->GetID() == id)
-			fView->RemoveChild(pview->GetView());
-	}
-	
-	if (unlock)
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
-
-
-status_t
-PView::DoChildAt(const BMessage &args, BMessage &outdata)
-{
-	outdata.MakeEmpty();
-	
-	int32 index;
-	if (args.FindInt32("index",&index) != B_OK)
-	{
-		outdata.AddInt32("error",B_ERROR);
-		return B_ERROR;
-	}
-	
-	bool unlock = false;
-	
-	if (fView->Window())
-	{
-		unlock = true;
-		fView->Window()->Lock();
-	}
-	
-	BView *view = fView->ChildAt(index);
-	PView *pview = dynamic_cast<PView*>(view);
-	
-	if (!view || !pview)
-		outdata.AddInt32("id",0);
-	else
-		outdata.AddInt32("id",pview->GetID());
-	
-	if (unlock)
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
 
 ViewItem::ViewItem(PView *view)
 	:	ObjectItem(view, "View")
@@ -922,5 +784,134 @@ PViewBackend::MessageReceived(BMessage *msg)
 			break;
 		}
 	}
+}
+
+
+status_t
+PViewAddChild(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PView *parent = dynamic_cast<PView*>(obj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BView *fView = parent->GetView();
+	
+	outdata.MakeEmpty();
+	
+	uint64 id;
+	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	bool unlock = false;
+	if (fView->Window())
+	{
+		fView->Window()->Lock();
+		unlock = true;
+	}
+	
+	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
+	
+	PView *pview = dynamic_cast<PView*>(broker->FindObject(id));
+	
+	if (pview)
+		fView->AddChild(pview->GetView());
+	
+	if (unlock);
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
+PViewRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PView *parent = dynamic_cast<PView*>(obj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BView *fView = parent->GetView();
+	
+	outdata.MakeEmpty();
+	
+	uint64 id;
+	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	bool unlock = false;
+	if (fView->Window())
+	{
+		unlock = true;
+		fView->Window()->Lock();
+	}
+	
+	int32 count = fView->CountChildren();
+	for (int32 i = 0; i < count; i++)
+	{
+		PView *pview = dynamic_cast<PView*>(fView->ChildAt(i));
+		if (pview && pview->GetID() == id)
+			fView->RemoveChild(pview->GetView());
+	}
+	
+	if (unlock)
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
+PViewChildAt(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PView *parent = dynamic_cast<PView*>(obj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BView *fView = parent->GetView();
+	
+	outdata.MakeEmpty();
+	
+	int32 index;
+	if (args.FindInt32("index",&index) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	bool unlock = false;
+	
+	if (fView->Window())
+	{
+		unlock = true;
+		fView->Window()->Lock();
+	}
+	
+	BView *view = fView->ChildAt(index);
+	PView *pview = dynamic_cast<PView*>(view);
+	
+	if (!view || !pview)
+		outdata.AddInt32("id",0);
+	else
+		outdata.AddInt32("id",pview->GetID());
+	
+	if (unlock)
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 

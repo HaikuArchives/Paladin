@@ -53,8 +53,6 @@ public:
 	static	PObject *		Create(void);
 	virtual	PObject *		Duplicate(void) const;
 	
-//	virtual	status_t		RunMethod(const char *name, const BMessage &args, BMessage &outdata);
-	
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	
@@ -66,12 +64,6 @@ private:
 	void					InitProperties(void);
 	void					InitBackend(void);
 	
-/*	status_t				DoAddChild(const BMessage &args, BMessage &outdata);
-	status_t				DoRemoveChild(const BMessage &args, BMessage &outdata);
-	status_t				DoChildAt(const BMessage &args, BMessage &outdata);
-	status_t				DoCountChildren(const BMessage &args, BMessage &outdata);
-	status_t				DoFindView(const BMessage &args, BMessage &outdata);
-*/	
 	PWindowBackend			*fWindow;
 };
 

@@ -3,12 +3,19 @@
 #include <stdio.h>
 
 #include "App.h"
-#include "MsgDefs.h"
-#include "PView.h"
-#include "PObjectBroker.h"
 #include "MiscProperties.h"
+#include "MsgDefs.h"
+#include "PObjectBroker.h"
+#include "PMethod.h"
+#include "PView.h"
 
 #define M_QUIT_REQUESTED 'mqut'
+
+status_t PWindowAddChild(PObject *object, BMessage &args, BMessage &outdata);
+status_t PWindowRemoveChild(PObject *object, BMessage &args, BMessage &outdata);
+status_t PWindowChildAt(PObject *object, BMessage &args, BMessage &outdata);
+status_t PWindowCountChildren(PObject *object, BMessage &args, BMessage &outdata);
+status_t PWindowFindView(PObject *object, BMessage &args, BMessage &outdata);
 
 class PWindowBackend : public BWindow
 {
@@ -112,7 +119,7 @@ PWindow::Duplicate(void) const
 	return new PWindow(*this);
 }
 
-	
+/*	
 status_t
 PWindow::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
 {
@@ -141,7 +148,7 @@ PWindow::RunMethod(const char *name, const BMessage &args, BMessage &outdata)
 	else
 		return PObject::RunMethod(name,args,outdata);
 }
-
+*/
 
 status_t
 PWindow::GetProperty(const char *name, PValue *value, const int32 &index) const
@@ -404,6 +411,13 @@ PWindow::CreateWindowItem(void)
 void
 PWindow::InitBackend(void)
 {
+	AddMethod(new PMethod("AddChild", PWindowAddChild));
+	AddMethod(new PMethod("RemoveChild", PWindowRemoveChild));
+	AddMethod(new PMethod("ChildAt", PWindowChildAt));
+	AddMethod(new PMethod("CountChildren", PWindowCountChildren));
+	AddMethod(new PMethod("FindView", PWindowFindView));
+	
+	
 	fWindow = new PWindowBackend(this);
 	
 	// Set the properties *before* we unlock its looper to save locking it later
@@ -456,7 +470,7 @@ PWindow::InitBackend(void)
 	fWindow->Show();
 }
 
-
+/*
 status_t
 PWindow::DoAddChild(const BMessage &args, BMessage &outdata)
 {
@@ -585,7 +599,7 @@ PWindow::DoFindView(const BMessage &args, BMessage &outdata)
 	
 	return B_OK;
 }
-
+*/
 
 PWindowBackend::PWindowBackend(PObject *owner)
 	:	BWindow(BRect(0,0,1,1),"",B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS),
@@ -686,3 +700,177 @@ WindowItem::GetWindow(void)
 	return dynamic_cast<PWindow*>(GetObject());
 }
 
+
+
+status_t
+PWindowAddChild(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	if (!pwin)
+		return B_BAD_TYPE;
+	
+	BWindow *fWindow = pwin->GetWindow();
+	
+	outdata.MakeEmpty();
+	
+	uint64 id;
+	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	fWindow->Lock();
+	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
+	
+	PView *pview = dynamic_cast<PView*>(broker->FindObject(id));
+	
+	if (pview)
+		fWindow->AddChild(pview->GetView());
+	
+	if (fWindow->IsLocked())
+		fWindow->Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
+PWindowRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	if (!pwin)
+		return B_BAD_TYPE;
+	
+	BWindow *fWindow = pwin->GetWindow();
+	
+	outdata.MakeEmpty();
+	
+	uint64 id;
+	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	fWindow->Lock();
+	
+	int32 count = fWindow->CountChildren();
+	for (int32 i = 0; i < count; i++)
+	{
+		PView *pview = dynamic_cast<PView*>(fWindow->ChildAt(i));
+		if (pview && pview->GetID() == id)
+			fWindow->RemoveChild(pview->GetView());
+	}
+	
+	if (fWindow->IsLocked())
+		fWindow->Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
+PWindowChildAt(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	if (!pwin)
+		return B_BAD_TYPE;
+	
+	BWindow *fWindow = pwin->GetWindow();
+	
+	outdata.MakeEmpty();
+	
+	int32 index;
+	if (args.FindInt32("index",&index) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	fWindow->Lock();
+	
+	BView *view = fWindow->ChildAt(index);
+	PView *pview = dynamic_cast<PView*>(view);
+	
+	if (!view || !pview)
+		outdata.AddInt32("id",0);
+	else
+		outdata.AddInt32("id",pview->GetID());
+	
+	if (fWindow->IsLocked())
+		fWindow->Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
+PWindowCountChildren(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	if (!pwin)
+		return B_BAD_TYPE;
+	
+	BWindow *fWindow = pwin->GetWindow();
+	
+	outdata.MakeEmpty();
+	
+	fWindow->Lock();
+	outdata.AddInt32("count",fWindow->CountChildren());
+	fWindow->Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
+PWindowFindView(PObject *obj, BMessage &args, BMessage &outdata)
+{
+	if (!obj)
+		return B_ERROR;
+	
+	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	if (!pwin)
+		return B_BAD_TYPE;
+	
+	BWindow *fWindow = pwin->GetWindow();
+	
+	outdata.MakeEmpty();
+	
+	BString name;
+	BPoint point;
+	if (args.FindString("name",&name) != B_OK && args.FindPoint("point",&point) != B_OK)
+	{
+		outdata.AddInt32("error",B_ERROR);
+		return B_ERROR;
+	}
+	
+	fWindow->Lock();
+	
+	BView *view = (name.CountChars() > 0) ? fWindow->FindView(name.String()) : 
+					fWindow->FindView(point);
+	
+	PView *pview = dynamic_cast<PView*>(view);
+	
+	if (!view || !pview)
+		outdata.AddInt32("id",0);
+	else
+		outdata.AddInt32("id",pview->GetID());
+	
+	fWindow->Unlock();
+	
+	return B_OK;
+}

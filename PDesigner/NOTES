@@ -1,3 +1,7 @@
+Convert PMethods to use PArgList instead of BMessages
+
+Implement pobject_run_method() in the C interface
+
 Convert PWindow to use PMethods instead of the old method architecture
 
 Test and fix PTextControl

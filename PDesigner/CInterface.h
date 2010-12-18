@@ -101,12 +101,11 @@ int32_t				add_parg_char(PArgList *list, const char *name, char arg);
 int32_t				add_parg_string(PArgList *list, const char *name, const char *arg);
 
 /* -------------------------------------------------------------------------------------
-	PProperty-related definitions
+	PValue-related definitions
    ------------------------------------------------------------------------------------- */
-/*bool				pvalue_accepts_type(void *pval);
-bool				pvalue_returns_type(void *pval);*/
-int32_t				pvalue_set_value(void *pval);
-int32_t				pvalue_get_value(void *pval);
+bool				pvalue_accepts_type(void *pval, const char *type);
+bool				pvalue_returns_type(void *pval, const char *type);
+int32_t				pvalue_copy_value(void *from, void *to);
 void				pvalue_get_type(void *pval, char **out);
 
 /* -------------------------------------------------------------------------------------
@@ -118,13 +117,13 @@ void *				pproperty_duplicate(void *prop);
 void				pproperty_copy(void *from, void *to);
 void				pproperty_set_name(void *prop, const char *name);
 void				pproperty_get_name(void *prop, char **out);
-/*bool				pproperty_is_read_only(void *prop);
+bool				pproperty_is_read_only(void *prop);
 void				pproperty_set_read_only(void *prop, bool value);
 void				pproperty_set_enabled(void *prop, bool value);
-bool				pproperty_is_enabled(void *prop);*/
+bool				pproperty_is_enabled(void *prop);
 int32_t				pproperty_set_value(void *prop, void *pvalue);
 int32_t				pproperty_get_value(void *prop, void *pvalue);
-int32_t				pproperty_get_value_as_string(void *prop, char **out);
+void				pproperty_get_value_as_string(void *prop, char **out);
 void				pproperty_set_description(void *prop, const char *desc);
 void				pproperty_get_description(void *prop, char **out);
 
@@ -143,40 +142,50 @@ void *				pdata_property_at(void *pdata, int32_t index);
 int32_t				pdata_index_of_property(void *pdata, void *property);
 void *				pdata_find_property(void *pdata, const char *name);
 
-/*bool				pdata_add_property(void *pdata, void *prop, uint32_t flags,
-										int32_t index);*/
+bool				pdata_add_property(void *pdata, void *prop, uint32_t flags,
+										int32_t index);
 void *				pdata_remove_property_at(void *pdata, int32_t index);
-/*bool				pdata_remove_property(void *pdata, void *prop);*/
-uint32_t			pdata_property_flags_at(int32_t index);
+void				pdata_remove_property(void *pdata, void *prop);
+uint32_t			pdata_property_flags_at(void *pdata, int32_t index);
 void				pdata_set_flags_for_property(void *pdata, void *prop, int32_t flags);
 uint32_t			pdata_flags_for_property(void *pdata, void *prop);
 
-int32_t				pdata_set_value_for_property(void *pdata, const char *propname,
+int32_t				pdata_set_value_for_property(void *pdata, const char *name,
 													void *pvalue);
 int32_t				pdata_get_value_for_property(void *pdata, const char *name,
 													void **pvalue);
-int32_t				pdata_set_string_property(const char *name, const char *value);
-int32_t				pdata_set_int_property(const char *name, int64_t value);
-/*int32_t				pdata_set_bool_property(const char *name, bool value);*/
-int32_t				pdata_set_float_property(const char *name, float value);
-int32_t				pdata_set_rect_property(const char *name, float left, float top,
-											float right, float bottom);
-int32_t				pdata_set_point_property(const char *name, float x, float y);
-int32_t				pdata_set_color_property(const char *name, uint8_t red,
+int32_t				pdata_set_string_property(void *pdata, const char *name,
+											const char *value);
+int32_t				pdata_set_int_property(void *pdata, const char *name,
+											int64_t value);
+int32_t				pdata_set_bool_property(void *pdata, const char *name, bool value);
+int32_t				pdata_set_float_property(void *pdata, const char *name,
+											float value);
+int32_t				pdata_set_rect_property(void *pdata, const char *name, float left,
+											float top, float right, float bottom);
+int32_t				pdata_set_point_property(void *pdata, const char *name, float x,
+											float y);
+int32_t				pdata_set_color_property(void *pdata, const char *name, uint8_t red,
 											uint8_t green, uint8_t blue, uint8_t alpha);
 
-int32_t				pdata_get_string_property(const char *name, const char **out);
-int32_t				pdata_get_int_property(const char *name, int64_t *value);
-/*int32_t				pdata_get_bool_property(const char *name, bool *value);*/
-int32_t				pdata_get_float_property(const char *name, float *value);
-int32_t				pdata_get_rect_property(const char *name, float *left, float *top,
+int32_t				pdata_get_string_property(void *pdata, const char *name,
+											char **out);
+int32_t				pdata_get_int_property(void *pdata, const char *name,
+											int64_t *value);
+int32_t				pdata_get_bool_property(void *pdata, const char *name,
+											bool *value);
+int32_t				pdata_get_float_property(void *pdata, const char *name,
+											float *value);
+int32_t				pdata_get_rect_property(void *pdata, const char *name,
+											float *left, float *top,
 											float *right, float *bottom);
-int32_t				pdata_get_point_property(const char *name, float *x, float *y);
-int32_t				pdata_get_color_property(const char *name, uint8_t *red,
-											uint8_t *green, uint8_t *blue,
-											uint8_t *alpha);
-void				pdata_get_type(void *pobj, char **out);
-void				pdata_get_friendly_type(void *pobj, char **out);
+int32_t				pdata_get_point_property(void *pdata, const char *name, float *x,
+											float *y);
+int32_t				pdata_get_color_property(void *pdata, const char *name,
+											uint8_t *red, uint8_t *green,
+											uint8_t *blue, uint8_t *alpha);
+void				pdata_get_type(void *pdata, char **out);
+void				pdata_get_friendly_type(void *pdata, char **out);
 
 
 /* -------------------------------------------------------------------------------------
@@ -187,12 +196,12 @@ void				pobjectspace_init(void);
 void				pobjectspace_shutdown(void);
 	
 int32_t				pobjectspace_count_types(void);
-int32_t				pobjectspace_type_at(int32_t index, char **out);
-int32_t				pobjectspace_friendly_type_at(int32_t index, char **out);
-int32_t				pobjectspace_find_object(uint64_t id);
+void				pobjectspace_type_at(int32_t index, char **out);
+void				pobjectspace_friendly_type_at(int32_t index, char **out);
+void *				pobjectspace_find_object(uint64_t id);
 
 void *				pobject_create(const char *type);
-void *				pobject_duplicate(void *from);
+void *				pobject_duplicate(void *pobj);
 void				pobject_copy(void *from, void *to);
 void				pobject_delete(void *pobj);
 uint64_t			pobject_get_id(void *pobj);
@@ -202,7 +211,10 @@ void *				pobject_find_method(void *pobj, const char *name);
 void *				pobject_method_at(void *pobj, int32_t index);
 int32_t				pobject_count_methods(void *pobj);
 
-/*bool				pobject_uses_interface(void *pobj, const char *name);*/
+bool				pobject_uses_interface(void *pobj, const char *name);
+void				pobject_interface_at(void *pobj, int32_t index,
+										char **out);
+int32_t				pobject_count_interfaces(void *pobj);
 void				pobject_print_to_stream(void *pobj);
 
 

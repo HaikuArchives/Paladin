@@ -291,7 +291,11 @@ SourceFileC::Compile(BuildInfo &info, const char *options)
 	if (gPlatform == PLATFORM_ZETA)
 		compileString << "-D_ZETA_TS_FIND_DIR_ ";
 	
-	compileString	<< " -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-unknown-pragmas ";
+	compileString << " -Wall -Wno-multichar -Wno-unknown-pragmas ";
+	
+	BString ext(GetPath().GetExtension());
+	if (ext.ICompare("c") != 0)
+		compileString << "-Wno-ctor-dtor-privacy ";
 	
 	// We should put extra compiler options so that -W options actually work
 	if (options)

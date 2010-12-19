@@ -4,9 +4,9 @@
 #include <malloc.h>
 
 #include "App.h"
-#include "CInterface.h"
 #include "MiscProperties.h"
 #include "MsgDefs.h"
+#include "PArgs.h"
 #include "PObjectBroker.h"
 #include "PMethod.h"
 #include "PView.h"
@@ -485,9 +485,9 @@ PWindowBackend::MessageReceived(BMessage *msg)
 void
 PWindowBackend::WindowActivated(bool active)
 {
-	PArgList in, out;
-	add_parg_bool(&in, "active", active);
-	fOwner->RunEvent("WindowActivated", in, out);
+	PArgs in, out;
+	in.AddBool("active", active);
+	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
 	
 	if (active)
 	{
@@ -501,9 +501,9 @@ PWindowBackend::WindowActivated(bool active)
 void
 PWindowBackend::FrameMoved(BPoint pt)
 {
-	PArgList in, out;
-	add_parg_point(&in, "point", pt.x, pt.y);
-	fOwner->RunEvent("FrameMoved", in, out);
+	PArgs in, out;
+	in.AddPoint("point", pt);
+	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
 	
 	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
 	msg.AddInt64("id",fOwner->GetID());
@@ -515,10 +515,10 @@ PWindowBackend::FrameMoved(BPoint pt)
 void
 PWindowBackend::FrameResized(float w, float h)
 {
-	PArgList in, out;
-	add_parg_float(&in, "width", w);
-	add_parg_float(&in, "height", h);
-	fOwner->RunEvent("FrameResized", in, out);
+	PArgs in, out;
+	in.AddFloat("width", w);
+	in.AddFloat("height", h);
+	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
 	
 	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
 	msg.AddInt64("id",fOwner->GetID());

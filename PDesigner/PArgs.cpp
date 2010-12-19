@@ -93,6 +93,13 @@ PArgs::AddDouble(const char *name, double arg)
 
 
 int32
+PArgs::AddBool(const char *name, bool arg)
+{
+	return add_parg(fArgList, name, (void*)&arg, sizeof(bool), PARG_BOOL);
+}
+
+
+int32
 PArgs::AddChar(const char *name, char arg)
 {
 	return add_parg(fArgList, name, (void*)&arg, sizeof(char), PARG_CHAR);
@@ -103,6 +110,20 @@ int32
 PArgs::AddString(const char *name, const char *arg)
 {
 	return add_parg(fArgList, name, (void*)arg, strlen(arg) + 1, PARG_STRING);
+}
+
+
+int32
+PArgs::AddPoint(const char *name, BPoint arg)
+{
+	return add_parg_point(fArgList, name, arg.x, arg.y);
+}
+
+
+int32
+PArgs::AddRect(const char *name, BRect arg)
+{
+	return add_parg_rect(fArgList, name, arg.left, arg.top, arg.right, arg.bottom);
 }
 
 
@@ -208,6 +229,21 @@ PArgs::FindDouble(const char *name, double *out)
 
 
 int32
+PArgs::FindBool(const char *name, bool *out)
+{
+	if (!name)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(fArgList, name, NULL);
+	if (!item)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((bool*)item->data);
+	return B_OK;
+}
+
+
+int32
 PArgs::FindChar(const char *name, char *out)
 {
 	if (!name)
@@ -234,6 +270,21 @@ PArgs::FindString(const char *name, char **out)
 	
 	*out = strdup((char*)item->data);
 	return B_OK;
+}
+
+
+int32
+PArgs::FindPoint(const char *name, BPoint *out)
+{
+	return find_parg_point(fArgList, name, &out->x, &out->y);
+}
+
+
+int32
+PArgs::FindRect(const char *name, BRect *out)
+{
+	return find_parg_rect(fArgList, name, &out->left, &out->top,
+							&out->right, &out->bottom);
 }
 
 

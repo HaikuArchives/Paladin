@@ -1,7 +1,7 @@
 #ifndef PARGS_H
 #define PARGS_H
 
-#include <SupportDefs.h>
+#include <Rect.h>
 #include "CInterface.h"
 
 class PArgs
@@ -23,8 +23,11 @@ public:
 	int32				AddInt64(const char *name, int64 arg);
 	int32				AddFloat(const char *name, float arg);
 	int32				AddDouble(const char *name, double arg);
+	int32				AddBool(const char *name, bool arg);
 	int32				AddChar(const char *name, char arg);
 	int32				AddString(const char *name, const char *arg);
+	int32				AddPoint(const char *name, BPoint arg);
+	int32				AddRect(const char *name, BRect arg);
 	
 	PArgListItem *		FindItem(const char *name, int32 index = 0);
 	int32				FindInt8(const char *name, int8 *out);
@@ -33,8 +36,11 @@ public:
 	int32				FindInt64(const char *name, int64 *out);
 	int32				FindFloat(const char *name, float *out);
 	int32				FindDouble(const char *name, double *out);
+	int32				FindBool(const char *name, bool *out);
 	int32				FindChar(const char *name, char *out);
 	int32				FindString(const char *name, char **out);
+	int32				FindPoint(const char *name, BPoint *arg);
+	int32				FindRect(const char *name, BRect *arg);
 	
 	PArgListItem *		ItemAt(int32 index);
 	

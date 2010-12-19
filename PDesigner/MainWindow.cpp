@@ -235,8 +235,8 @@ MainWindow::AddControl(const BString &type)
 		pview->SetStringProperty("Text", "Text");
 		pview->SetStringProperty("Label", "Label");
 		
-		PArgList in, out;
-		pview->RunMethod("SetPreferredDivider", in, out);
+		PArgs in, out;
+		pview->RunMethod("SetPreferredDivider", in.ListRef(), out.ListRef());
 	}
 	
 	FloatValue pw, ph;

@@ -23,8 +23,12 @@ public:
 			PMethod &		operator=(const PMethod &from);
 			
 	virtual	void			SetName(const char *name);
-	virtual void			SetName(const BString &name);
+			void			SetName(const BString &name);
 			BString			GetName(void) const;
+	
+	virtual	void			SetDescription(const char *string);
+			void			SetDescription(const BString &string);
+			BString			GetDescription(void) const;
 	
 	virtual	void			SetFunction(MethodFunction func);
 			MethodFunction	GetFunction(void) const;
@@ -32,7 +36,8 @@ public:
 	virtual	status_t		Run(PObject *object, PArgList &in, PArgList &out);
 	
 private:
-			BString			fName;
+			BString			fName,
+							fDescription;
 			MethodFunction	fFunction;
 			uint32			fFlags;
 };

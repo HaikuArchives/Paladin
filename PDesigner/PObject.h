@@ -9,6 +9,8 @@
 #include "PMethod.h"
 #include "PProperty.h"
 
+int32_t NullPMethod(void *pobject, PArgList *in, PArgList *out);
+
 class MethodData
 {
 public:
@@ -16,6 +18,23 @@ public:
 	
 	BString		name;
 	uint32 		flags;
+};
+
+
+class EventData
+{
+public:
+	EventData(const char *n, const char *d)
+	{
+		name = n;
+		description = d;
+		hook = NullPMethod;
+	}
+	
+	BString			name,
+					description;
+	
+	MethodFunction	hook;
 };
 
 
@@ -52,7 +71,10 @@ public:
 			bool			UsesInterface(const BString &name);
 			BString			InterfaceAt(const int32 &index) const;
 			int32			CountInterfaces(void) const;
-	
+			
+			EventData *		EventAt(const int32 &index) const;
+			int32			CountEvents(void) const;
+			
 	virtual	void			PrintToStream(void);
 	
 protected:
@@ -61,6 +83,11 @@ protected:
 	
 	virtual	status_t		AddMethod(PMethod *method);
 	virtual	status_t		RemoveMethod(const char *name);
+	
+	virtual	status_t		AddEvent(const char *name, const char *description);
+	virtual	status_t		RemoveEvent(const char *name);
+			EventData *		FindEvent(const char *name);
+	virtual	status_t		RunEvent(const char *name, PArgList &in, PArgList &out);
 	
 	BString					fType;
 	BString					fFriendlyType;
@@ -71,6 +98,7 @@ private:
 	BObjectList<PropertyData>	*fPropertyList;
 	BObjectList<PMethod>		*fMethodList;
 	BObjectList<BString>		*fInterfaceList;
+	BObjectList<EventData>		*fEventList;
 };
 
 // Convenience functions

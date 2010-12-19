@@ -11,6 +11,7 @@ PObject::PObject(void)
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
+	fEventList = new BObjectList<EventData>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	
@@ -25,6 +26,7 @@ PObject::PObject(BMessage *msg)
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
+	fEventList = new BObjectList<EventData>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	if (msg->FindString("type",&fType) != B_OK)
@@ -54,6 +56,7 @@ PObject::PObject(const char *name)
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
+	fEventList = new BObjectList<EventData>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
@@ -68,6 +71,7 @@ PObject::PObject(const PObject &from)
 	fPropertyList = new BObjectList<PropertyData>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
+	fEventList = new BObjectList<EventData>(20,true);
 	
 	PObjectBroker::RegisterObject(this);
 	*this = from;
@@ -110,6 +114,7 @@ PObject::~PObject(void)
 	delete fPropertyList;
 	delete fInterfaceList;
 	delete fMethodList;
+	delete fEventList;
 	
 	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
 	broker->UnregisterObject(this);
@@ -269,6 +274,20 @@ PObject::CountInterfaces(void) const
 }
 
 
+EventData *
+PObject::EventAt(const int32 &index) const
+{
+	return fEventList->ItemAt(index);
+}
+
+
+int32
+PObject::CountEvents(void) const
+{
+	return fEventList->CountItems();
+}
+
+			
 void
 PObject::PrintToStream(void)
 {
@@ -346,6 +365,66 @@ PObject::RemoveMethod(const char *name)
 	}
 	
 	return B_NAME_NOT_FOUND;
+}
+
+
+status_t
+PObject::AddEvent(const char *name, const char *description)
+{
+	if (!name || !description)
+		return B_NAME_IN_USE;
+	
+	if (FindEvent(name))
+		return B_OK;
+	
+	EventData *data = new EventData(name, description);
+	fEventList->AddItem(data);
+	return B_OK;
+}
+
+
+status_t
+PObject::RemoveEvent(const char *name)
+{
+	EventData *data = FindEvent(name);
+	if (!data)
+		return B_NAME_NOT_FOUND;
+	
+	return fEventList->RemoveItem(data) ? B_OK : B_ERROR;
+}
+
+
+EventData *
+PObject::FindEvent(const char *name)
+{
+	if (!name)
+		return NULL;
+	
+	for (int32 i = 0; i < fEventList->CountItems(); i++)
+	{
+		EventData *item = fEventList->ItemAt(i);
+		if (item->name.ICompare(name) == 0)
+			return item;
+	}
+	
+	return NULL;
+}
+
+
+status_t
+PObject::RunEvent(const char *name, PArgList &in, PArgList &out)
+{
+	if (!name)
+		return B_ERROR;
+	
+	EventData *event = FindEvent(name);
+	if (!event)
+		return B_NAME_NOT_FOUND;
+	
+	if (event->hook != NullPMethod)
+		return event->hook(this, &in, &out);
+	
+	return B_OK;
 }
 
 

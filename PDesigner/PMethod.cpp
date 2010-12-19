@@ -44,6 +44,27 @@ PMethod::GetName(void) const
 
 
 void
+PMethod::SetDescription(const char *string)
+{
+	fDescription = string;
+}
+
+
+void
+PMethod::SetDescription(const BString &string)
+{
+	SetDescription(string.String());
+}
+
+
+BString
+PMethod::GetDescription(void) const
+{
+	return fDescription;
+}
+
+	
+void
 PMethod::SetFunction(MethodFunction func)
 {
 	fFunction = func;

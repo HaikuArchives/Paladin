@@ -1,4 +1,4 @@
-Implement pobject_run_method() in the C interface
+Add interface discovery for methods and events
 
 Test and fix PTextControl
 

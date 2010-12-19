@@ -4,6 +4,7 @@
 #include <malloc.h>
 
 #include "App.h"
+#include "CInterface.h"
 #include "MiscProperties.h"
 #include "MsgDefs.h"
 #include "PObjectBroker.h"
@@ -496,6 +497,10 @@ PWindowBackend::WindowActivated(bool active)
 void
 PWindowBackend::FrameMoved(BPoint pt)
 {
+	PArgList in, out;
+	add_parg_point(&in, "point", pt.x, pt.y);
+	fOwner->RunEvent("FrameMoved", in, out);
+	
 	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
 	msg.AddInt64("id",fOwner->GetID());
 	msg.AddString("name","Location");

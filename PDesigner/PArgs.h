@@ -8,10 +8,13 @@ class PArgs
 {
 public:
 						PArgs(void);
+						PArgs(PArgList *from, bool own = false);
 						~PArgs(void);
 	
 	int32				AddItem(const char *name, void *arg, size_t argsize,
 								PArgType type);
+	int32				RemoveItem(PArgListItem *item);
+	
 	int32				AddInt8(const char *name, int8 arg);
 	int32				AddInt16(const char *name, int16 arg);
 	int32				AddInt32(const char *name, int32 arg);
@@ -20,7 +23,6 @@ public:
 	int32				AddDouble(const char *name, double arg);
 	int32				AddChar(const char *name, char arg);
 	int32				AddString(const char *name, const char *arg);
-	int32				RemoveItem(PArgListItem *item);
 	
 	PArgListItem *		FindItem(const char *name, int32 index = 0);
 	int32				FindInt8(const char *name, int8 *out);
@@ -39,6 +41,7 @@ public:
 	
 private:
 	PArgList			*fArgList;
+	bool				fFreeList;
 };
 
 #endif

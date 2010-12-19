@@ -3,14 +3,28 @@
 #include <string.h>
 
 PArgs::PArgs(void)
+	:	fFreeList(true)
 {
 	fArgList = create_parglist();
 }
 
 
+PArgs::PArgs(PArgList *from, bool own)
+	:	fArgList(from),
+		fFreeList(own)
+{
+	if (!from)
+	{
+		fArgList = create_parglist();
+		fFreeList = true;
+	}
+}
+
+
 PArgs::~PArgs(void)
 {
-	destroy_parglist(fArgList);
+	if (fFreeList)
+		destroy_parglist(fArgList);
 }
 
 
@@ -19,6 +33,13 @@ PArgs::AddItem(const char *name, void *arg, size_t argsize,
 							PArgType type)
 {
 	return add_parg(fArgList, name, arg, argsize, type);
+}
+
+
+int32
+PArgs::RemoveItem(PArgListItem *item)
+{
+	return remove_parg(fArgList, item);
 }
 
 
@@ -75,13 +96,6 @@ int32
 PArgs::AddString(const char *name, const char *arg)
 {
 	return add_parg(fArgList, name, (void*)arg, strlen(arg) + 1, PARG_STRING);
-}
-
-
-int32
-PArgs::RemoveItem(PArgListItem *item)
-{
-	return remove_parg(fArgList, item);
 }
 
 

@@ -148,6 +148,8 @@ destroy_parglist(PArgList *list)
 		destroy_pargitem(node);
 		node = next;
 	}
+	
+	free(list);
 }
 
 

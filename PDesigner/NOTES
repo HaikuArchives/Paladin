@@ -1,5 +1,3 @@
-Convert PMethods to use PArgList instead of BMessages
-
 Implement pobject_run_method() in the C interface
 
 Test and fix PTextControl

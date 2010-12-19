@@ -334,6 +334,7 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 			break;
 		}
 		default:
+			fprintf(stderr,"Unrecognized arg type in set_parg()\n");
 			break;
 	}
 	
@@ -1257,8 +1258,8 @@ int32_t
 pobject_run_method(void *pobj, const char *name, PArgList *in,
 										PArgList *out)
 {
-	// TODO: Implement after converting PObect to PArgList
-	return B_ERROR;
+	PObject *obj = static_cast<PObject*>(pobj);
+	return obj ? obj->RunMethod(name, *in, *out) : NULL;
 }
 
 

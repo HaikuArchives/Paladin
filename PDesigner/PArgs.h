@@ -11,6 +11,8 @@ public:
 						PArgs(PArgList *from, bool own = false);
 						~PArgs(void);
 	
+	void				MakeEmpty(void);
+	
 	int32				AddItem(const char *name, void *arg, size_t argsize,
 								PArgType type);
 	int32				RemoveItem(PArgListItem *item);

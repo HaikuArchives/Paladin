@@ -790,11 +790,10 @@ PViewBackend::MessageReceived(BMessage *msg)
 int32_t
 PViewAddChild(void *pobject, PArgList *in, PArgList *out)
 {
-/*
-	if (!obj)
+	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PView *parent = dynamic_cast<PView*>(obj);
+	PView *parent = static_cast<PView*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
@@ -803,7 +802,7 @@ PViewAddChild(void *pobject, PArgList *in, PArgList *out)
 	empty_parglist(out);
 	
 	uint64 id;
-	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	if (find_parg_int64(in, "id", (int64*)&id) != B_OK)
 	{
 		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
@@ -826,28 +825,26 @@ PViewAddChild(void *pobject, PArgList *in, PArgList *out)
 	if (unlock);
 		fView->Window()->Unlock();
 	
-*/	return B_OK;
-
-#warning fix PViewAddChild and related
+	return B_OK;
 }
 
 
 int32_t
 PViewRemoveChild(void *pobject, PArgList *in, PArgList *out)
 {
-/*	if (!obj)
+	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PView *parent = dynamic_cast<PView*>(obj);
+	PView *parent = static_cast<PView*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
 	BView *fView = parent->GetView();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
 	uint64 id;
-	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	if (find_parg_int64(in, "id", (int64*)&id) != B_OK)
 	{
 		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
@@ -870,7 +867,7 @@ PViewRemoveChild(void *pobject, PArgList *in, PArgList *out)
 	
 	if (unlock)
 		fView->Window()->Unlock();
-*/	
+	
 	return B_OK;
 }
 
@@ -878,21 +875,21 @@ PViewRemoveChild(void *pobject, PArgList *in, PArgList *out)
 int32_t
 PViewChildAt(void *pobject, PArgList *in, PArgList *out)
 {
-/*	if (!obj)
+	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PView *parent = dynamic_cast<PView*>(obj);
+	PView *parent = static_cast<PView*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
 	BView *fView = parent->GetView();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
-	int32 index;
-	if (args.FindInt32("index",&index) != B_OK)
+	int32_t index;
+	if (find_parg_int32(in, "index", &index) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
@@ -908,13 +905,13 @@ PViewChildAt(void *pobject, PArgList *in, PArgList *out)
 	PView *pview = dynamic_cast<PView*>(view);
 	
 	if (!view || !pview)
-		outdata.AddInt32("id",0);
+		add_parg_int32(out, "id", 0);
 	else
-		outdata.AddInt32("id",pview->GetID());
+		add_parg_int32(out, "id", pview->GetID());
 	
 	if (unlock)
 		fView->Window()->Unlock();
 	
-*/	return B_OK;
+	return B_OK;
 }
 

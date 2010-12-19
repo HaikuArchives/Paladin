@@ -28,6 +28,13 @@ PArgs::~PArgs(void)
 }
 
 
+void
+PArgs::MakeEmpty(void)
+{
+	empty_parglist(fArgList);
+}
+
+
 int32
 PArgs::AddItem(const char *name, void *arg, size_t argsize,
 							PArgType type)

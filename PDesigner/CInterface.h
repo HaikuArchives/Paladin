@@ -30,6 +30,7 @@ enum parg_type_t
 	PARG_FLOAT,
 	PARG_DOUBLE,
 	
+	PARG_BOOL,
 	PARG_CHAR,
 	PARG_STRING,
 	
@@ -103,6 +104,7 @@ int32_t				add_parg_int64(PArgList *list, const char *name, int64_t arg);
 int32_t				add_parg_float(PArgList *list, const char *name, float arg);
 int32_t				add_parg_double(PArgList *list, const char *name, double arg);
 
+int32_t				add_parg_bool(PArgList *list, const char *name, bool arg);
 int32_t				add_parg_char(PArgList *list, const char *name, char arg);
 int32_t				add_parg_string(PArgList *list, const char *name, const char *arg);
 
@@ -122,6 +124,7 @@ int32_t				find_parg_int64(PArgList *list, const char *name, int64_t *out);
 int32_t				find_parg_float(PArgList *list, const char *name, float *out);
 int32_t				find_parg_double(PArgList *list, const char *name, double *out);
 
+int32_t				find_parg_bool(PArgList *list, const char *name, bool *out);
 int32_t				find_parg_char(PArgList *list, const char *name, char *out);
 int32_t				find_parg_string(PArgList *list, const char *name, char **arg);
 

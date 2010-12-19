@@ -485,6 +485,10 @@ PWindowBackend::MessageReceived(BMessage *msg)
 void
 PWindowBackend::WindowActivated(bool active)
 {
+	PArgList in, out;
+	add_parg_bool(&in, "active", active);
+	fOwner->RunEvent("WindowActivated", in, out);
+	
 	if (active)
 	{
 		BMessage msg(M_ACTIVATE_OBJECT);
@@ -511,6 +515,11 @@ PWindowBackend::FrameMoved(BPoint pt)
 void
 PWindowBackend::FrameResized(float w, float h)
 {
+	PArgList in, out;
+	add_parg_float(&in, "width", w);
+	add_parg_float(&in, "height", h);
+	fOwner->RunEvent("FrameResized", in, out);
+	
 	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
 	msg.AddInt64("id",fOwner->GetID());
 	msg.AddString("name","Width");

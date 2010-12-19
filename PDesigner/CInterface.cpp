@@ -319,6 +319,13 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 			node->type = type;
 			break;
 		}
+		case PARG_BOOL:
+		{
+			*((bool*)node->data) = *((bool*)arg);
+			node->datasize = argsize;
+			node->type = type;
+			break;
+		}
 		case PARG_CHAR:
 		{
 			*((char*)node->data) = *((char*)arg);
@@ -329,6 +336,30 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 		case PARG_STRING:
 		{
 			strcpy((char*)node->data,(char*)arg);
+			node->datasize = argsize;
+			node->type = type;
+			break;
+		}
+		case PARG_RECT:
+		{
+			float *src = (float*)arg;
+			float *dest = (float*)node->data;
+			
+			for (int8_t i = 0; i < 4; i++)
+				dest[i] = src[i];
+			
+			node->datasize = argsize;
+			node->type = type;
+			break;
+		}
+		case PARG_POINT:
+		{
+			float *src = (float*)arg;
+			float *dest = (float*)node->data;
+			
+			dest[0] = src[0];
+			dest[1] = src[1];
+			
 			node->datasize = argsize;
 			node->type = type;
 			break;
@@ -380,6 +411,13 @@ int32_t
 add_parg_double(PArgList *list, const char *name, double arg)
 {
 	return add_parg(list, name, &arg, sizeof(double), PARG_DOUBLE);
+}
+
+
+int32_t
+add_parg_bool(PArgList *list, const char *name, bool arg)
+{
+	return add_parg(list, name, &arg, sizeof(bool), PARG_BOOL);
 }
 
 
@@ -554,6 +592,21 @@ find_parg_double(PArgList *list, const char *name, double *out)
 		return B_NAME_NOT_FOUND;
 	
 	*out = *((double*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_bool(PArgList *list, const char *name, bool *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((bool*)item->data);
 	return B_OK;
 }
 

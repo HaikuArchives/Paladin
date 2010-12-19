@@ -1,6 +1,7 @@
 #include "PWindow.h"
 
 #include <stdio.h>
+#include <malloc.h>
 
 #include "App.h"
 #include "MiscProperties.h"
@@ -11,11 +12,11 @@
 
 #define M_QUIT_REQUESTED 'mqut'
 
-status_t PWindowAddChild(PObject *object, BMessage &args, BMessage &outdata);
-status_t PWindowRemoveChild(PObject *object, BMessage &args, BMessage &outdata);
-status_t PWindowChildAt(PObject *object, BMessage &args, BMessage &outdata);
-status_t PWindowCountChildren(PObject *object, BMessage &args, BMessage &outdata);
-status_t PWindowFindView(PObject *object, BMessage &args, BMessage &outdata);
+int32_t PWindowAddChild(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowChildAt(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowCountChildren(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowFindView(void *pobject, PArgList *in, PArgList *out);
 
 class PWindowBackend : public BWindow
 {
@@ -541,24 +542,24 @@ WindowItem::GetWindow(void)
 
 
 
-status_t
-PWindowAddChild(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PWindowAddChild(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+	if (!pobject)
 		return B_ERROR;
 	
-	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	PWindow *pwin = static_cast<PWindow*>(pobject);
 	if (!pwin)
 		return B_BAD_TYPE;
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
 	uint64 id;
-	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	if (find_parg_int64(in, "id",(int64*)&id) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
@@ -577,24 +578,24 @@ PWindowAddChild(PObject *obj, BMessage &args, BMessage &outdata)
 }
 
 
-status_t
-PWindowRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+	if (!pobject)
 		return B_ERROR;
 	
-	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	PWindow *pwin = static_cast<PWindow*>(pobject);
 	if (!pwin)
 		return B_BAD_TYPE;
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
 	uint64 id;
-	if (args.FindInt64("id",(int64*)&id) != B_OK)
+	if (find_parg_int64(in, "id",(int64*)&id) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
@@ -615,24 +616,24 @@ PWindowRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
 }
 
 
-status_t
-PWindowChildAt(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PWindowChildAt(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+	if (!pobject)
 		return B_ERROR;
 	
-	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	PWindow *pwin = static_cast<PWindow*>(pobject);
 	if (!pwin)
 		return B_BAD_TYPE;
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
-	int32 index;
-	if (args.FindInt32("index",&index) != B_OK)
+	int32_t index;
+	if (find_parg_int32(in, "index",&index) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
@@ -642,9 +643,9 @@ PWindowChildAt(PObject *obj, BMessage &args, BMessage &outdata)
 	PView *pview = dynamic_cast<PView*>(view);
 	
 	if (!view || !pview)
-		outdata.AddInt32("id",0);
+		add_parg_int32(out, "id", 0);
 	else
-		outdata.AddInt32("id",pview->GetID());
+		add_parg_int32(out, "id", pview->GetID());
 	
 	if (fWindow->IsLocked())
 		fWindow->Unlock();
@@ -653,61 +654,64 @@ PWindowChildAt(PObject *obj, BMessage &args, BMessage &outdata)
 }
 
 
-status_t
-PWindowCountChildren(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PWindowCountChildren(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+	if (!pobject)
 		return B_ERROR;
 	
-	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	PWindow *pwin = static_cast<PWindow*>(pobject);
 	if (!pwin)
 		return B_BAD_TYPE;
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
 	fWindow->Lock();
-	outdata.AddInt32("count",fWindow->CountChildren());
+	add_parg_int32(out, "count", fWindow->CountChildren());
 	fWindow->Unlock();
 	
 	return B_OK;
 }
 
 
-status_t
-PWindowFindView(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PWindowFindView(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+	if (!pobject)
 		return B_ERROR;
 	
-	PWindow *pwin = dynamic_cast<PWindow*>(obj);
+	PWindow *pwin = static_cast<PWindow*>(pobject);
 	if (!pwin)
 		return B_BAD_TYPE;
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
-	BString name;
 	BPoint point;
-	if (args.FindString("name",&name) != B_OK && args.FindPoint("point",&point) != B_OK)
+	char *name;
+	if (find_parg_string(in, "name", &name) != B_OK &&
+		find_parg_point(in, "point", &point.x, &point.y) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
 	fWindow->Lock();
 	
-	BView *view = (name.CountChars() > 0) ? fWindow->FindView(name.String()) : 
+	BView *view = (strlen(name) > 0) ? fWindow->FindView(name) : 
 					fWindow->FindView(point);
+	
+	free(name);
 	
 	PView *pview = dynamic_cast<PView*>(view);
 	
 	if (!view || !pview)
-		outdata.AddInt32("id",0);
+		add_parg_int32(out, "id", 0);
 	else
-		outdata.AddInt32("id",pview->GetID());
+		add_parg_int32(out, "id", pview->GetID());
 	
 	fWindow->Unlock();
 	

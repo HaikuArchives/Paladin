@@ -21,9 +21,9 @@ static const uint32 ksFollowBottom = B_FOLLOW_BOTTOM;
 static const uint32 ksFollowTopBottom = B_FOLLOW_TOP_BOTTOM;
 static const uint32 ksFollowVCenter = B_FOLLOW_V_CENTER;
 
-status_t PViewAddChild(PObject *obj, BMessage &args, BMessage &outdata);
-status_t PViewRemoveChild(PObject *obj, BMessage &args, BMessage &outdata);
-status_t PViewChildAt(PObject *obj, BMessage &args, BMessage &outdata);
+int32_t PViewAddChild(void *pobject, PArgList *in, PArgList *out);
+int32_t PViewRemoveChild(void *pobject, PArgList *in, PArgList *out);
+int32_t PViewChildAt(void *pobject, PArgList *in, PArgList *out);
 
 class PViewBackend : public BView
 {
@@ -787,9 +787,10 @@ PViewBackend::MessageReceived(BMessage *msg)
 }
 
 
-status_t
-PViewAddChild(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PViewAddChild(void *pobject, PArgList *in, PArgList *out)
 {
+/*
 	if (!obj)
 		return B_ERROR;
 	
@@ -799,12 +800,12 @@ PViewAddChild(PObject *obj, BMessage &args, BMessage &outdata)
 	
 	BView *fView = parent->GetView();
 	
-	outdata.MakeEmpty();
+	empty_parglist(out);
 	
 	uint64 id;
 	if (args.FindInt64("id",(int64*)&id) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
@@ -825,14 +826,16 @@ PViewAddChild(PObject *obj, BMessage &args, BMessage &outdata)
 	if (unlock);
 		fView->Window()->Unlock();
 	
-	return B_OK;
+*/	return B_OK;
+
+#warning fix PViewAddChild and related
 }
 
 
-status_t
-PViewRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PViewRemoveChild(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+/*	if (!obj)
 		return B_ERROR;
 	
 	PView *parent = dynamic_cast<PView*>(obj);
@@ -846,7 +849,7 @@ PViewRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
 	uint64 id;
 	if (args.FindInt64("id",(int64*)&id) != B_OK)
 	{
-		outdata.AddInt32("error",B_ERROR);
+		add_parg_int32(out, "error", B_ERROR);
 		return B_ERROR;
 	}
 	
@@ -867,15 +870,15 @@ PViewRemoveChild(PObject *obj, BMessage &args, BMessage &outdata)
 	
 	if (unlock)
 		fView->Window()->Unlock();
-	
+*/	
 	return B_OK;
 }
 
 
-status_t
-PViewChildAt(PObject *obj, BMessage &args, BMessage &outdata)
+int32_t
+PViewChildAt(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!obj)
+/*	if (!obj)
 		return B_ERROR;
 	
 	PView *parent = dynamic_cast<PView*>(obj);
@@ -912,6 +915,6 @@ PViewChildAt(PObject *obj, BMessage &args, BMessage &outdata)
 	if (unlock)
 		fView->Window()->Unlock();
 	
-	return B_OK;
+*/	return B_OK;
 }
 

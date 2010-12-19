@@ -9,7 +9,7 @@
 #include <TextControl.h>
 #include <Window.h>
 
-status_t	PTextControlSetPreferredDivider(PObject *object, BMessage &in, BMessage &out);
+int32_t	PTextControlSetPreferredDivider(void *object, PArgList *in, PArgList *out);
 
 class PTextControlBackend : public AutoTextControl
 {
@@ -340,13 +340,14 @@ PTextControlBackend::MessageReceived(BMessage *msg)
 }
 
 
-status_t
-PTextControlSetPreferredDivider(PObject *object, BMessage &in, BMessage &out)
+int32_t
+PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out)
 {
-	if (!object)
+	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PTextControl *pcontrol = dynamic_cast<PTextControl*>(object);
+	PTextControl *pcontrol = static_cast<PTextControl*>(pobject);
+	PObject *object = static_cast<PObject*>(pobject);
 	
 	if (!object->UsesInterface("PTextControl") || !pcontrol)
 		return B_BAD_TYPE;

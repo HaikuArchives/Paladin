@@ -33,6 +33,10 @@ enum parg_type_t
 	PARG_CHAR,
 	PARG_STRING,
 	
+	PARG_RECT,
+	PARG_POINT,
+	PARG_COLOR,
+	
 	PARG_END
 };
 
@@ -63,6 +67,9 @@ struct p_arg_list
 
 typedef struct p_arg_list PArgList;
 
+typedef int32_t (*MethodFunction)(void *pobject, PArgList *in, PArgList *out);
+int32_t NullPMethod(void *pobject, PArgList *in, PArgList *out);
+
 
 /* -------------------------------------------------------------------------------------
 	Argument-passing code
@@ -79,13 +86,12 @@ void				print_pargitem(PArgListItem *node);
 
 PArgList *			create_parglist(void);
 void				destroy_parglist(PArgList *list);
+void				empty_parglist(PArgList *list);
 void				print_parglist(PArgList *list);
 
 int32_t				add_parg(PArgList *list, const char *name, void *arg, size_t argsize,
 							PArgType type);
 int32_t				remove_parg(PArgList *list, PArgListItem *node);
-PArgListItem *		find_parg(PArgList *list, const char *name, PArgListItem *startItem);
-PArgListItem *		find_parg_index(PArgList *list, int32_t index);
 void				set_parg(PArgListItem *node, void *arg, size_t argsize,
 							PArgType type);
 
@@ -99,6 +105,30 @@ int32_t				add_parg_double(PArgList *list, const char *name, double arg);
 
 int32_t				add_parg_char(PArgList *list, const char *name, char arg);
 int32_t				add_parg_string(PArgList *list, const char *name, const char *arg);
+
+int32_t				add_parg_point(PArgList *list, const char *name, float x,
+									float y);
+int32_t				add_parg_rect(PArgList *list, const char *name, float left,
+								float top, float right, float bottom);
+
+
+PArgListItem *		find_parg(PArgList *list, const char *name, PArgListItem *startItem);
+PArgListItem *		find_parg_index(PArgList *list, int32_t index);
+int32_t				find_parg_int8(PArgList *list, const char *name, int8_t *out);
+int32_t				find_parg_int16(PArgList *list, const char *name, int16_t *out);
+int32_t				find_parg_int32(PArgList *list, const char *name, int32_t *out);
+int32_t				find_parg_int64(PArgList *list, const char *name, int64_t *out);
+
+int32_t				find_parg_float(PArgList *list, const char *name, float *out);
+int32_t				find_parg_double(PArgList *list, const char *name, double *out);
+
+int32_t				find_parg_char(PArgList *list, const char *name, char *out);
+int32_t				find_parg_string(PArgList *list, const char *name, char **arg);
+
+int32_t				find_parg_point(PArgList *list, const char *name, float *x,
+									float *y);
+int32_t				find_parg_rect(PArgList *list, const char *name, float *left,
+									float *top, float *right, float *bottom);
 
 /* -------------------------------------------------------------------------------------
 	PValue-related definitions

@@ -151,6 +151,25 @@ destroy_parglist(PArgList *list)
 }
 
 
+void
+empty_parglist(PArgList *list)
+{
+	if (!list || list->itemcount == 0)
+		return;
+	
+	PArgListItem *node = list->head;
+	while (node)
+	{
+		PArgListItem *next = node->next;
+		destroy_pargitem(node);
+		node = next;
+	}
+	
+	list->head = list->tail = NULL;
+	list->itemcount = 0;
+}
+
+
 int32_t
 add_parg(PArgList *list, const char *name, void *arg, size_t argsize, PArgType type)
 {
@@ -199,49 +218,6 @@ remove_parg(PArgList *list, PArgListItem *node)
 		node->next->prev = node->prev;
 	
 	return B_OK;
-}
-
-
-PArgListItem *
-find_parg(PArgList *list, const char *name, PArgListItem *startItem)
-{
-	/* Searches for an item with the given name, starting from item start */
-	if (!list || !name)
-		return NULL;
-	
-	PArgListItem *current = startItem ? startItem : list->head;
-	while (current)
-	{
-		if (current->name && strcmp(current->name, name) == 0)
-			return current;
-		
-		current = current->next;
-	}
-	
-	return NULL;
-}
-
-
-PArgListItem *
-find_parg_index(PArgList *list, int32_t index)
-{
-	/* Returns an item at the specified index or NULL if the index is out of range */
-	if (!list || index < 0 || index >= list->itemcount)
-		return NULL;
-	
-	int32_t i = 0;
-	PArgListItem *current = list->head;
-	while (i < index)
-	{
-		if (!current->next)
-			return NULL;
-		else
-		{
-			current = current->next;
-			i++;
-		}
-	}
-	return current;
 }
 
 
@@ -419,6 +395,234 @@ add_parg_string(PArgList *list, const char *name, const char *arg)
 	
 	return add_parg(list, name, (void*)arg, strlen(arg) + 1, PARG_STRING);
 }
+
+
+int32_t
+add_parg_point(PArgList *list, const char *name, float x, float y)
+{
+	float data[2];
+	data[0] = x;
+	data[1] = y;
+	
+	return add_parg(list, name, data, sizeof(float) * 2, PARG_POINT);
+}
+
+
+int32_t
+add_parg_rect(PArgList *list, const char *name, float left, float top,
+			float right, float bottom)
+{
+	float data[4];
+	data[0] = left;
+	data[1] = top;
+	data[2] = right;
+	data[3] = bottom;
+	
+	return add_parg(list, name, data, sizeof(float) * 4, PARG_RECT);
+}
+
+
+PArgListItem *
+find_parg(PArgList *list, const char *name, PArgListItem *startItem)
+{
+	/* Searches for an item with the given name, starting from item start */
+	if (!list || !name)
+		return NULL;
+	
+	PArgListItem *current = startItem ? startItem : list->head;
+	while (current)
+	{
+		if (current->name && strcmp(current->name, name) == 0)
+			return current;
+		
+		current = current->next;
+	}
+	
+	return NULL;
+}
+
+
+PArgListItem *
+find_parg_index(PArgList *list, int32_t index)
+{
+	/* Returns an item at the specified index or NULL if the index is out of range */
+	if (!list || index < 0 || index >= list->itemcount)
+		return NULL;
+	
+	int32_t i = 0;
+	PArgListItem *current = list->head;
+	while (i < index)
+	{
+		if (!current->next)
+			return NULL;
+		else
+		{
+			current = current->next;
+			i++;
+		}
+	}
+	return current;
+}
+
+
+int32_t
+find_parg_int8(PArgList *list, const char *name, int8_t *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT8)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((int8_t*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_int16(PArgList *list, const char *name, int16_t *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT16)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((int16_t*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_int32(PArgList *list, const char *name, int32_t *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT32)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((int32_t*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_int64(PArgList *list, const char *name, int64_t *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((int64_t*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_float(PArgList *list, const char *name, float *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((float*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_double(PArgList *list, const char *name, double *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((double*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_char(PArgList *list, const char *name, char *out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = *((char*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_string(PArgList *list, const char *name, char **out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = strdup((char*)item->data);
+	return B_OK;
+}
+
+
+int32_t
+find_parg_point(PArgList *list, const char *name, float *x, float *y)
+{
+	if (!list || !name || !x || !y)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_POINT)
+		return B_NAME_NOT_FOUND;
+	
+	float *args = (float*)item->data;
+	*x = args[0];
+	*y = args[1];
+	
+	return B_OK;
+}
+
+
+int32_t
+find_parg_rect(PArgList *list, const char *name, float *left, float *top,
+				float *right, float *bottom)
+{
+	if (!list || !name || !left || !top || !right || !bottom)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_RECT)
+		return B_NAME_NOT_FOUND;
+	
+	float *args = (float*)item->data;
+	*left = args[0];
+	*top = args[1];
+	*right = args[2];
+	*bottom = args[3];
+	
+	return B_OK;
+}
+
 
 #pragma mark - value functions
 
@@ -1116,4 +1320,10 @@ pobject_print_to_stream(void *pobj)
 		obj->PrintToStream();
 }
 
+#pragma mark - PMethod-related
 
+int32_t
+NullPMethod(void *pobject, PArgList *in, PArgList *out)
+{
+	return B_OK;
+}

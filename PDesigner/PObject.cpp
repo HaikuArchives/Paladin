@@ -176,13 +176,13 @@ PObject::GetID(void) const
 
 
 status_t
-PObject::RunMethod(const char *name, BMessage &args, BMessage &outdata)
+PObject::RunMethod(const char *name, PArgList &in, PArgList &out)
 {
 	PMethod *method = FindMethod(name);
 	if (!method)
 		return B_NAME_NOT_FOUND;
 	
-	method->Run(this, args, outdata);
+	method->Run(this, in, out);
 	return B_OK;
 }
 

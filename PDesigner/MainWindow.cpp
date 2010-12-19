@@ -11,6 +11,7 @@
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "ObjectWindow.h"
+#include "PArgs.h"
 #include "PObjectBroker.h"
 #include "PropertyWindow.h"
 #include "PView.h"
@@ -234,7 +235,7 @@ MainWindow::AddControl(const BString &type)
 		pview->SetStringProperty("Text", "Text");
 		pview->SetStringProperty("Label", "Label");
 		
-		BMessage in, out;
+		PArgList in, out;
 		pview->RunMethod("SetPreferredDivider", in, out);
 	}
 	
@@ -264,10 +265,10 @@ MainWindow::AddControl(const BString &type)
 		if (witem)
 		{
 			PWindow *pwin = witem->GetWindow();
-			BMessage args,out;
+			PArgs args,out;
 			
 			if (pview->GetType().Compare("PView") == 0 && 
-				pwin->RunMethod("CountChildren",args,out) == B_OK)
+				pwin->RunMethod("CountChildren",args.ListRef(),out.ListRef()) == B_OK)
 			{
 				int32 count;
 				if (out.FindInt32("count",&count) == B_OK && count == 0)
@@ -284,7 +285,7 @@ MainWindow::AddControl(const BString &type)
 			}
 			
 			args.AddInt64("id",item->GetObject()->GetID());
-			if(pwin->RunMethod("AddChild",args,out) == B_OK)
+			if (pwin->RunMethod("AddChild", args.ListRef(), out.ListRef()) == B_OK)
 				fListView->AddUnder(item,witem);
 			else
 				fListView->AddItem(item);
@@ -295,9 +296,9 @@ MainWindow::AddControl(const BString &type)
 			if (vitem)
 			{
 				PView *parent = vitem->GetView();
-				BMessage args,out;
+				PArgs args,out;
 				args.AddInt64("id",item->GetObject()->GetID());
-				if(parent->RunMethod("AddChild",args,out) == B_OK)
+				if(parent->RunMethod("AddChild", args.ListRef(), out.ListRef()) == B_OK)
 					fListView->AddUnder(item,vitem);
 				else
 					fListView->AddItem(item);

@@ -58,13 +58,8 @@ PMethod::GetFunction(void) const
 
 
 status_t
-PMethod::Run(PObject *object, BMessage &in, BMessage &out)
+PMethod::Run(PObject *object, PArgList &in, PArgList &out)
 {
-	return fFunction(object, in, out);
+	return fFunction(object, &in, &out);
 }
 
-status_t
-NullPMethod(PObject *object, BMessage &in, BMessage &out)
-{
-	return B_OK;
-}

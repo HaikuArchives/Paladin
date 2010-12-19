@@ -4,11 +4,9 @@
 #include <Message.h>
 #include <String.h>
 
+#include "CInterface.h"
+
 class PObject;
-
-typedef status_t (*MethodFunction)(PObject *object, BMessage &in, BMessage &out);
-
-status_t	NullPMethod(PObject *object, BMessage &in, BMessage &out);
 
 enum
 {
@@ -31,7 +29,7 @@ public:
 	virtual	void			SetFunction(MethodFunction func);
 			MethodFunction	GetFunction(void) const;
 	
-	virtual	status_t		Run(PObject *object, BMessage &in, BMessage &out);
+	virtual	status_t		Run(PObject *object, PArgList &in, PArgList &out);
 	
 private:
 			BString			fName;

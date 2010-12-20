@@ -37,6 +37,7 @@ enum parg_type_t
 	PARG_RECT,
 	PARG_POINT,
 	PARG_COLOR,
+	PARG_POINTER,
 	
 	PARG_END
 };
@@ -112,6 +113,7 @@ int32_t				add_parg_point(PArgList *list, const char *name, float x,
 									float y);
 int32_t				add_parg_rect(PArgList *list, const char *name, float left,
 								float top, float right, float bottom);
+int32_t				add_parg_pointer(PArgList *list, const char *name, void *ptr);
 
 
 PArgListItem *		find_parg(PArgList *list, const char *name, PArgListItem *startItem);
@@ -132,6 +134,7 @@ int32_t				find_parg_point(PArgList *list, const char *name, float *x,
 									float *y);
 int32_t				find_parg_rect(PArgList *list, const char *name, float *left,
 									float *top, float *right, float *bottom);
+int32_t				find_parg_pointer(PArgList *list, const char *name, void **ptr);
 
 /* -------------------------------------------------------------------------------------
 	PValue-related definitions

@@ -340,6 +340,18 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 			node->type = type;
 			break;
 		}
+		case PARG_POINT:
+		{
+			float *src = (float*)arg;
+			float *dest = (float*)node->data;
+			
+			dest[0] = src[0];
+			dest[1] = src[1];
+			
+			node->datasize = argsize;
+			node->type = type;
+			break;
+		}
 		case PARG_RECT:
 		{
 			float *src = (float*)arg;
@@ -352,14 +364,9 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 			node->type = type;
 			break;
 		}
-		case PARG_POINT:
+		case PARG_POINTER:
 		{
-			float *src = (float*)arg;
-			float *dest = (float*)node->data;
-			
-			dest[0] = src[0];
-			dest[1] = src[1];
-			
+			*((void**)node->data) = *((void**)arg);
 			node->datasize = argsize;
 			node->type = type;
 			break;
@@ -460,6 +467,13 @@ add_parg_rect(PArgList *list, const char *name, float left, float top,
 	data[3] = bottom;
 	
 	return add_parg(list, name, data, sizeof(float) * 4, PARG_RECT);
+}
+
+
+int32_t
+add_parg_pointer(PArgList *list, const char *name, void *arg)
+{
+	return add_parg(list, name, &arg, sizeof(void *), PARG_POINTER);
 }
 
 
@@ -676,6 +690,21 @@ find_parg_rect(PArgList *list, const char *name, float *left, float *top,
 	*right = args[2];
 	*bottom = args[3];
 	
+	return B_OK;
+}
+
+
+int32_t
+find_parg_pointer(PArgList *list, const char *name, void **out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_INT64)
+		return B_NAME_NOT_FOUND;
+	
+	*out = item->data;
 	return B_OK;
 }
 

@@ -28,6 +28,7 @@ public:
 	int32				AddString(const char *name, const char *arg);
 	int32				AddPoint(const char *name, BPoint arg);
 	int32				AddRect(const char *name, BRect arg);
+	int32				AddPointer(const char *name, void *arg);
 	
 	PArgListItem *		FindItem(const char *name, int32 index = 0);
 	int32				FindInt8(const char *name, int8 *out);
@@ -41,6 +42,7 @@ public:
 	int32				FindString(const char *name, char **out);
 	int32				FindPoint(const char *name, BPoint *arg);
 	int32				FindRect(const char *name, BRect *arg);
+	int32				FindPointer(const char *name, void **arg);
 	
 	PArgListItem *		ItemAt(int32 index);
 	

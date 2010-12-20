@@ -29,6 +29,8 @@ enum
 int32_t PWindowWindowActivated(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowFrameMoved(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowFrameResized(void *pobject, PArgList *in, PArgList *out);
+int32_t PViewFocusChanged(void *pobject, PArgList *in, PArgList *out);
+int32_t PViewMouseDown(void *pobject, PArgList *in, PArgList *out);
 
 MainWindow::MainWindow(void)
 	:	BWindow(BRect(5,25,250,350),"PDesigner",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
@@ -320,6 +322,10 @@ MainWindow::AddControl(const BString &type)
 	}
 	else
 		fListView->AddItem(item);
+	
+	pview->ConnectEvent("FocusChanged", PViewFocusChanged);
+	pview->ConnectEvent("MouseDown", PViewMouseDown);
+	
 	fListView->Select(fListView->FullListIndexOf(item));
 }
 
@@ -427,6 +433,36 @@ PWindowFrameResized(void *pobject, PArgList *in, PArgList *out)
 	msg.AddInt64("id",owner->GetID());
 	msg.AddString("name","Width");
 	msg.AddString("name","Height");
+	be_app->PostMessage(&msg);
+	return B_OK;
+}
+
+
+int32_t
+PViewFocusChanged(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *owner = static_cast<PObject*>(pobject);
+	if (!owner || !in || !out)
+		return B_BAD_DATA;
+	
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",owner->GetID());
+	be_app->PostMessage(&msg);
+	return B_OK;
+}
+
+
+int32_t
+PViewMouseDown(void *pobject, PArgList *in, PArgList *out)
+{
+	PView *owner = static_cast<PView*>(pobject);
+	if (!owner || !in || !out)
+		return B_BAD_DATA;
+	
+	owner->SetBoolProperty("Focus", true);
+	
+	BMessage msg(M_ACTIVATE_OBJECT);
+	msg.AddInt64("id",owner->GetID());
 	be_app->PostMessage(&msg);
 	return B_OK;
 }

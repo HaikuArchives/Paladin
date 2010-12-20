@@ -127,6 +127,13 @@ PArgs::AddRect(const char *name, BRect arg)
 }
 
 
+int32
+PArgs::AddPointer(const char *name, void *arg)
+{
+	return add_parg(fArgList, name, &arg, sizeof(void *), PARG_POINTER);
+}
+
+
 PArgListItem *
 PArgs::FindItem(const char *name, int32 index)
 {
@@ -285,6 +292,21 @@ PArgs::FindRect(const char *name, BRect *out)
 {
 	return find_parg_rect(fArgList, name, &out->left, &out->top,
 							&out->right, &out->bottom);
+}
+
+
+int32
+PArgs::FindPointer(const char *name, void **out)
+{
+	if (!name)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(fArgList, name, NULL);
+	if (!item)
+		return B_NAME_NOT_FOUND;
+	
+	*out = item->data;
+	return B_OK;
 }
 
 

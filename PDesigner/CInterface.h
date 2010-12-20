@@ -113,6 +113,8 @@ int32_t				add_parg_point(PArgList *list, const char *name, float x,
 									float y);
 int32_t				add_parg_rect(PArgList *list, const char *name, float left,
 								float top, float right, float bottom);
+int32_t				add_parg_color(PArgList *list, const char *name, uint8_t red,
+									uint8_t green, uint8_t blue, uint8_t alpha);
 int32_t				add_parg_pointer(PArgList *list, const char *name, void *ptr);
 
 
@@ -134,6 +136,8 @@ int32_t				find_parg_point(PArgList *list, const char *name, float *x,
 									float *y);
 int32_t				find_parg_rect(PArgList *list, const char *name, float *left,
 									float *top, float *right, float *bottom);
+int32_t				find_parg_color(PArgList *list, const char *name, uint8_t *red,
+									uint8_t *green, uint8_t *blue, uint8_t *alpha);
 int32_t				find_parg_pointer(PArgList *list, const char *name, void **ptr);
 
 /* -------------------------------------------------------------------------------------

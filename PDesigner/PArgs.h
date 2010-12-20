@@ -2,6 +2,7 @@
 #define PARGS_H
 
 #include <Rect.h>
+#include <InterfaceDefs.h>
 #include "CInterface.h"
 
 class PArgs
@@ -28,6 +29,9 @@ public:
 	int32				AddString(const char *name, const char *arg);
 	int32				AddPoint(const char *name, BPoint arg);
 	int32				AddRect(const char *name, BRect arg);
+	int32				AddColor(const char *name, uint8 red, uint8 green,
+								uint8 blue, uint8 alpha = 255);
+	int32				AddColor(const char *name, rgb_color color);
 	int32				AddPointer(const char *name, void *arg);
 	
 	PArgListItem *		FindItem(const char *name, int32 index = 0);
@@ -42,6 +46,9 @@ public:
 	int32				FindString(const char *name, char **out);
 	int32				FindPoint(const char *name, BPoint *arg);
 	int32				FindRect(const char *name, BRect *arg);
+	int32				FindColor(const char *name, uint8 *red, uint8 *green,
+								uint8 *blue, uint8 *alpha = NULL);
+	int32				FindColor(const char *name, rgb_color *color);
 	int32				FindPointer(const char *name, void **arg);
 	
 	PArgListItem *		ItemAt(int32 index);

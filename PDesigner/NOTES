@@ -6,7 +6,15 @@ Add a tooltip property for PView.
 
 Implement a way to respond to messages via the event interface
 
-Add shortcut color methods to the C interface and PArgs
+Convert the following classes to use events:
+	PBox
+	PButton
+	PCheckBox
+	PLabel
+	PListView
+	PRadioButton
+	PScrollBar
+	PTextControl
 
 Test and fix PTextControl
 

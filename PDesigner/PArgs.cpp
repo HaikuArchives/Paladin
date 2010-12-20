@@ -128,6 +128,22 @@ PArgs::AddRect(const char *name, BRect arg)
 
 
 int32
+PArgs::AddColor(const char *name, uint8 red, uint8 green, uint8 blue,
+				uint8 alpha)
+{
+	return add_parg_color(fArgList, name, red, green, blue, alpha);
+}
+
+
+int32
+PArgs::AddColor(const char *name, rgb_color color)
+{
+	return add_parg_rect(fArgList, name, color.red, color.green, color.blue,
+						color.alpha);
+}
+
+
+int32
 PArgs::AddPointer(const char *name, void *arg)
 {
 	return add_parg(fArgList, name, &arg, sizeof(void *), PARG_POINTER);
@@ -292,6 +308,25 @@ PArgs::FindRect(const char *name, BRect *out)
 {
 	return find_parg_rect(fArgList, name, &out->left, &out->top,
 							&out->right, &out->bottom);
+}
+
+
+int32
+PArgs::FindColor(const char *name, uint8 *red, uint8 *green, uint8 *blue,
+				uint8 *alpha)
+{
+	return find_parg_color(fArgList, name, red, green, blue, alpha);
+}
+
+
+int32
+PArgs::FindColor(const char *name, rgb_color *color)
+{
+	if (!color)
+		return B_BAD_DATA;
+	
+	return find_parg_color(fArgList, name, &color->red, &color->green,
+							&color->blue, &color->alpha);
 }
 
 

@@ -471,6 +471,20 @@ add_parg_rect(PArgList *list, const char *name, float left, float top,
 
 
 int32_t
+add_parg_color(PArgList *list, const char *name, uint8_t red, uint8_t green,
+				uint8_t blue, uint8_t alpha)
+{
+	uint8_t data[4];
+	data[0] = red;
+	data[1] = green;
+	data[2] = blue;
+	data[3] = alpha;
+	
+	return add_parg(list, name, data, sizeof(uint8_t) * 4, PARG_COLOR);
+}
+
+
+int32_t
 add_parg_pointer(PArgList *list, const char *name, void *arg)
 {
 	return add_parg(list, name, &arg, sizeof(void *), PARG_POINTER);
@@ -689,6 +703,28 @@ find_parg_rect(PArgList *list, const char *name, float *left, float *top,
 	*top = args[1];
 	*right = args[2];
 	*bottom = args[3];
+	
+	return B_OK;
+}
+
+
+int32_t
+find_parg_color(PArgList *list, const char *name, uint8_t *red, uint8_t *green,
+				uint8_t *blue, uint8_t *alpha)
+{
+	if (!list || !name || !red || !green || !blue)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_COLOR)
+		return B_NAME_NOT_FOUND;
+	
+	uint8_t *args = (uint8_t*)item->data;
+	*red = args[0];
+	*green = args[1];
+	*blue = args[2];
+	if (alpha)
+		*alpha = args[3];
 	
 	return B_OK;
 }

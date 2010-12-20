@@ -74,7 +74,9 @@ public:
 			
 			EventData *		EventAt(const int32 &index) const;
 			int32			CountEvents(void) const;
+			EventData *		FindEvent(const char *name);
 	virtual	status_t		RunEvent(const char *name, PArgList &in, PArgList &out);
+			status_t		ConnectEvent(const char *name, MethodFunction func);
 			
 	virtual	void			PrintToStream(void);
 	
@@ -87,7 +89,6 @@ protected:
 	
 	virtual	status_t		AddEvent(const char *name, const char *description);
 	virtual	status_t		RemoveEvent(const char *name);
-			EventData *		FindEvent(const char *name);
 	
 	BString					fType;
 	BString					fFriendlyType;

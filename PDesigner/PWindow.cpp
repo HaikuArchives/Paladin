@@ -388,6 +388,10 @@ PWindow::InitBackend(void)
 	AddMethod(new PMethod("CountChildren", PWindowCountChildren));
 	AddMethod(new PMethod("FindView", PWindowFindView));
 	
+	AddEvent("QuitRequested", "The window was asked to quit.");
+	AddEvent("FrameMoved", "The window was moved.");
+	AddEvent("FrameResized", "The window was resized.");
+	AddEvent("WindowActivated", "The window gained or lost focus.");
 	
 	fWindow = new PWindowBackend(this);
 	
@@ -459,6 +463,9 @@ PWindowBackend::~PWindowBackend(void)
 bool
 PWindowBackend::QuitRequested(void)
 {
+	PArgs in, out;
+	fOwner->RunEvent("QuitRequest", in.ListRef(), out.ListRef());
+	
 	if (fQuitFlag)
 	{
 		while (CountChildren())
@@ -488,13 +495,6 @@ PWindowBackend::WindowActivated(bool active)
 	PArgs in, out;
 	in.AddBool("active", active);
 	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
-	
-	if (active)
-	{
-		BMessage msg(M_ACTIVATE_OBJECT);
-		msg.AddInt64("id",fOwner->GetID());
-		be_app->PostMessage(&msg);
-	}
 }
 
 
@@ -504,11 +504,6 @@ PWindowBackend::FrameMoved(BPoint pt)
 	PArgs in, out;
 	in.AddPoint("point", pt);
 	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
-	
-	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
-	msg.AddInt64("id",fOwner->GetID());
-	msg.AddString("name","Location");
-	be_app->PostMessage(&msg);
 }
 
 
@@ -519,12 +514,6 @@ PWindowBackend::FrameResized(float w, float h)
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
 	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
-	
-	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
-	msg.AddInt64("id",fOwner->GetID());
-	msg.AddString("name","Width");
-	msg.AddString("name","Height");
-	be_app->PostMessage(&msg);
 }
 
 
@@ -731,3 +720,5 @@ PWindowFindView(void *pobject, PArgList *in, PArgList *out)
 	
 	return B_OK;
 }
+
+

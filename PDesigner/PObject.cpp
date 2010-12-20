@@ -428,6 +428,18 @@ PObject::RunEvent(const char *name, PArgList &in, PArgList &out)
 }
 
 
+status_t
+PObject::ConnectEvent(const char *name, MethodFunction func)
+{
+	EventData *data = FindEvent(name);
+	if (!data)
+		return B_NAME_NOT_FOUND;
+	
+	data->hook = func;
+	return B_OK;
+}
+
+
 PObject *
 NewObject(const char *type)
 {

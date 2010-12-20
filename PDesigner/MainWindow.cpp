@@ -26,6 +26,10 @@ enum
 	M_OBJECT_SELECTED = 'obsl'
 };
 
+int32_t PWindowWindowActivated(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowFrameMoved(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowFrameResized(void *pobject, PArgList *in, PArgList *out);
+
 MainWindow::MainWindow(void)
 	:	BWindow(BRect(5,25,250,350),"PDesigner",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 		fProject(NULL)
@@ -200,6 +204,10 @@ MainWindow::AddWindow(void)
 		pwin->SetFloatProperty("Width",400);
 		pwin->SetFloatProperty("Height",300);
 		
+		pwin->ConnectEvent("FrameMoved", PWindowFrameMoved);
+		pwin->ConnectEvent("FrameResized", PWindowFrameResized);
+		pwin->ConnectEvent("WindowActivated", PWindowWindowActivated);
+		
 		fListView->AddItem(pwin->CreateWindowItem());
 		
 		int32 index = fListView->FullListIndexOf(fListView->LastItem());
@@ -372,3 +380,53 @@ MainWindow::UpdateFloaters(void)
 	}
 }
 
+
+int32_t
+PWindowWindowActivated(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *owner = static_cast<PObject*>(pobject);
+	if (!owner || !in || !out)
+		return B_BAD_DATA;
+	
+	bool active = false;
+	find_parg_bool(in, "active", &active);
+	
+	if (active)
+	{
+		BMessage msg(M_ACTIVATE_OBJECT);
+		msg.AddInt64("id",owner->GetID());
+		be_app->PostMessage(&msg);
+	}
+	return B_OK;
+}
+
+
+int32_t
+PWindowFrameMoved(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *owner = static_cast<PObject*>(pobject);
+	if (!owner || !in || !out)
+		return B_BAD_DATA;
+	
+	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
+	msg.AddInt64("id",owner->GetID());
+	msg.AddString("name","Location");
+	be_app->PostMessage(&msg);
+	return B_OK;
+}
+
+
+int32_t
+PWindowFrameResized(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *owner = static_cast<PObject*>(pobject);
+	if (!owner || !in || !out)
+		return B_BAD_DATA;
+	
+	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
+	msg.AddInt64("id",owner->GetID());
+	msg.AddString("name","Width");
+	msg.AddString("name","Height");
+	be_app->PostMessage(&msg);
+	return B_OK;
+}

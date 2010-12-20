@@ -25,11 +25,16 @@ public:
 				PWindowBackend(PObject *owner);
 				~PWindowBackend(void);
 	
-	bool		QuitRequested(void);
-	void		MessageReceived(BMessage *msg);
-	void		WindowActivated(bool active);
 	void		FrameMoved(BPoint pt);
 	void		FrameResized(float w, float h);
+	void		MenusBeginning(void);
+	void		MenusEnded(void);
+	void		WindowActivated(bool active);
+	void		ScreenChanged(BRect frame, color_space mode);
+	void		WorkspaceActivated(int32 workspace, bool active);
+	void		WorkspacesChanged(uint32 oldspace, uint32 newspace);
+	bool		QuitRequested(void);
+	void		MessageReceived(BMessage *msg);
 	
 	void		SetCodeFeel(window_feel feel);
 	window_feel	CodeFeel(void) const;
@@ -388,11 +393,16 @@ PWindow::InitBackend(void)
 	AddMethod(new PMethod("CountChildren", PWindowCountChildren));
 	AddMethod(new PMethod("FindView", PWindowFindView));
 	
-	AddEvent("QuitRequested", "The window was asked to quit.");
+	AddEvent("MenusBeginning", "The window is about to show a menu.");
+	AddEvent("MenusEnded", "The windows has finished showing a menu.");
 	AddEvent("FrameMoved", "The window was moved.");
 	AddEvent("FrameResized", "The window was resized.");
+	AddEvent("QuitRequested", "The window was asked to quit.");
+	AddEvent("ScreenChanged", "The screen has changed color space, size, or location.");
 	AddEvent("WindowActivated", "The window gained or lost focus.");
-	
+	AddEvent("WorkspaceActivated", "The user has changed workspaces.");
+	AddEvent("WorkspacesChanged", "The window has changed workspaces.");
+		
 	fWindow = new PWindowBackend(this);
 	
 	// Set the properties *before* we unlock its looper to save locking it later
@@ -460,11 +470,85 @@ PWindowBackend::~PWindowBackend(void)
 }
 
 
+void
+PWindowBackend::FrameMoved(BPoint pt)
+{
+	PArgs in, out;
+	in.AddPoint("point", pt);
+	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::FrameResized(float w, float h)
+{
+	PArgs in, out;
+	in.AddFloat("width", w);
+	in.AddFloat("height", h);
+	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::MenusBeginning(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("MenusBeginning", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::MenusEnded(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("MenusEnded", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::WindowActivated(bool active)
+{
+	PArgs in, out;
+	in.AddBool("active", active);
+	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::ScreenChanged(BRect frame, color_space mode)
+{
+	PArgs in, out;
+	in.AddRect("frame", frame);
+	in.AddInt32("color_space", mode);
+	fOwner->RunEvent("ScreenChanged", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::WorkspaceActivated(int32 workspace, bool active)
+{
+	PArgs in, out;
+	in.AddInt32("workspace", workspace);
+	in.AddBool("active", active);
+	fOwner->RunEvent("WorkspaceActivated", in.ListRef(), out.ListRef());
+}
+
+
+void
+PWindowBackend::WorkspacesChanged(uint32 oldspace, uint32 newspace)
+{
+	PArgs in, out;
+	in.AddInt32("old", oldspace);
+	in.AddInt32("new", newspace);
+	fOwner->RunEvent("WorkspacesChanged", in.ListRef(), out.ListRef());
+}
+
+
 bool
 PWindowBackend::QuitRequested(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("QuitRequest", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("QuitRequested", in.ListRef(), out.ListRef());
 	
 	if (fQuitFlag)
 	{
@@ -486,34 +570,6 @@ PWindowBackend::MessageReceived(BMessage *msg)
 	}
 	else
 		BWindow::MessageReceived(msg);
-}
-
-
-void
-PWindowBackend::WindowActivated(bool active)
-{
-	PArgs in, out;
-	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
-}
-
-
-void
-PWindowBackend::FrameMoved(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("point", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
-}
-
-
-void
-PWindowBackend::FrameResized(float w, float h)
-{
-	PArgs in, out;
-	in.AddFloat("width", w);
-	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
 }
 
 

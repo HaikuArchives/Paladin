@@ -1,8 +1,6 @@
 Add interface discovery for methods and events
 
-Finish implementing events for PWindow.
-
-Implement events for PView and PControl
+Refactor PWindowBackend::QuitRequested -- move code out into an event.
 
 Add a tooltip property for PView.
 

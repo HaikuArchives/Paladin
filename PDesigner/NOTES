@@ -2,8 +2,6 @@ Add interface discovery for methods and events
 
 Refactor PWindowBackend::QuitRequested -- move code out into an event.
 
-Add a tooltip property for PView.
-
 Implement a way to respond to messages via the event interface
 
 Convert the following classes to use events:

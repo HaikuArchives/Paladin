@@ -1,18 +1,12 @@
-Add interface discovery for methods and events
+Implement PSlider::SetProperty and test
 
-Refactor PWindowBackend::QuitRequested -- move code out into an event.
+Find out the default values on a BSlider
+
+Add interface discovery for methods and events
 
 Implement a way to respond to messages via the event interface
 
-Convert the following classes to use events:
-	PBox
-	PButton
-	PCheckBox
-	PLabel
-	PListView
-	PRadioButton
-	PScrollBar
-	PTextControl
+Refactor PWindowBackend::QuitRequested -- move code out into an event. This depends on a way to respond to messages.
 
 Test and fix PTextControl
 

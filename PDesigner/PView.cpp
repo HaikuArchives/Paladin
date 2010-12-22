@@ -892,7 +892,7 @@ PViewBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
 }
 
 

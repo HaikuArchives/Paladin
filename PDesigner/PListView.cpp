@@ -7,13 +7,33 @@
 #include "Floater.h"
 #include "FloaterBroker.h"
 #include "MsgDefs.h"
+#include "PArgs.h"
 
 class PListViewBackend : public BListView
 {
 public:
 			PListViewBackend(PObject *owner);
+	void	AttachedToWindow(void);
+	void	AllAttached(void);
+	void	DetachedFromWindow(void);
+	void	AllDetached(void);
+	
 	void	MakeFocus(bool value);
+	
+	void	FrameMoved(BPoint pt);
+	void	FrameResized(float w, float h);
+	
+	void	KeyDown(const char *bytes, int32 count);
+	void	KeyUp(const char *bytes, int32 count);
+	
+	void	MouseDown(BPoint pt);
 	void	MouseUp(BPoint pt);
+	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	
+	void	WindowActivated(bool active);
+	
+	void	Draw(BRect update);
+	void	DrawAfterChildren(BRect update);
 	void	MessageReceived(BMessage *msg);
 	
 private:
@@ -237,24 +257,155 @@ PListViewBackend::PListViewBackend(PObject *owner)
 
 
 void
+PListViewBackend::AttachedToWindow(void)
+{
+	BListView::AttachedToWindow();
+	PArgs in, out;
+	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::AllAttached(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::DetachedFromWindow(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::AllDetached(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+}
+
+
+void
 PListViewBackend::MakeFocus(bool value)
 {
-	BMessage msg(M_ACTIVATE_OBJECT);
-	msg.AddInt64("id",fOwner->GetID());
-	be_app->PostMessage(&msg);
-	
-	BListView::MakeFocus(value);
+	PArgs in, out;
+	in.AddBool("active", value);
+	fOwner->RunEvent("FocusChanged", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::FrameMoved(BPoint pt)
+{
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::FrameResized(float w, float h)
+{
+	BListView::FrameResized(w,h);
+	PArgs in, out;
+	in.AddFloat("width", w);
+	in.AddFloat("height", h);
+	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::KeyDown(const char *bytes, int32 count)
+{
+	BListView::KeyDown(bytes, count);
+	PArgs in, out;
+	in.AddString("bytes", bytes);
+	in.AddInt32("count", count);
+	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::KeyUp(const char *bytes, int32 count)
+{
+	PArgs in, out;
+	in.AddString("bytes", bytes);
+	in.AddInt32("count", count);
+	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::MouseDown(BPoint pt)
+{
+	BListView::MouseDown(pt);
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
 }
 
 
 void
 PListViewBackend::MouseUp(BPoint pt)
 {
-	BMessage msg(M_ACTIVATE_OBJECT);
-	msg.AddInt64("id",fOwner->GetID());
-	be_app->PostMessage(&msg);
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+{
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	in.AddInt32("buttons", buttons);
+	in.AddPointer("message", (void*)msg);
+	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::WindowActivated(bool active)
+{
+	BListView::WindowActivated(active);
+	PArgs in, out;
+	in.AddBool("active", active);
+	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+}
+
+
+void
+PListViewBackend::Draw(BRect update)
+{
+	EventData *data = fOwner->FindEvent("Draw");
+	if (data->hook == NullPMethod)
+		BListView::Draw(update);
 	
-	BListView::MouseUp(pt);
+	PArgs in, out;
+	in.AddRect("update", update);
+	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
+	
+	if (IsFocus())
+	{
+		SetPenSize(5.0);
+		SetHighColor(0,0,0);
+		SetLowColor(128,128,128);
+		StrokeRect(Bounds(),B_MIXED_COLORS);
+	}
+}
+
+
+void
+PListViewBackend::DrawAfterChildren(BRect update)
+{
+	PArgs in, out;
+	in.AddRect("update", update);
+	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
 }
 
 

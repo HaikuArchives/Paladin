@@ -417,12 +417,18 @@ PObject::RunEvent(const char *name, PArgList &in, PArgList &out)
 	if (!name)
 		return B_ERROR;
 	
-	EventData *event = FindEvent(name);
-	if (!event)
-		return B_NAME_NOT_FOUND;
+	return RunEvent(FindEvent(name), in, out);
+}
+
+
+status_t
+PObject::RunEvent(EventData *data, PArgList &in, PArgList &out)
+{
+	if (!data)
+		return B_ERROR;
 	
-	if (event->hook != NullPMethod)
-		return event->hook(this, &in, &out);
+	if (data->hook != NullPMethod)
+		return data->hook(this, &in, &out);
 	
 	return B_OK;
 }

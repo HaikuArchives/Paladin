@@ -3,6 +3,7 @@
 #include "Floater.h"
 #include "FloaterBroker.h"
 #include "MsgDefs.h"
+#include "PArgs.h"
 
 #include <Application.h>
 #include <stdio.h>
@@ -12,9 +13,26 @@ class PCheckBoxBackend : public BCheckBox
 public:
 				PCheckBoxBackend(PObject *owner);
 	void		AttachedToWindow(void);
-	void		Draw(BRect update);
+	void		AllAttached(void);
+	void		DetachedFromWindow(void);
+	void		AllDetached(void);
+	
 	void		MakeFocus(bool value);
+	
+	void		FrameMoved(BPoint pt);
+	void		FrameResized(float w, float h);
+	
+	void		KeyDown(const char *bytes, int32 count);
+	void		KeyUp(const char *bytes, int32 count);
+	
+	void		MouseDown(BPoint pt);
 	void		MouseUp(BPoint pt);
+	void		MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	
+	void		WindowActivated(bool active);
+	
+	void		Draw(BRect update);
+	void		DrawAfterChildren(BRect update);
 	status_t	Invoke(BMessage *msg = NULL);
 	void		MessageReceived(BMessage *msg);
 	
@@ -119,45 +137,148 @@ void
 PCheckBoxBackend::AttachedToWindow(void)
 {
 	fOwner->SetColorProperty("BackColor",Parent()->ViewColor());
+	
+	PArgs in, out;
+	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
 }
 
 
 void
-PCheckBoxBackend::Draw(BRect update)
+PCheckBoxBackend::AllAttached(void)
 {
-	BCheckBox::Draw(update);
-	if (IsFocus())
-	{
-		SetHighColor(0,0,0);
-		SetLowColor(128,128,128);
-		StrokeRect(Bounds(),B_MIXED_COLORS);
-	}
+	PArgs in, out;
+	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::DetachedFromWindow(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::AllDetached(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
 }
 
 
 void
 PCheckBoxBackend::MakeFocus(bool value)
 {
-	BMessage msg(M_ACTIVATE_OBJECT);
-	msg.AddInt64("id",fOwner->GetID());
-	be_app->PostMessage(&msg);
-	
-	Invalidate();
-	
-	BCheckBox::MakeFocus(value);
+	PArgs in, out;
+	in.AddBool("active", value);
+	fOwner->RunEvent("FocusChanged", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::FrameMoved(BPoint pt)
+{
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::FrameResized(float w, float h)
+{
+	PArgs in, out;
+	in.AddFloat("width", w);
+	in.AddFloat("height", h);
+	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::KeyDown(const char *bytes, int32 count)
+{
+	PArgs in, out;
+	in.AddString("bytes", bytes);
+	in.AddInt32("count", count);
+	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::KeyUp(const char *bytes, int32 count)
+{
+	PArgs in, out;
+	in.AddString("bytes", bytes);
+	in.AddInt32("count", count);
+	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::MouseDown(BPoint pt)
+{
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
 }
 
 
 void
 PCheckBoxBackend::MouseUp(BPoint pt)
 {
-	MakeFocus(true);
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+{
+	PArgs in, out;
+	in.AddPoint("where", pt);
+	in.AddInt32("buttons", buttons);
+	in.AddPointer("message", (void*)msg);
+	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::WindowActivated(bool active)
+{
+	PArgs in, out;
+	in.AddBool("active", active);
+	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::Draw(BRect update)
+{
+	EventData *data = fOwner->FindEvent("Draw");
+	if (data->hook == NullPMethod)
+		BCheckBox::Draw(update);
 	
-	BMessage msg(M_ACTIVATE_OBJECT);
-	msg.AddInt64("id",fOwner->GetID());
-	be_app->PostMessage(&msg);
+	if (IsFocus())
+	{
+		SetHighColor(0,0,0);
+		SetLowColor(128,128,128);
+		StrokeRect(Bounds(),B_MIXED_COLORS);
+	}
 	
-	BCheckBox::MouseUp(pt);
+	PArgs in, out;
+	in.AddRect("update", update);
+	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
+}
+
+
+void
+PCheckBoxBackend::DrawAfterChildren(BRect update)
+{
+	PArgs in, out;
+	in.AddRect("update", update);
+	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
 }
 
 

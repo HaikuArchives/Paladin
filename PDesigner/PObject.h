@@ -75,7 +75,8 @@ public:
 			EventData *		EventAt(const int32 &index) const;
 			int32			CountEvents(void) const;
 			EventData *		FindEvent(const char *name);
-	virtual	status_t		RunEvent(const char *name, PArgList &in, PArgList &out);
+			status_t		RunEvent(const char *name, PArgList &in, PArgList &out);
+	virtual	status_t		RunEvent(EventData *data, PArgList &in, PArgList &out);
 			status_t		ConnectEvent(const char *name, MethodFunction func);
 			
 	virtual	void			PrintToStream(void);

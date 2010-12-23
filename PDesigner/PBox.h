@@ -33,6 +33,7 @@ protected:
 
 private:
 	void					InitProperties(void);
+	void					InitMethods(void);
 };
 
 #endif

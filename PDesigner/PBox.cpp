@@ -3,11 +3,17 @@
 #include <Box.h>
 #include <Window.h>
 
+#include "CInterface.h"
 #include "EnumProperty.h"
 #include "Floater.h"
 #include "FloaterBroker.h"
 #include "MsgDefs.h"
 #include "PArgs.h"
+
+int32_t PBoxAttachedToWindow(void *pobject, PArgList *in, PArgList *out);
+int32_t PBoxDraw(void *pobject, PArgList *in, PArgList *out);
+int32_t PBoxFrameResized(void *pobject, PArgList *in, PArgList *out);
+
 
 class PBoxBackend : public BBox
 {
@@ -228,7 +234,15 @@ PBox::InitProperties(void)
 	eprop->SetValue(B_FANCY_BORDER);
 	AddProperty(eprop);
 	
-	
+}
+
+
+void
+PBox::InitMethods(void)
+{
+	AddMethod(new PMethod("_AttachedToWindow", PBoxAttachedToWindow));
+	AddMethod(new PMethod("_Draw", PBoxDraw));
+	AddMethod(new PMethod("_FrameResized", PBoxFrameResized));
 }
 
 
@@ -309,7 +323,7 @@ PBoxBackend::FrameMoved(BPoint pt)
 	PArgs in, out;
 	in.AddPoint("where", pt);
 	
-	EventData *data = fOwner->FindEvent("");
+	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
@@ -417,7 +431,7 @@ void
 PBoxBackend::Draw(BRect update)
 {
 	EventData *data = fOwner->FindEvent("Draw");
-	if (data->hook)
+	if (!data->hook)
 		BBox::Draw(update);
 	
 	PArgs in, out;
@@ -489,5 +503,83 @@ PBoxBackend::MessageReceived(BMessage *msg)
 			break;
 		}
 	}
+}
+
+
+int32_t
+PBoxAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	fView->BBox::AttachedToWindow();
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+PBoxDraw(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	PArgs args(in);
+	BRect r;
+	args.FindRect("update", &r);
+	
+	fView->BBox::Draw(r);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+PBoxFrameResized(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float w,h;
+	find_parg_float(in, "width", &w);
+	find_parg_float(in, "height", &h);
+	
+	fView->BBox::FrameResized(w, h);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 

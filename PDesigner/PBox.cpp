@@ -243,10 +243,15 @@ PBoxBackend::PBoxBackend(PObject *owner)
 void
 PBoxBackend::AttachedToWindow(void)
 {
-	fOwner->SetColorProperty("BackColor",ViewColor());
-	
 	PArgs in, out;
-	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+	{
+		BBox::AttachedToWindow();
+		fOwner->SetColorProperty("BackColor",ViewColor());
+	}
 }
 
 
@@ -254,7 +259,11 @@ void
 PBoxBackend::AllAttached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::AllAttached();
 }
 
 
@@ -262,7 +271,11 @@ void
 PBoxBackend::DetachedFromWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::DetachedFromWindow();
 }
 
 
@@ -270,7 +283,11 @@ void
 PBoxBackend::AllDetached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::AllDetached();
 }
 
 
@@ -278,8 +295,11 @@ void
 PBoxBackend::MakeFocus(bool value)
 {
 	PArgs in, out;
-	in.AddBool("active", value);
-	fOwner->RunEvent("FocusChanged", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FocusChanged");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::MakeFocus(value);
 }
 
 
@@ -288,18 +308,26 @@ PBoxBackend::FrameMoved(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+	
+	EventData *data = fOwner->FindEvent("");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::FrameMoved(pt);
 }
 
 
 void
 PBoxBackend::FrameResized(float w, float h)
 {
-	BBox::FrameResized(w, h);
 	PArgs in, out;
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FrameResized");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::FrameResized(w, h);
 }
 
 
@@ -309,7 +337,11 @@ PBoxBackend::KeyDown(const char *bytes, int32 count)
 	PArgs in, out;
 	in.AddString("bytes", bytes);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::KeyDown(bytes, count);
 }
 
 
@@ -319,7 +351,11 @@ PBoxBackend::KeyUp(const char *bytes, int32 count)
 	PArgs in, out;
 	in.AddString("bytes", bytes);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::KeyUp(bytes, count);
 }
 
 
@@ -328,7 +364,11 @@ PBoxBackend::MouseDown(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::MouseDown(pt);
 }
 
 
@@ -337,7 +377,11 @@ PBoxBackend::MouseUp(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::MouseUp(pt);
 }
 
 
@@ -348,7 +392,11 @@ PBoxBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
 	in.AddPoint("where", pt);
 	in.AddInt32("buttons", buttons);
 	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::MouseMoved(pt, buttons, msg);
 }
 
 
@@ -357,7 +405,11 @@ PBoxBackend::WindowActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::WindowActivated(active);
 }
 
 
@@ -365,7 +417,7 @@ void
 PBoxBackend::Draw(BRect update)
 {
 	EventData *data = fOwner->FindEvent("Draw");
-	if (data->hook != NullPMethod)
+	if (data->hook)
 		BBox::Draw(update);
 	
 	PArgs in, out;
@@ -387,7 +439,11 @@ PBoxBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BBox::DrawAfterChildren(update);
 }
 
 

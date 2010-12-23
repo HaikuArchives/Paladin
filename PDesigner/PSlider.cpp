@@ -213,7 +213,6 @@ PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 		ThumbStyle
 		UsingFillColor
 */
-/*
 	if (!name || !value)
 		return B_ERROR;
 	
@@ -228,20 +227,93 @@ PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 	BSlider *fSlider = (BSlider*)fView;
 	
 	IntValue iv;
+	ColorValue cv;
+	FloatValue fv;
+	StringValue sv;
+	BoolValue bv;
 	
 	status_t status = prop->SetValue(value);
 	if (status != B_OK)
 		return status;
 	
-	if (str.ICompare("SelectionType") == 0)
+	if (str.ICompare("BarColor") == 0)
+	{
+		prop->GetValue(&cv);
+		fSlider->SetBarColor(*cv.value);
+	}
+	else if (str.ICompare("BarThickness") == 0)
+	{
+		prop->GetValue(&fv);
+		fSlider->SetBarThickness(*fv.value);
+	}
+	else if (str.ICompare("FillColor") == 0)
+	{
+		rgb_color c;
+		bool usingColor = fSlider->FillColor(&c);
+		 
+		prop->GetValue(&cv);
+		fSlider->UseFillColor(usingColor, &c);
+	}
+	else if (str.ICompare("HashMarkCount") == 0)
 	{
 		prop->GetValue(&iv);
-//		fSlider->SetListType((list_view_type)*iv.value);
+		fSlider->SetHashMarkCount(*iv.value);
+	}
+	else if (str.ICompare("HashMarkLocation") == 0)
+	{
+		prop->GetValue(&iv);
+		fSlider->SetHashMarks((hash_mark_location)*iv.value);
+	}
+	else if (str.ICompare("MinLimit") == 0)
+	{
+		int32 min, max;
+		fSlider->GetLimits(&min, &max);
+		
+		prop->GetValue(&fv);
+		fSlider->SetLimits(*iv.value, max);
+	}
+	else if (str.ICompare("MinLimitLabel") == 0)
+	{
+		prop->GetValue(&sv);
+		fSlider->SetLimitLabels(*sv.value, fSlider->MaxLimitLabel());
+	}
+	else if (str.ICompare("MaxLimit") == 0)
+	{
+		int32 min, max;
+		fSlider->GetLimits(&min, &max);
+		
+		prop->GetValue(&fv);
+		fSlider->SetLimits(min, *iv.value);
+	}
+	else if (str.ICompare("MaxLimitLabel") == 0)
+	{
+		prop->GetValue(&sv);
+		fSlider->SetLimitLabels(fSlider->MinLimitLabel(), *sv.value);
+	}
+	else if (str.ICompare("Orientation") == 0)
+	{
+		prop->GetValue(&iv);
+		fSlider->SetOrientation((orientation)*iv.value);
+	}
+	else if (str.ICompare("Position") == 0)
+	{
+		prop->GetValue(&fv);
+		fSlider->SetPosition(*fv.value);
+	}
+	else if (str.ICompare("ThumbStyle") == 0)
+	{
+		prop->GetValue(&iv);
+		fSlider->SetStyle((thumb_style)*iv.value);
+	}
+	else if (str.ICompare("UsingFillColor") == 0)
+	{
+		prop->GetValue(&bv);
+		fSlider->UseFillColor(*bv.value);
 	}
 	else
-*/		return PControl::SetProperty(name,value,index);
+		return PControl::SetProperty(name,value,index);
 	
-//	return prop->GetValue(value);
+	return prop->GetValue(value);
 }
 
 	

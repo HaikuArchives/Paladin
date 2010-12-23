@@ -9,8 +9,6 @@
 #include "PMethod.h"
 #include "PProperty.h"
 
-int32_t NullPMethod(void *pobject, PArgList *in, PArgList *out);
-
 class MethodData
 {
 public:
@@ -28,7 +26,7 @@ public:
 	{
 		name = n;
 		description = d;
-		hook = NullPMethod;
+		hook = NULL;
 	}
 	
 	BString			name,
@@ -87,6 +85,7 @@ protected:
 	
 	virtual	status_t		AddMethod(PMethod *method);
 	virtual	status_t		RemoveMethod(const char *name);
+	virtual	status_t		ReplaceMethod(const char *old, PMethod *newMethod);
 	
 	virtual	status_t		AddEvent(const char *name, const char *description);
 	virtual	status_t		RemoveEvent(const char *name);

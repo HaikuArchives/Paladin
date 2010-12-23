@@ -1,5 +1,5 @@
-#ifndef PBUTTON_H
-#define PBUTTON_H
+#ifndef PSLIDER_H
+#define PSLIDER_H
 
 #include <Slider.h>
 #include "PControl.h"

@@ -301,6 +301,14 @@ PObject::PrintToStream(void)
 		printf("Property: Name is %s, Type is %s, Value is %s\n",p->GetName().String(),
 				p->GetType().String(), p->GetValueAsString().String());
 	}
+	
+	printf("Object:\nMethods:\n");
+	for (int32 i = 0; i < CountMethods(); i++)
+		printf("\t%s\n",MethodAt(i)->GetName().String());
+	
+	printf("Object:\nEvents:\n");
+	for (int32 i = 0; i < CountEvents(); i++)
+		printf("\t%s\n",EventAt(i)->name.String());
 }
 
 
@@ -369,6 +377,20 @@ PObject::RemoveMethod(const char *name)
 
 
 status_t
+PObject::ReplaceMethod(const char *old, PMethod *newMethod)
+{
+	if (!old)
+		return B_ERROR;
+	
+	RemoveMethod(old);
+	
+	if (newMethod)
+		fMethodList->AddItem(newMethod);
+	return B_OK;
+}
+
+
+status_t
 PObject::AddEvent(const char *name, const char *description)
 {
 	if (!name || !description)
@@ -427,7 +449,7 @@ PObject::RunEvent(EventData *data, PArgList &in, PArgList &out)
 	if (!data)
 		return B_ERROR;
 	
-	if (data->hook != NullPMethod)
+	if (data->hook)
 		return data->hook(this, &in, &out);
 	
 	return B_OK;

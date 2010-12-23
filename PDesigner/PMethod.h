@@ -17,7 +17,7 @@ class PMethod
 {
 public:
 							PMethod(const char *name = NULL,
-									MethodFunction func = NullPMethod,
+									MethodFunction func = NULL,
 									const int32 &flags = 0);
 	virtual					~PMethod(void);
 			PMethod &		operator=(const PMethod &from);

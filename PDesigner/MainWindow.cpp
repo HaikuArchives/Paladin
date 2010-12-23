@@ -231,7 +231,7 @@ MainWindow::AddControl(const BString &type)
 	
 	if (!pobj || !pobj->UsesInterface("PView"))
 		return;
-	
+		
 	PView *pview = dynamic_cast<PView*>(pobj);
 	if (!pview)
 		return;

@@ -2,6 +2,7 @@
 #include <Application.h>
 #include <Autolock.h>
 #include <Window.h>
+#include <stdio.h>
 
 #include "Floater.h"
 #include "FloaterBroker.h"

@@ -1,4 +1,4 @@
-Implement PSlider::SetProperty and test
+Rework floater framework to take out all (or as much as possible) floater-related code out of the object framework
 
 Find out the default values on a BSlider
 

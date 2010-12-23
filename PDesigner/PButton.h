@@ -26,6 +26,7 @@ public:
 	
 protected:
 	virtual void			InitBackend(BView *view = NULL);
+	void					InitMethods(void);
 };
 
 #endif

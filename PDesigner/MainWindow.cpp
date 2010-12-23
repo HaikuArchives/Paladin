@@ -460,6 +460,8 @@ PViewMouseDown(void *pobject, PArgList *in, PArgList *out)
 	if (!owner || !in || !out)
 		return B_BAD_DATA;
 	
+	owner->RunMethod("_MouseDown", *in, *out);
+	
 	owner->SetBoolProperty("Focus", true);
 	
 	BMessage msg(M_ACTIVATE_OBJECT);

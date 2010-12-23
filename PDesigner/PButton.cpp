@@ -8,6 +8,11 @@
 #include "MsgDefs.h"
 #include "PArgs.h"
 
+int32_t PButtonAttachedToWindow(void *pobject, PArgList *in, PArgList *out);
+int32_t PButtonDraw(void *pobject, PArgList *in, PArgList *out);
+int32_t PButtonKeyDown(void *pobject, PArgList *in, PArgList *out);
+int32_t PButtonMouseDown(void *pobject, PArgList *in, PArgList *out);
+
 class PButtonBackend : public BButton
 {
 public:
@@ -46,6 +51,7 @@ PButton::PButton(void)
 	fFriendlyType = "Button";
 	AddInterface("PButton");
 	
+	InitMethods();
 	InitBackend();
 }
 
@@ -72,6 +78,7 @@ PButton::PButton(const char *name)
 	fType = "PButton";
 	fFriendlyType = "Button";
 	AddInterface("PButton");
+	InitMethods();
 	InitBackend();
 }
 
@@ -82,6 +89,7 @@ PButton::PButton(const PButton &from)
 	fType = "PButton";
 	fFriendlyType = "Button";
 	AddInterface("PButton");
+	InitMethods();
 	InitBackend();
 }
 
@@ -114,6 +122,17 @@ PButton::Duplicate(void) const
 {
 	return new PButton(*this);
 }
+
+
+void
+PButton::InitMethods(void)
+{
+	AddMethod(new PMethod("_AttachedToWindow", PButtonAttachedToWindow));
+	AddMethod(new PMethod("_Draw", PButtonDraw));
+	AddMethod(new PMethod("_KeyDown", PButtonKeyDown));
+	AddMethod(new PMethod("_MouseDown", PButtonMouseDown));
+}
+
 
 void
 PButton::InitBackend(BView *view)
@@ -229,7 +248,7 @@ void
 PButtonBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
@@ -243,7 +262,7 @@ void
 PButtonBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
@@ -385,3 +404,109 @@ PButtonBackend::MessageReceived(BMessage *msg)
 		}
 	}
 }
+
+
+int32_t
+PButtonAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	fView->BButton::AttachedToWindow();
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+PButtonDraw(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	PArgs args(in);
+	BRect r;
+	args.FindRect("update", &r);
+	
+	fView->BButton::Draw(r);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+PButtonKeyDown(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	int32 count;
+	find_parg_int32(in, "count", (int32_t*)&count);
+	PArgListItem *item = find_parg(in, "bytes", NULL);
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BButton::KeyDown((const char*)item->data, count);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+PButtonMouseDown(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	BPoint pt;
+	find_parg_point(in, "where", &pt.x, &pt.y);
+	
+	fView->BButton::MouseDown(pt);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+

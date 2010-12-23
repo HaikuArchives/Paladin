@@ -54,6 +54,7 @@ PBox::PBox(void)
 	AddInterface("PBox");
 	
 	InitProperties();
+	InitMethods();
 	InitBackend();
 }
 
@@ -80,6 +81,7 @@ PBox::PBox(const char *name)
 	fType = "PBox";
 	fFriendlyType = "Box";
 	AddInterface("PBox");
+	InitMethods();
 	InitBackend();
 }
 
@@ -90,6 +92,7 @@ PBox::PBox(const PBox &from)
 	fType = "PBox";
 	fFriendlyType = "Box";
 	AddInterface("PBox");
+	InitMethods();
 	InitBackend();
 }
 

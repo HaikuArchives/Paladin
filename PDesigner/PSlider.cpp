@@ -367,13 +367,15 @@ PSlider::InitProperties(void)
 	prop->SetValue((int32)B_BLOCK_THUMB);
 	AddProperty(prop);
 	
-	AddProperty(new ColorProperty("BarColor", rgb_color(),
+	AddProperty(new ColorProperty("BarColor", 
+								tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+											B_DARKEN_4_TINT),
 								"The bar's color."));
-	AddProperty(new FloatProperty("BarThickness", 10.0));
+	AddProperty(new FloatProperty("BarThickness", 6.0));
 	AddProperty(new ColorProperty("FillColor", rgb_color(),
 								"The fill color, if it is being used."));
-	AddProperty(new IntProperty("HashMarkCount", 4));
-	AddProperty(new IntProperty("HashMarkLocation", 1));
+	AddProperty(new IntProperty("HashMarkCount", 0));
+	AddProperty(new IntProperty("HashMarkLocation", (int32)B_HASH_MARKS_NONE));
 	AddProperty(new FloatProperty("MinLimit", 0.0));
 	AddProperty(new StringProperty("MinLimitLabel", NULL));
 	AddProperty(new FloatProperty("MaxLimit", 100.0));

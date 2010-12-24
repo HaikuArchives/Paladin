@@ -455,12 +455,14 @@ PSliderBackend::FrameResized(float w, float h)
 void
 PSliderBackend::KeyDown(const char *bytes, int32 count)
 {
-	BSlider::KeyDown(bytes, count);
-	
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::KeyDown(bytes, count);
 }
 
 
@@ -468,9 +470,13 @@ void
 PSliderBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::KeyUp(bytes, count);
 }
 
 
@@ -518,7 +524,7 @@ void
 PSliderBackend::Draw(BRect update)
 {
 	EventData *data = fOwner->FindEvent("Draw");
-	if (data->hook == NullPMethod)
+	if (!data->hook)
 		BSlider::Draw(update);
 	
 	PArgs in, out;

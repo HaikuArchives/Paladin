@@ -10,10 +10,6 @@
 #include "MsgDefs.h"
 #include "PArgs.h"
 
-int32_t PBoxAttachedToWindow(void *pobject, PArgList *in, PArgList *out);
-int32_t PBoxDraw(void *pobject, PArgList *in, PArgList *out);
-int32_t PBoxFrameResized(void *pobject, PArgList *in, PArgList *out);
-
 
 class PBoxBackend : public BBox
 {
@@ -243,9 +239,6 @@ PBox::InitProperties(void)
 void
 PBox::InitMethods(void)
 {
-	AddMethod(new PMethod("_AttachedToWindow", PBoxAttachedToWindow));
-	AddMethod(new PMethod("_Draw", PBoxDraw));
-	AddMethod(new PMethod("_FrameResized", PBoxFrameResized));
 }
 
 
@@ -352,7 +345,7 @@ void
 PBoxBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
@@ -366,7 +359,7 @@ void
 PBoxBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)

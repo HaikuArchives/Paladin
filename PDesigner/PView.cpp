@@ -654,6 +654,76 @@ PView::RunMessageHandler(const int32 &constant, PArgList &args)
 void
 PView::ConvertMsgToArgs(BMessage &in, PArgList &out)
 {
+	char *fieldName;
+	uint32 fieldType;
+	int32 fieldCount;
+	
+	empty_parglist(&out);
+	
+	int32 i = 0;
+	while (in.GetInfo(B_ANY_TYPE, i, &fieldName, &fieldType, &fieldCount) == B_OK)
+	{
+		for (int32 j = 0; j < fieldCount; j++)
+		{
+			void *ptr = NULL;
+			ssize_t size = 0;
+			in.FindData(fieldName, fieldType, j, (const void**)&ptr, &size);
+			
+			PArgType pargType;
+			switch (fieldType)
+			{
+				case B_INT8_TYPE:
+					pargType = PARG_INT8;
+					break;
+				case B_INT16_TYPE:
+					pargType = PARG_INT16;
+					break;
+				case B_INT32_TYPE:
+					pargType = PARG_INT32;
+					break;
+				case B_INT64_TYPE:
+					pargType = PARG_INT64;
+					break;
+				case B_FLOAT_TYPE:
+					pargType = PARG_FLOAT;
+					break;
+				case B_DOUBLE_TYPE:
+					pargType = PARG_DOUBLE;
+					break;
+				case B_BOOL_TYPE:
+					pargType = PARG_BOOL;
+					break;
+				case B_CHAR_TYPE:
+					pargType = PARG_CHAR;
+					break;
+				case B_STRING_TYPE:
+					pargType = PARG_STRING;
+					break;
+				case B_RECT_TYPE:
+					pargType = PARG_RECT;
+					break;
+				case B_POINT_TYPE:
+					pargType = PARG_POINT;
+					break;
+/*				case B_RGB_32_BIT_TYPE:
+					pargType = PARG_COLOR;
+					break;
+				case B_RGB_COLOR_TYPE:
+					pargType = PARG_COLOR;
+					break;
+*/				case B_POINTER_TYPE:
+					pargType = PARG_POINTER;
+					break;
+				default:
+					pargType = PARG_RAW;
+					break;
+			}
+printf("Add parg: %s, %ld, %d\n", fieldName, size, pargType);			
+			add_parg(&out, fieldName, ptr, size, pargType);
+		}
+		
+		i++;
+	}
 }
 
 
@@ -943,54 +1013,13 @@ PViewBackend::MessageReceived(BMessage *msg)
 	PView *view = dynamic_cast<PView*>(fOwner);
 	if (view->GetMsgHandler(msg->what))
 	{
-		PArgList argList;
-		view->ConvertMsgToArgs(*msg, argList);
-		if (view->RunMessageHandler(msg->what, argList) == B_OK)
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
 			return;
 	}
 	
 	BView::MessageReceived(msg);
-	
-/*
-	switch (msg->what)
-	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-								case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BView::MessageReceived(msg);
-			break;
-		}
-	}
-*/
 }
 
 

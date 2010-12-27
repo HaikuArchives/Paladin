@@ -718,7 +718,6 @@ PView::ConvertMsgToArgs(BMessage &in, PArgList &out)
 					pargType = PARG_RAW;
 					break;
 			}
-printf("Add parg: %s, %ld, %d\n", fieldName, size, pargType);			
 			add_parg(&out, fieldName, ptr, size, pargType);
 		}
 		

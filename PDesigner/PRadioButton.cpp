@@ -311,44 +311,15 @@ PRadioButtonBackend::Invoke(BMessage *msg)
 void
 PRadioButtonBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PRadioButton *view = dynamic_cast<PRadioButton*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BRadioButton::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BRadioButton::MessageReceived(msg);
 }
 

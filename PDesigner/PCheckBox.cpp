@@ -310,43 +310,14 @@ PCheckBoxBackend::Invoke(BMessage *msg)
 void
 PCheckBoxBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PCheckBox *view = dynamic_cast<PCheckBox*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BCheckBox::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BCheckBox::MessageReceived(msg);
 }

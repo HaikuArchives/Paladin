@@ -2,6 +2,8 @@ Rework floater framework to take out all (or as much as possible) floater-relate
 
 Add interface discovery for methods and events
 
+Research color codes for BMessages and add color support to BMessage->PArgList conversions
+
 Refactor PWindowBackend::QuitRequested -- move code out into an event. This depends on a way to respond to messages.
 
 Test and fix PTextControl

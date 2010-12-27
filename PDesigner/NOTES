@@ -1,10 +1,10 @@
+Implement PView::ConvertMsgToArgs and test messaging interface
+
+There is a crash when attempting to use the message handling interface because the args list is empty, but looking for a field that isn't there shouldn't crash the app. :( Fix.
+
 Rework floater framework to take out all (or as much as possible) floater-related code out of the object framework
 
-Find out the default values on a BSlider
-
 Add interface discovery for methods and events
-
-Implement a way to respond to messages via the event interface
 
 Refactor PWindowBackend::QuitRequested -- move code out into an event. This depends on a way to respond to messages.
 

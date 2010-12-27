@@ -8,6 +8,7 @@
 #include <View.h>
 
 #include "FloaterBroker.h"
+#include "Floater.h"
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "ObjectWindow.h"
@@ -32,6 +33,7 @@ int32_t PWindowFrameResized(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowQuitRequested(void *pobject, PArgList *in, PArgList *out);
 int32_t PViewFocusChanged(void *pobject, PArgList *in, PArgList *out);
 int32_t PViewMouseDown(void *pobject, PArgList *in, PArgList *out);
+int32_t	PViewHandleFloaterMsg(void *pobject, PArgList *in, PArgList *out);
 
 MainWindow::MainWindow(void)
 	:	BWindow(BRect(5,25,250,350),"PDesigner",B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
@@ -326,6 +328,7 @@ MainWindow::AddControl(const BString &type)
 	
 	pview->ConnectEvent("FocusChanged", PViewFocusChanged);
 	pview->ConnectEvent("MouseDown", PViewMouseDown);
+	pview->SetMsgHandler(M_FLOATER_ACTION, PViewHandleFloaterMsg);
 	
 	fListView->Select(fListView->FullListIndexOf(item));
 }
@@ -469,3 +472,45 @@ PViewMouseDown(void *pobject, PArgList *in, PArgList *out)
 	be_app->PostMessage(&msg);
 	return B_OK;
 }
+
+
+int32_t
+PViewHandleFloaterMsg(void *ptr, PArgList *in, PArgList *out)
+{
+	PArgs args(in);
+	
+	int32 action;
+	if (args.FindInt32("action", &action) != B_OK)
+		return B_OK;
+	
+	float dx, dy;
+	args.FindFloat("dx", &dx);
+	args.FindFloat("dy", &dy);
+	
+	FloaterBroker *broker = FloaterBroker::GetInstance();
+	
+	PObject *pobject = static_cast<PObject*>(ptr);
+	PView *pview = dynamic_cast<PView*>(pobject);
+	if (!pview)
+		return B_OK;
+	
+	switch (action)
+	{
+		case FLOATER_MOVE:
+		{
+			pview->GetView()->MoveBy(dx, dy);
+			broker->NotifyFloaters(pview, FLOATER_MOVE);
+			break;
+		}
+		case FLOATER_RESIZE:
+		{
+			pview->GetView()->ResizeBy(dx, dy);
+			broker->NotifyFloaters(pview, FLOATER_RESIZE);
+			break;
+		}
+		default:
+			break;
+	}
+	return B_OK;
+}
+

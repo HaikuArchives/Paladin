@@ -2,7 +2,9 @@
 #define PVIEW_H
 
 #include <ListItem.h>
+#include <map>
 #include <View.h>
+
 #include "ObjectItem.h"
 #include "PComponents.h"
 
@@ -40,6 +42,8 @@
 
 class PView;
 
+using std::map;
+
 enum
 {
 	RESIZE_NONE = 0,
@@ -49,12 +53,15 @@ enum
 	RESIZE_CENTER
 };
 
+
 class ViewItem : public ObjectItem
 {
 public:
 				ViewItem(PView *win);
 	PView *		GetView(void);
 };
+
+typedef std::map<int32, MethodFunction> MsgHandlerMap;
 
 class PView : public PObject
 {
@@ -77,6 +84,13 @@ public:
 	virtual	BView *			GetView(void);
 	virtual ViewItem *		CreateViewItem(void);
 	
+	virtual	void			SetMsgHandler(const int32 &constant, MethodFunction handler);
+			MethodFunction	GetMsgHandler(const int32 &constant);
+			void			RemoveMsgHandler(const int32 &constant);
+	
+	virtual	status_t		RunMessageHandler(const int32 &constant, PArgList &args);
+			void			ConvertMsgToArgs(BMessage &in, PArgList &out);
+	
 protected:
 	virtual	void			InitBackend(BView *view = NULL);
 	virtual	void			InitMethods(void);
@@ -91,6 +105,7 @@ protected:
 private:
 	void					InitProperties(void);
 	
+	MsgHandlerMap			fMsgHandlerMap;
 };
 
 #endif

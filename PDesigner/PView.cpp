@@ -467,6 +467,28 @@ PView::CreateViewItem(void)
 
 
 void
+PView::SetMsgHandler(const int32 &constant, MethodFunction handler)
+{
+	fMsgHandlerMap[constant] = handler;
+}
+
+
+MethodFunction
+PView::GetMsgHandler(const int32 &constant)
+{
+	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
+	return (i == fMsgHandlerMap.end()) ? NULL : i->second;
+}
+
+
+void
+PView::RemoveMsgHandler(const int32 &constant)
+{
+	fMsgHandlerMap.erase(constant);
+}
+
+
+void
 PView::InitProperties(void)
 {
 	AddProperty(new StringProperty("Description","The base class for all controls"));
@@ -614,6 +636,24 @@ PView::InitMethods(void)
 	AddEvent("DrawAfterChildren", "Invoked when the view is to draw after its children.");
 	
 	AddEvent("WindowActivated", "The window was activated.");
+}
+
+
+status_t
+PView::RunMessageHandler(const int32 &constant, PArgList &args)
+{
+	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
+	if (i == fMsgHandlerMap.end())
+		return B_NAME_NOT_FOUND;
+	
+	PArgList out;
+	return i->second(this, &args, &out);
+}
+
+
+void
+PView::ConvertMsgToArgs(BMessage &in, PArgList &out)
+{
 }
 
 
@@ -900,6 +940,18 @@ PViewBackend::DrawAfterChildren(BRect update)
 void
 PViewBackend::MessageReceived(BMessage *msg)
 {
+	PView *view = dynamic_cast<PView*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
+	{
+		PArgList argList;
+		view->ConvertMsgToArgs(*msg, argList);
+		if (view->RunMessageHandler(msg->what, argList) == B_OK)
+			return;
+	}
+	
+	BView::MessageReceived(msg);
+	
+/*
 	switch (msg->what)
 	{
 		case M_FLOATER_ACTION:
@@ -921,8 +973,7 @@ PViewBackend::MessageReceived(BMessage *msg)
 					MoveBy(dx, dy);
 					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
 					break;
-				}
-				case FLOATER_RESIZE:
+								case FLOATER_RESIZE:
 				{
 					ResizeBy(dx, dy);
 					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
@@ -939,6 +990,7 @@ PViewBackend::MessageReceived(BMessage *msg)
 			break;
 		}
 	}
+*/
 }
 
 

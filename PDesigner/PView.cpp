@@ -1,6 +1,7 @@
 #include "PView.h"
 #include <Application.h>
 #include <Autolock.h>
+#include <Messenger.h>
 #include <Window.h>
 #include <stdio.h>
 
@@ -74,7 +75,7 @@ PView::PView(void)
 
 
 PView::PView(BMessage *msg)
-	:	PObject(msg),
+	:	PHandler(msg),
 		fView(NULL)
 {
 	fType = "PView";
@@ -91,7 +92,7 @@ PView::PView(BMessage *msg)
 
 
 PView::PView(const char *name)
-	:	PObject(name),
+	:	PHandler(name),
 		fView(NULL)
 {
 	fType = "PView";
@@ -103,7 +104,7 @@ PView::PView(const char *name)
 
 
 PView::PView(const PView &from)
-	:	PObject(from),
+	:	PHandler(from),
 		fView(NULL)
 {
 	fType = "PView";
@@ -290,7 +291,7 @@ PView::GetProperty(const char *name, PValue *value, const int32 &index) const
 	{
 		if (fView->Window())
 			fView->Window()->Unlock();
-		return PObject::GetProperty(name,value,index);
+		return PHandler::GetProperty(name,value,index);
 	}
 	
 	if (fView->Window())
@@ -442,13 +443,22 @@ PView::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		if (fView->Window())
 			fView->Window()->Unlock();
-		return PObject::SetProperty(name,value,index);
+		return PHandler::SetProperty(name,value,index);
 	}
 	
 	if (fView->Window())
 		fView->Window()->Unlock();
 	
 	return prop->GetValue(value);
+}
+
+
+status_t
+PView::SendMessage(BMessage *msg)
+{
+	BMessenger msgr(fView);
+	msgr.SendMessage(msg, (BHandler*)NULL, B_INFINITE_TIMEOUT);
+	return B_OK;
 }
 
 
@@ -463,28 +473,6 @@ ViewItem *
 PView::CreateViewItem(void)
 {
 	return new ViewItem(this);
-}
-
-
-void
-PView::SetMsgHandler(const int32 &constant, MethodFunction handler)
-{
-	fMsgHandlerMap[constant] = handler;
-}
-
-
-MethodFunction
-PView::GetMsgHandler(const int32 &constant)
-{
-	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
-	return (i == fMsgHandlerMap.end()) ? NULL : i->second;
-}
-
-
-void
-PView::RemoveMsgHandler(const int32 &constant)
-{
-	fMsgHandlerMap.erase(constant);
 }
 
 
@@ -566,42 +554,42 @@ PView::InitBackend(BView *view)
 	PointValue pv;
 	IntValue iv,iv2;
 	
-	PObject::GetProperty("Flags",&iv);
+	PHandler::GetProperty("Flags",&iv);
 	fView->SetFlags(*iv.value);
 	
-	PObject::GetProperty("Frame",&rv);
+	PHandler::GetProperty("Frame",&rv);
 	fView->MoveTo(rv.value->left, rv.value->top);
 	fView->ResizeTo(rv.value->Width() + 1.0, rv.value->Height() + 1.0);
 	
-	PObject::GetProperty("HighColor",&cv);
+	PHandler::GetProperty("HighColor",&cv);
 	fView->SetHighColor(*cv.value);
 	
-	PObject::GetProperty("LineCapMode",&iv);
-	PObject::GetProperty("LineJoinMode",&iv2);
+	PHandler::GetProperty("LineCapMode",&iv);
+	PHandler::GetProperty("LineJoinMode",&iv2);
 	fView->SetLineMode((cap_mode)*iv.value,(join_mode)*iv2.value);
 	
-	PObject::GetProperty("LowColor",&cv);
+	PHandler::GetProperty("LowColor",&cv);
 	fView->SetLowColor(*cv.value);
 	
-//	PObject::GetProperty("Origin",&pv);
+//	PHandler::GetProperty("Origin",&pv);
 //	fView->SetOrigin(*pv.value);
 	
-	PObject::GetProperty("PenPos",&pv);
+	PHandler::GetProperty("PenPos",&pv);
 	fView->MovePenTo(*pv.value);
 	
-	PObject::GetProperty("PenSize",&fv);
+	PHandler::GetProperty("PenSize",&fv);
 	fView->SetPenSize(*fv.value);
 	
-	PObject::GetProperty("ResizingMode",&iv);
+	PHandler::GetProperty("ResizingMode",&iv);
 	fView->SetResizingMode(*iv.value);
 	
-//	PObject::GetProperty("Scale",&fv);
+//	PHandler::GetProperty("Scale",&fv);
 //	fView->SetScale(*fv.value);
 	
-	PObject::GetProperty("BackColor",&cv);
+	PHandler::GetProperty("BackColor",&cv);
 	fView->SetViewColor(*cv.value);
 	
-	PObject::GetProperty("Visible",&bv);
+	PHandler::GetProperty("Visible",&bv);
 	if (!(*bv.value))
 		fView->Hide();
 }
@@ -636,93 +624,6 @@ PView::InitMethods(void)
 	AddEvent("DrawAfterChildren", "Invoked when the view is to draw after its children.");
 	
 	AddEvent("WindowActivated", "The window was activated.");
-}
-
-
-status_t
-PView::RunMessageHandler(const int32 &constant, PArgList &args)
-{
-	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
-	if (i == fMsgHandlerMap.end())
-		return B_NAME_NOT_FOUND;
-	
-	PArgList out;
-	return i->second(this, &args, &out);
-}
-
-
-void
-PView::ConvertMsgToArgs(BMessage &in, PArgList &out)
-{
-	char *fieldName;
-	uint32 fieldType;
-	int32 fieldCount;
-	
-	empty_parglist(&out);
-	
-	int32 i = 0;
-	while (in.GetInfo(B_ANY_TYPE, i, &fieldName, &fieldType, &fieldCount) == B_OK)
-	{
-		for (int32 j = 0; j < fieldCount; j++)
-		{
-			void *ptr = NULL;
-			ssize_t size = 0;
-			in.FindData(fieldName, fieldType, j, (const void**)&ptr, &size);
-			
-			PArgType pargType;
-			switch (fieldType)
-			{
-				case B_INT8_TYPE:
-					pargType = PARG_INT8;
-					break;
-				case B_INT16_TYPE:
-					pargType = PARG_INT16;
-					break;
-				case B_INT32_TYPE:
-					pargType = PARG_INT32;
-					break;
-				case B_INT64_TYPE:
-					pargType = PARG_INT64;
-					break;
-				case B_FLOAT_TYPE:
-					pargType = PARG_FLOAT;
-					break;
-				case B_DOUBLE_TYPE:
-					pargType = PARG_DOUBLE;
-					break;
-				case B_BOOL_TYPE:
-					pargType = PARG_BOOL;
-					break;
-				case B_CHAR_TYPE:
-					pargType = PARG_CHAR;
-					break;
-				case B_STRING_TYPE:
-					pargType = PARG_STRING;
-					break;
-				case B_RECT_TYPE:
-					pargType = PARG_RECT;
-					break;
-				case B_POINT_TYPE:
-					pargType = PARG_POINT;
-					break;
-/*				case B_RGB_32_BIT_TYPE:
-					pargType = PARG_COLOR;
-					break;
-				case B_RGB_COLOR_TYPE:
-					pargType = PARG_COLOR;
-					break;
-*/				case B_POINTER_TYPE:
-					pargType = PARG_POINTER;
-					break;
-				default:
-					pargType = PARG_RAW;
-					break;
-			}
-			add_parg(&out, fieldName, ptr, size, pargType);
-		}
-		
-		i++;
-	}
 }
 
 

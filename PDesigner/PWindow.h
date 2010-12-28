@@ -4,8 +4,8 @@
 #include <Window.h>
 #include <ListItem.h>
 #include "ObjectItem.h"
-#include "PObject.h"
-#include "PProperty.h"
+#include "PHandler.h"
+#include "PComponents.h"
 
 /* Window Property List:
 		Active
@@ -39,7 +39,7 @@ public:
 	PWindow *	GetWindow(void);
 };
 
-class PWindow : public PObject
+class PWindow : public PHandler
 {
 public:
 							PWindow(void);
@@ -55,6 +55,8 @@ public:
 	
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
+	
+	virtual	status_t		SendMessage(BMessage *msg);
 	
 	BWindow *				GetWindow(void);
 	

@@ -7,6 +7,7 @@
 
 #include "ObjectItem.h"
 #include "PComponents.h"
+#include "PHandler.h"
 
 /*
 	PView Properties:
@@ -42,8 +43,6 @@
 
 class PView;
 
-using std::map;
-
 enum
 {
 	RESIZE_NONE = 0,
@@ -61,9 +60,7 @@ public:
 	PView *		GetView(void);
 };
 
-typedef std::map<int32, MethodFunction> MsgHandlerMap;
-
-class PView : public PObject
+class PView : public PHandler
 {
 public:
 							PView(void);
@@ -81,15 +78,10 @@ public:
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 	
+	virtual	status_t		SendMessage(BMessage *msg);
+	
 	virtual	BView *			GetView(void);
 	virtual ViewItem *		CreateViewItem(void);
-	
-	virtual	void			SetMsgHandler(const int32 &constant, MethodFunction handler);
-			MethodFunction	GetMsgHandler(const int32 &constant);
-			void			RemoveMsgHandler(const int32 &constant);
-	
-	virtual	status_t		RunMessageHandler(const int32 &constant, PArgList &args);
-			void			ConvertMsgToArgs(BMessage &in, PArgList &out);
 	
 protected:
 	virtual	void			InitBackend(BView *view = NULL);
@@ -104,8 +96,6 @@ protected:
 	
 private:
 	void					InitProperties(void);
-	
-	MsgHandlerMap			fMsgHandlerMap;
 };
 
 #endif

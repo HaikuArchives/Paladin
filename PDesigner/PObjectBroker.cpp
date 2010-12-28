@@ -2,18 +2,19 @@
 #include "PProperty.h"
 
 #include <Locker.h>
-#include "PWindow.h"
-#include "PView.h"
 #include "PControl.h"
 #include "PBox.h"
 #include "PButton.h"
 #include "PCheckBox.h"
+#include "PHandler.h"
 #include "PLabel.h"
 #include "PListView.h"
 #include "PRadioButton.h"
 #include "PScrollBar.h"
 #include "PSlider.h"
 #include "PTextControl.h"
+#include "PView.h"
+#include "PWindow.h"
 
 static PObjectBroker *sBroker = NULL;
 static uint64 sNextID = 1;
@@ -44,6 +45,8 @@ PObjectBroker::PObjectBroker(void)
 	
 	fObjInfoList->AddItem(new PObjectInfo("PObject","Generic Object",PObject::Instantiate,
 											PObject::Create));
+	fObjInfoList->AddItem(new PObjectInfo("PHandler","Handler",PHandler::Instantiate,
+											PHandler::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PWindow","Window",PWindow::Instantiate,
 											PWindow::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PView","View",PView::Instantiate,PView::Create));

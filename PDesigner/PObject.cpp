@@ -1,4 +1,5 @@
 #include "PObject.h"
+#include "PArgs.h"
 #include "PObjectBroker.h"
 
 #include <ClassInfo.h>
@@ -17,6 +18,7 @@ PObject::PObject(void)
 	
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
 				PROPERTY_READ_ONLY);
+	AddEvent("Destructor", "The object is about to be destroyed.");
 }
 
 
@@ -47,6 +49,7 @@ PObject::PObject(BMessage *msg)
 	RemoveProperty(FindProperty("ObjectID"));
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
 				PROPERTY_READ_ONLY);
+	AddEvent("Destructor", "The object is about to be destroyed.");
 }
 
 
@@ -62,6 +65,7 @@ PObject::PObject(const char *name)
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
 				PROPERTY_READ_ONLY);
 	AddProperty(new StringProperty("Name",name));
+	AddEvent("Destructor", "The object is about to be destroyed.");
 }
 
 
@@ -78,6 +82,7 @@ PObject::PObject(const PObject &from)
 	RemoveProperty(FindProperty("ObjectID"));
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
 				PROPERTY_READ_ONLY);
+	AddEvent("Destructor", "The object is about to be destroyed.");
 }
 
 
@@ -111,6 +116,9 @@ PObject::operator[](const BString &name)
 
 PObject::~PObject(void)
 {
+	PArgs in, out;
+	RunEvent("Destructor", in.ListRef(), out.ListRef());
+	
 	delete fPropertyList;
 	delete fInterfaceList;
 	delete fMethodList;

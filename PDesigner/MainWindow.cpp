@@ -5,6 +5,7 @@
 #include <Menu.h>
 #include <MenuItem.h>
 #include <ScrollView.h>
+#include <stdio.h>
 #include <View.h>
 
 #include "FloaterBroker.h"
@@ -24,13 +25,16 @@ enum
 	M_ADD_WINDOW = 'adwn',
 	M_REMOVE_SELECTED = 'rmsl',
 	M_TOGGLE_PROPERTY_WIN = 'tprw',
-	M_OBJECT_SELECTED = 'obsl'
+	M_OBJECT_SELECTED = 'obsl',
+	M_QUIT_REQUESTED = 'qurq'
 };
 
 int32_t PWindowWindowActivated(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowFrameMoved(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowFrameResized(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowDestructor(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowQuitRequested(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowMQuitRequested(void *pobject, PArgList *in, PArgList *out);
 int32_t PViewFocusChanged(void *pobject, PArgList *in, PArgList *out);
 int32_t PViewMouseDown(void *pobject, PArgList *in, PArgList *out);
 int32_t	PViewHandleFloaterMsg(void *pobject, PArgList *in, PArgList *out);
@@ -202,7 +206,9 @@ MainWindow::AddWindow(void)
 	{
 		BString name("Window");
 		name << pwin->GetID();
-		pwin->AddProperty(new StringProperty("Name",name.String(),"The name for this window instance"),0,0);
+		pwin->AddProperty(new StringProperty("Name",name.String(),
+											"The name for this window instance"),0,0);
+		pwin->AddProperty(new BoolProperty("ReallyQuit", false), PROPERTY_HIDE_IN_EDITOR);
 		pwin->SetStringProperty("Title",name.String());
 
 		pwin->SetPointProperty("Location",BPoint(250,100));
@@ -212,6 +218,8 @@ MainWindow::AddWindow(void)
 		pwin->ConnectEvent("FrameMoved", PWindowFrameMoved);
 		pwin->ConnectEvent("FrameResized", PWindowFrameResized);
 		pwin->ConnectEvent("WindowActivated", PWindowWindowActivated);
+		pwin->ConnectEvent("QuitRequested", PWindowQuitRequested);
+		pwin->SetMsgHandler(M_QUIT_REQUESTED, PWindowMQuitRequested);
 		
 		fListView->AddItem(pwin->CreateWindowItem());
 		
@@ -438,6 +446,70 @@ PWindowFrameResized(void *pobject, PArgList *in, PArgList *out)
 	msg.AddString("name","Width");
 	msg.AddString("name","Height");
 	be_app->PostMessage(&msg);
+	return B_OK;
+}
+
+
+int32_t
+PWindowDestructor(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *obj = static_cast<PObject*>(pobject);
+	PWindow *win = dynamic_cast<PWindow*>(obj);
+	if (!win || !in || !out)
+		return B_BAD_DATA;
+	
+	BWindow *bwin = win->GetWindow();
+	bwin->Lock();
+	bwin->Quit();
+	return B_OK;
+}
+
+
+int32_t
+PWindowQuitRequested(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *obj = static_cast<PObject*>(pobject);
+	PWindow *win = dynamic_cast<PWindow*>(obj);
+	if (!win || !in || !out)
+		return B_BAD_DATA;
+	
+	bool quit;
+	if (win->GetBoolProperty("ReallyQuit", quit) != B_OK)
+	{
+		printf("Couldn't find the ReallyQuit property\n");
+		quit = false;
+	}
+	
+	empty_parglist(out);
+		
+	if (quit)
+	{
+		BWindow *bwin = win->GetWindow();
+		bwin->Lock();
+		while (bwin->CountChildren())
+			bwin->RemoveChild(bwin->ChildAt(0L));
+		bwin->Unlock();
+		
+		add_parg_bool(out, "value", true);
+	}
+	else
+		add_parg_bool(out, "value", false);
+	
+	return B_OK;
+}
+
+
+int32_t
+PWindowMQuitRequested(void *pobject, PArgList *in, PArgList *out)
+{
+	PObject *obj = static_cast<PObject*>(pobject);
+	PWindow *win = dynamic_cast<PWindow*>(obj);
+	if (!win || !in || !out)
+		return B_BAD_DATA;
+	
+	win->SetBoolProperty("ReallyQuit", true);
+	BMessage msg(B_QUIT_REQUESTED);
+	win->SendMessage(&msg);
 	return B_OK;
 }
 

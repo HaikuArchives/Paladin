@@ -152,13 +152,14 @@ PHandler::ConvertMsgToArgs(BMessage &in, PArgList &out)
 				case B_POINT_TYPE:
 					pargType = PARG_POINT;
 					break;
-/*				case B_RGB_32_BIT_TYPE:
+/*
+				case B_RGB_32_BIT_TYPE:
 					pargType = PARG_COLOR;
 					break;
-				case B_RGB_COLOR_TYPE:
+*/				case B_RGB_COLOR_TYPE:
 					pargType = PARG_COLOR;
 					break;
-*/				case B_POINTER_TYPE:
+				case B_POINTER_TYPE:
 					pargType = PARG_POINTER;
 					break;
 				default:
@@ -239,21 +240,26 @@ PHandler::ConvertArgsToMsg(PArgList &in, BMessage &out)
 				out.AddPoint(item->name, *((BPoint*)item->data));
 				break;
 			}
-//			case PARG_COLOR:
-//			{
-//				out.AddInt8(item->name, *((int8*)item->data));
-//				break;
-//			}
+			case PARG_COLOR:
+			{
+				rgb_color c;
+				uint8 *p = (uint8*)item->data;
+				c.red = p[0];
+				c.green = p[1];
+				c.blue = p[2];
+				c.alpha = p[3];
+				
+				out.AddData(item->name, B_RGB_COLOR_TYPE, (const void**)&c,
+							sizeof(rgb_color));
+				break;
+			}
 			case PARG_POINTER:
 			{
 				out.AddPointer(item->name, item->data);
 				break;
 			}
 			default:
-			{
-			//	out.AddInt8(item->name, *((int8*)item->data));
 				break;
-			}
 		}
 	}
 }

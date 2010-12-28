@@ -1,7 +1,5 @@
 Add interface discovery for methods and events
 
-Research color codes for BMessages and add color support to BMessage->PArgList conversions
-
 Test and fix PTextControl
 
 Resizing a window doesn't update its values. The Update() method for the editor is called by the PropertyWindow, but it ends up getting the old value for the property instead of the new one. At that point, the value for Frame() doesn't return the right values. Is this a Haiku bug?

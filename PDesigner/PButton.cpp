@@ -8,11 +8,6 @@
 #include "MsgDefs.h"
 #include "PArgs.h"
 
-int32_t PButtonAttachedToWindow(void *pobject, PArgList *in, PArgList *out);
-int32_t PButtonDraw(void *pobject, PArgList *in, PArgList *out);
-int32_t PButtonKeyDown(void *pobject, PArgList *in, PArgList *out);
-int32_t PButtonMouseDown(void *pobject, PArgList *in, PArgList *out);
-
 class PButtonBackend : public BButton
 {
 public:
@@ -127,10 +122,6 @@ PButton::Duplicate(void) const
 void
 PButton::InitMethods(void)
 {
-	AddMethod(new PMethod("_AttachedToWindow", PButtonAttachedToWindow));
-	AddMethod(new PMethod("_Draw", PButtonDraw));
-	AddMethod(new PMethod("_KeyDown", PButtonKeyDown));
-	AddMethod(new PMethod("_MouseDown", PButtonMouseDown));
 }
 
 
@@ -364,149 +355,14 @@ PButtonBackend::DrawAfterChildren(BRect update)
 void
 PButtonBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PButton *view = dynamic_cast<PButton*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BButton::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BButton::MessageReceived(msg);
 }
-
-
-int32_t
-PButtonAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-	
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BButton *fView = (BButton*)parent->GetView();
-	
-	if (fView->Window())
-		fView->Window()->Lock();
-	fView->BButton::AttachedToWindow();
-	if (fView->Window())
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
-
-
-int32_t
-PButtonDraw(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-	
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BButton *fView = (BButton*)parent->GetView();
-	
-	if (fView->Window())
-		fView->Window()->Lock();
-	
-	PArgs args(in);
-	BRect r;
-	args.FindRect("update", &r);
-	
-	fView->BButton::Draw(r);
-	
-	if (fView->Window())
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
-
-
-int32_t
-PButtonKeyDown(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-	
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BButton *fView = (BButton*)parent->GetView();
-	
-	int32 count;
-	find_parg_int32(in, "count", (int32_t*)&count);
-	PArgListItem *item = find_parg(in, "bytes", NULL);
-	
-	if (fView->Window())
-		fView->Window()->Lock();
-	
-	fView->BButton::KeyDown((const char*)item->data, count);
-	
-	if (fView->Window())
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
-
-
-int32_t
-PButtonMouseDown(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-	
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BButton *fView = (BButton*)parent->GetView();
-	
-	if (fView->Window())
-		fView->Window()->Lock();
-	
-	BPoint pt;
-	find_parg_point(in, "where", &pt.x, &pt.y);
-	
-	fView->BButton::MouseDown(pt);
-	
-	if (fView->Window())
-		fView->Window()->Unlock();
-	
-	return B_OK;
-}
-

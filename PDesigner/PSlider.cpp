@@ -367,13 +367,15 @@ PSlider::InitProperties(void)
 	prop->SetValue((int32)B_BLOCK_THUMB);
 	AddProperty(prop);
 	
-	AddProperty(new ColorProperty("BarColor", rgb_color(),
+	AddProperty(new ColorProperty("BarColor", 
+								tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+											B_DARKEN_4_TINT),
 								"The bar's color."));
-	AddProperty(new FloatProperty("BarThickness", 10.0));
+	AddProperty(new FloatProperty("BarThickness", 6.0));
 	AddProperty(new ColorProperty("FillColor", rgb_color(),
 								"The fill color, if it is being used."));
-	AddProperty(new IntProperty("HashMarkCount", 4));
-	AddProperty(new IntProperty("HashMarkLocation", 1));
+	AddProperty(new IntProperty("HashMarkCount", 0));
+	AddProperty(new IntProperty("HashMarkLocation", (int32)B_HASH_MARKS_NONE));
 	AddProperty(new FloatProperty("MinLimit", 0.0));
 	AddProperty(new StringProperty("MinLimitLabel", NULL));
 	AddProperty(new FloatProperty("MaxLimit", 100.0));
@@ -455,12 +457,14 @@ PSliderBackend::FrameResized(float w, float h)
 void
 PSliderBackend::KeyDown(const char *bytes, int32 count)
 {
-	BSlider::KeyDown(bytes, count);
-	
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::KeyDown(bytes, count);
 }
 
 
@@ -468,9 +472,13 @@ void
 PSliderBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::KeyUp(bytes, count);
 }
 
 
@@ -518,7 +526,7 @@ void
 PSliderBackend::Draw(BRect update)
 {
 	EventData *data = fOwner->FindEvent("Draw");
-	if (data->hook == NullPMethod)
+	if (!data->hook)
 		BSlider::Draw(update);
 	
 	PArgs in, out;
@@ -547,43 +555,14 @@ PSliderBackend::DrawAfterChildren(BRect update)
 void
 PSliderBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PSlider *view = dynamic_cast<PSlider*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BSlider::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BSlider::MessageReceived(msg);
 }

@@ -1,6 +1,7 @@
 #include "PView.h"
 #include <Application.h>
 #include <Autolock.h>
+#include <Messenger.h>
 #include <Window.h>
 #include <stdio.h>
 
@@ -74,7 +75,7 @@ PView::PView(void)
 
 
 PView::PView(BMessage *msg)
-	:	PObject(msg),
+	:	PHandler(msg),
 		fView(NULL)
 {
 	fType = "PView";
@@ -91,7 +92,7 @@ PView::PView(BMessage *msg)
 
 
 PView::PView(const char *name)
-	:	PObject(name),
+	:	PHandler(name),
 		fView(NULL)
 {
 	fType = "PView";
@@ -103,7 +104,7 @@ PView::PView(const char *name)
 
 
 PView::PView(const PView &from)
-	:	PObject(from),
+	:	PHandler(from),
 		fView(NULL)
 {
 	fType = "PView";
@@ -290,7 +291,7 @@ PView::GetProperty(const char *name, PValue *value, const int32 &index) const
 	{
 		if (fView->Window())
 			fView->Window()->Unlock();
-		return PObject::GetProperty(name,value,index);
+		return PHandler::GetProperty(name,value,index);
 	}
 	
 	if (fView->Window())
@@ -442,13 +443,22 @@ PView::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		if (fView->Window())
 			fView->Window()->Unlock();
-		return PObject::SetProperty(name,value,index);
+		return PHandler::SetProperty(name,value,index);
 	}
 	
 	if (fView->Window())
 		fView->Window()->Unlock();
 	
 	return prop->GetValue(value);
+}
+
+
+status_t
+PView::SendMessage(BMessage *msg)
+{
+	BMessenger msgr(fView);
+	msgr.SendMessage(msg, (BHandler*)NULL, B_INFINITE_TIMEOUT);
+	return B_OK;
 }
 
 
@@ -544,42 +554,42 @@ PView::InitBackend(BView *view)
 	PointValue pv;
 	IntValue iv,iv2;
 	
-	PObject::GetProperty("Flags",&iv);
+	PHandler::GetProperty("Flags",&iv);
 	fView->SetFlags(*iv.value);
 	
-	PObject::GetProperty("Frame",&rv);
+	PHandler::GetProperty("Frame",&rv);
 	fView->MoveTo(rv.value->left, rv.value->top);
 	fView->ResizeTo(rv.value->Width() + 1.0, rv.value->Height() + 1.0);
 	
-	PObject::GetProperty("HighColor",&cv);
+	PHandler::GetProperty("HighColor",&cv);
 	fView->SetHighColor(*cv.value);
 	
-	PObject::GetProperty("LineCapMode",&iv);
-	PObject::GetProperty("LineJoinMode",&iv2);
+	PHandler::GetProperty("LineCapMode",&iv);
+	PHandler::GetProperty("LineJoinMode",&iv2);
 	fView->SetLineMode((cap_mode)*iv.value,(join_mode)*iv2.value);
 	
-	PObject::GetProperty("LowColor",&cv);
+	PHandler::GetProperty("LowColor",&cv);
 	fView->SetLowColor(*cv.value);
 	
-//	PObject::GetProperty("Origin",&pv);
+//	PHandler::GetProperty("Origin",&pv);
 //	fView->SetOrigin(*pv.value);
 	
-	PObject::GetProperty("PenPos",&pv);
+	PHandler::GetProperty("PenPos",&pv);
 	fView->MovePenTo(*pv.value);
 	
-	PObject::GetProperty("PenSize",&fv);
+	PHandler::GetProperty("PenSize",&fv);
 	fView->SetPenSize(*fv.value);
 	
-	PObject::GetProperty("ResizingMode",&iv);
+	PHandler::GetProperty("ResizingMode",&iv);
 	fView->SetResizingMode(*iv.value);
 	
-//	PObject::GetProperty("Scale",&fv);
+//	PHandler::GetProperty("Scale",&fv);
 //	fView->SetScale(*fv.value);
 	
-	PObject::GetProperty("BackColor",&cv);
+	PHandler::GetProperty("BackColor",&cv);
 	fView->SetViewColor(*cv.value);
 	
-	PObject::GetProperty("Visible",&bv);
+	PHandler::GetProperty("Visible",&bv);
 	if (!(*bv.value))
 		fView->Hide();
 }
@@ -900,45 +910,16 @@ PViewBackend::DrawAfterChildren(BRect update)
 void
 PViewBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PView *view = dynamic_cast<PView*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BView::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BView::MessageReceived(msg);
 }
 
 

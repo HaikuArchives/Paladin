@@ -10,10 +10,6 @@
 #include "MsgDefs.h"
 #include "PArgs.h"
 
-int32_t PBoxAttachedToWindow(void *pobject, PArgList *in, PArgList *out);
-int32_t PBoxDraw(void *pobject, PArgList *in, PArgList *out);
-int32_t PBoxFrameResized(void *pobject, PArgList *in, PArgList *out);
-
 
 class PBoxBackend : public BBox
 {
@@ -243,9 +239,6 @@ PBox::InitProperties(void)
 void
 PBox::InitMethods(void)
 {
-	AddMethod(new PMethod("_AttachedToWindow", PBoxAttachedToWindow));
-	AddMethod(new PMethod("_Draw", PBoxDraw));
-	AddMethod(new PMethod("_FrameResized", PBoxFrameResized));
 }
 
 
@@ -352,7 +345,7 @@ void
 PBoxBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
@@ -366,7 +359,7 @@ void
 PBoxBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
@@ -467,45 +460,16 @@ PBoxBackend::DrawAfterChildren(BRect update)
 void
 PBoxBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PBox *view = dynamic_cast<PBox*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BBox::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BBox::MessageReceived(msg);
 }
 
 

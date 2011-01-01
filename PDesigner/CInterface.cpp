@@ -103,6 +103,11 @@ print_pargitem(PArgListItem *node)
 			printf("Type: float\t%g\n",*((double*)node->data));
 			break;
 		}
+		case PARG_BOOL:
+		{
+			printf("Type: bool\t%s\n",*((bool*)node->data) ? "true" : "false");
+			break;
+		}
 		case PARG_CHAR:
 		{
 			printf("Type: char\t%c\n",*((char*)node->data));
@@ -111,6 +116,29 @@ print_pargitem(PArgListItem *node)
 		case PARG_STRING:
 		{
 			printf("Type: string\t\"%s\"\n",(char*)node->data);
+			break;
+		}
+		case PARG_RECT:
+		{
+			float *r = (float*)node->data;
+			printf("Type: rect\t(%.0f,%.0f,%.0f,%.0f)\n",r[0],r[1],r[2],r[3]);
+			break;
+		}
+		case PARG_POINT:
+		{
+			float *p = (float*)node->data;
+			printf("Type: point\t(%.0f,%.0f)\n",p[0],p[1]);
+			break;
+		}
+		case PARG_COLOR:
+		{
+			uint8 *c = (uint8*)node->data;
+			printf("Type: color\t(%d,%d,%d,%d)\n",c[0],c[1],c[2],c[3]);
+			break;
+		}
+		case PARG_POINTER:
+		{
+			printf("Type: pointer\t%p\n",node->data);
 			break;
 		}
 		default:
@@ -488,6 +516,55 @@ int32_t
 add_parg_pointer(PArgList *list, const char *name, void *arg)
 {
 	return add_parg(list, name, &arg, sizeof(void *), PARG_POINTER);
+}
+
+
+PArgListItem *
+get_parg_first(PArgList *list)
+{
+	return list ? list->head : NULL;
+}
+
+
+PArgListItem *
+get_parg_last(PArgList *list)
+{
+	return list ? list->tail : NULL;
+}
+
+
+PArgListItem *
+get_parg_next(PArgList *list, PArgListItem *item)
+{
+	return (!list || !item) ? NULL : item->next;
+}
+
+
+PArgListItem *
+get_parg_previous(PArgList *list, PArgListItem *item)
+{
+	return (!list || !item) ? NULL : item->prev;
+}
+
+
+PArgListItem *
+get_parg_at(PArgList *list, int32_t index)
+{
+	if (!list || index < 0 || index > list->itemcount - 1)
+		return NULL;
+	
+	PArgListItem *item = NULL;
+	PArgListItem *temp = list->head;
+	int32 i = 0;
+	while (i < index && temp)
+	{
+		temp = temp->next;
+		i++;
+	}
+	if (i == index)
+		item = temp;
+	
+	return item;
 }
 
 

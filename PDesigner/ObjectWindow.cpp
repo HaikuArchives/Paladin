@@ -36,7 +36,7 @@ ObjectWindow::ObjectWindow(const BMessenger &target)
 	{
 		BString type = broker->TypeAt(i);
 		// We only want to add real controls, not just generic objects
-		if (type == "PObject" || type == "PControl")
+		if (type == "PObject" || type == "PControl" || type == "PHandler")
 			continue;
 		
 		BString name;

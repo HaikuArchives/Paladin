@@ -487,9 +487,13 @@ void
 PScrollBarBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BScrollBar::KeyDown(bytes, count);
 }
 
 
@@ -497,9 +501,13 @@ void
 PScrollBarBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("KeyUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BScrollBar::KeyUp(bytes, count);
 }
 
 
@@ -545,7 +553,7 @@ void
 PScrollBarBackend::Draw(BRect update)
 {
 	EventData *data = fOwner->FindEvent("Draw");
-	if (data->hook == NullPMethod)
+	if (!data->hook)
 		BScrollBar::Draw(update);
 	
 	PArgs in, out;
@@ -574,44 +582,15 @@ PScrollBarBackend::DrawAfterChildren(BRect update)
 void
 PScrollBarBackend::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
+	PScrollBar *view = dynamic_cast<PScrollBar*>(fOwner);
+	if (view->GetMsgHandler(msg->what))
 	{
-		case M_FLOATER_ACTION:
-		{
-			int32 action;
-			if (msg->FindInt32("action", &action) != B_OK)
-				break;
-			
-			float dx, dy;
-			msg->FindFloat("dx", &dx);
-			msg->FindFloat("dy", &dy);
-			
-			FloaterBroker *broker = FloaterBroker::GetInstance();
-			
-			switch (action)
-			{
-				case FLOATER_MOVE:
-				{
-					MoveBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_MOVE);
-					break;
-				}
-				case FLOATER_RESIZE:
-				{
-					ResizeBy(dx, dy);
-					broker->NotifyFloaters((PView*)fOwner, FLOATER_RESIZE);
-					break;
-				}
-				default:
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			BScrollBar::MessageReceived(msg);
-			break;
-		}
+		PArgs args;
+		view->ConvertMsgToArgs(*msg, args.ListRef());
+		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
+	
+	BScrollBar::MessageReceived(msg);
 }
 

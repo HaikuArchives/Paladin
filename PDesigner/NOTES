@@ -1,14 +1,4 @@
-Rework floater framework to take out all (or as much as possible) floater-related code out of the object framework
-
-Fix the Key* events because they do not use NULL-terminated strings
-
-Find out the default values on a BSlider
-
 Add interface discovery for methods and events
-
-Implement a way to respond to messages via the event interface
-
-Refactor PWindowBackend::QuitRequested -- move code out into an event. This depends on a way to respond to messages.
 
 Test and fix PTextControl
 

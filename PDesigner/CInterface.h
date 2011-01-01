@@ -117,6 +117,11 @@ int32_t				add_parg_color(PArgList *list, const char *name, uint8_t red,
 									uint8_t green, uint8_t blue, uint8_t alpha);
 int32_t				add_parg_pointer(PArgList *list, const char *name, void *ptr);
 
+PArgListItem *		get_parg_first(PArgList *list);
+PArgListItem *		get_parg_last(PArgList *list);
+PArgListItem *		get_parg_next(PArgList *list, PArgListItem *item);
+PArgListItem *		get_parg_previous(PArgList *list, PArgListItem *item);
+PArgListItem *		get_parg_at(PArgList *list, int32_t index);
 
 PArgListItem *		find_parg(PArgList *list, const char *name, PArgListItem *startItem);
 PArgListItem *		find_parg_index(PArgList *list, int32_t index);

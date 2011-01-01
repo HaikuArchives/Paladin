@@ -2,9 +2,12 @@
 #define PVIEW_H
 
 #include <ListItem.h>
+#include <map>
 #include <View.h>
+
 #include "ObjectItem.h"
 #include "PComponents.h"
+#include "PHandler.h"
 
 /*
 	PView Properties:
@@ -49,6 +52,7 @@ enum
 	RESIZE_CENTER
 };
 
+
 class ViewItem : public ObjectItem
 {
 public:
@@ -56,7 +60,7 @@ public:
 	PView *		GetView(void);
 };
 
-class PView : public PObject
+class PView : public PHandler
 {
 public:
 							PView(void);
@@ -74,6 +78,8 @@ public:
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 	
+	virtual	status_t		SendMessage(BMessage *msg);
+	
 	virtual	BView *			GetView(void);
 	virtual ViewItem *		CreateViewItem(void);
 	
@@ -90,7 +96,6 @@ protected:
 	
 private:
 	void					InitProperties(void);
-	
 };
 
 #endif

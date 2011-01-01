@@ -1,7 +1,8 @@
 #include "PWindow.h"
 
-#include <stdio.h>
+#include <Messenger.h>
 #include <malloc.h>
+#include <stdio.h>
 
 #include "App.h"
 #include "MiscProperties.h"
@@ -10,8 +11,6 @@
 #include "PObjectBroker.h"
 #include "PMethod.h"
 #include "PView.h"
-
-#define M_QUIT_REQUESTED 'mqut'
 
 int32_t PWindowAddChild(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out);
@@ -58,7 +57,7 @@ PWindow::PWindow(void)
 
 
 PWindow::PWindow(BMessage *msg)
-	:	PObject(msg),
+	:	PHandler(msg),
 		fWindow(NULL)
 {
 	fType = "PWindow";
@@ -69,7 +68,7 @@ PWindow::PWindow(BMessage *msg)
 
 
 PWindow::PWindow(const char *name)
-	:	PObject(name),
+	:	PHandler(name),
 		fWindow(NULL)
 {
 	fType = "PWindow";
@@ -80,7 +79,7 @@ PWindow::PWindow(const char *name)
 
 
 PWindow::PWindow(const PWindow &from)
-	:	PObject(from),
+	:	PHandler(from),
 		fWindow(NULL)
 {
 	fType = "PWindow";
@@ -92,13 +91,8 @@ PWindow::PWindow(const PWindow &from)
 
 PWindow::~PWindow(void)
 {
-	
-	int32 dummy;
-	int32 winThread = fWindow->Thread();
-	fWindow->PostMessage(M_QUIT_REQUESTED);
-	wait_for_thread(winThread,&dummy);
-	
-	
+	fWindow->Lock();
+	fWindow->Quit();
 	fWindow = NULL;
 }
 
@@ -190,7 +184,7 @@ PWindow::GetProperty(const char *name, PValue *value, const int32 &index) const
 	else if (str.ICompare("Workspaces") == 0)
 		((IntProperty*)prop)->SetValue(fWindow->Workspaces());
 	else
-		return PObject::GetProperty(name,value,index);
+		return PHandler::GetProperty(name,value,index);
 	
 	return prop->GetValue(value);
 }
@@ -317,7 +311,7 @@ PWindow::SetProperty(const char *name, PValue *value, const int32 &index)
 	else
 	{
 		fWindow->Unlock();
-		return PObject::SetProperty(name,value,index);
+		return PHandler::SetProperty(name,value,index);
 	}
 	
 	fWindow->Unlock();
@@ -370,6 +364,14 @@ PWindow::InitProperties(void)
 }
 
 
+status_t
+PWindow::SendMessage(BMessage *msg)
+{
+	BMessenger msgr(NULL, fWindow);
+	return msgr.SendMessage(msg);
+}
+
+	
 BWindow *
 PWindow::GetWindow(void)
 {
@@ -414,42 +416,42 @@ PWindow::InitBackend(void)
 	IntValue iv;
 	StringValue sv;
 	
-	PObject::GetProperty("Feel",&iv);
+	PHandler::GetProperty("Feel",&iv);
 	fWindow->SetCodeFeel((window_feel)*iv.value);
 	
-	PObject::GetProperty("Flags",&iv);
+	PHandler::GetProperty("Flags",&iv);
 	fWindow->SetFlags(*iv.value);
 	
-	PObject::GetProperty("Width",&fv);
-	PObject::GetProperty("Height",&fv2);
+	PHandler::GetProperty("Width",&fv);
+	PHandler::GetProperty("Height",&fv2);
 	fWindow->ResizeTo(*fv.value, *fv2.value);
 	
-	PObject::GetProperty("Location",&pv);
+	PHandler::GetProperty("Location",&pv);
 	fWindow->MoveTo(pv.value->x, pv.value->y);
 	
-	PObject::GetProperty("Look",&iv);
+	PHandler::GetProperty("Look",&iv);
 	fWindow->SetLook((window_look)*iv.value);
 	
-	PObject::GetProperty("Minimized",&bv);
+	PHandler::GetProperty("Minimized",&bv);
 	fWindow->Minimize(*bv.value);
 	
-	PObject::GetProperty("MinWidth",&fv);
-	PObject::GetProperty("MaxWidth",&fv2);
-	PObject::GetProperty("MinHeight",&fv3);
-	PObject::GetProperty("MaxHeight",&fv4);
+	PHandler::GetProperty("MinWidth",&fv);
+	PHandler::GetProperty("MaxWidth",&fv2);
+	PHandler::GetProperty("MinHeight",&fv3);
+	PHandler::GetProperty("MaxHeight",&fv4);
 	fWindow->SetSizeLimits(*fv.value,*fv2.value,*fv3.value,*fv4.value);
 	
-	PObject::GetProperty("PulseRate",&iv);
+	PHandler::GetProperty("PulseRate",&iv);
 	fWindow->SetPulseRate(*iv.value);
 	
-	PObject::GetProperty("Title",&sv);
+	PHandler::GetProperty("Title",&sv);
 	fWindow->SetTitle(sv.value->String());
 	
-	PObject::GetProperty("Visible",&bv);
+	PHandler::GetProperty("Visible",&bv);
 	if (!*bv.value)
 		fWindow->Hide();
 	
-	PObject::GetProperty("Workspaces",&iv);
+	PHandler::GetProperty("Workspaces",&iv);
 	fWindow->SetWorkspaces(*iv.value);
 	
 	fWindow->Show();
@@ -550,26 +552,26 @@ PWindowBackend::QuitRequested(void)
 	PArgs in, out;
 	fOwner->RunEvent("QuitRequested", in.ListRef(), out.ListRef());
 	
-	if (fQuitFlag)
-	{
-		while (CountChildren())
-			RemoveChild(ChildAt(0L));
-		
-		return true;
-	}
-	return false;
+	bool quit;
+	if (out.FindBool("value", &quit) != B_OK)
+		quit = false;
+	
+	return quit;
 }
 
 void
 PWindowBackend::MessageReceived(BMessage *msg)
 {
-	if (msg->what == M_QUIT_REQUESTED)
+	PWindow *window = dynamic_cast<PWindow*>(fOwner);
+	if (window->GetMsgHandler(msg->what))
 	{
-		fQuitFlag = true;
-		PostMessage(B_QUIT_REQUESTED);
+		PArgs args;
+		window->ConvertMsgToArgs(*msg, args.ListRef());
+		if (window->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+			return;
 	}
-	else
-		BWindow::MessageReceived(msg);
+	
+	BWindow::MessageReceived(msg);
 }
 
 

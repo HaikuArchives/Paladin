@@ -23,17 +23,13 @@ public:
 class EventData
 {
 public:
-	EventData(const char *n, const char *d)
-	{
-		name = n;
-		description = d;
-		hook = NULL;
-	}
+	EventData(const char *n, const char *d, PMethodInterface *pmi = NULL);
 	
-	BString			name,
-					description;
+	BString				name,
+						description;
 	
-	MethodFunction	hook;
+	PMethodInterface	interface;
+	MethodFunction		hook;
 };
 
 
@@ -88,7 +84,8 @@ protected:
 	virtual	status_t		RemoveMethod(const char *name);
 	virtual	status_t		ReplaceMethod(const char *old, PMethod *newMethod);
 	
-	virtual	status_t		AddEvent(const char *name, const char *description);
+	virtual	status_t		AddEvent(const char *name, const char *description,
+									PMethodInterface *interface = NULL);
 	virtual	status_t		RemoveEvent(const char *name);
 	
 	BString					fType;

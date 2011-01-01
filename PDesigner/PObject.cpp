@@ -399,7 +399,8 @@ PObject::ReplaceMethod(const char *old, PMethod *newMethod)
 
 
 status_t
-PObject::AddEvent(const char *name, const char *description)
+PObject::AddEvent(const char *name, const char *description,
+				PMethodInterface *interface)
 {
 	if (!name || !description)
 		return B_NAME_IN_USE;
@@ -407,7 +408,7 @@ PObject::AddEvent(const char *name, const char *description)
 	if (FindEvent(name))
 		return B_OK;
 	
-	EventData *data = new EventData(name, description);
+	EventData *data = new EventData(name, description, interface);
 	fEventList->AddItem(data);
 	return B_OK;
 }
@@ -492,4 +493,14 @@ UnflattenObject(BMessage *msg)
 	if (msg->FindString("class",0,&type) != B_OK)
 		return NULL;
 	return owner->MakeObject(type.String(),msg);
+}
+
+
+EventData::EventData(const char *n, const char *d, PMethodInterface *pmi)
+{
+	name = n;
+	description = d;
+	hook = NULL;
+	if (pmi)
+		interface = *pmi;
 }

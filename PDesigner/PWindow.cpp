@@ -390,13 +390,13 @@ void
 PWindow::InitBackend(void)
 {
 	PMethodInterface pmi;
-	pmi.AddArg("ChildID", PARG_INT64, "The object ID of the child view to add");
+	pmi.AddArg("id", PARG_INT64, "The object ID of the child view to add");
 	AddMethod(new PMethod("AddChild", PWindowAddChild, &pmi));
 	
-	pmi.SetArg(0, "ChildID", PARG_INT64, "The object ID of the child view to remove");
+	pmi.SetArg(0, "id", PARG_INT64, "The object ID of the child view to remove");
 	AddMethod(new PMethod("RemoveChild", PWindowRemoveChild, &pmi));
 	
-	pmi.SetArg(0, "Index", PARG_INT32, "The index of the child to get");
+	pmi.SetArg(0, "index", PARG_INT32, "The index of the child to get");
 	pmi.AddReturnValue("ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
 	AddMethod(new PMethod("ChildAt", PWindowChildAt, &pmi));
 	
@@ -404,19 +404,41 @@ PWindow::InitBackend(void)
 	pmi.SetReturnValue(0, "Count", PARG_INT32, "The number of children of the window");
 	AddMethod(new PMethod("CountChildren", PWindowCountChildren, &pmi));
 	
-	pmi.AddArg("ChildName", PARG_STRING, "The name of the child view to find.");
+	pmi.AddArg("name", PARG_STRING, "The name of the child view to find.");
 	pmi.SetReturnValue(0, "ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
 	AddMethod(new PMethod("FindView", PWindowFindView, &pmi));
 	
+	
 	AddEvent("MenusBeginning", "The window is about to show a menu.");
 	AddEvent("MenusEnded", "The windows has finished showing a menu.");
-	AddEvent("FrameMoved", "The window was moved.");
-	AddEvent("FrameResized", "The window was resized.");
-	AddEvent("QuitRequested", "The window was asked to quit.");
-	AddEvent("ScreenChanged", "The screen has changed color space, size, or location.");
-	AddEvent("WindowActivated", "The window gained or lost focus.");
-	AddEvent("WorkspaceActivated", "The user has changed workspaces.");
-	AddEvent("WorkspacesChanged", "The window has changed workspaces.");
+	
+		pmi.SetArg(0, "where", PARG_POINT, "The new location of the window in screen coordinates.");
+	AddEvent("FrameMoved", "The window was moved.", &pmi);
+	
+	pmi.SetArg(0, "width", PARG_FLOAT, "The new width of the window.");
+	pmi.AddArg("height", PARG_FLOAT, "The new height of the window.");
+	AddEvent("FrameResized", "The window was resized.", &pmi);
+	
+	pmi.RemoveArg(0);
+	pmi.AddReturnValue("value", PARG_BOOL, "Whether or not the window should really quit.");
+	AddEvent("QuitRequested", "The window was asked to quit.", &pmi);
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("frame", PARG_RECT, "The new size and location of the screen.");
+	pmi.AddArg("color_space", PARG_INT32, "The new color space constant for the screen.");
+	AddEvent("ScreenChanged", "The screen has changed color space, size, or location.", &pmi);
+	pmi.RemoveArg(1);
+	
+	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the window has the focus.");
+	AddEvent("WindowActivated", "The window gained or lost focus.", &pmi);
+	
+	pmi.SetArg(0, "workspace", PARG_INT32, "The index of the workspace which changed.");
+	pmi.AddArg("active", PARG_BOOL, "If the workspace is currently active.");
+	AddEvent("WorkspaceActivated", "The user has changed workspaces.", &pmi);
+	
+	pmi.SetArg(0, "old", PARG_INT32, "The index of the old workspace.");
+	pmi.SetArg(1, "new", PARG_INT32, "The index of the new workspace.");
+	AddEvent("WorkspacesChanged", "The window has changed workspaces.", &pmi);
 		
 	fWindow = new PWindowBackend(this);
 	

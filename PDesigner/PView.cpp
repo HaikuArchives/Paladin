@@ -599,37 +599,62 @@ void
 PView::InitMethods(void)
 {
 	PMethodInterface pmi;
-	pmi.AddArg("ChildID", PARG_INT64, "The object ID of the child view to add.");
+	pmi.AddArg("id", PARG_INT64, "The object ID of the child view to add.");
 	AddMethod(new PMethod("AddChild", PViewAddChild, &pmi));
 	
-	pmi.SetArg(0, "ChildID", PARG_INT64, "The object ID of the child view to remove.");
+	pmi.SetArg(0, "id", PARG_INT64, "The object ID of the child view to remove.");
 	AddMethod(new PMethod("RemoveChild", PViewRemoveChild, &pmi));
 	
-	pmi.SetArg(0, "Index", PARG_INT32, "The index of the child to return.");
+	pmi.SetArg(0, "index", PARG_INT32, "The index of the child to return.");
 	AddMethod(new PMethod("ChildAt", PViewChildAt, &pmi));
 	
+	// These all void which return no data, so no interface needs to be set.
 	AddEvent("AttachedToWindow", "The view was added to a window.");
 	AddEvent("AllAttached", "All views have been added to the window.");
 	AddEvent("DetachedFromWindow", "The view was removed from a window.");
 	AddEvent("AllDetached", "All views have been removed from the window.");
 	
-	AddEvent("FocusChanged", "The view gained or lost focus.");
-	AddEvent("FrameMoved", "The view was moved.");
-	AddEvent("FrameResized", "The view was resized.");
+	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the view currently has the focus.");
+	AddEvent("FocusChanged", "The view gained or lost focus.", &pmi);
 	
-	AddEvent("KeyDown", "A key was pressed.");
-	AddEvent("KeyUp", "A key was released.");
+	pmi.SetArg(0, "where", PARG_POINT, "The new location of the view in its parent's coordinates.");
+	AddEvent("FrameMoved", "The view was moved.", &pmi);
 	
-	AddEvent("MouseDown", "A button was pressed over the view.");
-	AddEvent("MouseMoved", "The mouse was moved over the view.");
-	AddEvent("MouseUp", "A button was released over the view.");
+	pmi.SetArg(0, "width", PARG_FLOAT, "The new width of the view.");
+	pmi.AddArg("height", PARG_FLOAT, "The new height of the view.");
+	AddEvent("FrameResized", "The view was resized.", &pmi);
 	
+	pmi.SetArg(0, "bytes", PARG_RAW, "An array of characters representing the key. It is not "
+									"a zero-terminated string.");
+	pmi.SetArg(1, "count", PARG_INT32, "The size of the bytes field");
+	AddEvent("KeyDown", "A key was pressed.", &pmi);
+	AddEvent("KeyUp", "A key was released.", &pmi);
+	pmi.RemoveArg(1);
+	
+	pmi.SetArg(0, "where", PARG_POINT, "The location of the mouse when the button was pressed.");
+	AddEvent("MouseDown", "A button was pressed over the view.", &pmi);
+	
+	pmi.SetArg(0, "where", PARG_POINT, "The current location of the mouse.");
+	pmi.AddArg("buttons", PARG_INT32, "The current button state.");
+	pmi.AddArg("message", PARG_POINTER, "Attached data if dragging something.");
+	AddEvent("MouseMoved", "The mouse was moved over the view.", &pmi);
+	pmi.RemoveArg(2);
+	pmi.RemoveArg(1);
+	
+	pmi.SetArg(0, "where", PARG_POINT, "The location of the mouse when the button was released.");
+	AddEvent("MouseUp", "A button was released over the view.", &pmi);
+	
+	// Also a method with no data in or out
 	AddEvent("Pulse", "Called at regular intervals.");
 	
-	AddEvent("Draw", "The view was asked to draw itself.");
-	AddEvent("DrawAfterChildren", "Invoked when the view is to draw after its children.");
+	pmi.SetArg(0, "update", PARG_RECT, "The area needing to be redrawn.");
+	AddEvent("Draw", "The view was asked to draw itself.", &pmi);
 	
-	AddEvent("WindowActivated", "The window was activated.");
+	pmi.SetArg(0, "update", PARG_RECT, "The area that was needing redrawn in Draw()");
+	AddEvent("DrawAfterChildren", "Invoked when the view is to draw after its children.", &pmi);
+	
+	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the window is now active.");
+	AddEvent("WindowActivated", "The window was activated.", &pmi);
 }
 
 
@@ -833,7 +858,7 @@ void
 PViewBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
 }
@@ -843,7 +868,7 @@ void
 PViewBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddString("bytes", bytes);
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
 	in.AddInt32("count", count);
 	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
 }

@@ -128,6 +128,10 @@ fi
 jam -q -j"$CPUCOUNT"
 cd ..
 
+cd PDesigner
+BuildNoDebug PDesigner
+cd ..
+
 cd PInstallEngine
 BuildNoDebug PInstallEngine
 cd ..
@@ -147,52 +151,52 @@ BuildNoDebug SymbolFinder
 cd ..
 
 # ----------------------------------------------------------------------------
-# PACKAGE
+# PACKAGE - disabled for now
 # ----------------------------------------------------------------------------
-APPVERSION=`version -n Paladin/Paladin | sed "s/\([0-9]\) \([0-9]\) [0-9] [a-z] [0-9]/\1.\2/"`
-PKGPATH="/boot/home/Desktop/Paladin.$APPVERSION.sfx"
+#APPVERSION=`version -n Paladin/Paladin | sed "s/\([0-9]\) \([0-9]\) [0-9] [a-z] [0-9]/\1.\2/"`
+#PKGPATH="/boot/home/Desktop/Paladin.$APPVERSION.sfx"
 
 #Until PSfx gets all the bugs worked out, we'll manually build the .sfx file
-copyattr -d PInstallEngine/PInstallEngine "$PKGPATH"
+#copyattr -d PInstallEngine/PInstallEngine "$PKGPATH"
 
 #Generate an rdef file to create all the necessary resources for the pkg
-rm -f Paladin.sfx.rdef
-echo "resource(1, \"AppName\") \"Paladin\";" > Paladin.sfx.rdef
-echo "resource(2, \"AppVersion\") \"$APPVERSION\";" >> Paladin.sfx.rdef
-echo "resource(3, \"PkgInfo\") #'CSTR' array {" >> Paladin.sfx.rdef
+#rm -f Paladin.sfx.rdef
+#echo "resource(1, \"AppName\") \"Paladin\";" > Paladin.sfx.rdef
+#echo "resource(2, \"AppVersion\") \"$APPVERSION\";" >> Paladin.sfx.rdef
+#echo "resource(3, \"PkgInfo\") #'CSTR' array {" >> Paladin.sfx.rdef
 
-PKGDATE=`date "+%s"`;
+#PKGDATE=`date "+%s"`;
 
-cat PSfx/PaladinPkgScript.txt | sed 's/^/"/' | sed 's/$/\\n"/' | sed "s/REPLACEDATE/$PKGDATE/" | sed "s/REPLACEVERSION/$APPVERSION/" >> Paladin.sfx.rdef
-echo "};" >> Paladin.sfx.rdef
+#cat PSfx/PaladinPkgScript.txt | sed 's/^/"/' | sed 's/$/\\n"/' | sed "s/REPLACEDATE/$PKGDATE/" | sed "s/REPLACEVERSION/$APPVERSION/" >> Paladin.sfx.rdef
+#echo "};" >> Paladin.sfx.rdef
 
-rc Paladin.sfx.rdef
-xres -o "$PKGPATH" Paladin.sfx.rsrc
+#rc Paladin.sfx.rdef
+#xres -o "$PKGPATH" Paladin.sfx.rsrc
 
-cd Paladin
-zip -9 ../PaladinFiles.zip Paladin README WHAT\'S\ NEW
+#cd Paladin
+#zip -9 ../PaladinFiles.zip Paladin README WHAT\'S\ NEW
 
-cd ../ccache
-zip -9 -u ../PaladinFiles.zip ccache
+#cd ../ccache
+#zip -9 -u ../PaladinFiles.zip ccache
 
-cd ../fastdep-0.16
-zip -9 -u ../PaladinFiles.zip fastdep
+#cd ../fastdep-0.16
+#zip -9 -u ../PaladinFiles.zip fastdep
 
-cd ../PalEdit/generated/distro
-zip -9 -u -r ../../../PaladinFiles.zip Languages Extensions lib PalEdit
-cd ../../..
+#cd ../PalEdit/generated/distro
+#zip -9 -u -r ../../../PaladinFiles.zip Languages Extensions lib PalEdit
+#cd ../../..
 
-cd Documentation
-zip -9 -u ../PaladinFiles.zip Paladin\ Documentation.pdf
+#cd Documentation
+#zip -9 -u ../PaladinFiles.zip Paladin\ Documentation.pdf
 
-cd ..
-unzip -l PaladinFiles.zip
-cat PaladinFiles.zip >> "$PKGPATH"
+#cd ..
+#unzip -l PaladinFiles.zip
+#cat PaladinFiles.zip >> "$PKGPATH"
 
-if [ "$MAKECLEAN" == 1 ]
-then
-	rm Paladin.sfx*
-	rm PaladinFiles.zip
-fi
+#if [ "$MAKECLEAN" == 1 ]
+#then
+#	rm Paladin.sfx*
+#	rm PaladinFiles.zip
+#fi
 
-chmod 0777 "$PKGPATH"
+#chmod 0777 "$PKGPATH"

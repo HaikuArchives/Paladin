@@ -262,7 +262,7 @@ PTextControl::InitProperties(void)
 	SetFlagsForProperty(prop,PROPERTY_HIDE_IN_EDITOR);
 	
 	AddMethod(new PMethod("SetPreferredDivider", PTextControlSetPreferredDivider,
-							METHOD_SHOW_IN_EDITOR));
+							NULL, METHOD_SHOW_IN_EDITOR));
 }
 
 

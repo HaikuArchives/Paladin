@@ -389,11 +389,24 @@ PWindow::CreateWindowItem(void)
 void
 PWindow::InitBackend(void)
 {
-	AddMethod(new PMethod("AddChild", PWindowAddChild));
-	AddMethod(new PMethod("RemoveChild", PWindowRemoveChild));
-	AddMethod(new PMethod("ChildAt", PWindowChildAt));
-	AddMethod(new PMethod("CountChildren", PWindowCountChildren));
-	AddMethod(new PMethod("FindView", PWindowFindView));
+	PMethodInterface pmi;
+	pmi.AddArg("ChildID", PARG_INT64, "The object ID of the child view to add");
+	AddMethod(new PMethod("AddChild", PWindowAddChild, &pmi));
+	
+	pmi.SetArg(0, "ChildID", PARG_INT64, "The object ID of the child view to remove");
+	AddMethod(new PMethod("RemoveChild", PWindowRemoveChild, &pmi));
+	
+	pmi.SetArg(0, "Index", PARG_INT32, "The index of the child to get");
+	pmi.AddReturnValue("ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
+	AddMethod(new PMethod("ChildAt", PWindowChildAt, &pmi));
+	
+	pmi.RemoveArg(0);
+	pmi.SetReturnValue(0, "Count", PARG_INT32, "The number of children of the window");
+	AddMethod(new PMethod("CountChildren", PWindowCountChildren, &pmi));
+	
+	pmi.AddArg("ChildName", PARG_STRING, "The name of the child view to find.");
+	pmi.SetReturnValue(0, "ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
+	AddMethod(new PMethod("FindView", PWindowFindView, &pmi));
 	
 	AddEvent("MenusBeginning", "The window is about to show a menu.");
 	AddEvent("MenusEnded", "The windows has finished showing a menu.");

@@ -598,9 +598,15 @@ PView::InitBackend(BView *view)
 void
 PView::InitMethods(void)
 {
-	AddMethod(new PMethod("AddChild", PViewAddChild));
-	AddMethod(new PMethod("RemoveChild", PViewRemoveChild));
-	AddMethod(new PMethod("ChildAt", PViewChildAt));
+	PMethodInterface pmi;
+	pmi.AddArg("ChildID", PARG_INT64, "The object ID of the child view to add.");
+	AddMethod(new PMethod("AddChild", PViewAddChild, &pmi));
+	
+	pmi.SetArg(0, "ChildID", PARG_INT64, "The object ID of the child view to remove.");
+	AddMethod(new PMethod("RemoveChild", PViewRemoveChild, &pmi));
+	
+	pmi.SetArg(0, "Index", PARG_INT32, "The index of the child to return.");
+	AddMethod(new PMethod("ChildAt", PViewChildAt, &pmi));
 	
 	AddEvent("AttachedToWindow", "The view was added to a window.");
 	AddEvent("AllAttached", "All views have been added to the window.");

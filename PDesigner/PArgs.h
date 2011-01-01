@@ -9,11 +9,16 @@ class PArgs
 {
 public:
 						PArgs(void);
+						PArgs(PArgs &from);
 						PArgs(PArgList *from, bool own = false);
 						~PArgs(void);
 	
+	PArgs &				operator=(const PArgs &from);
+	void				SetTo(const PArgs &from);
+	
 	void				MakeEmpty(void);
 	
+	int32				AddItem(PArgListItem *item);
 	int32				AddItem(const char *name, void *arg, size_t argsize,
 								PArgType type);
 	int32				RemoveItem(PArgListItem *item);

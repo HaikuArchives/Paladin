@@ -1,5 +1,7 @@
 Add interface discovery for methods and events
 
+Update C interface to reflect recent changes in methods
+
 Test and fix PTextControl
 
 Resizing a window doesn't update its values. The Update() method for the editor is called by the PropertyWindow, but it ends up getting the old value for the property instead of the new one. At that point, the value for Frame() doesn't return the right values. Is this a Haiku bug?

@@ -9,6 +9,13 @@ PArgs::PArgs(void)
 }
 
 
+PArgs::PArgs(PArgs &from)
+{
+	fArgList = create_parglist();
+	copy_parglist(fArgList, from.fArgList);
+}
+
+
 PArgs::PArgs(PArgList *from, bool own)
 	:	fArgList(from),
 		fFreeList(own)
@@ -28,10 +35,32 @@ PArgs::~PArgs(void)
 }
 
 
+PArgs &
+PArgs::operator=(const PArgs &from)
+{
+	copy_parglist(fArgList, from.fArgList);
+	return *this;
+}
+
+
+void
+PArgs::SetTo(const PArgs &from)
+{
+	copy_parglist(fArgList, from.fArgList);
+}
+
+
 void
 PArgs::MakeEmpty(void)
 {
 	empty_parglist(fArgList);
+}
+
+
+int32
+PArgs::AddItem(PArgListItem *item)
+{
+	return add_pargitem(fArgList, item);
 }
 
 

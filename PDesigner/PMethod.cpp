@@ -44,6 +44,20 @@ PMethod::GetName(void) const
 
 
 void
+PMethod::SetInterface(PArgs &in)
+{
+	fInterface = in;
+}
+
+
+void
+PMethod::GetInterface(PArgs &out)
+{
+	out = fInterface;
+}
+
+	
+void
 PMethod::SetDescription(const char *string)
 {
 	fDescription = string;

@@ -50,6 +50,15 @@ destroy_pargitem(PArgListItem *node)
 
 
 void
+copy_pargitem(PArgListItem *from, PArgListItem *to)
+{
+	set_pargitem_data(to, NULL, 0, PARG_END);
+	set_pargitem_name(to, NULL);
+	
+}
+
+
+void
 set_pargitem_name(PArgListItem *node, const char *name)
 {
 	if (!node)
@@ -59,6 +68,33 @@ set_pargitem_name(PArgListItem *node, const char *name)
 		free(node->name);
 	
 	node->name = (name != NULL) ? strdup(name) : NULL;
+}
+
+
+void
+set_pargitem_data(PArgListItem *node, void *inData, size_t inSize,
+					PArgType inType)
+{
+	if (!node)
+		return;
+	
+	if (node->data)
+		free(node->data);
+	
+	if (inData && inSize > 0 && inType < PARG_END)
+	{
+		node->data = malloc(inSize);
+		node->datasize = inSize;
+		node->type = inType;
+		
+		memcpy(node->data, inData, inSize);
+	}
+	else
+	{
+		node->data = NULL;
+		node->datasize = 0;
+		node->type = PARG_END;
+	}
 }
 
 
@@ -151,6 +187,7 @@ print_pargitem(PArgListItem *node)
 PArgList *
 create_parglist(void)
 {
+	/* parglist constructor function */
 	PArgList *list = (PArgList *)malloc(sizeof(PArgList));
 	
 	if (list)
@@ -166,6 +203,7 @@ create_parglist(void)
 void
 destroy_parglist(PArgList *list)
 {
+	/* parglist destructor function */
 	if (!list || list->itemcount == 0)
 		return;
 	
@@ -182,8 +220,30 @@ destroy_parglist(PArgList *list)
 
 
 void
+copy_parglist(PArgList *from, PArgList *to)
+{
+	/* Empties the target list and makes it a duplicate copy of data */
+	if (!from || !to)
+		return;
+	
+	empty_parglist(to);
+	
+	PArgListItem *node = from->head;
+	while (node)
+	{
+		PArgListItem *newItem = create_pargitem();
+		copy_pargitem(node, newItem);
+		add_pargitem(to, newItem);
+		
+		node = node->next;
+	}
+}
+
+
+void
 empty_parglist(PArgList *list)
 {
+	/* Deletes all items in the list */
 	if (!list || list->itemcount == 0)
 		return;
 	
@@ -197,6 +257,51 @@ empty_parglist(PArgList *list)
 	
 	list->head = list->tail = NULL;
 	list->itemcount = 0;
+}
+
+
+void
+print_parglist(PArgList *list)
+{
+	/* Prints each item in the list */
+	if (!list)
+	{
+		printf("print_parglist(): NULL list\n");
+		return;
+	}
+	
+	PArgListItem *current = list->head;
+	while (current)
+	{
+		print_pargitem(current);
+		current = current->next;
+	}
+	
+}
+
+
+int32_t
+add_pargitem(PArgList *list, PArgListItem *item)
+{
+	/* Appends a PArgListItem node to the list */
+	if (!list || !item)
+		return B_ERROR;
+	
+	if (!list->head)
+	{
+		list->head = list->tail = item;
+		list->itemcount = 1;
+		item->prev = item->next = NULL;
+	}
+	else
+	{
+		list->tail->next = item;
+		item->prev = list->tail;
+		list->tail = item;
+		list->itemcount++;
+	}
+	
+	return B_OK;
 }
 
 
@@ -248,26 +353,6 @@ remove_parg(PArgList *list, PArgListItem *node)
 		node->next->prev = node->prev;
 	
 	return B_OK;
-}
-
-
-void
-print_parglist(PArgList *list)
-{
-	/* Prints each item in the list */
-	if (!list)
-	{
-		printf("print_parglist(): NULL list\n");
-		return;
-	}
-	
-	PArgListItem *current = list->head;
-	while (current)
-	{
-		print_pargitem(current);
-		current = current->next;
-	}
-	
 }
 
 

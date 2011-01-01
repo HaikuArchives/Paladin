@@ -5,6 +5,7 @@
 #include <String.h>
 
 #include "CInterface.h"
+#include "PArgs.h"
 
 class PObject;
 
@@ -26,6 +27,9 @@ public:
 			void			SetName(const BString &name);
 			BString			GetName(void) const;
 	
+	virtual	void			SetInterface(PArgs &in);
+			void			GetInterface(PArgs &out);
+	
 	virtual	void			SetDescription(const char *string);
 			void			SetDescription(const BString &string);
 			BString			GetDescription(void) const;
@@ -40,6 +44,7 @@ private:
 							fDescription;
 			MethodFunction	fFunction;
 			uint32			fFlags;
+			PArgs			fInterface;
 };
 
 

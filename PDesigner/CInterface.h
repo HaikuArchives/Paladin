@@ -83,14 +83,19 @@ int32_t NullPMethod(void *pobject, PArgList *in, PArgList *out);
 
 PArgListItem *		create_pargitem(void);
 void				destroy_pargitem(PArgListItem *node);
+void				copy_pargitem(PArgListItem *from, PArgListItem *to);
 void				set_pargitem_name(PArgListItem *node, const char *name);
+void				set_pargitem_data(PArgListItem *node, void *inData,
+									size_t inSize, PArgType inType);
 void				print_pargitem(PArgListItem *node);
 
 PArgList *			create_parglist(void);
 void				destroy_parglist(PArgList *list);
 void				empty_parglist(PArgList *list);
+void				copy_parglist(PArgList *from, PArgList *to);
 void				print_parglist(PArgList *list);
 
+int32_t				add_pargitem(PArgList *list, PArgListItem *item);
 int32_t				add_parg(PArgList *list, const char *name, void *arg, size_t argsize,
 							PArgType type);
 int32_t				remove_parg(PArgList *list, PArgListItem *node);

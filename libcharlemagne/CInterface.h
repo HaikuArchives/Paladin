@@ -275,6 +275,49 @@ int32_t				pobject_run_event(void *pobj, const char *name, PArgList *in,
 int32_t				pobject_connect_event(void *pobj, const char *name,
 										MethodFunction func);
 
+/* -------------------------------------------------------------------------------------
+	PMethod-related definitions
+	
+   ------------------------------------------------------------------------------------- */
+void *				pmethodinterface_create(void);
+void				pmethodinterface_destroy(void *pmethodinterface);
+void				pmethodinterface_set_arg(void *pmi, int32_t index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_add_arg(void *pmi, int32_t index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_remove_arg(void *pmi, int32_t index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_arg_name_at(void *pmi, int32_t index, const char **out);
+PArgType			pmethodinterface_arg_type_at(void *pmi, int32_t index);
+void				pmethodinterface_arg_desc_at(void *pmi, int32_t index, const char **out);
+int32_t				pmethodinterface_count_args(void *pmi);
+int32_t				pmethodinterface_find_arg(void *pmi, const char *name);
+
+void				pmethodinterface_set_rval(void *pmi, int32_t index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_add_rval(void *pmi, int32_t index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_remove_rval(void *pmi, int32_t index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_rval_name_at(void *pmi, int32_t index, const char **out);
+PArgType			pmethodinterface_rval_type_at(void *pmi, int32_t index);
+void				pmethodinterface_rval_desc_at(void *pmi, int32_t index, const char **out);
+int32_t				pmethodinterface_count_rvals(void *pmi);
+int32_t				pmethodinterface_find_rval(void *pmi, const char *name);
+
+
+void *				pmethod_create(void);
+void				pmethod_destroy(void *pmethod);
+void				pmethod_set_name(void *pmethod, const char *name);
+void				pmethod_get_name(void *pmethod, const char **out);
+void				pmethod_set_interface(void *pmethod, void *pmi);
+void				pmethod_get_interface(void *pmethod, void *pmi);
+void				pmethod_set_desc(void *pmethod, const char *name);
+void				pmethod_get_desc(void *pmethod, const char **out);
+void				pmethod_set_function(void *pmethod, MethodFunction func);
+MethodFunction		pmethod_get_function(void *pmethod);
+int32_t				pmethod_run(void *pobject, PArgList &in, PArgList &out);
+
 #if defined(__cplusplus)
 	}
 #endif

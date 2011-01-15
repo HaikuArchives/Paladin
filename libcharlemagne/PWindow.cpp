@@ -580,7 +580,7 @@ PWindowBackend::QuitRequested(void)
 	
 	bool quit;
 	if (out.FindBool("value", &quit) != B_OK)
-		quit = false;
+		quit = true;
 	
 	return quit;
 }

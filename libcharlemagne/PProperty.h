@@ -269,10 +269,20 @@ private:
 };
 
 
-class PMetaProperty;
-
 typedef BArchivable * (*MakeFromArchiveFunc)(BMessage *msg);
 typedef PProperty *	(*MakePropertyFunc)(void);
+
+class PMetaProperty
+{
+public:
+	PMetaProperty(const char *typestr, MakeFromArchiveFunc objfunc,
+				MakePropertyFunc func) { type = typestr; arcfunc = objfunc; createfunc = func; }
+	
+	MakeFromArchiveFunc arcfunc;
+	MakePropertyFunc createfunc;
+	BString type;
+};
+
 
 class PropertyRoster
 {

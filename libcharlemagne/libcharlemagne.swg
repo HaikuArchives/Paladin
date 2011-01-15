@@ -1,0 +1,28 @@
+%module haiku
+%{
+#include "AutoTextControl.h"
+#include "EnumProperty.h"
+#include "MiscProperties.h"
+#include "ObjectList.h"
+#include "PArgs.h"
+#include "PBox.h"
+#include "PData.h"
+#include "PMethod.h"
+#include "PObjectBroker.h"
+#include "PObject.h"
+#include "PProperty.h"
+#include "PValue.h"
+%}
+
+%include "AutoTextControl.h"
+%include "EnumProperty.h"
+%include "MiscProperties.h"
+%include "ObjectList.h"
+%include "PArgs.h"
+%include "PBox.h"
+%include "PData.h"
+%include "PMethod.h"
+%include "PObjectBroker.h"
+%include "PObject.h"
+%include "PProperty.h"
+%include "PValue.h"

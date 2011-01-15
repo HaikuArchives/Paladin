@@ -1174,17 +1174,6 @@ MessageProperty::GetValueAsString(void) const
 	return BString("BMessage()");
 }
 
-class PMetaProperty
-{
-public:
-	PMetaProperty(const char *typestr, MakeFromArchiveFunc objfunc,
-				MakePropertyFunc func) { type = typestr; arcfunc = objfunc; createfunc = func; }
-	
-	MakeFromArchiveFunc arcfunc;
-	MakePropertyFunc createfunc;
-	BString type;
-};
-
 
 PropertyRoster::PropertyRoster(void)
 	:	fPropertyList(20, true)

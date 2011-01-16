@@ -1343,13 +1343,13 @@ ProjectWindow::SetupMenus(void)
 	fSourceMenu = new BMenu(TR("Source Control"));
 	fSourceMenu->AddItem(new BMenuItem(TR("Check Project In"),
 										new BMessage(M_GET_CHECK_IN_MSG), 'I',
-										B_COMMAND_KEY | B_CONTROL_KEY));
+										B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 	fSourceMenu->AddItem(new BMenuItem(TR("Show Changed Files from Last Check-in"),
 										new BMessage(M_PROJECT_SCM_STATUS), 'S',
-										B_COMMAND_KEY | B_CONTROL_KEY));
+										B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 	fSourceMenu->AddItem(new BMenuItem(TR("Show Differences from Last Check-in"),
 										new BMessage(M_DIFF_PROJECT), 'D',
-										B_COMMAND_KEY | B_CONTROL_KEY));
+										B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 	fSourceMenu->AddSeparatorItem();
 	fSourceMenu->AddItem(new BMenuItem(TR("Revert Project"),
 										new BMessage(M_REVERT_PROJECT)));

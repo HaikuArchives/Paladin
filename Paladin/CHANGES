@@ -4,6 +4,8 @@ New Features
 
 User Interface
 Files are now sorted first by type and then by name
+New files or new file pairs added via Add New File are automatically added to source control
+Changed key accelerators for common source control from Control + Alt to Control + Alt + Shift due to the newly-added window management shortcuts which clash with the old ones
 
 Bugfixes
 The dirty file count doesn't change during builds on SMP machines

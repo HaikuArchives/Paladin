@@ -38,7 +38,14 @@ ProjectList::MessageReceived(BMessage *msg)
 	{
 		entry_ref refs;
 		if (msg->FindRef("refs",&refs) == B_OK && Window())
+		{
+//			BPoint dropPoint;
+//			msg->FindPoint("_drop_point_", &dropPoint);
+//			ConvertToParent(&dropPoint);
+//			msg->ReplacePoint("_drop_point_", dropPoint);
+			
 			Window()->PostMessage(msg);
+		}
 		else
 		if (msg->what == B_SIMPLE_DATA)
 		{

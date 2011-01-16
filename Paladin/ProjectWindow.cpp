@@ -1969,5 +1969,72 @@ compare_source_file_items(const BListItem *item1, const BListItem *item2)
 	if (!two->Text())
 		return -1;
 	
+	// Sort based on type.
+	int8 type1, type2;
+	switch (one->GetData()->GetType())
+	{
+		case TYPE_C:
+		{
+			type1 = 0;
+			break;
+		}
+		case TYPE_LEX:
+		case TYPE_YACC:
+		{
+			type1 = 1;
+			break;
+		}
+		case TYPE_RESOURCE:
+		{
+			type1 = 2;
+			break;
+		}
+		case TYPE_LIB:
+		{
+			type1 = 3;
+			break;
+		}
+		default:
+		{
+			type1 = 10;
+			break;
+		}
+	}
+	
+	switch (two->GetData()->GetType())
+	{
+		case TYPE_C:
+		{
+			type2 = 0;
+			break;
+		}
+		case TYPE_LEX:
+		case TYPE_YACC:
+		{
+			type2 = 1;
+			break;
+		}
+		case TYPE_RESOURCE:
+		{
+			type2 = 2;
+			break;
+		}
+		case TYPE_LIB:
+		{
+			type2 = 3;
+			break;
+		}
+		default:
+		{
+			type2 = 10;
+			break;
+		}
+	}
+	
+	if (type1 < type2)
+		return -1;
+	else if (type2 < type1)
+		return 1;
+	
 	return strcmp(one->Text(),two->Text());
 }

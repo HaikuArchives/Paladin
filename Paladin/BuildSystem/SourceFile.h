@@ -42,7 +42,7 @@ public:
 			int8		BuildFlag(void) const;
 	virtual	bool		UsesBuild(void) const;
 	
-//			SourceFileType	GetType(void) const { return fType; }
+			SourceFileType	GetType(void) const { return fType; }
 			
 			void		UpdateModTime(void);
 			time_t		GetModTime(void) const;

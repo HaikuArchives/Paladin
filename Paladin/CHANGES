@@ -3,9 +3,11 @@ Changes in Paladin 1.4
 New Features
 
 User Interface
+Files are now sorted first by type and then by name
 
 Bugfixes
 The dirty file count doesn't change during builds on SMP machines
+Fixed a problem with files dropped from Tracker
 
 Internal changes
 

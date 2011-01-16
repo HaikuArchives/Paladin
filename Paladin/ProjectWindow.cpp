@@ -1686,6 +1686,12 @@ ProjectWindow::AddNewFile(BString name, bool create_pair)
 			data << "#include \"" << nametwo.String() << "\"\n\n";
 			ref = MakeProjectFile(projfile.GetFolder(),nameone.String(),data.String());
 			AddFile(ref);
+
+			if (fSourceControl)
+			{
+				DPath mainPath(ref);
+				fSourceControl->AddToRepository(mainPath.GetFullPath());
+			}
 			msg.AddRef("refs",&ref);
 			
 			data = MakeHeaderGuard(nametwo.String());
@@ -1695,7 +1701,13 @@ ProjectWindow::AddNewFile(BString name, bool create_pair)
 			if (!ref.name)
 				return;
 			
-			// We don't add headers to the project. User can do that if he wants
+			// We don't add headers to the project. User can do that if he wants.
+			// We *do* add them to source control however.
+			if (fSourceControl)
+			{
+				DPath partnerPath(ref);
+				fSourceControl->AddToRepository(partnerPath.GetFullPath());
+			}
 			
 			msg.AddRef("refs",&ref);
 			be_app->PostMessage(&msg);
@@ -1723,6 +1735,12 @@ ProjectWindow::AddNewFile(BString name, bool create_pair)
 	
 	if (!is_header)
 		AddFile(ref);
+	
+	if (fSourceControl)
+	{
+		DPath filePath(ref);
+		fSourceControl->AddToRepository(filePath.GetFullPath());
+	}
 	
 	msg.AddRef("refs",&ref);
 	be_app->PostMessage(&msg);

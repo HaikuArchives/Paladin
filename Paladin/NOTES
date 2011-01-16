@@ -7,7 +7,7 @@ TODO:
 		Current code in the tree attempts to add the file, but nothing
 		happens.
 	Need to handle SCM setup -- bzr, hg, and git all require an e-mail address. The user should be asked what it is upon first use of any of these SCMs and have the information saved and re-used for each SCM.
-	Adding a file to the project window via the New File window should add the file or file pair to source control
+	Removing a file from source control should remove its partner file, as well.
 
 Features to implement / consider:
 	Bazaar support

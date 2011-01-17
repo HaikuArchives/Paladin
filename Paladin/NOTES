@@ -2,11 +2,10 @@ TODO:
 	Issue: Printing output for hg push doesn't happen until after the fact
 	Later: move SCM commands to using ShellHelper class for safety
 	Need to handle password requests for SCMs.
-	Bug: Files dropped from Tracker end up in the group above the one dropped on
 	Bug: Dragging an item from one project to another causes a crash.
 		Current code in the tree attempts to add the file, but nothing
 		happens.
-	Need to handle SCM setup -- bzr, hg, and git all require an e-mail address. The user should be asked what it is upon first use of any of these SCMs and have the information saved and re-used for each SCM.
+	Need to handle SCM setup -- bzr, hg, and git all require an e-mail address The user should be asked what it is upon first use of any of these SCMs and have the information saved and re-used for each SCM.
 	Removing a file from source control should remove its partner file, as well.
 
 Features to implement / consider:

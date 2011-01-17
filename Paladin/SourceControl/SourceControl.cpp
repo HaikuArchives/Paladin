@@ -1,5 +1,6 @@
 #include "SourceControl.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 
 SourceControl::SourceControl(void)
@@ -293,13 +294,15 @@ SourceControl::GetPassword(void) const
 
 
 int
-SourceControl::RunCommand(const BString &in, BString &out)
+SourceControl::RunCommand(BString in, BString &out)
 {
 	if (fDebug)
 		printf("Command: %s: %s\n", fShortName.String(), in.String());
 	
 	if (in.CountChars() < 1)
 		return -1;
+	
+	in << "\necho \"Paladin command return value: $?\"";
 	
 	FILE *fd = popen(in.String(),"r");
 	
@@ -320,6 +323,13 @@ SourceControl::RunCommand(const BString &in, BString &out)
 	if (fDebug)
 		printf("%s: out:\n------------\n%s------------\n",
 				GetShortName(), out.String());
-	return 0;
+	
+	// Grab the return value of the command
+	int32 pos = out.FindLast("Paladin command return value");
+	
+	int returnValue = atoi(out.String() + pos + strlen("Paladin command return value: "));
+	out.Truncate(pos);
+	
+	return returnValue;
 }
 

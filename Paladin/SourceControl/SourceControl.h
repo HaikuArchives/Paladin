@@ -87,7 +87,7 @@ protected:
 			BString			GetUsername(void) const;
 			BString			GetPassword(void) const;
 			
-			int				RunCommand(const BString &in, BString &out);
+			int				RunCommand(BString in, BString &out);
 
 private:
 	BString					fShortName,

@@ -430,7 +430,7 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		{
 			if (fSourceControl)
 			{
-				SCMOutputWindow *win = new SCMOutputWindow(TR("Push"));
+				SCMOutputWindow *win = new SCMOutputWindow(TR("Pull"));
 				win->Show();
 				fSourceControl->Pull(NULL);
 			}

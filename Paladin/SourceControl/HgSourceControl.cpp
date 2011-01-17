@@ -208,7 +208,8 @@ HgSourceControl::Push(const char *url)
 		SetURL(url);
 	
 	BString command;
-	command << "cd '" << GetWorkingDirectory() << "'; hg ";
+	command << "cd '" << GetWorkingDirectory()
+			<< "'; echo \"Pushing to repository...\"; hg ";
 	
 	if (GetVerboseMode())
 		command << "-v ";

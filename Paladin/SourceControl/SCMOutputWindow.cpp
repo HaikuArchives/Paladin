@@ -90,13 +90,18 @@ SCMOutputCallback(const char *text)
 		}
 	}
 	
-	printf("%s",text);
+	BString out(text);
+	int32 pos = out.FindLast("Source control command return value");
+	if (pos >= 0)
+		out.Truncate(pos);
+	
+	printf("%s",out.String());
 	
 	if (!win)
 		return;
 	
 	BMessage logmsg(M_APPEND_TO_LOG);
-	logmsg.AddString("text", text);
+	logmsg.AddString("text", out);
 	win->PostMessage(&logmsg);
 }
 

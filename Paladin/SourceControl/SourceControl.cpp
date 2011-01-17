@@ -302,7 +302,7 @@ SourceControl::RunCommand(BString in, BString &out)
 	if (in.CountChars() < 1)
 		return -1;
 	
-	in << "\necho \"Paladin command return value: $?\"";
+	in << "\necho \"Source control command return value: $?\"";
 	
 	FILE *fd = popen(in.String(),"r");
 	
@@ -325,9 +325,9 @@ SourceControl::RunCommand(BString in, BString &out)
 				GetShortName(), out.String());
 	
 	// Grab the return value of the command
-	int32 pos = out.FindLast("Paladin command return value");
+	int32 pos = out.FindLast("Source control command return value");
 	
-	int returnValue = atoi(out.String() + pos + strlen("Paladin command return value: "));
+	int returnValue = atoi(out.String() + pos + strlen("Source control command return value: "));
 	out.Truncate(pos);
 	
 	return returnValue;

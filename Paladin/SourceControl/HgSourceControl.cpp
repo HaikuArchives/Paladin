@@ -196,8 +196,7 @@ HgSourceControl::Merge(const char *rev)
 		command	<< "'" << rev << "'";
 	
 	BString out;
-	RunCommand(command, out);
-	return B_OK;
+	return (RunCommand(command, out) == 0) ? B_OK : B_ERROR;
 }
 
 
@@ -217,8 +216,7 @@ HgSourceControl::Push(const char *url)
 	command	<< "push '" << GetURL() << "'";
 	
 	BString out;
-	RunCommand(command, out);
-	return B_OK;
+	return (RunCommand(command, out) == 0) ? B_OK : B_ERROR;
 }
 
 
@@ -237,8 +235,7 @@ HgSourceControl::Pull(const char *url)
 	command	<< "pull -u '" << GetURL() << "'";
 	
 	BString out;
-	RunCommand(command, out);
-	return B_OK;
+	return (RunCommand(command, out) == 0) ? B_OK : B_ERROR;
 }
 
 
@@ -276,8 +273,7 @@ HgSourceControl::Revert(const char *relPath)
 		command << " --all";
 	
 	BString out;
-	RunCommand(command, out);
-	return B_OK;
+	return (RunCommand(command, out) == 0) ? B_OK : B_ERROR;
 }
 
 
@@ -294,8 +290,7 @@ HgSourceControl::Rename(const char *oldname, const char *newname)
 	command << "rename '" << oldname << "' '" << newname << "'";
 	
 	BString out;
-	RunCommand(command, out);
-	return B_OK;
+	return (RunCommand(command, out) == 0) ? B_OK : B_ERROR;
 }
 
 
@@ -314,8 +309,7 @@ HgSourceControl::Diff(const char *filename, const char *revision)
 		command << "-r " << revision;
 	
 	BString out;
-	RunCommand(command, out);
-	return B_OK;
+	return (RunCommand(command, out) == 0) ? B_OK : B_ERROR;
 }
 
 

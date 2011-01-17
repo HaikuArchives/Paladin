@@ -540,3 +540,13 @@ IsBeIDEProject(const entry_ref &ref)
 	return (strcmp(magic, "MIDE") == 0);
 }
 
+
+int32
+AlertError(const char *message, const char *button1, const char *button2,
+			const char *button3)
+{
+	BAlert *alert = new BAlert("Paladin", message, button1, button2, button3);
+	return alert->Go();
+}
+
+

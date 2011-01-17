@@ -33,6 +33,8 @@ status_t	RunPipedCommand(const char *command, BString &out,
 							bool redirectStdErr);
 status_t	BeIDE2Paladin(const char *path, BString &outpath);
 bool		IsBeIDEProject(const entry_ref &ref);
+int32		AlertError(const char *message, const char *button1,
+						const char *button2 = NULL, const char *button3 = NULL);
 
 extern Project *gCurrentProject;
 extern LockableList<Project> *gProjectList;

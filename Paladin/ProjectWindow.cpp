@@ -289,6 +289,8 @@ ProjectWindow::QuitRequested()
 void
 ProjectWindow::MessageReceived(BMessage *msg)
 {
+	status_t status;
+	
 	if ( (msg->WasDropped() && msg->what == B_SIMPLE_DATA) || msg->what == M_ADD_FILES)
 	{
 		fAddFileStruct.refmsg = *msg;
@@ -432,7 +434,12 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			{
 				SCMOutputWindow *win = new SCMOutputWindow(TR("Pull"));
 				win->Show();
-				fSourceControl->Pull(NULL);
+				status = fSourceControl->Pull(NULL);
+				
+				if (!status)
+					AlertError("Unable to pull from the remote repository. If it "
+							"uses a secure connection, please set up the appropriate "
+							"SSH keys on the remote server.", "OK");
 			}
 			break;
 		}

@@ -100,6 +100,11 @@ then
 	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/Paladin"
 fi
 
+# Paladin usually expects PalEdit (or a link) to be in the same directory
+# The link will be broken for the moment, but will work once the script
+# finishes
+ln -s ../PalEdit/generated/distro/PalEdit
+
 cd ../
 
 # Now attempt ccache

@@ -58,6 +58,8 @@ public:
 	// to make sure that paths typed in actually exist. It defaults to false.
 	virtual	void			MakeValidating(bool value);
 			bool			IsValidating(void) const;
+	
+	virtual	void			MakeFocus(bool focus = true);
 			
 			BFilePanel *	FilePanel(void) const;
 	

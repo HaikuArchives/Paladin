@@ -57,6 +57,7 @@ extern bool gFastDepAvailable;
 extern bool gHgAvailable;
 extern bool gGitAvailable;
 extern bool gSvnAvailable;
+extern BString gDefaultEmail;
 
 extern uint8 gCPUCount;
 

@@ -374,6 +374,14 @@ PathBox::IsValidating(void) const
 }
 
 
+void
+PathBox::MakeFocus(bool focus)
+{
+	if (focus)
+		fPathControl->MakeFocus(true);
+}
+
+
 BFilePanel *
 PathBox::FilePanel(void) const
 {

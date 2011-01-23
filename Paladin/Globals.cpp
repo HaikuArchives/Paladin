@@ -35,6 +35,7 @@ bool gFastDepAvailable = false;
 bool gHgAvailable = false;
 bool gGitAvailable = false;
 bool gSvnAvailable = false;
+BString gDefaultEmail;
 
 Project *gCurrentProject = NULL;
 LockableList<Project> *gProjectList = NULL;

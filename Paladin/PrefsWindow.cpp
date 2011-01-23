@@ -11,22 +11,52 @@
 #include "PLocale.h"
 #include "Settings.h"
 
-#define M_SET_SCM 'sscm'
+enum
+{
+	M_SET_SCM = 'sscm',
+	M_SET_TAB_1 = 'stb1',
+	M_SET_TAB_2 = 'stb2'
+};
 
 PrefsWindow::PrefsWindow(BRect frame)
-	:	DWindow(frame,TR("Program Settings"))
+	:	DWindow(frame,TR("Program Settings"), B_TITLED_WINDOW, B_NOT_V_RESIZABLE |
+																B_NOT_ZOOMABLE)
 {
+	AddShortcut('1', B_COMMAND_KEY, new BMessage(M_SET_TAB_1));
+	AddShortcut('2', B_COMMAND_KEY, new BMessage(M_SET_TAB_2));
+	
 	MakeCenteredOnShow(true);
 	BView *top = GetBackgroundView();
 	
 	float pw,ph;
 	BString label;
 	
-	fProjectFolder = new PathBox(BRect(10,10,11,11),"projfolder",
+	BMenu *menu = new BMenu("Settings");
+	menu->AddItem(new BMenuItem("General", new BMessage(M_SET_TAB_1)));
+	menu->AddItem(new BMenuItem("Source Control", new BMessage(M_SET_TAB_2)));
+	
+	BRect r(10,10,11,11);
+	fViewChooser = new BMenuField(r, "viewchooser", NULL, menu);
+	top->AddChild(fViewChooser);
+	fViewChooser->ResizeToPreferred();
+	r = fViewChooser->Frame();
+	fViewChooser->Menu()->SetLabelFromMarked(true);
+	fViewChooser->Menu()->SetRadioMode(true);
+	fViewChooser->Menu()->ItemAt(0L)->SetMarked(true);
+	
+	BRect tabBounds(Bounds());
+	tabBounds.top = r.bottom + 1.0;
+	
+	BView *view = new BView(tabBounds, "tab1", B_FOLLOW_ALL, B_WILL_DRAW);
+	view->SetViewColor(top->ViewColor());
+	top->AddChild(view);
+	fViews[0] = view;
+	
+	fProjectFolder = new PathBox(r,"projfolder",
 								gProjectPath.GetFullPath(),
 								TR("Default Project Folder:"),
 								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fProjectFolder);
+	view->AddChild(fProjectFolder);
 	fProjectFolder->GetPreferredSize(&pw,&ph);
 	fProjectFolder->SetDivider(fProjectFolder->StringWidth(
 								TR("Default Project Folder:")) + 5.0);
@@ -34,13 +64,13 @@ PrefsWindow::PrefsWindow(BRect frame)
 	fProjectFolder->MakeValidating(true);
 	SetToolTip(fProjectFolder,TR("The default path for new projects."));
 	
-	BRect r(fProjectFolder->Frame());
+	r = fProjectFolder->Frame();
 	r.OffsetBy(0,r.Height() + 5);
 	fShowProjFolder = new BCheckBox(r,"showfolder",
 									TR("Show Project Folder on Open"),
 									new BMessage,
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fShowProjFolder);
+	view->AddChild(fShowProjFolder);
 	
 	fShowProjFolder->GetPreferredSize(&pw,&ph);
 	fShowProjFolder->ResizeTo(r.Width(), ph);
@@ -52,9 +82,9 @@ PrefsWindow::PrefsWindow(BRect frame)
 	r = fShowProjFolder->Frame();
 	r.OffsetBy(0,r.Height() + 5.0);
 	
-	BBox *buildBox = new BBox(r);
+	BBox *buildBox = new BBox(r, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	buildBox->SetLabel(TR("Build"));
-	top->AddChild(buildBox);
+	view->AddChild(buildBox);
 	
 	BRect boxr(buildBox->Bounds().InsetByCopy(10.0, 10.0));
 	boxr.bottom = boxr.top + fShowProjFolder->Frame().Height();
@@ -120,7 +150,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 									TR("Automatically Synchronize Modules"),
 									new BMessage,
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fAutoSyncModules);
+	view->AddChild(fAutoSyncModules);
 	if (gAutoSyncModules)
 		fAutoSyncModules->SetValue(B_CONTROL_ON);
 	SetToolTip(fAutoSyncModules,TR("Automatically synchronize modules in your "
@@ -128,7 +158,27 @@ PrefsWindow::PrefsWindow(BRect frame)
 	r.OffsetBy(0,r.Height() + 5.0);
 	#endif
 	
-	BMenu *menu = new BMenu("SCM Chooser");
+	r.right = r.left + 1.0;
+	r.bottom = r.top + 1.0;
+	fBackupFolder = new PathBox(r,"backupfolder", gBackupPath.GetFullPath(),
+								TR("Backup Folder:"),
+								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	view->AddChild(fBackupFolder);
+	fBackupFolder->MoveTo(r.left,r.top);
+	fBackupFolder->GetPreferredSize(&pw,&ph);
+	fBackupFolder->ResizeTo(Bounds().Width() - 20.0, ph);
+	fBackupFolder->SetDivider(fBackupFolder->StringWidth(
+								"Backup Folder:") + 5.0);
+	fBackupFolder->MakeValidating(true);
+	SetToolTip(fBackupFolder,TR("Sets the location for project backups"));
+	
+	view = new BView(tabBounds, "tab2", B_FOLLOW_ALL, B_WILL_DRAW);
+	view->SetViewColor(top->ViewColor());
+	top->AddChild(view);
+	fViews[1] = view;
+	
+	r.OffsetTo(10.0, 10.0);
+	menu = new BMenu("SCM Chooser");
 	menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
 	menu->AddItem(new BMenuItem("Git", new BMessage()));
 	menu->AddItem(new BMenuItem("Subversion", new BMessage()));
@@ -136,7 +186,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 	
 	fSCMChooser = new BMenuField(r, "scmchooser", "Preferred Source Control: ",
 								menu);
-	top->AddChild(fSCMChooser);
+	view->AddChild(fSCMChooser);
 	
 	#ifdef DISABLE_GIT_SUPPORT
 	menu->ItemAt(1)->SetEnabled(false);
@@ -170,22 +220,12 @@ PrefsWindow::PrefsWindow(BRect frame)
 		}
 	}
 	
-	r.OffsetBy(0.0, r.Height() + 5.0);
-	r.right = r.left + 1.0;
-	r.bottom = r.top + 1.0;
-	fBackupFolder = new PathBox(r,"backupfolder", gBackupPath.GetFullPath(),
-								TR("Backup Folder:"),
-								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fBackupFolder);
-	fBackupFolder->MoveTo(r.left,r.top);
-	fBackupFolder->GetPreferredSize(&pw,&ph);
-	fBackupFolder->ResizeTo(Bounds().Width() - 20.0, ph);
-	fBackupFolder->SetDivider(fBackupFolder->StringWidth(
-								"Backup Folder:") + 5.0);
-	fBackupFolder->MakeValidating(true);
-	SetToolTip(fBackupFolder,TR("Sets the location for project backups"));
+	fActiveView = fViews[0];
+	fViews[1]->Hide();
 	
-	ResizeTo(Bounds().Width(), fBackupFolder->Frame().bottom + 10.0);
+	ResizeTo(Bounds().Width(), fViewChooser->Frame().bottom +
+								fBackupFolder->Frame().bottom + 10.0);
+	SetSizeLimits(Bounds().Width(), 30000, Bounds().Height(), 30000);
 }
 
 
@@ -220,3 +260,33 @@ PrefsWindow::QuitRequested(void)
 	return true;
 }
 
+
+void
+PrefsWindow::MessageReceived(BMessage *msg)
+{
+	switch (msg->what)
+	{
+		case M_SET_TAB_1:
+		{
+			if (!fActiveView->IsHidden())
+				fActiveView->Hide();
+			fActiveView = fViews[0];
+			fActiveView->Show();
+			fViewChooser->Menu()->FindMarked()->SetMarked(false);
+			fViewChooser->Menu()->ItemAt(0L)->SetMarked(true);
+			break;
+		}
+		case M_SET_TAB_2:
+		{
+			if (!fActiveView->IsHidden())
+				fActiveView->Hide();
+			fActiveView = fViews[1];
+			fActiveView->Show();
+			fViewChooser->Menu()->FindMarked()->SetMarked(false);
+			fViewChooser->Menu()->ItemAt(1L)->SetMarked(true);
+			break;
+		}
+		default:
+			DWindow::MessageReceived(msg);
+	}
+}

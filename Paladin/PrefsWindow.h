@@ -13,6 +13,7 @@ class PrefsWindow : public DWindow
 public:
 						PrefsWindow(BRect frame);
 				bool	QuitRequested(void);
+				void	MessageReceived(BMessage *msg);
 private:
 	PathBox			*fProjectFolder,
 					*fBackupFolder;
@@ -23,7 +24,11 @@ private:
 					*fFastDep,
 					*fAutoSyncModules;
 	
-	BMenuField		*fSCMChooser;
+	BMenuField		*fSCMChooser,
+					*fViewChooser;
+	
+	BView			*fViews[2],
+					*fActiveView;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #include "PProperty.h"
 
 #include <Locker.h>
+#include "PApplication.h"
 #include "PControl.h"
 #include "PBox.h"
 #include "PButton.h"
@@ -45,6 +46,8 @@ PObjectBroker::PObjectBroker(void)
 	
 	fObjInfoList->AddItem(new PObjectInfo("PObject","Generic Object",PObject::Instantiate,
 											PObject::Create));
+	fObjInfoList->AddItem(new PObjectInfo("PApplication","Application",PApplication::Instantiate,
+											PApplication::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PHandler","Handler",PHandler::Instantiate,
 											PHandler::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PWindow","Window",PWindow::Instantiate,

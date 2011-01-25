@@ -1,7 +1,5 @@
 #include "PApplication.h"
 
-#include <Application.h>
-
 #include <Messenger.h>
 #include <malloc.h>
 #include <stdio.h>
@@ -11,19 +9,16 @@
 #include "PObjectBroker.h"
 #include "PMethod.h"
 #include "PView.h"
+#include "PWindow.h"
+#include "PWindowPriv.h"
 
-class PAppBackend : public BApplication
-{
-public:
-				PAppBackend(PObject *owner, const char *signature);
-				~PAppBackend(void);
-	
-private:
-	PObject 	*fOwner;
-};
+int32_t PAppObscureCursor(void *pobject, PArgList *in, PArgList *out);
+int32_t PAppRun(void *pobject, PArgList *in, PArgList *out);
+int32_t PAppQuit(void *pobject, PArgList *in, PArgList *out);
+int32_t PAppWindowAt(void *pobject, PArgList *in, PArgList *out);
 
 PApplication::PApplication(void)
-	:	fApp(NULL)
+	:	fPulseRate(0)
 {
 	fType = "PApplication";
 	fFriendlyType = "Application";
@@ -38,7 +33,7 @@ PApplication::PApplication(void)
 
 PApplication::PApplication(BMessage *msg)
 	:	PHandler(msg),
-		fApp(NULL)
+		fPulseRate(0)
 {
 	fType = "PApplication";
 	fFriendlyType = "Application";
@@ -49,7 +44,7 @@ PApplication::PApplication(BMessage *msg)
 
 PApplication::PApplication(const char *name)
 	:	PHandler(name),
-		fApp(NULL)
+		fPulseRate(0)
 {
 	fType = "PApplication";
 	fFriendlyType = "Application";
@@ -60,7 +55,7 @@ PApplication::PApplication(const char *name)
 
 PApplication::PApplication(const PApplication &from)
 	:	PHandler(from),
-		fApp(NULL)
+		fPulseRate(0)
 {
 	fType = "PApplication";
 	fFriendlyType = "Application";
@@ -71,21 +66,30 @@ PApplication::PApplication(const PApplication &from)
 
 PApplication::~PApplication(void)
 {
-	fApp->Lock();
-	fApp->Quit();
-	fApp = NULL;
+	if (be_app)
+	{
+		be_app->Lock();
+		be_app->Quit();
+		be_app = NULL;
+	}
 }
 
 
 void
 PApplication::Run(const char *signature)
 {
-	BString sig(signature);
-	if (sig.CountChars() < 1)
-		sig = "application/x-vnd.dw-CharlemagneApp";
-	SetStringProperty("signature", sig.String());
-	fApp = new PAppBackend(this, sig.String());
-	fApp->Run();
+	BApplication *app = NULL;
+	if (!be_app)
+	{
+		BString sig(signature);
+		if (sig.CountChars() < 1)
+			sig = "application/x-vnd.dw-CharlemagneApp";
+		SetStringProperty("signature", sig.String());
+		app = new BApplication(sig.String());
+	}
+	else
+		app = be_app;
+	app->Run();
 }
 
 
@@ -123,61 +127,36 @@ PApplication::GetProperty(const char *name, PValue *value, const int32 &index) c
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-/*	float minx,maxx,miny,maxy;
-	
-	if (str.ICompare("Active") == 0)
-		((BoolProperty*)prop)->SetValue(fApp->IsActive());
-	else if (str.ICompare("Feel") == 0)
-		((WindowFeelProperty*)prop)->SetValue(fApp->CodeFeel());
+	if (str.ICompare("CursorVisible") == 0)
+		((BoolProperty*)prop)->SetValue(!be_app->IsCursorHidden());
 	else if (str.ICompare("Flags") == 0)
-		((IntProperty*)prop)->SetValue(fApp->Flags());
-	else if (str.ICompare("Floating") == 0)
-		((BoolProperty*)prop)->SetValue(fApp->IsFloating());
-	else if (str.ICompare("Width") == 0)
-		((FloatProperty*)prop)->SetValue(fApp->Frame().Width());
-	else if (str.ICompare("Height") == 0)
-		((FloatProperty*)prop)->SetValue(fApp->Frame().Height());
-	else if (str.ICompare("Location") == 0)
-		((PointProperty*)prop)->SetValue(fApp->Frame().LeftTop());
-	else if (str.ICompare("Front") == 0)
-		((BoolProperty*)prop)->SetValue(fApp->IsFront());
-	else if (str.ICompare("Look") == 0)
-		((WindowLookProperty*)prop)->SetValue(fApp->Look());
-	else if (str.ICompare("Minimized") == 0)
-		((BoolProperty*)prop)->SetValue(fApp->IsMinimized());
-	else if (str.ICompare("MinWidth") == 0)
 	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		((FloatProperty*)prop)->SetValue(minx);
+		if (!be_app)
+			return B_NO_INIT;
+		((IntProperty*)prop)->SetValue(fAppInfo.flags);
 	}
-	else if (str.ICompare("MaxWidth") == 0)
+	else if (str.ICompare("IsLaunching") == 0)
+		((BoolProperty*)prop)->SetValue(be_app->IsLaunching());
+	else if (str.ICompare("Port") == 0)
 	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		((FloatProperty*)prop)->SetValue(maxx);
+		if (!be_app)
+			return B_NO_INIT;
+		((IntProperty*)prop)->SetValue(fAppInfo.port);
 	}
-	else if (str.ICompare("MinHeight") == 0)
-	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		((FloatProperty*)prop)->SetValue(miny);
-	}
-	else if (str.ICompare("MaxHeight") == 0)
-	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		((FloatProperty*)prop)->SetValue(maxy);
-	}
-	else if (str.ICompare("Modal") == 0)
-		((BoolProperty*)prop)->SetValue(fApp->IsModal());
 	else if (str.ICompare("PulseRate") == 0)
-		((IntProperty*)prop)->SetValue(fApp->PulseRate());
-	else if (str.ICompare("Title") == 0)
-		((StringProperty*)prop)->SetValue(fApp->Title());
-	else if (str.ICompare("Visible") == 0)
-		((BoolProperty*)prop)->SetValue(!fApp->IsHidden());
-	else if (str.ICompare("Workspaces") == 0)
-		((IntProperty*)prop)->SetValue(fApp->Workspaces());
+		((IntProperty*)prop)->SetValue(fPulseRate);
+	else if (str.ICompare("Signature") == 0)
+		((StringProperty*)prop)->SetValue(fAppInfo.signature);
+	else if (str.ICompare("Team") == 0)
+		((IntProperty*)prop)->SetValue(fAppInfo.team);
+	else if (str.ICompare("Thread") == 0)
+		((IntProperty*)prop)->SetValue(fAppInfo.team);
+	else if (str.ICompare("WindowCount") == 0)
+		((BoolProperty*)prop)->SetValue(be_app->CountWindows());
 	else
-*/
-	return PHandler::GetProperty(name,value,index);
+		return PHandler::GetProperty(name,value,index);
+	
+	return B_OK;
 }
 
 
@@ -199,114 +178,43 @@ PApplication::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (status != B_OK)
 		return status;
 	
-/*	float minx,maxx,miny,maxy;
-	
 	BoolValue bv;
-	FloatValue fv;
-	RectValue rv;
-	PointValue pv;
 	IntValue iv;
 	StringValue sv;
-	fApp->Lock();
-	if (str.ICompare("Active") == 0)
+	be_app->Lock();
+	if (str.ICompare("CursorVisible") == 0)
 	{
 		prop->GetValue(&bv);
-		fApp->Activate(*bv.value);
-	}
-	else if (str.ICompare("Feel") == 0)
-	{
-		prop->GetValue(&iv);
-		fApp->SetCodeFeel((window_feel)*iv.value);
-	}
-	else if (str.ICompare("Flags") == 0)
-	{
-		prop->GetValue(&iv);
-		fApp->SetFlags(*iv.value);
-	}
-	else if (str.ICompare("Width") == 0)
-	{
-		prop->GetValue(&fv);
-		fApp->ResizeTo(*fv.value,fApp->Frame().Height());
-	}
-	else if (str.ICompare("Height") == 0)
-	{
-		prop->GetValue(&fv);
-		fApp->ResizeTo(fApp->Frame().Width(),*fv.value);
-	}
-	else if (str.ICompare("Location") == 0)
-	{
-		prop->GetValue(&pv);
-		fApp->MoveTo(pv.value->x,pv.value->y);
-	}
-	else if (str.ICompare("Look") == 0)
-	{
-		prop->GetValue(&iv);
-		fApp->SetLook((window_look)*iv.value);
-	}
-	else if (str.ICompare("Minimized") == 0)
-	{
-		prop->GetValue(&bv);
-		fApp->Minimize(*bv.value);
-	}
-	else if (str.ICompare("MinWidth") == 0)
-	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		prop->GetValue(&fv);
-		minx = *fv.value;
-		fApp->SetSizeLimits(minx,maxx,miny,maxy);
-	}
-	else if (str.ICompare("MaxWidth") == 0)
-	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		prop->GetValue(&fv);
-		maxx = *fv.value;
-		fApp->SetSizeLimits(minx,maxx,miny,maxy);
-	}
-	else if (str.ICompare("MinHeight") == 0)
-	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		prop->GetValue(&fv);
-		miny = *fv.value;
-		fApp->SetSizeLimits(minx,maxx,miny,maxy);
-	}
-	else if (str.ICompare("MaxHeight") == 0)
-	{
-		fApp->GetSizeLimits(&minx,&maxx,&miny,&maxy);
-		prop->GetValue(&fv);
-		maxy = *fv.value;
-		fApp->SetSizeLimits(minx,maxx,miny,maxy);
+		if (*bv.value)
+			be_app->ShowCursor();
+		else
+			be_app->HideCursor();
 	}
 	else if (str.ICompare("PulseRate") == 0)
 	{
 		prop->GetValue(&iv);
-		fApp->SetPulseRate(*iv.value);
+		fPulseRate = *iv.value;
+		be_app->SetPulseRate(fPulseRate);
 	}
-	else if (str.ICompare("Title") == 0)
+	else if (str.ICompare("Signature") == 0)
 	{
+		if (be_app)
+			return B_ERROR;
+		
 		prop->GetValue(&sv);
-		fApp->SetTitle(sv.value->String());
-	}
-	else if (str.ICompare("Visible") == 0)
-	{
-		prop->GetValue(&bv);
-		if (fApp->IsHidden() && *bv.value == true)
-			fApp->Show();
-		else if (!fApp->IsHidden() && *bv.value == false)
-			fApp->Hide();
-	}
-	else if (str.ICompare("Workspaces") == 0)
-	{
-		prop->GetValue(&iv);
-		fApp->SetWorkspaces(*iv.value);
+		
+		BApplication *app = new BApplication(sv.value->String());
+		
+		// just to quiet the compiler
+		app->IsLaunching();
 	}
 	else
 	{
-		fApp->Unlock();
+		be_app->Unlock();
 		return PHandler::SetProperty(name,value,index);
 	}
 	
-	fApp->Unlock();
-*/	
+	be_app->Unlock();
 	return prop->GetValue(value);
 }
 
@@ -314,51 +222,31 @@ PApplication::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PApplication::InitProperties(void)
 {
-	AddProperty(new StringProperty("Title","","The title of the window"));
-	AddProperty(new BoolProperty("Active",false,
-								"Set to true if the window is the active one."),
+	AddProperty(new BoolProperty("CursorVisible",true,
+								"Set to true if the cursor can be seen."),
 								PROPERTY_HIDE_IN_EDITOR);
-	AddProperty(new StringProperty("Description","A program window."));
-	AddProperty(new WindowFeelProperty("Feel",B_NORMAL_WINDOW_FEEL,"The window's behavior"));
-	AddProperty(new WindowFlagsProperty("Flags",B_ASYNCHRONOUS_CONTROLS,
-								"Flags that change the window's behavior"));
-	AddProperty(new BoolProperty("Floating",false,
-								"Set to true if the window is a floating one. Read-only."),
-				PROPERTY_READ_ONLY);
-	AddProperty(new FloatProperty("Width",1,"The width of the window"));
-	AddProperty(new FloatProperty("Height",1,"The height of the window"));
-	AddProperty(new PointProperty("Location",BPoint(0,0),"The location of the window"));
-	AddProperty(new BoolProperty("Front",false,
-								"Set to true if the window is the frontmost one. Read-only."),
-				PROPERTY_READ_ONLY);
-	AddProperty(new WindowLookProperty("Look",B_TITLED_WINDOW_LOOK,"The window's frame and tab style."));
-	AddProperty(new BoolProperty("Minimized",false,"True if the window is minimized to the Deskbar."),
-				PROPERTY_HIDE_IN_EDITOR);
-	
-	AddProperty(new FloatProperty("MinWidth",1,"Minimum width of the window"));
-	AddProperty(new FloatProperty("MaxWidth",30000,"Maximum width of the window"));
-	AddProperty(new FloatProperty("MinHeight",1,"Minimum height of the window"));
-	AddProperty(new FloatProperty("MaxHeight",30000,"Maximum height of the window"));
-	AddProperty(new BoolProperty("Modal",false,"Set to true if the window is modal. Read-only."),
-				PROPERTY_READ_ONLY);
-	AddProperty(new IntProperty("PulseRate",1000000,"The length of time between B_PULSE ticks in microseconds"));
-	AddProperty(new BoolProperty("Visible",true,"False if the window is hidden."),
-				PROPERTY_HIDE_IN_EDITOR);
-	
-	EnumProperty *prop = new EnumProperty();
-	prop->SetName("Workspaces");
-	prop->AddValuePair("B_CURRENT_WORKSPACE",B_CURRENT_WORKSPACE);
-	prop->AddValuePair("B_ALL_WORKSPACES",B_ALL_WORKSPACES);
-	prop->SetDescription("The window's initial workspace");
-	prop->SetValue((int32)B_CURRENT_WORKSPACE);
-	AddProperty(prop);
+	AddProperty(new StringProperty("Description","The main program object. There can be only one."));
+	AddProperty(new IntProperty("Flags", 0, "Launch flags for the application"),
+								PROPERTY_READ_ONLY);
+	AddProperty(new BoolProperty("IsLaunching", true,
+								"True if the app is still launching -- before ReadyToRun is called."),
+								PROPERTY_READ_ONLY);
+
+	AddProperty(new IntProperty("Port", -1, "ID of the main communications port for the app."),
+								PROPERTY_READ_ONLY);
+	AddProperty(new IntProperty("Port", -1, "ID of the main communications port for the app."),
+								PROPERTY_READ_ONLY);
+	AddProperty(new IntProperty("PulseRate",0,"The length of time between B_PULSE ticks in microseconds"));
+	AddProperty(new StringProperty("Signature","The signature of the app. This is read-only once set."));
+	AddProperty(new IntProperty("Team",-1,"ID for this instance of the app."));
+	AddProperty(new IntProperty("WindowCount", 0, "The number of windows in the app, visible or otherwise."));
 }
 
 
 status_t
 PApplication::SendMessage(BMessage *msg)
 {
-	BMessenger msgr(NULL, fApp);
+	BMessenger msgr(NULL, be_app);
 	return msgr.SendMessage(msg);
 }
 
@@ -366,121 +254,109 @@ PApplication::SendMessage(BMessage *msg)
 void
 PApplication::InitBackend(void)
 {
-/*
+
 	PMethodInterface pmi;
-	pmi.AddArg("id", PARG_INT64, "The object ID of the child view to add");
-	AddMethod(new PMethod("AddChild", PApplicationAddChild, &pmi));
+	AddMethod(new PMethod("ObscureCursor", PAppObscureCursor, &pmi));
 	
-	pmi.SetArg(0, "id", PARG_INT64, "The object ID of the child view to remove");
-	AddMethod(new PMethod("RemoveChild", PApplicationRemoveChild, &pmi));
+	pmi.AddReturnValue("thread_id", PARG_INT64, "The ID of the main thread.");
+	AddMethod(new PMethod("Run", PAppRun, &pmi));
+	pmi.MakeEmpty();
 	
-	pmi.SetArg(0, "index", PARG_INT32, "The index of the child to get");
-	pmi.AddReturnValue("ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
-	AddMethod(new PMethod("ChildAt", PApplicationChildAt, &pmi));
+	AddMethod(new PMethod("Quit", PAppQuit, &pmi));
 	
-	pmi.RemoveArg(0);
-	pmi.SetReturnValue(0, "Count", PARG_INT32, "The number of children of the window");
-	AddMethod(new PMethod("CountChildren", PApplicationCountChildren, &pmi));
+	pmi.AddArg("index", PARG_INT32, "The index of the window to return");
+	AddMethod(new PMethod("WindowAt", PAppWindowAt, &pmi));
 	
-	pmi.AddArg("name", PARG_STRING, "The name of the child view to find.");
-	pmi.SetReturnValue(0, "ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
-	AddMethod(new PMethod("FindView", PApplicationFindView, &pmi));
+	AddEvent("AboutRequested", "The app has been asked to show an about window.");
 	
+	pmi.SetArg(0, "active", PARG_BOOL, "The active status of the app.");
+	AddEvent("AppActivated", "The app has gained or lost focus.");
 	
-	AddEvent("MenusBeginning", "The window is about to show a menu.");
-	AddEvent("MenusEnded", "The windows has finished showing a menu.");
+	pmi.AddArg("argv", PARG_STRING, "A list of strings containing the arguments.");
+	AddEvent("ArgvReceived", "The window was launched from the command line.", &pmi);
+	pmi.MakeEmpty();
 	
-		pmi.SetArg(0, "where", PARG_POINT, "The new location of the window in screen coordinates.");
-	AddEvent("FrameMoved", "The window was moved.", &pmi);
+	AddEvent("Pulse", "Run at specified clock intervals.", &pmi);
 	
-	pmi.SetArg(0, "width", PARG_FLOAT, "The new width of the window.");
-	pmi.AddArg("height", PARG_FLOAT, "The new height of the window.");
-	AddEvent("FrameResized", "The window was resized.", &pmi);
-	
-	pmi.RemoveArg(0);
-	pmi.AddReturnValue("value", PARG_BOOL, "Whether or not the window should really quit.");
+	pmi.AddReturnValue("value", PARG_BOOL, "Whether or not the app should really quit.");
 	AddEvent("QuitRequested", "The window was asked to quit.", &pmi);
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("frame", PARG_RECT, "The new size and location of the screen.");
-	pmi.AddArg("color_space", PARG_INT32, "The new color space constant for the screen.");
-	AddEvent("ScreenChanged", "The screen has changed color space, size, or location.", &pmi);
-	pmi.RemoveArg(1);
+	AddEvent("ReadyToRun", "The app is ready to run.", &pmi);
 	
-	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the window has the focus.");
-	AddEvent("WindowActivated", "The window gained or lost focus.", &pmi);
+	pmi.AddArg("refs", PARG_POINTER, "A list of entry_ref structures pointing to files/directories sent to the app.");
+	AddEvent("RefsReceived", "The app was sent a list of files/directories.", &pmi);
+}
+
+
+int32_t
+PAppObscureCursor(void *pobject, PArgList *in, PArgList *out)
+{
+	if (be_app)
+		be_app->ObscureCursor();
 	
-	pmi.SetArg(0, "workspace", PARG_INT32, "The index of the workspace which changed.");
-	pmi.AddArg("active", PARG_BOOL, "If the workspace is currently active.");
-	AddEvent("WorkspaceActivated", "The user has changed workspaces.", &pmi);
+	return be_app ? B_OK : B_NO_INIT;
+}
+
+
+int32_t
+PAppRun(void *pobject, PArgList *in, PArgList *out)
+{
+	thread_id id = -1;
+	if (be_app)
+	{
+		id = be_app->Run();
 	
-	pmi.SetArg(0, "old", PARG_INT32, "The index of the old workspace.");
-	pmi.SetArg(1, "new", PARG_INT32, "The index of the new workspace.");
-	AddEvent("WorkspacesChanged", "The window has changed workspaces.", &pmi);
+		PArgs outargs(out);
+		outargs.MakeEmpty();
+		outargs.AddInt64("thread_id", id);
+	}
+	
+	return be_app ? B_OK : B_NO_INIT;
+}
+
+
+int32_t
+PAppQuit(void *pobject, PArgList *in, PArgList *out)
+{
+	if (be_app)
+		be_app->Quit();
+	
+	return be_app ? B_OK : B_NO_INIT;
+}
+
+
+int32_t
+PAppWindowAt(void *pobject, PArgList *in, PArgList *out)
+{
+	uint64_t id = 0;
+	if (be_app)
+	{
+		int32 windex;
 		
-	fApp = new PAppBackend(this);
+		PArgs args(in);
+		if (args.FindInt32("index", &windex) != B_OK)
+			return B_ERROR;
+		
+		
+		BWindow *win = be_app->WindowAt(windex);
+		if (!win)
+			return B_ERROR;
+		
+		PWindowBackend *pwinBack = dynamic_cast<PWindowBackend*>(win);
+		if (pwinBack)
+		{
+			PObject *obj = pwinBack->GetOwner();
+			if (obj)
+				id = obj->GetID();
+		}
+				
+		PArgs outargs(out);
+		outargs.MakeEmpty();
+		outargs.AddInt64("id", id);
+		
+	}
 	
-	// Set the properties *before* we unlock its looper to save locking it later
-	
-	BoolValue bv;
-	FloatValue fv, fv2, fv3, fv4;
-	RectValue rv;
-	PointValue pv;
-	IntValue iv;
-	StringValue sv;
-	
-	PHandler::GetProperty("Feel",&iv);
-	fApp->SetCodeFeel((window_feel)*iv.value);
-	
-	PHandler::GetProperty("Flags",&iv);
-	fApp->SetFlags(*iv.value);
-	
-	PHandler::GetProperty("Width",&fv);
-	PHandler::GetProperty("Height",&fv2);
-	fApp->ResizeTo(*fv.value, *fv2.value);
-	
-	PHandler::GetProperty("Location",&pv);
-	fApp->MoveTo(pv.value->x, pv.value->y);
-	
-	PHandler::GetProperty("Look",&iv);
-	fApp->SetLook((window_look)*iv.value);
-	
-	PHandler::GetProperty("Minimized",&bv);
-	fApp->Minimize(*bv.value);
-	
-	PHandler::GetProperty("MinWidth",&fv);
-	PHandler::GetProperty("MaxWidth",&fv2);
-	PHandler::GetProperty("MinHeight",&fv3);
-	PHandler::GetProperty("MaxHeight",&fv4);
-	fApp->SetSizeLimits(*fv.value,*fv2.value,*fv3.value,*fv4.value);
-	
-	PHandler::GetProperty("PulseRate",&iv);
-	fApp->SetPulseRate(*iv.value);
-	
-	PHandler::GetProperty("Title",&sv);
-	fApp->SetTitle(sv.value->String());
-	
-	PHandler::GetProperty("Visible",&bv);
-	if (!*bv.value)
-		fApp->Hide();
-	
-	PHandler::GetProperty("Workspaces",&iv);
-	fApp->SetWorkspaces(*iv.value);
-	
-	fApp->Show();
-*/
+	return be_app ? B_OK : B_NO_INIT;
 }
-
-
-PAppBackend::PAppBackend(PObject *owner, const char *signature)
-	:	BApplication(signature),
-		fOwner(owner)
-{
-}
-
-
-PAppBackend::~PAppBackend(void)
-{
-}
-
 

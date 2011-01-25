@@ -9,38 +9,13 @@
 #include "PObjectBroker.h"
 #include "PMethod.h"
 #include "PView.h"
+#include "PWindowPriv.h"
 
 int32_t PWindowAddChild(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowChildAt(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowCountChildren(void *pobject, PArgList *in, PArgList *out);
 int32_t PWindowFindView(void *pobject, PArgList *in, PArgList *out);
-
-class PWindowBackend : public BWindow
-{
-public:
-				PWindowBackend(PObject *owner);
-				~PWindowBackend(void);
-	
-	void		FrameMoved(BPoint pt);
-	void		FrameResized(float w, float h);
-	void		MenusBeginning(void);
-	void		MenusEnded(void);
-	void		WindowActivated(bool active);
-	void		ScreenChanged(BRect frame, color_space mode);
-	void		WorkspaceActivated(int32 workspace, bool active);
-	void		WorkspacesChanged(uint32 oldspace, uint32 newspace);
-	bool		QuitRequested(void);
-	void		MessageReceived(BMessage *msg);
-	
-	void		SetCodeFeel(window_feel feel);
-	window_feel	CodeFeel(void) const;
-	
-private:
-	PObject 	*fOwner;
-	bool		fQuitFlag;
-	window_feel	fCodeFeel;
-};
 
 PWindow::PWindow(void)
 	:	fWindow(NULL)
@@ -612,6 +587,13 @@ window_feel
 PWindowBackend::CodeFeel(void) const
 {
 	return fCodeFeel;
+}
+
+
+PObject *
+PWindowBackend::GetOwner(void)
+{
+	return fOwner;
 }
 
 

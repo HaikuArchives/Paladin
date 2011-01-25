@@ -1,6 +1,9 @@
 #ifndef PAPPLICATION_H
 #define PAPPLICATION_H
 
+#include <Application.h>
+#include <Roster.h>
+
 #include "PObject.h"
 #include "PHandler.h"
 #include "PComponents.h"
@@ -9,8 +12,21 @@
 	PApplication
 	
 	Properties
+		CursorVisible
+		Flags (read-only)
+		IsLaunching (read-only)
+		Port (read-only)
+		PulseRate
+		Signature
+		Team (read-only)
+		Thread (read-only)
+		WindowCount (read-only)
 	
 	Methods
+		ObscureCursor
+		Run
+		Quit
+		WindowAt
 	
 	Events
 		AboutRequested
@@ -49,7 +65,8 @@ private:
 	void					InitProperties(void);
 	void					InitBackend(void);
 	
-	PAppBackend				*fApp;
+	app_info				fAppInfo;
+	bigtime_t				fPulseRate;
 };
 
 #endif

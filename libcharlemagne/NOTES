@@ -1,5 +1,6 @@
-Finish implementing PApplication
-
 implement PMethod and PMethodInterface C functions
 
 Test and fix PTextControl problems
+
+Later on:
+PCursor class and associated methods in PApplication

@@ -1657,179 +1657,269 @@ pmethodinterface_create(void)
 
 
 void 
-pmethodinterface_destroy(void *pmethodinterface)
+pmethodinterface_destroy(void *pminterface)
 {
-	PMethodInterface *pmi = static_cast<PMethodInterface*>(pmethodinterface);
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
 		delete pmi;
 }
 
 
 void 
-pmethodinterface_set_arg(void *pmi, int32_t index, const char *name,
+pmethodinterface_set_arg(void *pminterface, int32_t index, const char *name,
 											PArgType type, const char *description)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		pmi->SetArg(index, name, type, description);
 }
 
 
 void 
-pmethodinterface_add_arg(void *pmi, int32_t index, const char *name,
-											PArgType type, const char *description)
+pmethodinterface_add_arg(void *pminterface, const char *name, PArgType type,
+						const char *description)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		pmi->AddArg(name, type, description);
 }
 
 
 void 
-pmethodinterface_remove_arg(void *pmi, int32_t index, const char *name,
+pmethodinterface_remove_arg(void *pminterface, int32_t index, const char *name,
 											PArgType type, const char *description)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		pmi->RemoveArg(index);
 }
 
 
 void 
-pmethodinterface_arg_name_at(void *pmi, int32_t index, const char **out)
+pmethodinterface_arg_name_at(void *pminterface, int32_t index, char **out)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		*out = strdup(pmi->ArgNameAt(index));
 }
 
 
 PArgType
-pmethodinterface_arg_type_at(void *pmi, int32_t index)
+pmethodinterface_arg_type_at(void *pminterface, int32_t index)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		return pmi->ArgTypeAt(index);
+	
+	return PARG_END;
 }
 
 
 void 
-pmethodinterface_arg_desc_at(void *pmi, int32_t index, const char **out)
+pmethodinterface_arg_desc_at(void *pminterface, int32_t index, char **out)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		*out = strdup(pmi->ArgDescAt(index));
 }
 
 
 int32_t 
-pmethodinterface_count_args(void *pmi)
+pmethodinterface_count_args(void *pminterface)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		return pmi->CountArgs();
+	return B_ERROR;
 }
 
 
 int32_t 
-pmethodinterface_find_arg(void *pmi, const char *name)
+pmethodinterface_find_arg(void *pminterface, const char *name)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		return pmi->FindArg(name);
+	return B_ERROR;
 }
 
 
 void 
-pmethodinterface_set_rval(void *pmi, int32_t index, const char *name,
+pmethodinterface_set_rval(void *pminterface, int32_t index, const char *name,
 											PArgType type, const char *description)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		pmi->SetReturnValue(index, name, type, description);
 }
 
 
 void 
-pmethodinterface_add_rval(void *pmi, int32_t index, const char *name,
+pmethodinterface_add_rval(void *pminterface, const char *name, PArgType type,
+							const char *description)
+{
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		pmi->AddReturnValue(name, type, description);
+}
+
+
+void 
+pmethodinterface_remove_rval(void *pminterface, int32_t index, const char *name,
 											PArgType type, const char *description)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		pmi->RemoveReturnValue(index);
 }
 
 
 void 
-pmethodinterface_remove_rval(void *pmi, int32_t index, const char *name,
-											PArgType type, const char *description)
+pmethodinterface_rval_name_at(void *pminterface, int32_t index, char **out)
 {
-}
-
-
-void 
-pmethodinterface_rval_name_at(void *pmi, int32_t index, const char **out)
-{
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		*out = strdup(pmi->ReturnNameAt(index));
 }
 
 
 PArgType
-pmethodinterface_rval_type_at(void *pmi, int32_t index)
+pmethodinterface_rval_type_at(void *pminterface, int32_t index)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		return pmi->ReturnTypeAt(index);
+	
+	return PARG_END;
 }
 
 
 void 
-pmethodinterface_rval_desc_at(void *pmi, int32_t index, const char **out)
+pmethodinterface_rval_desc_at(void *pminterface, int32_t index, char **out)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		*out = strdup(pmi->ReturnDescAt(index));
 }
 
 
 int32_t 
-pmethodinterface_count_rvals(void *pmi)
+pmethodinterface_count_rvals(void *pminterface)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		return pmi->CountReturnValues();
+	return B_ERROR;
 }
 
 
 int32_t 
-pmethodinterface_find_rval(void *pmi, const char *name)
+pmethodinterface_find_rval(void *pminterface, const char *name)
 {
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pmi)
+		return pmi->FindReturnValue(name);
+	return B_ERROR;
 }
 
 
 void *
 pmethod_create(void)
 {
+	return new PMethod();
 }
 
 
 void 
 pmethod_destroy(void *pmethod)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	delete pm;
 }
 
 
 void 
 pmethod_set_name(void *pmethod, const char *name)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		pm->SetName(name);
 }
 
 
 void 
-pmethod_get_name(void *pmethod, const char **out)
+pmethod_get_name(void *pmethod, char **out)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		*out = strdup(pm->GetName().String());
 }
 
 
 void 
-pmethod_set_interface(void *pmethod, void *pmi)
+pmethod_set_interface(void *pmethod, void *pminterface)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pm && pmi)
+		pm->SetInterface(*pmi);
 }
 
 
 void 
-pmethod_get_interface(void *pmethod, void *pmi)
+pmethod_get_interface(void *pmethod, void *pminterface)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
+	if (pm && pmi)
+		pm->GetInterface(*pmi);
 }
 
 
 void 
 pmethod_set_desc(void *pmethod, const char *name)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		pm->SetDescription(name);
 }
 
 
 void 
-pmethod_get_desc(void *pmethod, const char **out)
+pmethod_get_desc(void *pmethod, char **out)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		*out = strdup(pm->GetDescription().String());
 }
 
 
 void 
 pmethod_set_function(void *pmethod, MethodFunction func)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		pm->SetFunction(func);
 }
 
 
 MethodFunction
 pmethod_get_function(void *pmethod)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		return pm->GetFunction();
+	
+	return NULL;
 }
 
 
 int32_t 
-pmethod_run(void *pobject, PArgList &in, PArgList &out)
+pmethod_run(void *pmethod, void *pobject, PArgList &in, PArgList &out)
 {
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	PObject *pobj = static_cast<PObject*>(pobject);
+	return pm ? pm->Run(pobj, in, out) : B_ERROR;
 }
 
 

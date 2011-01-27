@@ -36,6 +36,7 @@
 		QuitRequested
 		ReadyToRun
 		RefsReceived
+		SetupApp
 */
 
 class PAppBackend;
@@ -49,7 +50,7 @@ public:
 							PApplication(const PApplication &from);
 							~PApplication(void);
 	
-	virtual	void			Run(const char *signature);
+	virtual	int32			Run(const char *signature);
 	
 	static	BArchivable *	Instantiate(BMessage *data);
 		

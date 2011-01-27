@@ -11,6 +11,8 @@
 
 #if defined(__cplusplus)
 	extern "C" {
+#else
+	typedef unsigned char bool;
 #endif
 
 /*
@@ -250,6 +252,9 @@ void				pobjectspace_type_at(int32_t index, char **out);
 void				pobjectspace_friendly_type_at(int32_t index, char **out);
 void *				pobjectspace_find_object(uint64_t id);
 
+/* This method saves a load of code just to run the PApplication object */
+int32_t				run_app(void *papplication, const char *signature, MethodFunction setupFunc);
+
 void *				pobject_create(const char *type);
 void *				pobject_duplicate(void *pobj);
 void				pobject_copy(void *from, void *to);
@@ -316,7 +321,7 @@ void				pmethod_set_desc(void *pmethod, const char *name);
 void				pmethod_get_desc(void *pmethod, const char **out);
 void				pmethod_set_function(void *pmethod, MethodFunction func);
 MethodFunction		pmethod_get_function(void *pmethod);
-int32_t				pmethod_run(void *pmethod, void *pobject, PArgList &in, PArgList &out);
+int32_t				pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out);
 
 #if defined(__cplusplus)
 	}

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "PApplication.h"
 #include "PData.h"
 #include "PObject.h"
 #include "PObjectBroker.h"
@@ -1490,6 +1491,18 @@ void *
 pobjectspace_find_object(uint64_t id)
 {
 	return BROKER->FindObject(id);
+}
+
+
+int32_t
+run_app(void *papplication, const char *signature, MethodFunction setupFunc)
+{
+	PApplication *app = static_cast<PApplication*>(papplication);
+	
+	if (setupFunc)
+		app->ConnectEvent("AppSetup", setupFunc);
+	
+	return (int32_t)app->Run(signature);
 }
 
 

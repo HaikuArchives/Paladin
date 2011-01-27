@@ -17,6 +17,17 @@ int32_t PAppRun(void *pobject, PArgList *in, PArgList *out);
 int32_t PAppQuit(void *pobject, PArgList *in, PArgList *out);
 int32_t PAppWindowAt(void *pobject, PArgList *in, PArgList *out);
 
+
+class PAppBackend : public BApplication
+{
+public:
+	PAppBackend(PObject *owner, const char *signature);
+
+private:
+	PObject *fOwner;
+};
+
+
 PApplication::PApplication(void)
 	:	fPulseRate(0)
 {
@@ -75,21 +86,21 @@ PApplication::~PApplication(void)
 }
 
 
-void
+int32
 PApplication::Run(const char *signature)
 {
-	BApplication *app = NULL;
+	PAppBackend *app = NULL;
 	if (!be_app)
 	{
 		BString sig(signature);
 		if (sig.CountChars() < 1)
 			sig = "application/x-vnd.dw-CharlemagneApp";
 		SetStringProperty("signature", sig.String());
-		app = new BApplication(sig.String());
+		app = new PAppBackend(this, sig.String());
 	}
 	else
-		app = be_app;
-	app->Run();
+		app = dynamic_cast<PAppBackend*>(be_app);
+	return app->Run();
 }
 
 
@@ -203,7 +214,7 @@ PApplication::SetProperty(const char *name, PValue *value, const int32 &index)
 		
 		prop->GetValue(&sv);
 		
-		BApplication *app = new BApplication(sv.value->String());
+		PAppBackend *app = new PAppBackend(this, sv.value->String());
 		
 		// just to quiet the compiler
 		app->IsLaunching();
@@ -271,6 +282,9 @@ PApplication::InitBackend(void)
 	
 	pmi.SetArg(0, "active", PARG_BOOL, "The active status of the app.");
 	AddEvent("AppActivated", "The app has gained or lost focus.");
+	pmi.MakeEmpty();
+	
+	AddEvent("AppSetup", "The app is being set up.", &pmi);
 	
 	pmi.AddArg("argv", PARG_STRING, "A list of strings containing the arguments.");
 	AddEvent("ArgvReceived", "The window was launched from the command line.", &pmi);
@@ -360,3 +374,13 @@ PAppWindowAt(void *pobject, PArgList *in, PArgList *out)
 	return be_app ? B_OK : B_NO_INIT;
 }
 
+
+
+PAppBackend::PAppBackend(PObject *owner, const char *signature)
+	:	BApplication(signature),
+		fOwner(owner)
+{
+	PArgs in, out;
+	
+	fOwner->RunEvent("AppSetup", in.ListRef(), out.ListRef());
+}

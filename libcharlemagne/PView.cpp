@@ -218,6 +218,8 @@ PView::GetProperty(const char *name, PValue *value, const int32 &index) const
 		((IntProperty*)prop)->SetValue(fView->Flags());
 	else if (str.ICompare("Focus") == 0)
 		((BoolProperty*)prop)->SetValue(fView->IsFocus());
+	else if (str.ICompare("Frame") == 0)
+		((RectProperty*)prop)->SetValue(fView->Frame());
 	else if (str.ICompare("Width") == 0)
 		((FloatProperty*)prop)->SetValue(fView->Frame().Width());
 	else if (str.ICompare("Height") == 0)
@@ -336,6 +338,12 @@ PView::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		prop->GetValue(&bv);
 		fView->MakeFocus(*bv.value);
+	}
+	else if (str.ICompare("Frame") == 0)
+	{
+		prop->GetValue(&rv);
+		fView->MoveTo(rv.value->left, rv.value->top);
+		fView->ResizeTo(rv.value->Width(), rv.value->Height());
 	}
 	else if (str.ICompare("Width") == 0)
 	{
@@ -468,6 +476,7 @@ PView::InitProperties(void)
 	AddProperty(new BoolProperty("Focus",false,
 								"True if keyboard events are sent directly to the view"),
 				PROPERTY_HIDE_IN_EDITOR);
+	AddProperty(new RectProperty("Frame",BRect(0,0,1,1),"The size and location of the view"));
 	AddProperty(new FloatProperty("Width",1,"The width of the view"));
 	AddProperty(new FloatProperty("Height",1,"The height of the view"));
 	AddProperty(new PointProperty("Location",BPoint(0,0),"The location of the view"));

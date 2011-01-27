@@ -114,6 +114,8 @@ PWindow::GetProperty(const char *name, PValue *value, const int32 &index) const
 		((IntProperty*)prop)->SetValue(fWindow->Flags());
 	else if (str.ICompare("Floating") == 0)
 		((BoolProperty*)prop)->SetValue(fWindow->IsFloating());
+	else if (str.ICompare("Frame") == 0)
+		((RectProperty*)prop)->SetValue(fWindow->Frame());
 	else if (str.ICompare("Width") == 0)
 		((FloatProperty*)prop)->SetValue(fWindow->Frame().Width());
 	else if (str.ICompare("Height") == 0)
@@ -204,6 +206,12 @@ PWindow::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		prop->GetValue(&iv);
 		fWindow->SetFlags(*iv.value);
+	}
+	else if (str.ICompare("Frame") == 0)
+	{
+		prop->GetValue(&rv);
+		fWindow->MoveTo(rv.value->left, rv.value->top);
+		fWindow->ResizeTo(rv.value->Width(), rv.value->Height());
 	}
 	else if (str.ICompare("Width") == 0)
 	{
@@ -307,6 +315,7 @@ PWindow::InitProperties(void)
 	AddProperty(new BoolProperty("Floating",false,
 								"Set to true if the window is a floating one. Read-only."),
 				PROPERTY_READ_ONLY);
+	AddProperty(new RectProperty("Frame", BRect(0,0,1,1), "Size and location of the window"));
 	AddProperty(new FloatProperty("Width",1,"The width of the window"));
 	AddProperty(new FloatProperty("Height",1,"The height of the window"));
 	AddProperty(new PointProperty("Location",BPoint(0,0),"The location of the window"));

@@ -64,9 +64,15 @@ PWindow::PWindow(const PWindow &from)
 
 PWindow::~PWindow(void)
 {
-	fWindow->Lock();
-	fWindow->Quit();
-	fWindow = NULL;
+	if (fWindow)
+	{
+		while (fWindow->CountChildren())
+			fWindow->ChildAt(0)->RemoveSelf();
+		
+		fWindow->Lock();
+		fWindow->Quit();
+		fWindow = NULL;
+	}
 }
 
 
@@ -565,6 +571,15 @@ PWindowBackend::QuitRequested(void)
 	bool quit;
 	if (out.FindBool("value", &quit) != B_OK)
 		quit = true;
+	
+	if (quit)
+	{
+		PWindow *pwin = dynamic_cast<PWindow*>(fOwner);
+		pwin->fWindow = NULL;
+		
+		while (CountChildren())
+			ChildAt(0)->RemoveSelf();
+	}
 	
 	return quit;
 }

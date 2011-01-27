@@ -1,6 +1,7 @@
 #ifndef POBJECTBROKER_H
 #define POBJECTBROKER_H
 
+#include <Looper.h>
 #include <String.h>
 
 #include "ObjectList.h"
@@ -11,6 +12,11 @@ typedef PObject *	(*MakeObjectFunc)(void);
 
 void InitObjectSystem(void);
 void ShutdownObjectSystem(void);
+
+enum
+{
+	POBJECT_BROKER_DELETE_OBJECT = 'pdlo'
+};
 
 class PObjectInfo
 {
@@ -31,7 +37,7 @@ public:
 };
 
 
-class PObjectBroker
+class PObjectBroker : public BLooper
 {
 public:
 						PObjectBroker(void);
@@ -47,6 +53,8 @@ public:
 	static	PObjectBroker *	GetBrokerInstance(void);
 	static	void		RegisterObject(PObject *obj);
 			void		UnregisterObject(PObject *obj);
+	
+			void		MessageReceived(BMessage *msg);
 	
 private:
 	

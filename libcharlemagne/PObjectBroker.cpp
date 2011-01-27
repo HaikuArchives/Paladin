@@ -2,6 +2,8 @@
 #include "PProperty.h"
 
 #include <Locker.h>
+#include <stdio.h>
+
 #include "PApplication.h"
 #include "PControl.h"
 #include "PBox.h"
@@ -39,7 +41,8 @@ ShutdownObjectSystem(void)
 }
 
 PObjectBroker::PObjectBroker(void)
-	:	fQuitting(false)
+	:	BLooper("PObjectBroker"),
+		fQuitting(false)
 {
 	fObjectList = new BObjectList<PObject>(20,true);
 	fObjInfoList = new BObjectList<PObjectInfo>(20,true);
@@ -186,6 +189,27 @@ PObjectBroker::UnregisterObject(PObject *obj)
 		sIDLock.Lock();
 		fObjectList->RemoveItem(obj,false);
 		sIDLock.Unlock();
+	}
+}
+
+
+void
+PObjectBroker::MessageReceived(BMessage *msg)
+{
+	switch (msg->what)
+	{
+		case POBJECT_BROKER_DELETE_OBJECT:
+		{
+			int64 id;
+			if (msg->FindInt64("id", &id) == B_OK)
+			{
+				PObject *obj = FindObject(id);
+				delete obj;
+			}
+			break;
+		}
+		default:
+			BLooper::MessageReceived(msg);
 	}
 }
 

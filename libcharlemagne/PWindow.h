@@ -53,6 +53,8 @@ public:
 	BWindow *				GetWindow(void);
 	
 private:
+	friend class			PWindowBackend;
+	
 	void					InitProperties(void);
 	void					InitBackend(void);
 	

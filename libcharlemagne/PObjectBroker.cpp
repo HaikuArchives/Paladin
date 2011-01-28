@@ -16,6 +16,7 @@
 #include "PScrollBar.h"
 #include "PSlider.h"
 #include "PTextControl.h"
+#include "PTextView.h"
 #include "PView.h"
 #include "PWindow.h"
 
@@ -71,8 +72,10 @@ PObjectBroker::PObjectBroker(void)
 											PListView::Instantiate,PListView::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PSlider","Slider",
 											PSlider::Instantiate,PSlider::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PTextControl","Text Control",PControl::Instantiate,
+	fObjInfoList->AddItem(new PObjectInfo("PTextControl","Text Control", PTextControl::Instantiate,
 											PTextControl::Create));
+	fObjInfoList->AddItem(new PObjectInfo("PTextView","Text View",PTextView::Instantiate,
+											PTextView::Create));
 }
 
 

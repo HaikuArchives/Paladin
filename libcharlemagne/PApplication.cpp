@@ -2,6 +2,7 @@
 
 #include <Messenger.h>
 #include <malloc.h>
+#include <Path.h>
 #include <stdio.h>
 
 #include "MiscProperties.h"
@@ -21,8 +22,16 @@ int32_t PAppWindowAt(void *pobject, PArgList *in, PArgList *out);
 class PAppBackend : public BApplication
 {
 public:
-	PAppBackend(PObject *owner, const char *signature);
-
+			PAppBackend(PObject *owner, const char *signature);
+	
+	void	AboutRequested(void);
+	void	AppActivated(bool active);
+	void	ArgvReceived(int32 argc, char **argv);
+	void	Pulse(void);
+	bool	QuitRequested(void);
+	void	ReadyToRun(void);
+	void	RefsReceived(BMessage *msg);
+	
 private:
 	PObject *fOwner;
 };
@@ -384,3 +393,80 @@ PAppBackend::PAppBackend(PObject *owner, const char *signature)
 	
 	fOwner->RunEvent("AppSetup", in.ListRef(), out.ListRef());
 }
+
+
+void
+PAppBackend::AboutRequested(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("AboutRequested", in.ListRef(), out.ListRef());
+}
+
+
+void
+PAppBackend::AppActivated(bool active)
+{
+	PArgs in, out;
+	in.AddBool("active", active);
+	fOwner->RunEvent("AppActivated", in.ListRef(), out.ListRef());
+}
+
+
+void
+PAppBackend::ArgvReceived(int32 argc, char **argv)
+{
+	PArgs in, out;
+	
+	for (int32 i = 0; i < argc; i++)
+		in.AddString("argv", argv[i]);
+	fOwner->RunEvent("ArgvReceived", in.ListRef(), out.ListRef());
+}
+
+
+void
+PAppBackend::Pulse(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("Pulse", in.ListRef(), out.ListRef());
+}
+
+
+bool
+PAppBackend::QuitRequested(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("QuitRequested", in.ListRef(), out.ListRef());
+	
+	bool quit;
+	if (out.FindBool("value", &quit) != B_OK)
+		quit = true;
+	
+	return quit;
+}
+
+
+void
+PAppBackend::ReadyToRun(void)
+{
+	PArgs in, out;
+	fOwner->RunEvent("ReadyToRun", in.ListRef(), out.ListRef());
+}
+
+
+void
+PAppBackend::RefsReceived(BMessage *msg)
+{
+	PArgs in, out;
+	int32 i = 0;
+	entry_ref ref;
+	
+	while (msg->FindRef("refs", i++, &ref) == B_OK)
+	{
+		BPath path(&ref);
+		if (path.InitCheck() == B_OK)
+			in.AddString("path", path.Path());
+	}
+	
+	fOwner->RunEvent("RefsReceived", in.ListRef(), out.ListRef());
+}
+

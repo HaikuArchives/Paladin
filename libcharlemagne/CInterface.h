@@ -17,7 +17,8 @@
 
 /*
 	Doubly-linked list implementation for passing arguments into and out of PObject methods.
-	Do not use the node objects directly. Instead, use the C++-like *_parglist function calls
+	Do not use the node objects directly unless you really like pain. Instead, use the
+	C++-like *_parglist function calls for list manipulation.
 */
 
 enum parg_type_t

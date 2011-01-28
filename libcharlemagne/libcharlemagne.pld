@@ -59,6 +59,7 @@ DEPENDENCY=/boot/home/projects/paladin/libcharlemagne/PWindow.h|/boot/home/proje
 GROUP=Build
 EXPANDGROUP=yes
 SOURCEFILE=NOTES
+SOURCEFILE=PostBuild.sh
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp
 SYSTEMINCLUDE=/boot/develop/headers/posix

@@ -32,13 +32,13 @@
 		
 		Methods
 			All PView Methods
-			AllowChar
+			AllowChars
 			ByteAt
 			CanEndLine
 			Cut
 			Copy
 			Delete
-			DisallowChar
+			DisallowChars
 			FindWord
 			GetInsets
 			GetSelection

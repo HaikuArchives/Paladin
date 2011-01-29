@@ -28,8 +28,6 @@ public:
 			void			RemoveMsgHandler(const int32 &constant);
 	
 	virtual	status_t		RunMessageHandler(const int32 &constant, PArgList &args);
-			void			ConvertMsgToArgs(BMessage &in, PArgList &out);
-			void			ConvertArgsToMsg(PArgList &in, BMessage &out);
 	
 	virtual	status_t		SendMessage(BMessage *msg);
 	

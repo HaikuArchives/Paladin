@@ -9,6 +9,36 @@
 #include "EnumProperty.h"
 #include "PArgs.h"
 
+// Method function declarations
+int32_t PTextViewAllowChars(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewByteAt(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewCanEndLine(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewCut(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewCopy(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewDelete(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewDisallowChars(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewFindWord(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewGetInsets(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewGetSelection(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewGetText(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewGetTextRegion(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewHighlight(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewInsert(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewLineAt(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewLineHeight(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewLineWidth(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewOffsetAtLine(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewOffsetAtPoint(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewPaste(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewPointAt(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewScrollToOffset(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewScrollToSelection(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewSelect(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewSelectAll(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewSetInsets(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewSetText(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewTextHeight(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewUndo(void *pobject, PArgList *in, PArgList *out);
 
 class PTextViewBackend : public BTextView
 {
@@ -40,6 +70,8 @@ public:
 private:
 	PObject	*fOwner;
 };
+
+#pragma mark PTextView class implementation
 
 PTextView::PTextView(void)
 	:	PView()
@@ -423,7 +455,22 @@ PTextView::InitProperties(void)
 void
 PTextView::InitMethods(void)
 {
+	PMethodInterface pmi;
+	pmi.AddArg("chars", PARG_STRING, "The set of characters to allow");
+	AddMethod(new PMethod("AddChars", PTextViewAllowChars, &pmi));
+	
+	pmi.SetArg(0, "offset", PARG_INT32, "Offset of the byte to get.");
+	AddMethod(new PMethod("ByteAt", PTextViewByteAt, &pmi));
+	
+	pmi.SetArg(0, "offset", PARG_INT32, "Offset to test for line ending");
+	pmi.AddReturnValue("value", PARG_BOOL, "True if the character can be the last one on a line.");
+	AddMethod(new PMethod("ByteAt", PTextViewCanEndLine, &pmi));
+	
+	// TODO: finish methods
 }
+
+
+#pragma mark - PTextView backend class
 
 
 PTextViewBackend::PTextViewBackend(PObject *owner)
@@ -658,6 +705,16 @@ PTextViewBackend::MessageReceived(BMessage *msg)
 }
 
 
+#pragma mark - Method functions
+
+
+int32_t
+PTextViewAllowChars(void *pobject, PArgList *in, PArgList *out)
+{
+	
+}
+
+
 int32_t
 PTextViewAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
 {
@@ -677,6 +734,42 @@ PTextViewAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
 		fView->Window()->Unlock();
 	
 	return B_OK;
+}
+
+
+int32_t
+PTextViewByteAt(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewCanEndLine(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewCut(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewCopy(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewDelete(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewDisallowChars(void *pobject, PArgList *in, PArgList *out)
+{
 }
 
 
@@ -709,6 +802,12 @@ PTextViewDraw(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
+PTextViewFindWord(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
 PTextViewFrameResized(void *pobject, PArgList *in, PArgList *out)
 {
 	if (!pobject || !in || !out)
@@ -734,4 +833,131 @@ PTextViewFrameResized(void *pobject, PArgList *in, PArgList *out)
 	
 	return B_OK;
 }
+
+
+int32_t
+PTextViewGetInsets(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewGetSelection(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewGetText(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewGetTextRegion(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewHighlight(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewInsert(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewLineAt(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewLineHeight(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewLineWidth(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewOffsetAtLine(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewOffsetAtPoint(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewPaste(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewPointAt(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewScrollToOffset(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewScrollToSelection(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewSelect(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewSelectAll(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewSetInsets(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewSetText(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewTextHeight(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
+
+int32_t
+PTextViewUndo(void *pobject, PArgList *in, PArgList *out)
+{
+}
+
 

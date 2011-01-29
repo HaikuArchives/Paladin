@@ -5,6 +5,7 @@
 #include <Message.h>
 #include <String.h>
 
+#include "CInterface.h"
 #include "ObjectList.h"
 #include "PData.h"
 #include "PMethod.h"
@@ -76,6 +77,9 @@ public:
 			
 	virtual	void			PrintToStream(void);
 	
+			void			ConvertMsgToArgs(BMessage &in, PArgList &out);
+			void			ConvertArgsToMsg(PArgList &in, BMessage &out);
+			
 protected:
 			void			AddInterface(const char *name);
 			void			RemoveInterface(const char *name);
@@ -87,6 +91,7 @@ protected:
 	virtual	status_t		AddEvent(const char *name, const char *description,
 									PMethodInterface *interface = NULL);
 	virtual	status_t		RemoveEvent(const char *name);
+	
 	
 	BString					fType;
 	BString					fFriendlyType;

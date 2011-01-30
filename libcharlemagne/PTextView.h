@@ -43,14 +43,12 @@
 			GetInsets
 			GetSelection
 			GetText
-			GetTextRegion
 			Highlight
 			Insert
 			LineAt
 			LineHeight
 			LineWidth
-			OffsetAtLine
-			OffsetAtPoint
+			OffsetAt
 			Paste
 			PointAt
 			ScrollToOffset
@@ -58,7 +56,6 @@
 			Select
 			SelectAll
 			SetInsets
-			SetText
 			TextHeight
 			Undo
 			

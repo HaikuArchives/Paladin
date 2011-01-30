@@ -27,8 +27,7 @@ int32_t PTextViewInsert(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewLineAt(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewLineHeight(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewLineWidth(void *pobject, PArgList *in, PArgList *out);
-int32_t PTextViewOffsetAtLine(void *pobject, PArgList *in, PArgList *out);
-int32_t PTextViewOffsetAtPoint(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewOffsetAt(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewPaste(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewPointAt(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewScrollToOffset(void *pobject, PArgList *in, PArgList *out);
@@ -457,7 +456,7 @@ PTextView::InitMethods(void)
 {
 	PMethodInterface pmi;
 	pmi.AddArg("chars", PARG_STRING, "The set of characters to allow");
-	AddMethod(new PMethod("AddChars", PTextViewAllowChars, &pmi));
+	AddMethod(new PMethod("AllowChars", PTextViewAllowChars, &pmi));
 	
 	pmi.SetArg(0, "offset", PARG_INT32, "Offset of the byte to get.");
 	AddMethod(new PMethod("ByteAt", PTextViewByteAt, &pmi));
@@ -466,7 +465,117 @@ PTextView::InitMethods(void)
 	pmi.AddReturnValue("value", PARG_BOOL, "True if the character can be the last one on a line.");
 	AddMethod(new PMethod("ByteAt", PTextViewCanEndLine, &pmi));
 	
-	// TODO: finish methods
+	pmi.SetArg(0, "clipid", PARG_INT64, "ID of a PClipboard object");
+	pmi.RemoveReturnValue(0);
+	AddMethod(new PMethod("Copy", PTextViewCopy, &pmi));
+	AddMethod(new PMethod("Cut", PTextViewCut, &pmi));
+	
+	pmi.SetArg(0, "start", PARG_INT32, "Starting offset of section to delete.");
+	pmi.AddArg("end", PARG_INT32, "Ending offset of section to delete.");
+	AddMethod(new PMethod("Delete", PTextViewDelete, &pmi));
+	
+	pmi.RemoveArg(1);
+	pmi.SetArg(0, "offset", PARG_INT32, "Starting point for searching for a word.");
+	pmi.AddReturnValue("start", PARG_INT32, "Starting offset of next word");
+	pmi.AddReturnValue("end", PARG_INT32, "Ending offset of next word");
+	AddMethod(new PMethod("FindWord", PTextViewFindWord, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddReturnValue("left", PARG_FLOAT, "Left inset");
+	pmi.AddReturnValue("top", PARG_FLOAT, "Top inset");
+	pmi.AddReturnValue("right", PARG_FLOAT, "Right inset");
+	pmi.AddReturnValue("bottom", PARG_FLOAT, "Bottom inset");
+	AddMethod(new PMethod("GetInsets", PTextViewGetInsets, &pmi));
+	
+	pmi.SetReturnValue(0, "start", PARG_INT32, "Start of selection");
+	pmi.SetReturnValue(1, "end", PARG_INT32, "End of selection");
+	pmi.RemoveReturnValue(4);
+	pmi.RemoveReturnValue(3);
+	AddMethod(new PMethod("GetSelection", PTextViewGetSelection, &pmi));
+	
+	pmi.SetReturnValue(0, "text", PARG_STRING, "Text at the specified by offets");
+	pmi.RemoveReturnValue(1);
+	AddMethod(new PMethod("GetText", PTextViewGetText, &pmi));
+	
+	pmi.RemoveReturnValue(0);
+	AddMethod(new PMethod("Highlight", PTextViewHighlight, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("text", PARG_STRING, "The text to insert");
+	pmi.AddArg("length", PARG_INT32, "How much of the text to insert", PMIFLAG_OPTIONAL);
+	pmi.AddArg("offset", PARG_INT32, "Location to insert the text", PMIFLAG_OPTIONAL);
+	AddMethod(new PMethod("Insert", PTextViewInsert, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("offset", PARG_INT32, "Offset to find the line for", PMIFLAG_OPTIONAL);
+	pmi.AddArg("point", PARG_POINT, "Point to find the line for", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("offsetline", PARG_INT32, "Line for the specified offset. "
+												"Returned only if offset is specified.");
+	pmi.AddReturnValue("pointline", PARG_INT32, "Line for the specified point. "
+												"Returned only if point is specified.");
+	AddMethod(new PMethod("LineAt", PTextViewLineAt, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("index", PARG_INT32, "Line to get the height of. 0 is assumed if not specified.",
+				PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("value", PARG_FLOAT, "Height of the line specified");
+	AddMethod(new PMethod("LineHeight", PTextViewLineHeight, &pmi));
+	
+	pmi.SetArg(0, "index", PARG_INT32, "Line to get the width of. 0 is assumed if not specified.",
+				PMIFLAG_OPTIONAL);
+	pmi.SetReturnValue(0, "value", PARG_FLOAT, "Width of the line specified");
+	AddMethod(new PMethod("LineWidth", PTextViewLineWidth, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("line", PARG_INT32, "Line to find the offset for", PMIFLAG_OPTIONAL);
+	pmi.AddArg("point", PARG_POINT, "Point to find the offset for", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("lineoffset", PARG_INT32, "Offset for the specified line. "
+												"Returned only if offset is specified.");
+	pmi.AddReturnValue("pointoffset", PARG_INT32, "Offset for the specified point. "
+												"Returned only if point is specified.");
+	AddMethod(new PMethod("OffsetAt", PTextViewOffsetAt, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.SetArg(0, "clipid", PARG_INT64, "ID of a PClipboard object");
+	AddMethod(new PMethod("Paste", PTextViewPaste, &pmi));
+	
+	pmi.SetArg(0, "offset", PARG_INT32, "Offset to get the point for");
+	pmi.AddReturnValue("point", PARG_POINT, "Point for the specified offset.");
+	pmi.AddReturnValue("height", PARG_FLOAT, "Height of the line at the specified point");
+	AddMethod(new PMethod("PointAt", PTextViewPointAt, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("offset", PARG_INT32, "Offset to scroll to");
+	AddMethod(new PMethod("ScrollToOffset", PTextViewScrollToOffset, &pmi));
+	
+	pmi.RemoveArg(0);
+	AddMethod(new PMethod("ScrollToSelection", PTextViewScrollToSelection, &pmi));
+	
+	pmi.AddArg("start", PARG_INT32, "The starting offset of the selection");
+	pmi.AddArg("end", PARG_INT32, "The ending offset of the selection");
+	AddMethod(new PMethod("Select", PTextViewSelect, &pmi));
+	
+	pmi.MakeEmpty();
+	AddMethod(new PMethod("SelectAll", PTextViewSelectAll, &pmi));
+	
+	pmi.AddArg("left", PARG_FLOAT, "Left inset");
+	pmi.AddArg("top", PARG_FLOAT, "Top inset");
+	pmi.AddArg("right", PARG_FLOAT, "Right inset");
+	pmi.AddArg("bottom", PARG_FLOAT, "Bottom inset");
+	AddMethod(new PMethod("SetInsets", PTextViewSetInsets, &pmi));
+	
+	pmi.AddArg("index", PARG_INT32, "Line to get the height of. 0 is assumed if not specified.",
+				PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("value", PARG_FLOAT, "Height of the line specified");
+	AddMethod(new PMethod("LineHeight", PTextViewLineHeight, &pmi));
+	
+	pmi.AddArg("start", PARG_INT32, "Start of the text");
+	pmi.AddArg("end", PARG_INT32, "End of the text");
+	AddMethod(new PMethod("TextHeight", PTextViewTextHeight, &pmi));
+	
+	pmi.SetArg(0, "clipid", PARG_INT64, "ID of a PClipboard object");
+	pmi.RemoveArg(1);
+	AddMethod(new PMethod("Undo", PTextViewUndo, &pmi));
 }
 
 

@@ -16,6 +16,11 @@ enum
 };
 
 
+enum
+{
+	PMIFLAG_OPTIONAL = 1
+};
+
 class PMethodInterfaceData
 {
 public:
@@ -31,16 +36,19 @@ public:
 							}
 							PMethodInterfaceData(const char *inName,
 												const PArgType &inType,
-												const char *inDescription)
+												const char *inDescription,
+												uint32 inFlags = 0)
 							{
 								name = inName;
 								type = inType;
 								description = inDescription;
+								flags = inFlags;
 							}
 							
 			BString			name;
 			PArgType		type;
 			BString			description;
+			int32			flags;
 };
 
 
@@ -57,14 +65,17 @@ public:
 			
 	virtual	status_t		SetArg(const int32 &index, const char *name,
 									const PArgType &type,
-									const char *description = NULL);
+									const char *description = NULL,
+									const int32 &flags = 0);
 	virtual	status_t		AddArg(const char *name, const PArgType &type,
-									const char *description = NULL);
+									const char *description = NULL,
+									const int32 &flags = 0);
 	virtual	status_t		RemoveArg(const int32 &index);
 	
 			BString			ArgNameAt(const int32 &index);
 			PArgType		ArgTypeAt(const int32 &index);
 			BString			ArgDescAt(const int32 &index);
+			int32			ArgFlagsAt(const int32 &index);
 			int32			CountArgs(void) const;
 			int32			FindArg(const char *name) const;
 			
@@ -77,6 +88,7 @@ public:
 			BString			ReturnNameAt(const int32 &index);
 			PArgType		ReturnTypeAt(const int32 &index);
 			BString			ReturnDescAt(const int32 &index);
+			int32			ReturnFlagsAt(const int32 &index);
 			int32			CountReturnValues(void) const;
 			int32			FindReturnValue(const char *name) const;
 			

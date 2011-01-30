@@ -113,6 +113,7 @@ PMethodInterface::PMethodInterface(PMethodInterface &from)
 	:	fIn(20, true),
 		fOut(20, true)
 {
+	// TODO: Implement copy constructor
 }
 
 
@@ -159,7 +160,8 @@ PMethodInterface::MakeEmpty(void)
 
 status_t
 PMethodInterface::SetArg(const int32 &index, const char *name,
-						const PArgType &type, const char *description)
+						const PArgType &type, const char *description,
+						const int32 &flags)
 {
 	if (!name)
 		return B_ERROR;
@@ -171,6 +173,7 @@ PMethodInterface::SetArg(const int32 &index, const char *name,
 	data->name = name;
 	data->type = type;
 	data->description = description;
+	data->flags = flags;
 	
 	return B_OK;
 }
@@ -178,7 +181,7 @@ PMethodInterface::SetArg(const int32 &index, const char *name,
 
 status_t
 PMethodInterface::AddArg(const char *name, const PArgType &type,
-						const char *description)
+						const char *description, const int32 &flags)
 {
 	if (!name)
 		return B_ERROR;
@@ -186,7 +189,7 @@ PMethodInterface::AddArg(const char *name, const PArgType &type,
 	if (FindArg(name) >= 0)
 		return B_NAME_IN_USE;
 	
-	return fIn.AddItem(new PMethodInterfaceData(name, type, description)) ? B_OK : B_ERROR;
+	return fIn.AddItem(new PMethodInterfaceData(name, type, description, flags)) ? B_OK : B_ERROR;
 }
 
 
@@ -219,6 +222,14 @@ PMethodInterface::ArgDescAt(const int32 &index)
 {
 	PMethodInterfaceData *data = fIn.ItemAt(index);
 	return data ? data->description : BString();
+}
+
+
+int32
+PMethodInterface::ArgFlagsAt(const int32 &index)
+{
+	PMethodInterfaceData *data = fIn.ItemAt(index);
+	return data ? data->flags : -1;
 }
 
 
@@ -299,11 +310,11 @@ PMethodInterface::ReturnTypeAt(const int32 &index)
 }
 
 
-BString
-PMethodInterface::ReturnDescAt(const int32 &index)
+int32
+PMethodInterface::ReturnFlagsAt(const int32 &index)
 {
 	PMethodInterfaceData *data = fOut.ItemAt(index);
-	return data ? data->description : BString();
+	return data ? data->flags : -1;
 }
 
 

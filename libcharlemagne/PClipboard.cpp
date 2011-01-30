@@ -14,7 +14,7 @@ int32_t PClipboardRevert(void *pobject, PArgList *in, PArgList *out);
 
 
 PClipboard::PClipboard(void)
-	:	fClipboard(NULL)
+	:	fClipboard(be_clipboard)
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
@@ -28,7 +28,7 @@ PClipboard::PClipboard(void)
 
 PClipboard::PClipboard(BMessage *msg)
 	:	PHandler(msg),
-		fClipboard(NULL)
+		fClipboard(be_clipboard)
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
@@ -39,7 +39,7 @@ PClipboard::PClipboard(BMessage *msg)
 
 PClipboard::PClipboard(const char *name)
 	:	PHandler(name),
-		fClipboard(NULL)
+		fClipboard(be_clipboard)
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
@@ -51,7 +51,7 @@ PClipboard::PClipboard(const char *name)
 
 PClipboard::PClipboard(const PClipboard &from)
 	:	PHandler(from),
-		fClipboard(NULL)
+		fClipboard(be_clipboard)
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";

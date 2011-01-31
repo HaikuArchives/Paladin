@@ -326,6 +326,21 @@ PArgs::FindString(const char *name, char **out)
 
 
 int32
+PArgs::FindString(const char *name, BString *out)
+{
+	if (!name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(fArgList, name, NULL);
+	if (!item)
+		return B_NAME_NOT_FOUND;
+	
+	*out = (char *)item->data;
+	return B_OK;
+}
+
+
+int32
 PArgs::FindPoint(const char *name, BPoint *out)
 {
 	return find_parg_point(fArgList, name, &out->x, &out->y);

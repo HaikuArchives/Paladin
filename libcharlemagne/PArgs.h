@@ -3,6 +3,8 @@
 
 #include <Rect.h>
 #include <InterfaceDefs.h>
+#include <String.h>
+
 #include "CInterface.h"
 
 class PArgs
@@ -49,6 +51,7 @@ public:
 	int32				FindBool(const char *name, bool *out);
 	int32				FindChar(const char *name, char *out);
 	int32				FindString(const char *name, char **out);
+	int32				FindString(const char *name, BString *out);
 	int32				FindPoint(const char *name, BPoint *arg);
 	int32				FindRect(const char *name, BRect *arg);
 	int32				FindColor(const char *name, uint8 *red, uint8 *green,

@@ -8,6 +8,8 @@
 #include "CInterface.h"
 #include "EnumProperty.h"
 #include "PArgs.h"
+#include "PClipboard.h"
+#include "PObjectBroker.h"
 
 // Method function declarations
 int32_t PTextViewAllowChars(void *pobject, PArgList *in, PArgList *out);
@@ -459,11 +461,12 @@ PTextView::InitMethods(void)
 	AddMethod(new PMethod("AllowChars", PTextViewAllowChars, &pmi));
 	
 	pmi.SetArg(0, "offset", PARG_INT32, "Offset of the byte to get.");
+	pmi.AddReturnValue("value", PARG_CHAR, "1-byte character at the specified offset.");
 	AddMethod(new PMethod("ByteAt", PTextViewByteAt, &pmi));
 	
 	pmi.SetArg(0, "offset", PARG_INT32, "Offset to test for line ending");
-	pmi.AddReturnValue("value", PARG_BOOL, "True if the character can be the last one on a line.");
-	AddMethod(new PMethod("ByteAt", PTextViewCanEndLine, &pmi));
+	pmi.SetReturnValue(0, "value", PARG_BOOL, "True if the character can be the last one on a line.");
+	AddMethod(new PMethod("CanEndLine", PTextViewCanEndLine, &pmi));
 	
 	pmi.SetArg(0, "clipid", PARG_INT64, "ID of a PClipboard object");
 	pmi.RemoveReturnValue(0);
@@ -820,7 +823,34 @@ PTextViewBackend::MessageReceived(BMessage *msg)
 int32_t
 PTextViewAllowChars(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
 	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in);
+	BString string;
+	if (args.FindString("chars", &string) != B_OK)
+		return B_ERROR;
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	for (int32 i = 0; i < string.CountChars(); i++)
+	{
+		char c = string.ByteAt(i);
+		if (c)
+			fView->AllowChar(c);
+	}
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
@@ -849,36 +879,199 @@ PTextViewAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
 int32_t
 PTextViewByteAt(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	int32 offset;
+	if (args.FindInt32("offset", &offset) != B_OK)
+		return B_ERROR;
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	outargs.MakeEmpty();
+	outargs.AddChar("value", fView->ByteAt(offset));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
 int32_t
 PTextViewCanEndLine(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	int32 offset;
+	if (args.FindInt32("offset", &offset) != B_OK)
+		return B_ERROR;
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	outargs.MakeEmpty();
+	outargs.AddBool("value", fView->CanEndLine(offset));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
 int32_t
 PTextViewCut(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->Cut(clip->GetBackend());
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
 int32_t
 PTextViewCopy(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->Copy(clip->GetBackend());
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
 int32_t
 PTextViewDelete(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in);
+	
+	int32 start, end;
+	if (args.FindInt32("start", &start) != B_OK ||
+		args.FindInt32("start", &end) != B_OK)
+		return B_ERROR;
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->Delete(start, end);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
 int32_t
 PTextViewDisallowChars(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in);
+	BString string;
+	if (args.FindString("chars", &string) != B_OK)
+		return B_ERROR;
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	for (int32 i = 0; i < string.CountChars(); i++)
+	{
+		char c = string.ByteAt(i);
+		if (c)
+			fView->DisallowChar(c);
+	}
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
@@ -913,6 +1106,36 @@ PTextViewDraw(void *pobject, PArgList *in, PArgList *out)
 int32_t
 PTextViewFindWord(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	int32 offset;
+	if (args.FindInt32("offset", &offset) != B_OK)
+		return B_ERROR;
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	int32 outStart, outEnd;
+	
+	fView->FindWord(offset, &outStart, &outEnd);
+	
+	outargs.MakeEmpty();
+	outargs.AddInt32("start", outStart);
+	outargs.AddInt32("end", outEnd);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 
@@ -1013,6 +1236,36 @@ PTextViewOffsetAtPoint(void *pobject, PArgList *in, PArgList *out)
 int32_t
 PTextViewPaste(void *pobject, PArgList *in, PArgList *out)
 {
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *fView = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->Paste(clip->GetBackend());
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
 }
 
 

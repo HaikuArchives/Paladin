@@ -10,6 +10,7 @@ Changed key accelerators for common source control from Control + Alt to Control
 Bugfixes
 The dirty file count doesn't change during builds on SMP machines
 Fixed a problem with files dropped from Tracker
+Shell scripts are now executed properly
 
 Internal changes
 

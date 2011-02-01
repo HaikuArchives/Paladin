@@ -12,6 +12,7 @@ Bugfixes
 The dirty file count doesn't change during builds on SMP machines
 Fixed a problem with files dropped from Tracker
 Shell scripts are now executed properly
+Automatically adjust types on .rsrc files so Edit Program Settings always works right.
 
 Internal changes
 

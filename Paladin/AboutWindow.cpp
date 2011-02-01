@@ -69,7 +69,7 @@ AboutView::AboutView(BRect frame)
 	be_plain_font->GetHeight(&height);
 	
 	versionpos.y = fLogo->Bounds().bottom - 5;
-	versionpos.x = fLogo->Bounds().right - StringWidth(version) - 7;
+	versionpos.x = fLogo->Bounds().right - StringWidth(version) - 10;
 	
 	SetDrawingMode(B_OP_OVER);
 	SetFont(be_bold_font);

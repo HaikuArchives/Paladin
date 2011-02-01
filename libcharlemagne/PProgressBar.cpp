@@ -41,7 +41,7 @@ private:
 };
 
 PProgressBar::PProgressBar(void)
-	:	PView()
+	:	PView(false)
 {
 	fType = "PProgressBar";
 	fFriendlyType = "Progress Bar";
@@ -54,10 +54,10 @@ PProgressBar::PProgressBar(void)
 
 
 PProgressBar::PProgressBar(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg, false)
 {
 	fType = "PProgressBar";
-	fFriendlyType = "ProgressBar";
+	fFriendlyType = "Progress Bar";
 	AddInterface("PProgressBar");
 	
 	BMessage viewmsg;
@@ -69,10 +69,10 @@ PProgressBar::PProgressBar(BMessage *msg)
 
 
 PProgressBar::PProgressBar(const char *name)
-	:	PView(name)
+	:	PView(name, false)
 {
 	fType = "PProgressBar";
-	fFriendlyType = "ProgressBar";
+	fFriendlyType = "Progress Bar";
 	AddInterface("PProgressBar");
 	InitMethods();
 	InitBackend();
@@ -80,10 +80,10 @@ PProgressBar::PProgressBar(const char *name)
 
 
 PProgressBar::PProgressBar(const PProgressBar &from)
-	:	PView(from)
+	:	PView(from, false)
 {
 	fType = "PProgressBar";
-	fFriendlyType = "ProgressBar";
+	fFriendlyType = "Progress Bar";
 	AddInterface("PProgressBar");
 	InitMethods();
 	InitBackend();
@@ -257,7 +257,7 @@ PProgressBar::InitBackend(void)
 {
 	if (!fView)
 		fView = new PProgressBarBackend(this);
-	StringValue sv("A generalized View-based control template.");
+	StringValue sv("A prorgress indicator.");
 	SetProperty("Description",&sv);
 }
 

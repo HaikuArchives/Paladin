@@ -1,2 +1,2 @@
 #!/bin/sh
-cp ./libcharlemagne.so /boot/common/lib/
+cp -f ./libcharlemagne.so /boot/common/lib/

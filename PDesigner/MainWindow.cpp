@@ -12,6 +12,7 @@
 #include "Floater.h"
 #include "Globals.h"
 #include "MsgDefs.h"
+#include "ObjectItem.h"
 #include "ObjectWindow.h"
 #include "PArgs.h"
 #include "PObjectBroker.h"
@@ -221,7 +222,7 @@ MainWindow::AddWindow(void)
 		pwin->ConnectEvent("QuitRequested", PWindowQuitRequested);
 		pwin->SetMsgHandler(M_QUIT_REQUESTED, PWindowMQuitRequested);
 		
-		fListView->AddItem(pwin->CreateWindowItem());
+		fListView->AddItem(new ObjectItem(pwin));
 		
 		int32 index = fListView->FullListIndexOf(fListView->LastItem());
 		fListView->Select(index);
@@ -278,61 +279,61 @@ MainWindow::AddControl(const BString &type)
 	// selected window. If there is no selection, we will add the item at the end with no
 	// parent
 	
-	ViewItem *item = pview->CreateViewItem();
+	ObjectItem *item = new ObjectItem(pview);
 	int32 selection = fListView->FullListCurrentSelection();
-	if (selection >= 0)
+	if (selection < 0)
+		fListView->AddItem(item);
+	
+	ObjectItem *oitem = dynamic_cast<ObjectItem*>(fListView->FullListItemAt(selection));
+	if (!oitem)
+		return;
+	
+	PWindow *pwin = dynamic_cast<PWindow*>(oitem->GetObject());
+	if (pwin)
 	{
-		WindowItem *witem = dynamic_cast<WindowItem*>(fListView->FullListItemAt(selection));
-		if (witem)
+		PArgs args,out;
+		
+		if (pview->GetType().Compare("PView") == 0 && 
+			pwin->RunMethod("CountChildren",args.ListRef(),out.ListRef()) == B_OK)
 		{
-			PWindow *pwin = witem->GetWindow();
-			PArgs args,out;
-			
-			if (pview->GetType().Compare("PView") == 0 && 
-				pwin->RunMethod("CountChildren",args.ListRef(),out.ListRef()) == B_OK)
+			int32 count;
+			if (out.FindInt32("count",&count) == B_OK && count == 0)
 			{
-				int32 count;
-				if (out.FindInt32("count",&count) == B_OK && count == 0)
-				{
-					float winWidth, winHeight;
-					pwin->GetFloatProperty("Width",winWidth);
-					pwin->GetFloatProperty("Height",winHeight);
-					pview->SetFloatProperty("Width",winWidth);
-					pview->SetFloatProperty("Height",winHeight);
-					pview->SetIntProperty("HResizingMode",RESIZE_BOTH);
-					pview->SetIntProperty("VResizingMode",RESIZE_BOTH);
-				}
-				pview->SetColorProperty("BackColor",ui_color(B_PANEL_BACKGROUND_COLOR));
+				float winWidth, winHeight;
+				pwin->GetFloatProperty("Width",winWidth);
+				pwin->GetFloatProperty("Height",winHeight);
+				pview->SetFloatProperty("Width",winWidth);
+				pview->SetFloatProperty("Height",winHeight);
+				pview->SetIntProperty("HResizingMode",RESIZE_BOTH);
+				pview->SetIntProperty("VResizingMode",RESIZE_BOTH);
 			}
-			
+			pview->SetColorProperty("BackColor",ui_color(B_PANEL_BACKGROUND_COLOR));
+		}
+		
+		args.AddInt64("id",item->GetObject()->GetID());
+		if (pwin->RunMethod("AddChild", args.ListRef(), out.ListRef()) == B_OK)
+			fListView->AddUnder(item,oitem);
+		else
+			fListView->AddItem(item);
+	}
+	else
+	{
+		if (oitem->GetObject()->UsesInterface("PView"))
+		{
+			PView *parent = dynamic_cast<PView*>(oitem->GetObject());
+			PArgs args,out;
 			args.AddInt64("id",item->GetObject()->GetID());
-			if (pwin->RunMethod("AddChild", args.ListRef(), out.ListRef()) == B_OK)
-				fListView->AddUnder(item,witem);
+			if(parent->RunMethod("AddChild", args.ListRef(), out.ListRef()) == B_OK)
+				fListView->AddUnder(item,oitem);
 			else
 				fListView->AddItem(item);
 		}
 		else
 		{
-			ViewItem *vitem = dynamic_cast<ViewItem*>(fListView->FullListItemAt(selection));
-			if (vitem)
-			{
-				PView *parent = vitem->GetView();
-				PArgs args,out;
-				args.AddInt64("id",item->GetObject()->GetID());
-				if(parent->RunMethod("AddChild", args.ListRef(), out.ListRef()) == B_OK)
-					fListView->AddUnder(item,vitem);
-				else
-					fListView->AddItem(item);
-			}
-			else
-			{
-				// Not a view or window, so just add it on at the end
-				fListView->AddItem(item);
-			}
+			// Not a view or window, so just add it on at the end
+			fListView->AddItem(item);
 		}
 	}
-	else
-		fListView->AddItem(item);
 	
 	pview->ConnectEvent("FocusChanged", PViewFocusChanged);
 	pview->ConnectEvent("MouseDown", PViewMouseDown);
@@ -385,6 +386,7 @@ MainWindow::UpdateProperties(void)
 void
 MainWindow::UpdateFloaters(void)
 {
+	/*
 	ViewItem *item = dynamic_cast<ViewItem*>(fListView->FullListItemAt(
 											fListView->FullListCurrentSelection()));
 	
@@ -396,6 +398,7 @@ MainWindow::UpdateFloaters(void)
 		PView *view = item->GetView();
 		broker->AttachAllFloaters(view);
 	}
+	*/
 }
 
 

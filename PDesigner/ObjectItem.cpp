@@ -20,7 +20,7 @@ ObjectItem::SetName(const char *namebase)
 		
 		if (name)
 		{
-			BString text = namebase ? namebase : "Object";
+			BString text = namebase ? namebase : fObject->GetFriendlyType().String();
 			text << ": " << name->GetValueAsString();
 			SetText(text.String());
 		}

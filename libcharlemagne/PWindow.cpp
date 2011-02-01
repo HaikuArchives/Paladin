@@ -66,10 +66,10 @@ PWindow::~PWindow(void)
 {
 	if (fWindow)
 	{
+		fWindow->Lock();
 		while (fWindow->CountChildren())
 			fWindow->ChildAt(0)->RemoveSelf();
 		
-		fWindow->Lock();
 		fWindow->Quit();
 		fWindow = NULL;
 	}
@@ -577,8 +577,10 @@ PWindowBackend::QuitRequested(void)
 		PWindow *pwin = dynamic_cast<PWindow*>(fOwner);
 		pwin->fWindow = NULL;
 		
+		Lock();
 		while (CountChildren())
 			ChildAt(0)->RemoveSelf();
+		Unlock();
 	}
 	
 	return quit;

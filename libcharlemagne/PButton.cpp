@@ -3,12 +3,15 @@
 #include <Application.h>
 #include <stdio.h>
 
+#include "DebugTools.h"
 #include "PArgs.h"
 
 class PButtonBackend : public BButton
 {
 public:
 			PButtonBackend(PObject *owner);
+			~PButtonBackend(void);
+			
 	void	AttachedToWindow(void);
 	void	AllAttached(void);
 	void	DetachedFromWindow(void);
@@ -39,6 +42,7 @@ private:
 PButton::PButton(void)
 	:	PControl()
 {
+	STRACE(("new PButton(void)\n"), TRACE_CREATE);
 	fType = "PButton";
 	fFriendlyType = "Button";
 	AddInterface("PButton");
@@ -51,6 +55,8 @@ PButton::PButton(void)
 PButton::PButton(BMessage *msg)
 	:	PControl(msg)
 {
+	STRACE(("new PButton(msg)\n"), TRACE_CREATE);
+	
 	fType = "PButton";
 	fFriendlyType = "Button";
 	AddInterface("PButton");
@@ -67,6 +73,7 @@ PButton::PButton(BMessage *msg)
 PButton::PButton(const char *name)
 	:	PControl(name)
 {
+	STRACE(("new PButton(%s)\n",name), TRACE_CREATE);
 	fType = "PButton";
 	fFriendlyType = "Button";
 	AddInterface("PButton");
@@ -78,6 +85,7 @@ PButton::PButton(const char *name)
 PButton::PButton(const PButton &from)
 	:	PControl(from)
 {
+	STRACE(("new PButton(copy)\n"), TRACE_CREATE);
 	fType = "PButton";
 	fFriendlyType = "Button";
 	AddInterface("PButton");
@@ -88,6 +96,7 @@ PButton::PButton(const PButton &from)
 
 PButton::~PButton(void)
 {
+	STRACE(("Delete PButton()\n"), TRACE_DESTROY);
 	// We don't have to worry about removing and deleting fView -- ~PView does that for us. :)
 }
 
@@ -138,6 +147,13 @@ PButtonBackend::PButtonBackend(PObject *owner)
 	:	BButton(BRect(0,0,1,1),"", "", new BMessage),
 		fOwner(owner)
 {
+	STRACE(("new PButtonBackend\n"), TRACE_CREATE);
+}
+
+
+PButtonBackend::~PButtonBackend(void)
+{
+	STRACE(("Delete PButtonBackend\n"), TRACE_DESTROY);
 }
 
 

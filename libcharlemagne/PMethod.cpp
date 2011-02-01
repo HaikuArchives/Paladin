@@ -310,6 +310,14 @@ PMethodInterface::ReturnTypeAt(const int32 &index)
 }
 
 
+BString
+PMethodInterface::ReturnDescAt(const int32 &index)
+{
+	PMethodInterfaceData *data = fOut.ItemAt(index);
+	return data ? data->description : BString();
+}
+
+
 int32
 PMethodInterface::ReturnFlagsAt(const int32 &index)
 {

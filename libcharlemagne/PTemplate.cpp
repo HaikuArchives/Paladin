@@ -59,12 +59,11 @@ PTemplate::PTemplate(BMessage *msg)
 	fFriendlyType = "Template";
 	AddInterface("PTemplate");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BView::Instantiate(&viewmsg);
+		fView = (BView*)BView::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -204,9 +203,10 @@ PTemplate::Duplicate(void) const
 }
 
 void
-PTemplate::InitBackend(BView *view)
+PTemplate::InitBackend(void)
 {
-	fView = new PTemplateBackend(this);
+	if (!fView)
+		fView = new PTemplateBackend(this);
 	StringValue sv("A generalized View-based control template.");
 	SetProperty("Description",&sv);
 }

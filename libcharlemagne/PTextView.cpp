@@ -93,12 +93,11 @@ PTextView::PTextView(BMessage *msg)
 	fFriendlyType = "TextView";
 	AddInterface("PTextView");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BTextView::Instantiate(&viewmsg);
+		fView = (BView*)BTextView::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -397,9 +396,10 @@ PTextView::Duplicate(void) const
 }
 
 void
-PTextView::InitBackend(BView *view)
+PTextView::InitBackend(void)
 {
-	fView = new PTextViewBackend(this);
+	if (!fView)
+		fView = new PTextViewBackend(this);
 	StringValue sv("A multi-line text editor.");
 	SetProperty("Description",&sv);
 }

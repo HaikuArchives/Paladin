@@ -55,12 +55,11 @@ PListView::PListView(BMessage *msg)
 	fType = "PListView";
 	AddInterface("PListView");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BListView::Instantiate(&viewmsg);
+		fView = (BView*)BListView::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 	InitProperties();
 }
 
@@ -212,11 +211,10 @@ PListView::SetProperty(const char *name, PValue *value, const int32 &index)
 
 	
 void
-PListView::InitBackend(BView *view)
+PListView::InitBackend(void)
 {
-	if (fView)
-		delete fView;
-	fView = (view == NULL) ? new PListViewBackend(this) : view;
+	if (!fView)
+		fView = new PListViewBackend(this);
 }
 
 

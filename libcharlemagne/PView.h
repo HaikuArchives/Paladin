@@ -55,10 +55,10 @@ enum
 class PView : public PHandler
 {
 public:
-							PView(void);
-							PView(BMessage *msg);
-							PView(const char *name);
-							PView(const PView &from);
+							PView(bool skipBackend = false);
+							PView(BMessage *msg, bool skipBackend = false);
+							PView(const char *name, bool skipBackend = false);
+							PView(const PView &from, bool skipBackend = false);
 							~PView(void);
 			
 	static	BArchivable *	Instantiate(BMessage *data);
@@ -75,7 +75,7 @@ public:
 	virtual	BView *			GetView(void);
 	
 protected:
-	virtual	void			InitBackend(BView *view = NULL);
+	virtual	void			InitBackend(void);
 	virtual	void			InitMethods(void);
 	
 	void					SetHResizingMode(const int32 &value);
@@ -87,6 +87,7 @@ protected:
 	
 private:
 	void					InitProperties(void);
+	bool					fSkipBackend;
 };
 
 #endif

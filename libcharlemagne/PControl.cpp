@@ -13,28 +13,28 @@
 */
 
 PControl::PControl(void)
-	:	PView()
+	:	PView(true)
 {
 	InitPControl();
 }
 
 
 PControl::PControl(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg, true)
 {
 	InitPControl();
 }
 
 
 PControl::PControl(const char *name)
-	:	PView(name)
+	:	PView(name, true)
 {
 	InitPControl();
 }
 
 
 PControl::PControl(const PControl &from)
-	:	PView(from)
+	:	PView(from, true)
 {
 	InitPControl();
 }
@@ -80,6 +80,9 @@ PControl::GetProperty(const char *name, PValue *value, const int32 &index) const
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
+	if (!fView)
+		return B_NO_INIT;
+	
 	BControl *viewAsControl = (BControl*)fView;
 	
 	if (str.ICompare("Enabled") == 0)
@@ -110,6 +113,9 @@ PControl::SetProperty(const char *name, PValue *value, const int32 &index)
 	status_t status = prop->SetValue(value);
 	if (status != B_OK)
 		return status;
+	
+	if (!fView)
+		return B_NO_INIT;
 	
 	BControl *viewAsControl = (BControl*)fView;
 	
@@ -147,15 +153,6 @@ PControl::SetProperty(const char *name, PValue *value, const int32 &index)
 		viewAsControl->Window()->Unlock();
 	
 	return prop->GetValue(value);
-}
-
-
-void
-PControl::InitBackend(BView *view)
-{
-	fView = (view == NULL) ? new BControl(BRect(0,0,1,1),"", "", new BMessage, 
-											B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) : 
-											(BControl*) view;
 }
 
 

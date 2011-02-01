@@ -55,12 +55,11 @@ PRadioButton::PRadioButton(BMessage *msg)
 	fFriendlyType = "Radio Button";
 	AddInterface("PRadioButton");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BRadioButton::Instantiate(&viewmsg);
+		fView = (BView*)BRadioButton::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -114,9 +113,10 @@ PRadioButton::Duplicate(void) const
 }
 
 void
-PRadioButton::InitBackend(BView *view)
+PRadioButton::InitBackend(void)
 {
-	fView = (view == NULL) ? new PRadioButtonBackend(this) : view;
+	if (!fView)
+		fView = new PRadioButtonBackend(this);
 	StringValue sv("A one-from-many decisionmaking control.");
 	SetProperty("Description",&sv);
 }

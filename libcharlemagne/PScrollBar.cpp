@@ -367,9 +367,10 @@ PScrollBar::SetProperty(const char *name, PValue *value, const int32 &index)
 
 
 void
-PScrollBar::InitBackend(BView *view)
+PScrollBar::InitBackend(void)
 {
-	fView = (view == NULL) ? new PScrollBarBackend(this, B_VERTICAL) : view;
+	if (!fView)
+		fView = new PScrollBarBackend(this, B_VERTICAL);
 	StringValue sv("A scroll bar.");
 	SetProperty("Description", &sv);
 	

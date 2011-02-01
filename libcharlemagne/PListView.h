@@ -30,7 +30,7 @@ public:
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 	
 protected:
-	virtual void			InitBackend(BView *view = NULL);
+	virtual void			InitBackend(void);
 
 private:
 	void					InitProperties(void);

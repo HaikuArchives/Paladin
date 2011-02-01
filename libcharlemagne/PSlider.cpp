@@ -55,12 +55,11 @@ PSlider::PSlider(BMessage *msg)
 	fFriendlyType = "Slider";
 	AddInterface("PSlider");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BSlider::Instantiate(&viewmsg);
+		fView = (BView*)BSlider::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -315,11 +314,10 @@ PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 
 	
 void
-PSlider::InitBackend(BView *view)
+PSlider::InitBackend(void)
 {
-	if (fView)
-		delete fView;
-	fView = (view == NULL) ? new PSliderBackend(this) : view;
+	if (!fView)
+		fView = new PSliderBackend(this);
 }
 
 

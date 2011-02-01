@@ -61,12 +61,11 @@ PTextControl::PTextControl(BMessage *msg)
 	fFriendlyType = "Text Control";
 	AddInterface("PTextControl");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)AutoTextControl::Instantiate(&viewmsg);
+		fView = (BView*)AutoTextControl::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -239,9 +238,10 @@ PTextControl::Duplicate(void) const
 
 
 void
-PTextControl::InitBackend(BView *view)
+PTextControl::InitBackend(void)
 {
-	fView = (view == NULL) ? new AutoTextControl(BRect(0,0,1,1),"", "", "", new BMessage) : view;
+	if (!fView)
+		fView = new AutoTextControl(BRect(0,0,1,1),"", "", "", new BMessage);
 	StringValue sv("A single line text box. It sends a message when its value changes.");
 	SetProperty("Description",&sv);
 }

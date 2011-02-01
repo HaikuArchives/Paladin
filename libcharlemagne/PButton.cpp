@@ -134,7 +134,8 @@ PButton::InitMethods(void)
 void
 PButton::InitBackend(BView *view)
 {
-	fView = (view == NULL) ? new PButtonBackend(this) : view;
+	if (!fView)
+		fView = new PButtonBackend(this);
 	StringValue sv("A basic button object. It sends a message when clicked.");
 	SetProperty("Description",&sv);
 	

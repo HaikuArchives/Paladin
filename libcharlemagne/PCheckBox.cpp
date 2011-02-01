@@ -55,12 +55,11 @@ PCheckBox::PCheckBox(BMessage *msg)
 	fFriendlyType = "Checkbox";
 	AddInterface("PCheckBox");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BCheckBox::Instantiate(&viewmsg);
+		fView = (BView*)BCheckBox::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -114,9 +113,10 @@ PCheckBox::Duplicate(void) const
 }
 
 void
-PCheckBox::InitBackend(BView *view)
+PCheckBox::InitBackend(void)
 {
-	fView = (view == NULL) ? new PCheckBoxBackend(this) : view;
+	if (!fView)
+		fView = new PCheckBoxBackend(this);
 	StringValue sv("A check box. It sends a message when its value changes.");
 	SetProperty("Description",&sv);
 }

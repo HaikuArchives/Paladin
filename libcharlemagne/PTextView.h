@@ -81,7 +81,7 @@ public:
 	virtual	PObject *		Duplicate(void) const;
 	
 protected:
-	virtual void			InitBackend(BView *view = NULL);
+	virtual void			InitBackend(void);
 
 private:
 	void					InitProperties(void);

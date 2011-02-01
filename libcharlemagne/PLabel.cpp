@@ -56,12 +56,11 @@ PLabel::PLabel(BMessage *msg)
 	fFriendlyType = "Label";
 	AddInterface("PLabel");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BStringView::Instantiate(&viewmsg);
+		fView = (BView*)BStringView::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -212,9 +211,10 @@ PLabel::Duplicate(void) const
 }
 
 void
-PLabel::InitBackend(BView *view)
+PLabel::InitBackend(void)
 {
-	fView = (view == NULL) ? new PLabelBackend(this) : view;
+	if (!fView)
+		fView = new PLabelBackend(this);
 	StringValue sv("A basic button object. It sends a message when clicked.");
 	SetProperty("Description",&sv);
 }

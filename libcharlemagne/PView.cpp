@@ -59,8 +59,9 @@ private:
 	PObject	*fOwner;
 };
 
-PView::PView(void)
-	:	fView(NULL)
+PView::PView(bool skipBackend)
+	:	fView(NULL),
+		fSkipBackend(skipBackend)
 {
 	STRACE(("new PView(void)\n"), TRACE_CREATE);
 	fType = "PView";
@@ -74,27 +75,28 @@ PView::PView(void)
 }
 
 
-PView::PView(BMessage *msg)
+PView::PView(BMessage *msg, bool skipBackend)
 	:	PHandler(msg),
-		fView(NULL)
+		fView(NULL),
+		fSkipBackend(skipBackend)
 {
 	STRACE(("new PView(msg)\n"), TRACE_CREATE);
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BView::Instantiate(&viewmsg);
+		fView = (BView*)BView::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
-PView::PView(const char *name)
+PView::PView(const char *name, bool skipBackend)
 	:	PHandler(name),
-		fView(NULL)
+		fView(NULL),
+		fSkipBackend(skipBackend)
 {
 	STRACE(("new PView(%s)\n",name), TRACE_CREATE);
 	fType = "PView";
@@ -105,9 +107,10 @@ PView::PView(const char *name)
 }
 
 
-PView::PView(const PView &from)
+PView::PView(const PView &from, bool skipBackend)
 	:	PHandler(from),
-		fView(NULL)
+		fView(NULL),
+		fSkipBackend(skipBackend)
 {
 	STRACE(("new PView(copy)\n"), TRACE_CREATE);
 	fType = "PView";
@@ -543,9 +546,13 @@ PView::InitProperties(void)
 
 
 void
-PView::InitBackend(BView *view)
+PView::InitBackend(void)
 {
-	fView = (view == NULL) ? new PViewBackend(this) : view;
+	if (!fView)
+		fView = fSkipBackend ? NULL : new PViewBackend(this);
+	
+	if (!fView)
+		return;
 	
 	// Set the view's settings based on the object's properties
 	BoolValue bv;

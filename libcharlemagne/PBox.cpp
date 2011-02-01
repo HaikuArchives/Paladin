@@ -59,12 +59,11 @@ PBox::PBox(BMessage *msg)
 	fFriendlyType = "Box";
 	AddInterface("PBox");
 	
-	BView *view = NULL;
 	BMessage viewmsg;
 	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		view = (BView*)BBox::Instantiate(&viewmsg);
+		fView = (BView*)BBox::Instantiate(&viewmsg);
 	
-	InitBackend(view);
+	InitBackend();
 }
 
 
@@ -209,9 +208,10 @@ PBox::Duplicate(void) const
 }
 
 void
-PBox::InitBackend(BView *view)
+PBox::InitBackend(void)
 {
-	fView = new PBoxBackend(this);
+	if (!fView)
+		fView = new PBoxBackend(this);
 	StringValue sv("A box for grouping together associated controls.");
 	SetProperty("Description",&sv);
 }

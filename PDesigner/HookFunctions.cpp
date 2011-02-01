@@ -28,11 +28,6 @@ PWindowFrameMoved(void *pobject, PArgList *in, PArgList *out)
 	
 	// Update the floaters so that they still hover above the
 	// focus control
-	PArgs args(in);
-	
-	BPoint point;
-	args.FindPoint("point", &point);
-	
 	FloaterBroker *broker = FloaterBroker::GetInstance();
 	
 	if (gFocusView)
@@ -54,6 +49,14 @@ PWindowFrameResized(void *pobject, PArgList *in, PArgList *out)
 	msg.AddString("name","Width");
 	msg.AddString("name","Height");
 	be_app->PostMessage(&msg);
+	
+	// Update the floaters so that they still hover above the
+	// focus control
+	FloaterBroker *broker = FloaterBroker::GetInstance();
+	
+	if (gFocusView)
+		broker->NotifyFloaters((PView*)gFocusView, FLOATER_SET_LOCATION);
+	
 	return B_OK;
 }
 

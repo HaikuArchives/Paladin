@@ -12,6 +12,7 @@
 #include "PHandler.h"
 #include "PLabel.h"
 #include "PListView.h"
+#include "PProgressBar.h"
 #include "PRadioButton.h"
 #include "PScrollBar.h"
 #include "PSlider.h"
@@ -64,6 +65,8 @@ PObjectBroker::PObjectBroker(void)
 	fObjInfoList->AddItem(new PObjectInfo("PControl","Generic Control",PControl::Instantiate,
 											PControl::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PLabel","Label",PLabel::Instantiate,PLabel::Create));
+	fObjInfoList->AddItem(new PObjectInfo("PProgressBar","ProgressBar",PProgressBar::Instantiate,
+											PProgressBar::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PRadioButton","RadioButton",PRadioButton::Instantiate,
 											PRadioButton::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PScrollBar","ScrollBar",PScrollBar::Instantiate,

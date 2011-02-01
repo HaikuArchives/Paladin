@@ -330,6 +330,8 @@ MainWindow::AddControl(const BString &type)
 	pview->ConnectEvent("MouseDown", PViewMouseDown);
 	pview->SetMsgHandler(M_FLOATER_ACTION, PViewHandleFloaterMsg);
 	
+	pview->SetBoolProperty("Focus", true);
+	
 	fListView->Select(fListView->FullListIndexOf(item));
 }
 
@@ -389,4 +391,3 @@ MainWindow::UpdateFloaters(void)
 		broker->AttachAllFloaters(view);
 	}
 }
-

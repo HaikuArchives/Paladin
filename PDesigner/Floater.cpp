@@ -41,6 +41,7 @@ Floater::Update(PView *view, const int32 &action)
 		
 		FLOATER_RESIZE: sent when the target view is resized
 		FLOATER_MOVE: sent when the target view is moved
+		FLOATER_SET_LOCATION: sent when all floaters need new locations
 	*/
 }
 
@@ -230,6 +231,7 @@ HandleWindow::Update(PView *pview, const int32 &action)
 	{
 		case FLOATER_INTERNAL_MOVE:
 		case FLOATER_INTERNAL_RESIZE:
+		case FLOATER_SET_LOCATION:
 		{
 			if (fView->fAction == FLOATER_MOVE)
 				MoveTo(rect.right + 5.0, rect.top);

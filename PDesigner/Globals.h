@@ -3,7 +3,10 @@
 
 #include "LockableVar.h"
 
+class PObject;
+
 extern LockableBool gIsQuitting;
 
+extern PObject *gFocusView;
 
 #endif

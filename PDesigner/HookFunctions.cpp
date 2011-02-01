@@ -5,6 +5,7 @@
 
 #include "Floater.h"
 #include "FloaterBroker.h"
+#include "Globals.h"
 #include "MsgDefs.h"
 #include "PArgs.h"
 #include "PObject.h"
@@ -12,36 +13,31 @@
 #include "PView.h"
 
 int32_t
-PWindowWindowActivated(void *pobject, PArgList *in, PArgList *out)
-{
-	PObject *owner = static_cast<PObject*>(pobject);
-	if (!owner || !in || !out)
-		return B_BAD_DATA;
-	
-	bool active = false;
-	find_parg_bool(in, "active", &active);
-	
-	if (active)
-	{
-		BMessage msg(M_ACTIVATE_OBJECT);
-		msg.AddInt64("id",owner->GetID());
-		be_app->PostMessage(&msg);
-	}
-	return B_OK;
-}
-
-
-int32_t
 PWindowFrameMoved(void *pobject, PArgList *in, PArgList *out)
 {
-	PObject *owner = static_cast<PObject*>(pobject);
+	PWindow *owner = static_cast<PWindow*>(pobject);
 	if (!owner || !in || !out)
 		return B_BAD_DATA;
 	
+	// Tell the property editor about the move so its position
+	// can be displayed
 	BMessage msg(M_UPDATE_PROPERTY_EDITOR);
 	msg.AddInt64("id",owner->GetID());
 	msg.AddString("name","Location");
 	be_app->PostMessage(&msg);
+	
+	// Update the floaters so that they still hover above the
+	// focus control
+	PArgs args(in);
+	
+	BPoint point;
+	args.FindPoint("point", &point);
+	
+	FloaterBroker *broker = FloaterBroker::GetInstance();
+	
+	if (gFocusView)
+		broker->NotifyFloaters((PView*)gFocusView, FLOATER_SET_LOCATION);
+	
 	return B_OK;
 }
 
@@ -127,15 +123,38 @@ PWindowMQuitRequested(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PViewFocusChanged(void *pobject, PArgList *in, PArgList *out)
+PWindowWindowActivated(void *pobject, PArgList *in, PArgList *out)
 {
 	PObject *owner = static_cast<PObject*>(pobject);
+	if (!owner || !in || !out)
+		return B_BAD_DATA;
+	
+	bool active = false;
+	find_parg_bool(in, "active", &active);
+	
+	if (active)
+	{
+		BMessage msg(M_ACTIVATE_OBJECT);
+		msg.AddInt64("id",owner->GetID());
+		be_app->PostMessage(&msg);
+	}
+	return B_OK;
+}
+
+
+int32_t
+PViewFocusChanged(void *pobject, PArgList *in, PArgList *out)
+{
+	PView *owner = static_cast<PView*>(pobject);
 	if (!owner || !in || !out)
 		return B_BAD_DATA;
 	
 	BMessage msg(M_ACTIVATE_OBJECT);
 	msg.AddInt64("id",owner->GetID());
 	be_app->PostMessage(&msg);
+	
+	gFocusView = owner;
+	
 	return B_OK;
 }
 
@@ -147,7 +166,7 @@ PViewMouseDown(void *pobject, PArgList *in, PArgList *out)
 	if (!owner || !in || !out)
 		return B_BAD_DATA;
 	
-	owner->RunMethod("_MouseDown", *in, *out);
+	owner->RunMethod("MouseDown", *in, *out);
 	
 	owner->SetBoolProperty("Focus", true);
 	

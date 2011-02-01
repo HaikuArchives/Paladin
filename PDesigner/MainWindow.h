@@ -7,6 +7,7 @@
 class ObjectWindow;
 class Project;
 class PropertyWindow;
+class PObject;
 
 class MainWindow : public BWindow
 {
@@ -25,6 +26,7 @@ private:
 			Project				*fProject;
 			PropertyWindow		*fPropertyWin;
 			ObjectWindow		*fObjectWin;
+			
 };
 
 #endif

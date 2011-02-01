@@ -20,7 +20,8 @@ enum
 	FLOATER_INTERNAL_RESIZE,
 	FLOATER_RESIZE,
 	FLOATER_INTERNAL_MOVE,
-	FLOATER_MOVE
+	FLOATER_MOVE,
+	FLOATER_SET_LOCATION
 };
 
 // The Floater class is a generic interface for attaching floating manipulators

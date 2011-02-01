@@ -29,7 +29,7 @@ LockableBool::operator==(const bool &from)
 bool
 LockableBool::operator!=(const bool &from)
 {
-	return GetValue() != from;
+	return GetValue() == from;
 }
 
 
@@ -51,4 +51,3 @@ LockableBool::GetValue(void)
 	fLock.Unlock();
 	return value;
 }
-

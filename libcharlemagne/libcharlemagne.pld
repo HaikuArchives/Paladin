@@ -1,7 +1,7 @@
 NAME=libcharlemagne
 TARGETNAME=libcharlemagne.so
 PLATFORM=HaikuGCC4
-SCM=none
+SCM=hg
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=AutoTextControl.cpp

@@ -7,6 +7,9 @@ GitSourceControl::GitSourceControl(void)
 {
 	SetShortName("git");
 	SetLongName("Git");
+	
+	// I don't think git tracks directories, but I'm not 100% sure.
+	SetFlags(SCM_BRANCH | SCM_DISTRIBUTED);
 }
 
 

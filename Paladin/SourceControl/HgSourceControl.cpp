@@ -10,6 +10,7 @@ HgSourceControl::HgSourceControl(void)
 {
 	SetShortName("hg");
 	SetLongName("Mercurial");
+	SetFlags(SCM_BRANCH | SCM_DISTRIBUTED);
 }
 
 
@@ -18,6 +19,7 @@ HgSourceControl::HgSourceControl(const entry_ref &workingDir)
 {
 	SetShortName("hg");
 	SetLongName("Mercurial");
+	SetFlags(SCM_BRANCH | SCM_DISTRIBUTED);
 }
 
 

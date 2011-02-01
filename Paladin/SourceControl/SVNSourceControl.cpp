@@ -10,6 +10,7 @@ SVNSourceControl::SVNSourceControl(void)
 {
 	SetShortName("svn");
 	SetLongName("Subversion");
+	SetFlags(SCM_BRANCH);
 }
 
 
@@ -18,6 +19,7 @@ SVNSourceControl::SVNSourceControl(const entry_ref &workingDir)
 {
 	SetShortName("svn");
 	SetLongName("Subversion");
+	SetFlags(SCM_BRANCH);
 }
 
 

@@ -7,8 +7,9 @@
 
 enum
 {
-	SCM_BRANCH		= 0x00000001,
-	SCM_DISTRIBUTED	= 0x00000002
+	SCM_BRANCH				= 0x00000001,
+	SCM_DISTRIBUTED			= 0x00000002,
+	SCM_TRACKS_DIRECTORIES	= 0x00000004
 };
 
 typedef void (*SourceControlCallback)(const char *newText);

@@ -5,6 +5,7 @@
 #include <Window.h>
 #include <stdio.h>
 
+#include "DebugTools.h"
 #include "PArgs.h"
 #include "PObjectBroker.h"
 #include "PWindow.h"
@@ -29,6 +30,7 @@ class PViewBackend : public BView
 {
 public:
 			PViewBackend(PObject *owner);
+			~PViewBackend(void);
 	
 	void	AttachedToWindow(void);
 	void	AllAttached(void);
@@ -60,6 +62,7 @@ private:
 PView::PView(void)
 	:	fView(NULL)
 {
+	STRACE(("new PView(void)\n"), TRACE_CREATE);
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
@@ -75,6 +78,7 @@ PView::PView(BMessage *msg)
 	:	PHandler(msg),
 		fView(NULL)
 {
+	STRACE(("new PView(msg)\n"), TRACE_CREATE);
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
@@ -92,6 +96,7 @@ PView::PView(const char *name)
 	:	PHandler(name),
 		fView(NULL)
 {
+	STRACE(("new PView(%s)\n",name), TRACE_CREATE);
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
@@ -104,6 +109,7 @@ PView::PView(const PView &from)
 	:	PHandler(from),
 		fView(NULL)
 {
+	STRACE(("new PView(copy)\n"), TRACE_CREATE);
 	fType = "PView";
 	fFriendlyType = "View";
 	AddInterface("PView");
@@ -114,6 +120,8 @@ PView::PView(const PView &from)
 
 PView::~PView(void)
 {
+	STRACE(("new PView(void)\n"), TRACE_DESTROY);
+	
 	BAutolock lock((BLooper*)fView->Window());
 	BView *parent = fView->Parent();
 	fView->RemoveSelf();
@@ -769,6 +777,13 @@ PViewBackend::PViewBackend(PObject *owner)
 	:	BView(BRect(0,0,1,1),"",B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE),
 		fOwner(owner)
 {
+	STRACE(("new PViewBackend\n"), TRACE_CREATE);
+}
+
+
+PViewBackend::~PViewBackend(void)
+{
+	STRACE(("Delete PViewBackend\n"), TRACE_DESTROY);
 }
 
 

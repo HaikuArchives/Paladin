@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <stdio.h>
 
+#include "DebugTools.h"
 #include "MiscProperties.h"
 #include "PArgs.h"
 #include "PObjectBroker.h"
@@ -20,6 +21,7 @@ int32_t PWindowFindView(void *pobject, PArgList *in, PArgList *out);
 PWindow::PWindow(void)
 	:	fWindow(NULL)
 {
+	STRACE(("new PWindow(void)\n"), TRACE_CREATE);
 	fType = "PWindow";
 	fFriendlyType = "Window";
 	AddInterface("PWindow");
@@ -33,6 +35,7 @@ PWindow::PWindow(BMessage *msg)
 	:	PHandler(msg),
 		fWindow(NULL)
 {
+	STRACE(("new PWindow(msg)\n"), TRACE_CREATE);
 	fType = "PWindow";
 	fFriendlyType = "Window";
 	AddInterface("PWindow");
@@ -44,6 +47,7 @@ PWindow::PWindow(const char *name)
 	:	PHandler(name),
 		fWindow(NULL)
 {
+	STRACE(("new PWindow(%s)\n",name), TRACE_CREATE);
 	fType = "PWindow";
 	fFriendlyType = "Window";
 	AddInterface("PWindow");
@@ -55,6 +59,7 @@ PWindow::PWindow(const PWindow &from)
 	:	PHandler(from),
 		fWindow(NULL)
 {
+	STRACE(("new PWindow(copy)\n"), TRACE_CREATE);
 	fType = "PWindow";
 	fFriendlyType = "Window";
 	AddInterface("PWindow");
@@ -64,6 +69,7 @@ PWindow::PWindow(const PWindow &from)
 
 PWindow::~PWindow(void)
 {
+	STRACE(("Delete PWindow\n"), TRACE_DESTROY);
 	if (fWindow)
 	{
 		fWindow->Lock();
@@ -480,11 +486,13 @@ PWindowBackend::PWindowBackend(PObject *owner)
 		fQuitFlag(false),
 		fCodeFeel(B_NORMAL_WINDOW_FEEL)
 {
+	STRACE(("new PWindowBackend\n"), TRACE_CREATE);
 }
 
 
 PWindowBackend::~PWindowBackend(void)
 {
+	STRACE(("Delete PWindowBackend\n"), TRACE_DESTROY);
 }
 
 
@@ -565,6 +573,7 @@ PWindowBackend::WorkspacesChanged(uint32 oldspace, uint32 newspace)
 bool
 PWindowBackend::QuitRequested(void)
 {
+	STRACE(("PWindow Quit Requested\n"), TRACE_DESTROY);
 	PArgs in, out;
 	fOwner->RunEvent("QuitRequested", in.ListRef(), out.ListRef());
 	

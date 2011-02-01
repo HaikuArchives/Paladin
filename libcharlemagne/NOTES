@@ -1,4 +1,33 @@
 Test and fix PTextControl problems
 
-Later on:
+Objects to Implement:
+
+PColorControl
 PCursor class and associated methods in PApplication
+PDragger
+PFont
+PMenu
+PMenuBar
+PMenuField
+PMessageRunner
+POutlineListView
+PPopUpMenu
+PRoster
+PScreen
+PShelf
+PStatusBar
+PTabView
+
+Classes to investigate further
+
+BInvoker
+BListItem
+BMenuItem / BSeparatorItem
+BMessageFilter
+BPoint (PData?)
+BRect (PData?)
+BRegion (PData?)
+BScrollView
+BShape (PData?)
+BShapeIterator
+BStringItem

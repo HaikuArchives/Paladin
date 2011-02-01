@@ -7,6 +7,7 @@
 #include "EnumProperty.h"
 #include "PArgs.h"
 
+int32_t PProgressBarReset(void *obj, PArgList *in, PArgList *out);
 
 class PProgressBarBackend : public BStatusBar
 {
@@ -121,10 +122,22 @@ PProgressBar::GetProperty(const char *name, PValue *value, const int32 &index) c
 	
 	BStatusBar *view = dynamic_cast<BStatusBar*>(fView);
 		
-	if (str.ICompare("PropertyOne") == 0)
-	{
-		// call backend method here
-	}
+	if (str.ICompare("BarColor") == 0)
+		((ColorProperty*)prop)->SetValue(view->BarColor());
+	else if (str.ICompare("BarHeight") == 0)
+		((FloatProperty*)prop)->SetValue(view->BarHeight());
+	else if (str.ICompare("Label") == 0)
+		((StringProperty*)prop)->SetValue(view->Label());
+	else if (str.ICompare("CurrentValue") == 0)
+		((FloatProperty*)prop)->SetValue(view->CurrentValue());
+	else if (str.ICompare("MaxValue") == 0)
+		((FloatProperty*)prop)->SetValue(view->BarHeight());
+	else if (str.ICompare("Text") == 0)
+		((StringProperty*)prop)->SetValue(view->Text());
+	else if (str.ICompare("TrailingLabel") == 0)
+		((StringProperty*)prop)->SetValue(view->TrailingLabel());
+	else if (str.ICompare("TrailingText") == 0)
+		((StringProperty*)prop)->SetValue(view->TrailingText());
 	else
 	{
 		if (fView->Window())
@@ -170,10 +183,47 @@ PProgressBar::SetProperty(const char *name, PValue *value, const int32 &index)
 	
 	BStatusBar *view = dynamic_cast<BStatusBar*>(fView);
 	
-	if (str.ICompare("PropertyOne") == 0)
+/*
+	Properties:
+		BarColor
+		BarHeight
+		Label (read-only)
+		CurrentValue
+		MaxValue
+		Text
+		TrailingLabel (read-only)
+		TrailingText
+*/
+	if (str.ICompare("BarColor") == 0)
 	{
-		// prop->GetValue(&sv);
-		// Invoke backend method here
+		prop->GetValue(&cv);
+		view->SetBarColor(*cv.value);
+	}
+	else if (str.ICompare("BarHeight") == 0)
+	{
+		prop->GetValue(&fv);
+		view->SetBarHeight(*fv.value);
+	}
+	else if (str.ICompare("CurrentValue") == 0)
+	{
+		prop->GetValue(&fv);
+		float current = view->CurrentValue();
+		view->Update((*fv.value) - current);
+	}
+	else if (str.ICompare("MaxValue") == 0)
+	{
+		prop->GetValue(&fv);
+		view->SetMaxValue(*fv.value);
+	}
+	else if (str.ICompare("Text") == 0)
+	{
+		prop->GetValue(&sv);
+		view->SetText(sv.value->String());
+	}
+	else if (str.ICompare("TrailingText") == 0)
+	{
+		prop->GetValue(&sv);
+		view->SetTrailingText(sv.value->String());
 	}
 	else
 	{
@@ -215,23 +265,24 @@ PProgressBar::InitBackend(void)
 void
 PProgressBar::InitProperties(void)
 {
-/*
-	Properties:
-		BarColor
-		BarHeight
-		Label
-		CurrentValue
-		MaxValue
-		Text
-		TrailingLabel
-		TrailingText
-*/
+	AddProperty(new ColorProperty("BarColor", 50, 150, 255));
+	AddProperty(new FloatProperty("BarHeight", 10.0));
+	AddProperty(new StringProperty("Label", ""), PROPERTY_READ_ONLY);
+	AddProperty(new FloatProperty("CurrentValue", 0.0));
+	AddProperty(new FloatProperty("MaxValue", 100.0));
+	AddProperty(new StringProperty("Text", ""));
+	AddProperty(new StringProperty("TrailingLabel", ""), PROPERTY_READ_ONLY);
+	AddProperty(new StringProperty("TrailingText", ""));
 }
 
 
 void
 PProgressBar::InitMethods(void)
 {
+	PMethodInterface pmi;
+	pmi.AddArg("label", PARG_STRING, "The starting label");
+	pmi.AddArg("trailinglabel", PARG_STRING, "The ending label");
+	AddMethod(new PMethod("Reset", PProgressBarReset, &pmi));
 }
 
 
@@ -508,6 +559,37 @@ PProgressBarDraw(void *pobject, PArgList *in, PArgList *out)
 	args.FindRect("update", &r);
 	
 	fView->BStatusBar::Draw(r);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+PProgressBarReset(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BStatusBar *fView = (BStatusBar*)parent->GetView();
+	
+	PArgs args(in);
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	BString text, trailingText;
+	if (args.FindString("label", &text) != B_OK ||
+		args.FindString("trailingLabel", &trailingText) != B_OK)
+		return B_ERROR;
+	
+	fView->Reset(text.String(), trailingText.String());
 	
 	if (fView->Window())
 		fView->Window()->Unlock();

@@ -15,7 +15,6 @@ PPopUpMenu
 PRoster
 PScreen
 PShelf
-PStatusBar
 PTabView
 
 Classes to investigate further

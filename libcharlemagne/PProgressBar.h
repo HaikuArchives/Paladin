@@ -5,7 +5,8 @@
 #include <StatusBar.h>
 
 /*
-	PProgressBar Properties:
+	PProgressBar
+		Properties:
 			All PView Properties
 			BarColor
 			BarHeight
@@ -15,6 +16,8 @@
 			Text
 			TrailingLabel
 			TrailingText
+		Methods
+			Reset
 */
 
 class PProgressBar : public PView

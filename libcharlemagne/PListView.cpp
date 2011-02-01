@@ -39,7 +39,7 @@ private:
 
 
 PListView::PListView(void)
-	:	PView()
+	:	PView(false)
 {
 	fType = "PListView";
 	AddInterface("PListView");
@@ -50,7 +50,7 @@ PListView::PListView(void)
 
 
 PListView::PListView(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg, false)
 {
 	fType = "PListView";
 	AddInterface("PListView");
@@ -65,7 +65,7 @@ PListView::PListView(BMessage *msg)
 
 
 PListView::PListView(const char *name)
-	:	PView(name)
+	:	PView(name, false)
 {
 	fType = "PListView";
 	AddInterface("PListView");
@@ -75,7 +75,7 @@ PListView::PListView(const char *name)
 
 
 PListView::PListView(const PListView &from)
-	:	PView(from)
+	:	PView(from, false)
 {
 	fType = "PListView";
 	AddInterface("PListView");

@@ -120,7 +120,7 @@ PProgressBar::GetProperty(const char *name, PValue *value, const int32 &index) c
 	if (fView->Window())
 		fView->Window()->Lock();
 	
-	BStatusBar *view = dynamic_cast<BStatusBar*>(fView);
+	BStatusBar *view = static_cast<BStatusBar*>(fView);
 		
 	if (str.ICompare("BarColor") == 0)
 		((ColorProperty*)prop)->SetValue(view->BarColor());
@@ -181,7 +181,7 @@ PProgressBar::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (fView->Window())
 		fView->Window()->Lock();
 	
-	BStatusBar *view = dynamic_cast<BStatusBar*>(fView);
+	BStatusBar *view = static_cast<BStatusBar*>(fView);
 	
 /*
 	Properties:
@@ -257,7 +257,7 @@ PProgressBar::InitBackend(void)
 {
 	if (!fView)
 		fView = new PProgressBarBackend(this);
-	StringValue sv("A prorgress indicator.");
+	StringValue sv("A progress indicator.");
 	SetProperty("Description",&sv);
 }
 

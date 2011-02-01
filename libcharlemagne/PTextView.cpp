@@ -74,7 +74,7 @@ private:
 #pragma mark PTextView class implementation
 
 PTextView::PTextView(void)
-	:	PView()
+	:	PView(false)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -87,7 +87,7 @@ PTextView::PTextView(void)
 
 
 PTextView::PTextView(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg, false)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -102,7 +102,7 @@ PTextView::PTextView(BMessage *msg)
 
 
 PTextView::PTextView(const char *name)
-	:	PView(name)
+	:	PView(name, false)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -113,7 +113,7 @@ PTextView::PTextView(const char *name)
 
 
 PTextView::PTextView(const PTextView &from)
-	:	PView(from)
+	:	PView(from, false)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -153,7 +153,7 @@ PTextView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 	if (fView->Window())
 		fView->Window()->Lock();
 	
-	BTextView *tview = dynamic_cast<BTextView*>(fView);
+	BTextView *tview = static_cast<BTextView*>(fView);
 	
 	if (str.ICompare("Alignment") == 0)
 		((IntProperty*)prop)->SetValue(tview->Alignment());
@@ -261,7 +261,7 @@ PTextView::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (fView->Window())
 		fView->Window()->Lock();
 	
-	BTextView *tview = dynamic_cast<BTextView*>(fView);
+	BTextView *tview = static_cast<BTextView*>(fView);
 	
 	if (str.ICompare("Alignment") == 0)
 	{
@@ -409,7 +409,7 @@ void
 PTextView::InitProperties(void)
 {
 	BTextView *tview = dynamic_cast<BTextView*>(fView);
-	AddProperty(new IntProperty("Alignment", tview->Alignment(),
+	AddProperty(new IntProperty("Alignment", B_ALIGN_LEFT,
 								"The current alignment mode of the text view's contents."));
 	AddProperty(new BoolProperty("AutoIndent", false, "Toggles autoindenting of new lines."));
 	AddProperty(new IntProperty("ColorSpace", B_CMAP8, "Color space of the offscreen bitmap "
@@ -425,27 +425,27 @@ PTextView::InitProperties(void)
 	AddProperty(new StringProperty("FontName", fam, "The name of the current font"));
 	AddProperty(new BoolProperty("HideTyping", false, "Hides typing, such as for a password box."));
 	AddProperty(new BoolProperty("LineCount", 0, "The current line count."), PROPERTY_READ_ONLY);
-	AddProperty(new IntProperty("MaxBytes", tview->MaxBytes(),
+	AddProperty(new IntProperty("MaxBytes", 0,
 								"The maximum number of bytes the text view will accept."));
-	AddProperty(new BoolProperty("Resizable", tview->IsResizable(),
+	AddProperty(new BoolProperty("Resizable", false,
 								"Whether or not the text view will resize itself to contain "
 								"its contents."));
-	AddProperty(new BoolProperty("Selectable", tview->IsSelectable(),
+	AddProperty(new BoolProperty("Selectable", true,
 								"Whether or not the user can select the text view's text."));
 	AddProperty(new BoolProperty("Stylable", false, "Whether or not the text view will "
 													"display multiple text styles."));
-	AddProperty(new FloatProperty("TabWidth", tview->TabWidth(),
+	AddProperty(new FloatProperty("TabWidth", 10,
 									"The number of pixels indented for each tab character."));
 	AddProperty(new StringProperty("Text", NULL, "The text held by the text view."));
 	AddProperty(new IntProperty("TextLength", 0, "The number of bytes occupied by the "
 												"contents of the text view, excluding the "
 												"terminating NULL."), PROPERTY_READ_ONLY);
-	AddProperty(new RectProperty("TextRect", tview->TextRect(),
+	AddProperty(new RectProperty("TextRect", BRect(0,0,1,1),
 								"The size and location of the area used to display the text."));
-	AddProperty(new BoolProperty("Undoable", tview->DoesUndo(),
+	AddProperty(new BoolProperty("Undoable", true,
 								"Whether or not the text view supports undo."));
 	bool isredo;
-	AddProperty(new IntProperty("UndoState", tview->UndoState(&isredo)), PROPERTY_READ_ONLY);
+	AddProperty(new IntProperty("UndoState", (int32)B_UNDO_UNAVAILABLE), PROPERTY_READ_ONLY);
 	AddProperty(new BoolProperty("UseWordWrap", true,
 								"Whether or not the text view wraps text to fit to its size."));
 	

@@ -134,6 +134,9 @@ jam -q -j"$CPUCOUNT"
 cd ..
 
 cd PDesigner
+
+# PDesigner needs a link to libcharlemagne's directory for the includes
+ln -s ../libcharlemagne
 BuildNoDebug PDesigner
 cd ..
 

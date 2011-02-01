@@ -60,6 +60,7 @@ SOURCEFILE=PropertyWindow.cpp
 DEPENDENCY=/boot/home/projects/paladin/PDesigner/PropertyWindow.cpp|/boot/home/projects/paladin/PDesigner/PropertyWindow.h|/boot/home/projects/paladin/PDesigner/AutoTextControl.h|/boot/home/projects/paladin/PDesigner/Globals.h|/boot/home/projects/paladin/PDesigner/LockableVar.h|/boot/home/projects/paladin/PDesigner/MsgDefs.h|/boot/home/projects/paladin/PDesigner/PObjectBroker.h|/boot/home/projects/paladin/PDesigner/ObjectList.h|/boot/home/projects/paladin/PDesigner/PProperty.h|/boot/home/projects/paladin/PDesigner/PValue.h|/boot/home/projects/paladin/PDesigner/PObject.h|/boot/home/projects/paladin/PDesigner/PData.h|/boot/home/projects/paladin/PDesigner/PMethod.h|/boot/home/projects/paladin/PDesigner/CInterface.h|/boot/home/projects/paladin/PDesigner/PropEditor.h
 SOURCEFILE=TimeSupport.cpp
 DEPENDENCY=/boot/home/projects/paladin/PDesigner/TimeSupport.h
+LOCALINCLUDE=libcharlemagne
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp
 SYSTEMINCLUDE=/boot/develop/headers/posix

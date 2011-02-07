@@ -251,7 +251,7 @@ void
 PTextControl::InitProperties(void)
 {
 	AddProperty(new StringProperty("Text",""));
-	AddProperty(new FloatProperty("Divider",20.0));
+	AddProperty(new FloatProperty("Divider",0.0));
 	AddProperty(new IntProperty("LabelAlignment",B_ALIGN_LEFT));
 	AddProperty(new IntProperty("TextAlignment",B_ALIGN_LEFT));
 	
@@ -290,7 +290,14 @@ PTextControlBackend::AttachedToWindow(void)
 {
 	SetDivider(0.0);
 	PArgs in, out;
-	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+	{
+		BTextControl::AttachedToWindow();
+		fOwner->SetColorProperty("BackColor",ViewColor());
+	}
 }
 
 
@@ -298,7 +305,11 @@ void
 PTextControlBackend::AllAttached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::AllAttached();
 }
 
 
@@ -306,7 +317,11 @@ void
 PTextControlBackend::DetachedFromWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::DetachedFromWindow();
 }
 
 
@@ -314,7 +329,11 @@ void
 PTextControlBackend::AllDetached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::AllDetached();
 }
 
 
@@ -322,8 +341,11 @@ void
 PTextControlBackend::MakeFocus(bool value)
 {
 	PArgs in, out;
-	in.AddBool("active", value);
-	fOwner->RunEvent("FocusChanged", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FocusChanged");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::MakeFocus(value);
 }
 
 
@@ -332,7 +354,12 @@ PTextControlBackend::FrameMoved(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+	
+	EventData *data = fOwner->FindEvent("");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::FrameMoved(pt);
 }
 
 
@@ -342,7 +369,11 @@ PTextControlBackend::FrameResized(float w, float h)
 	PArgs in, out;
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FrameResized");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::FrameResized(w, h);
 }
 
 
@@ -379,7 +410,12 @@ PTextControlBackend::MouseDown(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseDown");
+
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::MouseDown(pt);
 }
 
 
@@ -388,7 +424,11 @@ PTextControlBackend::MouseUp(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::MouseUp(pt);
 }
 
 
@@ -399,7 +439,11 @@ PTextControlBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
 	in.AddPoint("where", pt);
 	in.AddInt32("buttons", buttons);
 	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::MouseMoved(pt, buttons, msg);
 }
 
 
@@ -408,7 +452,11 @@ PTextControlBackend::WindowActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::WindowActivated(active);
 }
 
 
@@ -416,7 +464,7 @@ void
 PTextControlBackend::Draw(BRect update)
 {
 	EventData *data = fOwner->FindEvent("Draw");
-	if (data->hook)
+	if (data->hook == NULL)
 		BTextControl::Draw(update);
 	
 	PArgs in, out;
@@ -438,7 +486,11 @@ PTextControlBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BTextControl::DrawAfterChildren(update);
 }
 
 

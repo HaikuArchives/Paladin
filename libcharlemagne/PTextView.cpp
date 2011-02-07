@@ -589,7 +589,7 @@ PTextView::InitMethods(void)
 
 
 PTextViewBackend::PTextViewBackend(PObject *owner)
-	:	BTextView(BRect(0,0,1,1),"textview", BRect(0,0,1,1),
+	:	BTextView(BRect(0,0,99,99),"textview", BRect(5,5,94,94),
 					B_FOLLOW_LEFT | B_FOLLOW_TOP),
 		fOwner(owner)
 {

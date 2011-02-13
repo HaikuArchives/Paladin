@@ -40,7 +40,7 @@ private:
 };
 
 PTemplate::PTemplate(void)
-	:	PView()
+	:	PView(true)
 {
 	fType = "PTemplate";
 	fFriendlyType = "Template";
@@ -53,7 +53,7 @@ PTemplate::PTemplate(void)
 
 
 PTemplate::PTemplate(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg, true)
 {
 	fType = "PTemplate";
 	fFriendlyType = "Template";
@@ -68,7 +68,7 @@ PTemplate::PTemplate(BMessage *msg)
 
 
 PTemplate::PTemplate(const char *name)
-	:	PView(name)
+	:	PView(name, true)
 {
 	fType = "PTemplate";
 	fFriendlyType = "Template";
@@ -79,7 +79,7 @@ PTemplate::PTemplate(const char *name)
 
 
 PTemplate::PTemplate(const PTemplate &from)
-	:	PView(from)
+	:	PView(from, true)
 {
 	fType = "PTemplate";
 	fFriendlyType = "Template";

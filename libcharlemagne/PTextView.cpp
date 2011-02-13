@@ -3,6 +3,7 @@
 #include <Application.h>
 #include <Clipboard.h>
 #include <TextView.h>
+#include <stdio.h>
 #include <Window.h>
 
 #include "CInterface.h"
@@ -74,7 +75,7 @@ private:
 #pragma mark PTextView class implementation
 
 PTextView::PTextView(void)
-	:	PView(false)
+	:	PView(true)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -87,7 +88,7 @@ PTextView::PTextView(void)
 
 
 PTextView::PTextView(BMessage *msg)
-	:	PView(msg, false)
+	:	PView(msg, true)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -102,7 +103,7 @@ PTextView::PTextView(BMessage *msg)
 
 
 PTextView::PTextView(const char *name)
-	:	PView(name, false)
+	:	PView(name, true)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -113,7 +114,7 @@ PTextView::PTextView(const char *name)
 
 
 PTextView::PTextView(const PTextView &from)
-	:	PView(from, false)
+	:	PView(from, true)
 {
 	fType = "PTextView";
 	fFriendlyType = "TextView";
@@ -399,7 +400,14 @@ void
 PTextView::InitBackend(void)
 {
 	if (!fView)
+	{
+		printf("Init using BTextViewBackend\n");
 		fView = new PTextViewBackend(this);
+	}
+	else
+	{
+		printf("Using existing backend\n");
+	}
 	StringValue sv("A multi-line text editor.");
 	SetProperty("Description",&sv);
 }
@@ -689,12 +697,14 @@ PTextViewBackend::FrameResized(float w, float h)
 void
 PTextViewBackend::KeyDown(const char *bytes, int32 count)
 {
-	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
-	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
+	{
+		PArgs in, out;
+		in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+		in.AddInt32("count", count);
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	}
 	else
 		BTextView::KeyDown(bytes, count);
 }
@@ -703,12 +713,14 @@ PTextViewBackend::KeyDown(const char *bytes, int32 count)
 void
 PTextViewBackend::KeyUp(const char *bytes, int32 count)
 {
-	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
-	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
+	{
+		PArgs in, out;
+		in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+		in.AddInt32("count", count);
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	}
 	else
 		BTextView::KeyUp(bytes, count);
 }
@@ -717,11 +729,13 @@ PTextViewBackend::KeyUp(const char *bytes, int32 count)
 void
 PTextViewBackend::MouseDown(BPoint pt)
 {
-	PArgs in, out;
-	in.AddPoint("where", pt);
 	EventData *data = fOwner->FindEvent("MouseDown");
 	if (data->hook)
+	{
+		PArgs in, out;
+		in.AddPoint("where", pt);
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	}
 	else
 		BTextView::MouseDown(pt);
 }
@@ -730,11 +744,13 @@ PTextViewBackend::MouseDown(BPoint pt)
 void
 PTextViewBackend::MouseUp(BPoint pt)
 {
-	PArgs in, out;
-	in.AddPoint("where", pt);
 	EventData *data = fOwner->FindEvent("MouseUp");
 	if (data->hook)
+	{
+		PArgs in, out;
+		in.AddPoint("where", pt);
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	}
 	else
 		BTextView::MouseUp(pt);
 }
@@ -743,13 +759,15 @@ PTextViewBackend::MouseUp(BPoint pt)
 void
 PTextViewBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
 {
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
-	in.AddPointer("message", (void*)msg);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
+	{
+		PArgs in, out;
+		in.AddPoint("where", pt);
+		in.AddInt32("buttons", buttons);
+		in.AddPointer("message", (void*)msg);
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	}
 	else
 		BTextView::MouseMoved(pt, buttons, msg);
 }

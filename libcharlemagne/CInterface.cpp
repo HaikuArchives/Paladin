@@ -1495,9 +1495,9 @@ pobjectspace_find_object(uint64_t id)
 
 
 int32_t
-run_app(void *papplication, const char *signature, MethodFunction setupFunc)
+run_app(const char *signature, MethodFunction setupFunc)
 {
-	PApplication *app = static_cast<PApplication*>(papplication);
+	PApplication *app = (PApplication*)MakeObject("PApplication");
 	
 	if (setupFunc)
 		app->ConnectEvent("AppSetup", setupFunc);

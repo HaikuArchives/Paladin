@@ -7,6 +7,7 @@
 
 #include "CInterface.h"
 #include "ObjectList.h"
+#include "PArgs.h"
 #include "PData.h"
 #include "PMethod.h"
 #include "PProperty.h"
@@ -32,6 +33,10 @@ public:
 	PMethodInterface	interface;
 	MethodFunction		hook;
 };
+
+
+void InitObjectSystem(void);
+void ShutdownObjectSystem(void);
 
 
 class PObject : public PData
@@ -106,8 +111,7 @@ private:
 };
 
 // Convenience functions
-PObject *			NewObject(const char *type);
-
+PObject *			MakeObject(const char *type);
 PObject *			UnflattenObject(BMessage *msg);
 
 #endif

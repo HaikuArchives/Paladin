@@ -254,7 +254,7 @@ void				pobjectspace_friendly_type_at(int32_t index, char **out);
 void *				pobjectspace_find_object(uint64_t id);
 
 /* This method saves a load of code just to run the PApplication object */
-int32_t				run_app(void *papplication, const char *signature, MethodFunction setupFunc);
+int32_t				run_app(const char *signature, MethodFunction setupFunc);
 
 void *				pobject_create(const char *type);
 void *				pobject_duplicate(void *pobj);

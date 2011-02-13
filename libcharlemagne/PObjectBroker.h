@@ -10,9 +10,6 @@
 
 typedef PObject *	(*MakeObjectFunc)(void);
 
-void InitObjectSystem(void);
-void ShutdownObjectSystem(void);
-
 enum
 {
 	POBJECT_BROKER_DELETE_OBJECT = 'pdlo'

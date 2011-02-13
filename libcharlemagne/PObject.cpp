@@ -645,7 +645,7 @@ PObject::ConnectEvent(const char *name, MethodFunction func)
 
 
 PObject *
-NewObject(const char *type)
+MakeObject(const char *type)
 {
 	PObjectBroker *owner = PObjectBroker::GetBrokerInstance();
 	return owner->MakeObject(type);

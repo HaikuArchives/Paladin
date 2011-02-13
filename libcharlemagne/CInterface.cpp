@@ -1928,11 +1928,11 @@ pmethod_get_function(void *pmethod)
 
 
 int32_t 
-pmethod_run(void *pmethod, void *pobject, PArgList &in, PArgList &out)
+pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out)
 {
 	PMethod *pm = static_cast<PMethod*>(pmethod);
 	PObject *pobj = static_cast<PObject*>(pobject);
-	return pm ? pm->Run(pobj, in, out) : B_ERROR;
+	return pm ? pm->Run(pobj, *in, *out) : B_ERROR;
 }
 
 

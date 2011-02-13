@@ -124,6 +124,7 @@ PTemplate::GetProperty(const char *name, PValue *value, const int32 &index) cons
 	if (str.ICompare("PropertyOne") == 0)
 	{
 		// call backend method here
+		view->CountChildren();
 	}
 	else
 	{
@@ -174,6 +175,7 @@ PTemplate::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		// prop->GetValue(&sv);
 		// Invoke backend method here
+		view->CountChildren();
 	}
 	else
 	{

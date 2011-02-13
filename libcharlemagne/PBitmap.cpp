@@ -95,6 +95,7 @@ PBitmap::GetProperty(const char *name, PValue *value, const int32 &index) const
 	
 	return prop->GetValue(value);
 */
+	return B_OK;
 }
 
 
@@ -131,6 +132,7 @@ PBitmap::SetProperty(const char *name, PValue *value, const int32 &index)
 	
 	return prop->GetValue(value);
 */
+	return B_OK;
 }
 
 

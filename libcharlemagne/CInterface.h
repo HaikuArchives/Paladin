@@ -9,10 +9,12 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 	extern "C" {
 #else
-	typedef unsigned char bool;
+	#ifndef SWIG
+		typedef unsigned char bool;
+	#endif
 #endif
 
 /*
@@ -73,8 +75,6 @@ struct p_arg_list
 typedef struct p_arg_list PArgList;
 
 typedef int32_t (*MethodFunction)(void *pobject, PArgList *in, PArgList *out);
-int32_t NullPMethod(void *pobject, PArgList *in, PArgList *out);
-
 
 /* -------------------------------------------------------------------------------------
 	Argument-passing code
@@ -156,8 +156,8 @@ int32_t				find_parg_pointer(PArgList *list, const char *name, void **ptr);
 /* -------------------------------------------------------------------------------------
 	PValue-related definitions
    ------------------------------------------------------------------------------------- */
-bool				pvalue_accepts_type(void *pval, const char *type);
-bool				pvalue_returns_type(void *pval, const char *type);
+bool				pvalue_accepts_type(void *pval, void *type);
+bool				pvalue_returns_type(void *pval, void *type);
 int32_t				pvalue_copy_value(void *from, void *to);
 void				pvalue_get_type(void *pval, char **out);
 
@@ -315,11 +315,11 @@ int32_t				pmethodinterface_find_rval(void *pmi, const char *name);
 void *				pmethod_create(void);
 void				pmethod_destroy(void *pmethod);
 void				pmethod_set_name(void *pmethod, const char *name);
-void				pmethod_get_name(void *pmethod, const char **out);
+void				pmethod_get_name(void *pmethod, char **out);
 void				pmethod_set_interface(void *pmethod, void *pmi);
 void				pmethod_get_interface(void *pmethod, void *pmi);
 void				pmethod_set_desc(void *pmethod, const char *name);
-void				pmethod_get_desc(void *pmethod, const char **out);
+void				pmethod_get_desc(void *pmethod, char **out);
 void				pmethod_set_function(void *pmethod, MethodFunction func);
 MethodFunction		pmethod_get_function(void *pmethod);
 int32_t				pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out);

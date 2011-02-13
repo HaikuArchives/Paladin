@@ -103,6 +103,9 @@ PObjectBroker::MakeObject(const char *type, BMessage *msg)
 	if (!type)
 		return NULL;
 	
+	if (pApp && BString(type).ICompare("PApplication") == 0)
+		return pApp;
+	
 	PObjectInfo *info = NULL;
 	for (int32 i = 0; i < fObjInfoList->CountItems(); i++)
 	{

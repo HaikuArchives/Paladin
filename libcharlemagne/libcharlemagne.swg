@@ -1,7 +1,5 @@
 %module haiku
 %{
-#include "AutoTextControl.h"
-#include "ObjectList.h"
 #include "PArgs.h"
 #include "PData.h"
 #include "PMethod.h"
@@ -13,8 +11,6 @@
 #include "PValue.h"
 %}
 
-%include "AutoTextControl.h"
-%include "ObjectList.h"
 %include "PArgs.h"
 %include "PData.h"
 %include "PMethod.h"

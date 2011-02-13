@@ -1,4 +1,4 @@
-%module haiku
+%module charlemagne
 %{
 #include "PArgs.h"
 #include "PData.h"

@@ -44,7 +44,8 @@ ShutdownObjectSystem(void)
 
 PObjectBroker::PObjectBroker(void)
 	:	BLooper("PObjectBroker"),
-		fQuitting(false)
+		fQuitting(false),
+		pApp(NULL)
 {
 	fObjectList = new BObjectList<PObject>(20,true);
 	fObjInfoList = new BObjectList<PObjectInfo>(20,true);
@@ -86,8 +87,13 @@ PObjectBroker::~PObjectBroker(void)
 {
 	fQuitting = true;
 	
+	if (pApp)
+		fObjectList->RemoveItem(pApp, false);
+	
 	delete fObjectList;
 	delete fObjInfoList;
+	
+	delete pApp;
 }
 
 
@@ -112,6 +118,10 @@ PObjectBroker::MakeObject(const char *type, BMessage *msg)
 	{
 		PObject *obj = msg ? (PObject*)info->arcfunc(msg) : info->createfunc();
 		fObjectList->AddItem(obj);
+		
+		if (!pApp && obj->GetType().Compare("PApplication") == 0)
+			pApp = obj;
+		
 		return obj;
 	}
 	
@@ -171,6 +181,9 @@ PObjectBroker::FindObject(const uint64 &id)
 PObjectBroker *
 PObjectBroker::GetBrokerInstance(void)
 {
+	if (!sBroker)
+		InitObjectSystem();
+	
 	return sBroker;
 }
 

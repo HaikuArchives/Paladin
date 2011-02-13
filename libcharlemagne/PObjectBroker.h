@@ -63,7 +63,8 @@ private:
 	
 	PObjectInfo *		FindObjectInfo(const char *type);
 	
-	bool						fQuitting;
+	bool				fQuitting;
+	PObject				*pApp;
 };
 
 #define BROKER PObjectBroker::GetBrokerInstance()

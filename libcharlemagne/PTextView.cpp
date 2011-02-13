@@ -408,7 +408,6 @@ PTextView::InitBackend(void)
 void
 PTextView::InitProperties(void)
 {
-	BTextView *tview = dynamic_cast<BTextView*>(fView);
 	AddProperty(new IntProperty("Alignment", B_ALIGN_LEFT,
 								"The current alignment mode of the text view's contents."));
 	AddProperty(new BoolProperty("AutoIndent", false, "Toggles autoindenting of new lines."));
@@ -444,7 +443,6 @@ PTextView::InitProperties(void)
 								"The size and location of the area used to display the text."));
 	AddProperty(new BoolProperty("Undoable", true,
 								"Whether or not the text view supports undo."));
-	bool isredo;
 	AddProperty(new IntProperty("UndoState", (int32)B_UNDO_UNAVAILABLE), PROPERTY_READ_ONLY);
 	AddProperty(new BoolProperty("UseWordWrap", true,
 								"Whether or not the text view wraps text to fit to its size."));

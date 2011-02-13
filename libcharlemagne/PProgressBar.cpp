@@ -41,7 +41,7 @@ private:
 };
 
 PProgressBar::PProgressBar(void)
-	:	PView(false)
+	:	PView(true)
 {
 	fType = "PProgressBar";
 	fFriendlyType = "Progress Bar";
@@ -54,7 +54,7 @@ PProgressBar::PProgressBar(void)
 
 
 PProgressBar::PProgressBar(BMessage *msg)
-	:	PView(msg, false)
+	:	PView(msg, true)
 {
 	fType = "PProgressBar";
 	fFriendlyType = "Progress Bar";
@@ -69,7 +69,7 @@ PProgressBar::PProgressBar(BMessage *msg)
 
 
 PProgressBar::PProgressBar(const char *name)
-	:	PView(name, false)
+	:	PView(name, true)
 {
 	fType = "PProgressBar";
 	fFriendlyType = "Progress Bar";
@@ -80,7 +80,7 @@ PProgressBar::PProgressBar(const char *name)
 
 
 PProgressBar::PProgressBar(const PProgressBar &from)
-	:	PView(from, false)
+	:	PView(from, true)
 {
 	fType = "PProgressBar";
 	fFriendlyType = "Progress Bar";

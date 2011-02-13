@@ -1,5 +1,7 @@
 Test and fix PTextControl problems
 
+Implement a header for the constants for the HAIKU API, such as resizing modes, BView flags, etc.
+
 Objects to Implement:
 
 PColorControl

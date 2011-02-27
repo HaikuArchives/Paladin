@@ -1,7 +1,7 @@
 #!/bin/sh
 clear
 rm test.db
-find /boot/develop/headers/os -name "*.h" -exec ./IndexHaikuHeader.lua test.db '{}' \;
+find /boot/develop/headers/os -name "*.h" -exec lua ./IndexHaikuHeader.lua test.db '{}' \;
 echo "------------------------"
 echo "Files"
 echo "------------------------"

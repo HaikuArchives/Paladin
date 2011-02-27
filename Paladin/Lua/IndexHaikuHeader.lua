@@ -139,7 +139,7 @@ end
 ----------------------------------------------------------------------------------------------
 -- Begin main part of script
 
-SetupParser = assert(loadfile("headerparser.lua"))
+SetupParser = assert(loadfile("ParseHaikuHeader.lua"))
 SetupParser()
 
 env = luasql.sqlite3("")

@@ -13,7 +13,6 @@ if (arg[2] and arg[2] ==  "-d") then
 end
 
 dprint("Analysis tracing enabled")
-
 tokenList = TokenizeHeader(arg[1])
 headerData = AnalyzeTokens(tokenList)
 

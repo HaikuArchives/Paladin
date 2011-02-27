@@ -91,8 +91,9 @@ function TokenizeHeader(filePath)
 	
 	-- Convert the definitions for #define and #if directives into stand-in tokens to
 	-- make analysis easier
-	data = string.gsub(data, "(\#define [%w_]+)[ \t]+[^\n]+\n","%1 1234\n")
-	data = string.gsub(data, "\#if[%s]+[^\n]+\n","#if 1234\n")
+	data = string.gsub(data, "(\#define%s[%w_%s\t%(%),]+)[ \t]+[^\n]+\n","%1 1234\n")
+	data = string.gsub(data, "(\#define%s[%w_]+%(.-%))[ \t]+[^\n]+\n","%1 1234\n")
+	data = string.gsub(data, "\#if%s+[^\n]+\n","#if 1234\n")
 	
 	-- Convert strings into stand-ins because while we don't track strings, we should
 	-- have something in place for tokenization purposes. Escaped quotes are turned
@@ -367,8 +368,14 @@ function AnalyzeClass(tokenList, index)
 	
 	local tokenCount = table.getn(tokenList)
 	local leftBraceIndex = FindToken(tokenList, "{", index + 1)
+	
+	if (not leftBraceIndex) then
+		return { ["nextIndex"] = index + 1,
+				["class"] = nil }
+	end
+	
 	local rightBraceIndex = FindPartnerToken(tokenList, "{", "}", leftBraceIndex)
-	if (rightBraceIndex == nil) then
+	if (not rightBraceIndex) then
 		print ("Unclosed brace at token " .. index .. ". Aborting class scan")
 		return { ["nextIndex"] = leftBraceIndex + 1,
 				["class"] = nil }
@@ -490,6 +497,13 @@ function AnalyzeGlobal(tokenList, index)
 	elseif (token == "(") then
 		local startIndex = index - 2
 		local semicolonIndex = FindToken(tokenList, ";", index);
+if (semicolonIndex == nil) then
+	print("Null semicolon index at " .. index)
+	local rightIndex = FindToken(tokenList, ")", index)
+	if (rightIndex) then
+		print("Entry: " .. JoinTokens(tokenList, startIndex, rightIndex - 1, " "))
+	end
+end
 		outData.entry = JoinTokens(tokenList, startIndex, semicolonIndex - 1, " ")
 		outData.nextIndex = semicolonIndex + 1
 		outData.removeCount = 2

@@ -83,7 +83,6 @@ App::RefsReceived(BMessage *msg)
 void
 App::ReadyToRun(void)
 {
-	debugger("Ready to run");
 	if (CountRegisteredWindows() < 1)
 	{
 		PkgWindow *win = new PkgWindow(NULL);

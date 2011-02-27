@@ -1,3 +1,13 @@
+Finish inherited methods for BBox
+
+Check all MakeFocus methods and make sure they send in boolean parameter they are supposed to
+
+Fix MouseMoved fields for all BView-based classes
+
+Finish PRoster class
+
+Look into refactoring AddMethod/AddInheritedMethod to emptying the PMethodInterface given it for code clarity
+
 Test and fix PTextControl problems
 
 Implement a header for the constants for the HAIKU API, such as resizing modes, BView flags, etc.

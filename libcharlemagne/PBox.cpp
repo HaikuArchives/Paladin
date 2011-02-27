@@ -7,6 +7,20 @@
 #include "EnumProperty.h"
 #include "PArgs.h"
 
+int32_t BBoxSetBorder(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxDraw(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxAttachedToWindow(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxDetachedFromWindow(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxAllAttached(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxAllDetached(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxFrameResized(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxMouseUp(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxMouseDown(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxMouseMoved(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxFrameMoved(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxResizeToPreferred(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxGetPreferredSize(void *pobj, PArgList *in, PArgList *out);
+int32_t BBoxMakeFocus(void *pobj, PArgList *in, PArgList *out);
 
 class PBoxBackend : public BBox
 {
@@ -236,6 +250,52 @@ PBox::InitProperties(void)
 void
 PBox::InitMethods(void)
 {
+	PMethodInterface pmi;
+	
+	pmi.AddArg("border", PARG_INT32, "The border style constant");
+	AddInheritedMethod(new PMethod("BBox::SetBorder", BBoxSetBorder, &pmi));
+	
+	pmi.SetArg(0, "update", PARG_RECT, "The area to update");
+	AddInheritedMethod(new PMethod("BBox::Draw", BBoxDraw, &pmi));
+	
+	pmi.MakeEmpty();
+	AddInheritedMethod(new PMethod("BBox::AttachedToWindow", BBoxAttachedToWindow));
+	AddInheritedMethod(new PMethod("BBox::DetachedFromWindow", BBoxAttachedToWindow));
+	AddInheritedMethod(new PMethod("BBox::AllAttached", BBoxAllAttached));
+	AddInheritedMethod(new PMethod("BBox::AllDetached", BBoxAllDetached));
+	
+	pmi.AddArg("width", PARG_FLOAT, "The new width");
+	pmi.AddArg("height", PARG_FLOAT, "The new height");
+	AddInheritedMethod(new PMethod("BBox::FrameResized", BBoxFrameResized, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("where", PARG_POINT, "The location of the mouse up event");
+	AddInheritedMethod(new PMethod("BBox::MouseUp", BBoxMouseUp, &pmi));
+
+	pmi.SetArg(0, "where", PARG_POINT, "The location of the mouse down event");
+	AddInheritedMethod(new PMethod("BBox::MouseDown", BBoxMouseDown, &pmi));
+	
+	pmi.SetArg(0, "where", PARG_POINT, "The current location of the pointer");
+	pmi.AddArg("transit", PARG_INT32, "The transit flag. See BView::MouseDown.");
+	pmi.AddArg("buttons", PARG_INT32, "The current mouse button state");
+	pmi.AddArg("message", PARG_POINTER, "The drag message. NULL if empty");
+	AddInheritedMethod(new PMethod("BBox::MouseMoved", BBoxMouseMoved, &pmi));
+	pmi.MakeEmpty();
+	
+	AddInheritedMethod(new PMethod("BBox::ResizeToPreferred", BBoxResizeToPreferred));
+	
+	pmi.AddArg("where", PARG_POINT, "The new top left corner of the frame.");
+	AddInheritedMethod(new PMethod("BBox::FrameMoved", BBoxFrameMoved, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddReturnValue("width", PARG_FLOAT, "The preferred width");
+	pmi.AddReturnValue("height", PARG_FLOAT, "The preferred height");
+	AddInheritedMethod(new PMethod("BBox::GetPreferredSize", BBoxGetPreferredSize, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddArg("focus", PARG_BOOL, "The current focus value - active or inactive.");
+	AddInheritedMethod(new PMethod("BBox::MakeFocus", BBoxMakeFocus, &pmi));
+	pmi.MakeEmpty();
 }
 
 
@@ -302,6 +362,7 @@ void
 PBoxBackend::MakeFocus(bool value)
 {
 	PArgs in, out;
+	in.AddBool("focus", value);
 	EventData *data = fOwner->FindEvent("FocusChanged");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
@@ -476,7 +537,7 @@ PBoxAttachedToWindow(void *pobject, PArgList *in, PArgList *out)
 	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PView *parent = static_cast<PView*>(pobject);
+	PBox *parent = static_cast<PBox*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
@@ -498,7 +559,7 @@ PBoxDraw(void *pobject, PArgList *in, PArgList *out)
 	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PView *parent = static_cast<PView*>(pobject);
+	PBox *parent = static_cast<PBox*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
@@ -509,7 +570,13 @@ PBoxDraw(void *pobject, PArgList *in, PArgList *out)
 	
 	PArgs args(in);
 	BRect r;
-	args.FindRect("update", &r);
+	int32_t outCode = args.FindRect("update", &r);
+	if (outCode != B_OK)
+	{
+		if (fView->Window())
+			fView->Window()->Unlock();
+		return outCode;
+	}
 	
 	fView->BBox::Draw(r);
 	
@@ -526,7 +593,7 @@ PBoxFrameResized(void *pobject, PArgList *in, PArgList *out)
 	if (!pobject || !in || !out)
 		return B_ERROR;
 	
-	PView *parent = static_cast<PView*>(pobject);
+	PBox *parent = static_cast<PBox*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
@@ -536,10 +603,418 @@ PBoxFrameResized(void *pobject, PArgList *in, PArgList *out)
 		fView->Window()->Lock();
 	
 	float w,h;
-	find_parg_float(in, "width", &w);
-	find_parg_float(in, "height", &h);
+	int32_t outCode;
+	outCode = find_parg_float(in, "width", &w);
+	if (outCode != B_OK)
+		return outCode;
+	
+	outCode = find_parg_float(in, "height", &h);
+	if (outCode != B_OK)
+		return outCode;
 	
 	fView->BBox::FrameResized(w, h);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxSetBorder(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	int32_t b;
+	int32_t outCode = find_parg_int32(in, "border", &b);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::SetBorder((border_style)b);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxDraw(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float left, top, right, bottom;
+	int32_t outCode = find_parg_rect(in, "update", &left, &top, &right, &bottom);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::Draw(BRect(left, top, right, bottom));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxAttachedToWindow(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BBox::AttachedToWindow();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxDetachedFromWindow(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BBox::DetachedFromWindow();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxAllAttached(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BBox::AllAttached();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxAllDetached(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BBox::AllDetached();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxFrameResized(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float w,h;
+	int32 outCode;
+	outCode = find_parg_float(in, "width", &w);
+	if (outCode != B_OK)
+		return outCode;
+	
+	outCode = find_parg_float(in, "height", &h);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::FrameResized(w, h);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxMouseUp(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32 outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::MouseUp(BPoint(x,y));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxMouseDown(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32 outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::MouseDown(BPoint(x,y));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxMouseMoved(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32_t outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+
+	int32_t transit;
+	outCode = find_parg_int32(in, "transit", &transit);
+	if (outCode != B_OK)
+		return outCode;
+	
+	void *msg;
+	outCode = find_parg_pointer(in, "message", &msg);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::MouseMoved(BPoint(x,y), transit, (BMessage*)msg);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxFrameMoved(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32 outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::FrameMoved(BPoint(x,y));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxResizeToPreferred(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BBox::ResizeToPreferred();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxGetPreferredSize(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float w, h;
+	fView->BBox::GetPreferredSize(&w, &h);
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddFloat("width", w);
+	outArgs.AddFloat("heigh", h);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BBoxMakeFocus(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PBox *parent = static_cast<PBox*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BBox *fView = (BBox*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	bool b;
+	int32_t outCode;
+	outCode = find_parg_bool(in, "focus", &b);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BBox::MakeFocus(b);
 	
 	if (fView->Window())
 		fView->Window()->Unlock();

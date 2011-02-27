@@ -644,6 +644,7 @@ PView::InitMethods(void)
 	
 	pmi.SetArg(0, "where", PARG_POINT, "The current location of the mouse.");
 	pmi.AddArg("buttons", PARG_INT32, "The current button state.");
+	pmi.AddArg("transit", PARG_INT32, "The transition state.");
 	pmi.AddArg("message", PARG_POINTER, "Attached data if dragging something.");
 	AddEvent("MouseMoved", "The mouse was moved over the view.", &pmi);
 	pmi.RemoveArg(2);

@@ -65,6 +65,11 @@ public:
 			PMethod *		MethodAt(const int32 &index) const;
 			int32			CountMethods(void) const;
 			
+	virtual	status_t		RunInheritedMethod(const char *name, PArgList &in, PArgList &out);
+			PMethod *		FindInheritedMethod(const char *name);
+			PMethod *		InheritedMethodAt(const int32 &index) const;
+			int32			CountInheritedMethods(void) const;
+			
 			BString			GetType(void) const;
 			BString			GetFriendlyType(void) const;
 			
@@ -93,6 +98,8 @@ protected:
 	virtual	status_t		RemoveMethod(const char *name);
 	virtual	status_t		ReplaceMethod(const char *old, PMethod *newMethod);
 	
+	virtual	status_t		AddInheritedMethod(PMethod *method);
+	
 	virtual	status_t		AddEvent(const char *name, const char *description,
 									PMethodInterface *interface = NULL);
 	virtual	status_t		RemoveEvent(const char *name);
@@ -106,6 +113,7 @@ private:
 	uint64						fObjectID;
 	BObjectList<PropertyData>	*fPropertyList;
 	BObjectList<PMethod>		*fMethodList;
+	BObjectList<PMethod>		*fInheritedList;
 	BObjectList<BString>		*fInterfaceList;
 	BObjectList<EventData>		*fEventList;
 };

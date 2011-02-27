@@ -9,6 +9,7 @@
 #include "PBox.h"
 #include "PButton.h"
 #include "PCheckBox.h"
+#include "PColorControl.h"
 #include "PHandler.h"
 #include "PLabel.h"
 #include "PListView.h"
@@ -63,6 +64,8 @@ PObjectBroker::PObjectBroker(void)
 	fObjInfoList->AddItem(new PObjectInfo("PCheckBox","Checkbox",PCheckBox::Instantiate,
 											PCheckBox::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PBox","Box",PBox::Instantiate,PBox::Create));
+	fObjInfoList->AddItem(new PObjectInfo("PColorControl","Color Picker",PColorControl::Instantiate,
+											PColorControl::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PControl","Generic Control",PControl::Instantiate,
 											PControl::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PLabel","Label",PLabel::Instantiate,PLabel::Create));

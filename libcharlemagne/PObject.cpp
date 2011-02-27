@@ -10,6 +10,7 @@ PObject::PObject(void)
 		fFriendlyType("Generic Object")
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
@@ -26,6 +27,7 @@ PObject::PObject(BMessage *msg)
 	:	fType("PObject")
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
@@ -57,6 +59,7 @@ PObject::PObject(const char *name)
 	:	fType("PObject")
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
@@ -73,6 +76,7 @@ PObject::PObject(const PObject &from)
 	:	fType("PObject")
 {
 	fPropertyList = new BObjectList<PropertyData>(20,true);
+	fInheritedList = new BObjectList<PMethod>(20,true);
 	fInterfaceList = new BObjectList<BString>(20,true);
 	fMethodList = new BObjectList<PMethod>(20,true);
 	fEventList = new BObjectList<EventData>(20,true);
@@ -227,6 +231,48 @@ int32
 PObject::CountMethods(void) const
 {
 	return fMethodList->CountItems();
+}
+
+
+status_t
+PObject::RunInheritedMethod(const char *name, PArgList &in, PArgList &out)
+{
+	PMethod *method = FindInheritedMethod(name);
+	if (!method)
+		return B_NAME_NOT_FOUND;
+	
+	method->Run(this, in, out);
+	return B_OK;
+}
+
+
+PMethod *
+PObject::FindInheritedMethod(const char *name)
+{
+	if (!name)
+		return NULL;
+	
+	for (int32 i = 0; i < fInheritedList->CountItems(); i++)
+	{
+		PMethod *item = fInheritedList->ItemAt(i);
+		if (item->GetName().ICompare(name) == 0)
+			return item;
+	}
+	return NULL;
+}
+
+
+PMethod *
+PObject::InheritedMethodAt(const int32 &index) const
+{
+	return fInheritedList->ItemAt(index);
+}
+
+
+int32
+PObject::CountInheritedMethods(void) const
+{
+	return fInheritedList->CountItems();
 }
 
 

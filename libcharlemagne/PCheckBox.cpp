@@ -136,7 +136,11 @@ PCheckBoxBackend::AttachedToWindow(void)
 	fOwner->SetColorProperty("BackColor",Parent()->ViewColor());
 	
 	PArgs in, out;
-	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PCheckBoxBackend::AttachedToWindow();
 }
 
 
@@ -144,7 +148,11 @@ void
 PCheckBoxBackend::AllAttached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PCheckBoxBackend::AllAttached();
 }
 
 
@@ -152,7 +160,11 @@ void
 PCheckBoxBackend::DetachedFromWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PCheckBoxBackend::DetachedFromWindow();
 }
 
 
@@ -160,7 +172,11 @@ void
 PCheckBoxBackend::AllDetached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PCheckBoxBackend::AllDetached();
 }
 
 
@@ -229,7 +245,11 @@ PCheckBoxBackend::MouseDown(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BCheckBox::MouseDown(pt);
 }
 
 
@@ -238,18 +258,26 @@ PCheckBoxBackend::MouseUp(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BCheckBox::MouseUp(pt);
 }
 
 
 void
-PCheckBoxBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PCheckBoxBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BCheckBox::MouseMoved(pt, transit, msg);
 }
 
 
@@ -258,7 +286,11 @@ PCheckBoxBackend::WindowActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BCheckBox::WindowActivated(active);
 }
 
 
@@ -287,19 +319,26 @@ PCheckBoxBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BCheckBox::DrawAfterChildren(update);
 }
 
 
 status_t
 PCheckBoxBackend::Invoke(BMessage *msg)
 {
+	PArgs in, out;
 	EventData *data = fOwner->FindEvent("Invoke");
-	if (!data->hook)
+	if (data->hook)
+		return fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
 		return BCheckBox::Invoke(msg);
 	
-	PArgs in, out;
-	return fOwner->RunEvent("Invoke", in.ListRef(), out.ListRef());
+	// Just to hush the compiler
+	return B_OK;
 }
 
 

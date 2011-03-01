@@ -2,6 +2,8 @@ Add inherited methods for everything except BBox
 
 Fix hook functions in PCheckBoxBackend, PLabelBackend, PListView, PRadioButton, PScrollBar, PSlider, PView
 
+Once all inherited methods are added, make Draw hook functions work like the others and update PDesigner accordingly
+
 Fix MouseMoved fields for all BView-based classes
 
 Finish PRoster class

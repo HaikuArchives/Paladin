@@ -256,10 +256,14 @@ PLabelBackend::PLabelBackend(PObject *owner)
 void
 PLabelBackend::AttachedToWindow(void)
 {
-	BStringView::AttachedToWindow();
+	fOwner->SetColorProperty("BackColor",Parent()->ViewColor());
 	
 	PArgs in, out;
-	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PLabelBackend::AttachedToWindow();
 }
 
 
@@ -267,7 +271,11 @@ void
 PLabelBackend::AllAttached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PLabelBackend::AllAttached();
 }
 
 
@@ -275,7 +283,11 @@ void
 PLabelBackend::DetachedFromWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PLabelBackend::DetachedFromWindow();
 }
 
 
@@ -283,7 +295,11 @@ void
 PLabelBackend::AllDetached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		PLabelBackend::AllDetached();
 }
 
 

@@ -1,10 +1,12 @@
-Finish inherited methods for BBox
+Add inherited methods for everything except BBox
 
-Check all MakeFocus methods and make sure they send in boolean parameter they are supposed to
+Fix hook functions in PCheckBoxBackend, PLabelBackend, PListView, PRadioButton, PScrollBar, PSlider, PView
 
 Fix MouseMoved fields for all BView-based classes
 
 Finish PRoster class
+
+Finish PBitmap class
 
 Look into refactoring AddMethod/AddInheritedMethod to emptying the PMethodInterface given it for code clarity
 

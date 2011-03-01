@@ -291,8 +291,12 @@ void
 PLabelBackend::MakeFocus(bool value)
 {
 	PArgs in, out;
-	in.AddBool("active", value);
-	fOwner->RunEvent("FocusChanged", in.ListRef(), out.ListRef());
+	in.AddBool("focus", value);
+	EventData *data = fOwner->FindEvent("FocusChanged");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MakeFocus(value);
 }
 
 

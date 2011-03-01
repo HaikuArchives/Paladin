@@ -658,6 +658,7 @@ void
 PTextViewBackend::MakeFocus(bool value)
 {
 	PArgs in, out;
+	in.AddBool("focus", value);
 	EventData *data = fOwner->FindEvent("FocusChanged");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());

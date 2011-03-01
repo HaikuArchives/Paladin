@@ -14,7 +14,6 @@ Implement a header for the constants for the HAIKU API, such as resizing modes, 
 
 Objects to Implement:
 
-PColorControl
 PCursor class and associated methods in PApplication
 PDragger
 PFont

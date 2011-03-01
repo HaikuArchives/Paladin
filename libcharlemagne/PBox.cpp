@@ -276,7 +276,6 @@ PBox::InitMethods(void)
 	AddInheritedMethod(new PMethod("BBox::MouseDown", BBoxMouseDown, &pmi));
 	
 	pmi.SetArg(0, "where", PARG_POINT, "The current location of the pointer");
-	pmi.AddArg("transit", PARG_INT32, "The transit flag. See BView::MouseDown.");
 	pmi.AddArg("transit", PARG_INT32, "The mouse transition state");
 	pmi.AddArg("message", PARG_POINTER, "The drag message. NULL if empty");
 	AddInheritedMethod(new PMethod("BBox::MouseMoved", BBoxMouseMoved, &pmi));
@@ -292,7 +291,7 @@ PBox::InitMethods(void)
 	pmi.AddReturnValue("height", PARG_FLOAT, "The preferred height");
 	AddInheritedMethod(new PMethod("BBox::GetPreferredSize", BBoxGetPreferredSize, &pmi));
 	pmi.MakeEmpty();
-
+	
 	pmi.AddArg("focus", PARG_BOOL, "The current focus value - active or inactive.");
 	AddInheritedMethod(new PMethod("BBox::MakeFocus", BBoxMakeFocus, &pmi));
 	pmi.MakeEmpty();

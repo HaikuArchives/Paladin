@@ -1,10 +1,32 @@
 #include "PButton.h"
 
 #include <Application.h>
+#include <Window.h>
 #include <stdio.h>
 
 #include "DebugTools.h"
 #include "PArgs.h"
+
+int32_t BButtonDraw(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonAttachedToWindow(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonDetachedFromWindow(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonAllAttached(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonAllDetached(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonFrameResized(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonMouseUp(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonMouseDown(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonMouseMoved(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonFrameMoved(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonResizeToPreferred(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonGetPreferredSize(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonMakeFocus(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonKeyDown(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonMakeDefault(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonSetLabel(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonWindowActivated(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonSetValue(void *pobj, PArgList *in, PArgList *out);
+int32_t BButtonInvoke(void *pobj, PArgList *in, PArgList *out);
+
 
 class PButtonBackend : public BButton
 {
@@ -128,6 +150,74 @@ PButton::Duplicate(void) const
 void
 PButton::InitMethods(void)
 {
+	PMethodInterface pmi;
+	
+	pmi.AddArg("update", PARG_RECT, "The area to update");
+	AddInheritedMethod(new PMethod("BButton::Draw", BButtonDraw, &pmi));
+	
+	pmi.MakeEmpty();
+	AddInheritedMethod(new PMethod("BButton::AttachedToWindow", BButtonAttachedToWindow));
+	AddInheritedMethod(new PMethod("BButton::DetachedFromWindow", BButtonAttachedToWindow));
+	AddInheritedMethod(new PMethod("BButton::AllAttached", BButtonAllAttached));
+	AddInheritedMethod(new PMethod("BButton::AllDetached", BButtonAllDetached));
+	
+	pmi.AddArg("width", PARG_FLOAT, "The new width");
+	pmi.AddArg("height", PARG_FLOAT, "The new height");
+	AddInheritedMethod(new PMethod("BButton::FrameResized", BButtonFrameResized, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("where", PARG_POINT, "The location of the mouse up event");
+	AddInheritedMethod(new PMethod("BButton::MouseUp", BButtonMouseUp, &pmi));
+
+	pmi.SetArg(0, "where", PARG_POINT, "The location of the mouse down event");
+	AddInheritedMethod(new PMethod("BButton::MouseDown", BButtonMouseDown, &pmi));
+	
+	pmi.SetArg(0, "where", PARG_POINT, "The current location of the pointer");
+	pmi.AddArg("transit", PARG_INT32, "The mouse transition state");
+	pmi.AddArg("message", PARG_POINTER, "The drag message. NULL if empty");
+	AddInheritedMethod(new PMethod("BButton::MouseMoved", BButtonMouseMoved, &pmi));
+	pmi.MakeEmpty();
+	
+	AddInheritedMethod(new PMethod("BButton::ResizeToPreferred", BButtonResizeToPreferred));
+	
+	pmi.AddArg("where", PARG_POINT, "The new top left corner of the frame.");
+	AddInheritedMethod(new PMethod("BButton::FrameMoved", BButtonFrameMoved, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddReturnValue("width", PARG_FLOAT, "The preferred width");
+	pmi.AddReturnValue("height", PARG_FLOAT, "The preferred height");
+	AddInheritedMethod(new PMethod("BButton::GetPreferredSize", BButtonGetPreferredSize, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddArg("focus", PARG_BOOL, "The current focus value - active or inactive.");
+	AddInheritedMethod(new PMethod("BButton::MakeFocus", BButtonMakeFocus, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddArg("count", PARG_INT32, "Size of the key down array, in bytes");
+	pmi.AddArg("bytes", PARG_RAW, "Character array containing the key pressed.");
+	AddInheritedMethod(new PMethod("BButton::KeyDown", BButtonKeyDown, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("value", PARG_BOOL, "Whether or not the button should be the default");
+	AddInheritedMethod(new PMethod("BButton::MakeDefault", BButtonMakeDefault, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("label", PARG_STRING, "The label for the button.");
+	AddInheritedMethod(new PMethod("BButton::SetLabel", BButtonSetLabel, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("active", PARG_BOOL, "Whether or not the window is active");
+	AddInheritedMethod(new PMethod("BButton::WindowActivated", BButtonWindowActivated, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("value", PARG_INT32, "The on/off value for the button");
+	AddInheritedMethod(new PMethod("BButton::SetValue", BButtonSetValue, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("message", PARG_POINTER, "Pointer to the message to send. May be NULL.");
+	AddInheritedMethod(new PMethod("BButton::Invoke", BButtonInvoke, &pmi));
+	pmi.MakeEmpty();
+	
 }
 
 
@@ -381,3 +471,559 @@ PButtonBackend::MessageReceived(BMessage *msg)
 	
 	BButton::MessageReceived(msg);
 }
+
+
+int32_t
+BButtonDraw(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float left, top, right, bottom;
+	int32_t outCode = find_parg_rect(in, "update", &left, &top, &right, &bottom);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::Draw(BRect(left, top, right, bottom));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonAttachedToWindow(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BButton::AttachedToWindow();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonDetachedFromWindow(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BButton::DetachedFromWindow();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonAllAttached(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BButton::AllAttached();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonAllDetached(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BButton::AllDetached();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonFrameResized(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float w,h;
+	int32 outCode;
+	outCode = find_parg_float(in, "width", &w);
+	if (outCode != B_OK)
+		return outCode;
+	
+	outCode = find_parg_float(in, "height", &h);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::FrameResized(w, h);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonMouseUp(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32 outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::MouseUp(BPoint(x,y));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonMouseDown(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32 outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::MouseDown(BPoint(x,y));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonMouseMoved(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32_t outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+
+	int32_t transit;
+	outCode = find_parg_int32(in, "transit", &transit);
+	if (outCode != B_OK)
+		return outCode;
+	
+	void *msg;
+	outCode = find_parg_pointer(in, "message", &msg);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::MouseMoved(BPoint(x,y), transit, (BMessage*)msg);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonFrameMoved(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float x, y;
+	int32 outCode;
+	outCode = find_parg_point(in, "where", &x, &y);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::FrameMoved(BPoint(x,y));
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonResizeToPreferred(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	fView->BButton::ResizeToPreferred();
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonGetPreferredSize(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	float w, h;
+	fView->BButton::GetPreferredSize(&w, &h);
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddFloat("width", w);
+	outArgs.AddFloat("heigh", h);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonMakeFocus(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	bool b;
+	int32_t outCode;
+	outCode = find_parg_bool(in, "focus", &b);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::MakeFocus(b);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonKeyDown(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	PArgListItem *item = find_parg(in, "bytes", NULL);
+	if (!item != B_OK)
+		return B_NAME_NOT_FOUND;
+	
+	char bytes[item->datasize];
+	
+	fView->BButton::KeyDown(bytes, item->datasize);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonMakeDefault(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	bool b;
+	int32_t outCode;
+	outCode = find_parg_bool(in, "value", &b);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::MakeDefault(b);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonSetLabel(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	PArgs inArgs(in);
+	BString label;
+	int32_t outCode;
+	outCode = inArgs.FindString("label", &label);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::SetLabel(label.String());
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonWindowActivated(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	bool b;
+	int32_t outCode;
+	outCode = find_parg_bool(in, "active", &b);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::WindowActivated(b);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonSetValue(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	int32_t value;
+	int32_t outCode;
+	outCode = find_parg_int32(in, "value", &value);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::SetValue(value);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+
+int32_t
+BButtonInvoke(void *pobj, PArgList *in, PArgList *out)
+{
+	if (!pobj || !in || !out)
+		return B_ERROR;
+	
+	PButton *parent = static_cast<PButton*>(pobj);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BButton *fView = (BButton*)parent->GetView();
+	
+	if (fView->Window())
+		fView->Window()->Lock();
+	
+	BMessage *msg;
+	int32_t outCode;
+	outCode = find_parg_pointer(in, "message", (void**)&msg);
+	if (outCode != B_OK)
+		return outCode;
+	
+	fView->BButton::Invoke(msg);
+	
+	if (fView->Window())
+		fView->Window()->Unlock();
+	
+	return B_OK;
+}
+
+

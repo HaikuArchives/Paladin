@@ -25,7 +25,7 @@ public:
 	
 	void	MouseDown(BPoint pt);
 	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	
 	void	WindowActivated(bool active);
 	
@@ -321,7 +321,11 @@ PLabelBackend::FrameMoved(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FrameMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::FrameMoved(pt);
 }
 
 
@@ -331,7 +335,11 @@ PLabelBackend::FrameResized(float w, float h)
 	PArgs in, out;
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FrameResized");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::FrameResized(w,h);
 }
 
 
@@ -368,7 +376,11 @@ PLabelBackend::MouseDown(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MouseDown(pt);
 }
 
 
@@ -377,18 +389,26 @@ PLabelBackend::MouseUp(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MouseUp(pt);
 }
 
 
 void
-PLabelBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PLabelBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MouseMoved(pt, transit, msg);
 }
 
 
@@ -397,7 +417,11 @@ PLabelBackend::WindowActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::WindowActivated(active);
 }
 
 
@@ -427,7 +451,11 @@ PLabelBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::DrawAfterChildren(update);
 }
 
 

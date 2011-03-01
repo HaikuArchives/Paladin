@@ -26,7 +26,7 @@ public:
 	void	KeyUp(const char *bytes, int32 count);
 	
 	void	MouseDown(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	void	MouseUp(BPoint pt);
 	
 	void	WindowActivated(bool active);
@@ -405,17 +405,17 @@ PColorControlBackend::MouseUp(BPoint pt)
 
 
 void
-PColorControlBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PColorControlBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BColorControl::MouseMoved(pt, buttons, msg);
+		BColorControl::MouseMoved(pt, transit, msg);
 }
 
 

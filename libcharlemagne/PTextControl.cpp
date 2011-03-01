@@ -28,7 +28,7 @@ public:
 	
 	void	MouseDown(BPoint pt);
 	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	
 	void	WindowActivated(bool active);
 	
@@ -434,17 +434,17 @@ PTextControlBackend::MouseUp(BPoint pt)
 
 
 void
-PTextControlBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PTextControlBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BTextControl::MouseMoved(pt, buttons, msg);
+		BTextControl::MouseMoved(pt, transit, msg);
 }
 
 

@@ -40,7 +40,7 @@ public:
 	
 	void	MouseDown(BPoint pt);
 	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	
 	void	WindowActivated(bool active);
 	
@@ -532,11 +532,11 @@ PScrollBarBackend::MouseUp(BPoint pt)
 
 
 void
-PScrollBarBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PScrollBarBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
 	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
 }

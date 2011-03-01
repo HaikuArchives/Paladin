@@ -24,7 +24,7 @@ public:
 	
 	void		MouseDown(BPoint pt);
 	void		MouseUp(BPoint pt);
-	void		MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void		MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	
 	void		WindowActivated(bool active);
 	

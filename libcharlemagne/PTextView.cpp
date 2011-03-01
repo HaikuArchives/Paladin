@@ -59,7 +59,7 @@ public:
 	void	KeyUp(const char *bytes, int32 count);
 	
 	void	MouseDown(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	void	MouseUp(BPoint pt);
 	
 	void	WindowActivated(bool active);
@@ -758,19 +758,19 @@ PTextViewBackend::MouseUp(BPoint pt)
 
 
 void
-PTextViewBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PTextViewBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
 	{
 		PArgs in, out;
 		in.AddPoint("where", pt);
-		in.AddInt32("buttons", buttons);
+		in.AddInt32("transit", transit);
 		in.AddPointer("message", (void*)msg);
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	}
 	else
-		BTextView::MouseMoved(pt, buttons, msg);
+		BTextView::MouseMoved(pt, transit, msg);
 }
 
 

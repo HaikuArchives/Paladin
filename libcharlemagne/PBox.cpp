@@ -40,7 +40,7 @@ public:
 	void	KeyUp(const char *bytes, int32 count);
 	
 	void	MouseDown(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	void	MouseUp(BPoint pt);
 	
 	void	WindowActivated(bool active);
@@ -277,7 +277,7 @@ PBox::InitMethods(void)
 	
 	pmi.SetArg(0, "where", PARG_POINT, "The current location of the pointer");
 	pmi.AddArg("transit", PARG_INT32, "The transit flag. See BView::MouseDown.");
-	pmi.AddArg("buttons", PARG_INT32, "The current mouse button state");
+	pmi.AddArg("transit", PARG_INT32, "The mouse transition state");
 	pmi.AddArg("message", PARG_POINTER, "The drag message. NULL if empty");
 	AddInheritedMethod(new PMethod("BBox::MouseMoved", BBoxMouseMoved, &pmi));
 	pmi.MakeEmpty();
@@ -454,17 +454,17 @@ PBoxBackend::MouseUp(BPoint pt)
 
 
 void
-PBoxBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PBoxBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BBox::MouseMoved(pt, buttons, msg);
+		BBox::MouseMoved(pt, transit, msg);
 }
 
 

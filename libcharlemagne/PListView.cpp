@@ -25,7 +25,7 @@ public:
 	
 	void	MouseDown(BPoint pt);
 	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	
 	void	WindowActivated(bool active);
 	
@@ -256,7 +256,11 @@ PListViewBackend::AttachedToWindow(void)
 {
 	BListView::AttachedToWindow();
 	PArgs in, out;
-	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::AttachedToWindow();
 }
 
 
@@ -264,7 +268,11 @@ void
 PListViewBackend::AllAttached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::AllAttached();
 }
 
 
@@ -272,7 +280,11 @@ void
 PListViewBackend::DetachedFromWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::DetachedFromWindow();
 }
 
 
@@ -280,7 +292,11 @@ void
 PListViewBackend::AllDetached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::AllDetached();
 }
 
 
@@ -302,7 +318,11 @@ PListViewBackend::FrameMoved(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FrameMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::FrameMoved(pt);
 }
 
 
@@ -313,7 +333,11 @@ PListViewBackend::FrameResized(float w, float h)
 	PArgs in, out;
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("FrameResized");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::FrameResized(w, h);
 }
 
 
@@ -351,7 +375,11 @@ PListViewBackend::MouseDown(BPoint pt)
 	BListView::MouseDown(pt);
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MouseDown(pt);
 }
 
 
@@ -360,18 +388,26 @@ PListViewBackend::MouseUp(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MouseUp(pt);
 }
 
 
 void
-PListViewBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PListViewBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MouseMoved(pt, transit, msg);
 }
 
 
@@ -381,7 +417,11 @@ PListViewBackend::WindowActivated(bool active)
 	BListView::WindowActivated(active);
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::WindowActivated(active);
 }
 
 
@@ -411,7 +451,11 @@ PListViewBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::DrawAfterChildren(update);
 }
 
 

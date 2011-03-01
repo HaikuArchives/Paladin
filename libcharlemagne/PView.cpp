@@ -47,7 +47,7 @@ public:
 	
 	void	MouseDown(BPoint pt);
 	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg);
+	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	
 	void	WindowActivated(bool active);
 	
@@ -643,7 +643,6 @@ PView::InitMethods(void)
 	AddEvent("MouseDown", "A button was pressed over the view.", &pmi);
 	
 	pmi.SetArg(0, "where", PARG_POINT, "The current location of the mouse.");
-	pmi.AddArg("buttons", PARG_INT32, "The current button state.");
 	pmi.AddArg("transit", PARG_INT32, "The transition state.");
 	pmi.AddArg("message", PARG_POINTER, "Attached data if dragging something.");
 	AddEvent("MouseMoved", "The mouse was moved over the view.", &pmi);
@@ -898,11 +897,11 @@ PViewBackend::MouseUp(BPoint pt)
 
 
 void
-PViewBackend::MouseMoved(BPoint pt, uint32 buttons, const BMessage *msg)
+PViewBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	in.AddInt32("buttons", buttons);
+	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
 	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
 }

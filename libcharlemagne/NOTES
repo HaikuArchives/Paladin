@@ -1,7 +1,5 @@
 Add inherited methods for everything except BBox
 
-Fix hook functions in PScrollBar, PSlider, PView
-
 Once all inherited methods are added, make Draw hook functions work like the others and update PDesigner accordingly
 
 Finish PRoster class

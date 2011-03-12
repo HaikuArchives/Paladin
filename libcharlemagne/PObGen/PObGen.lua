@@ -1,4 +1,3 @@
-#!/usr/bin/lua
 -- Script to automagically generate a PObject file for libcharlemagne
 
 ------------------------------------------------------------------------------
@@ -88,11 +87,11 @@ PObjectHeaderCode = [[
 class %(POBJECTNAME) : %(POBJECT_PARENT_ACCESS) %(POBJECT_PARENT_NAME)
 {
 public:
-							%(POBJECTNAME)(void)
-							%(POBJECTNAME)(BMessage *msg)
-							%(POBJECTNAME)(const char *name)
-							%(POBJECTNAME)(const %(POBJECTNAME) &from)
-							~%(POBJECTNAME)(void)
+							%(POBJECTNAME)(void);
+							%(POBJECTNAME)(BMessage *msg);
+							%(POBJECTNAME)(const char *name);
+							%(POBJECTNAME)(const %(POBJECTNAME) &from);
+							~%(POBJECTNAME)(void);
 
 	static	BArchivable *	Instantiate(BMessage *data);
 
@@ -197,7 +196,7 @@ status_t
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-	%(BACKEND_PARENT_NAME) *fBackend = (%(BACKEND_PARENT_NAME)*)fView;
+	%(BACKEND_PARENT_NAME) *fView = (%(BACKEND_PARENT_NAME)*)fView;
 ]]
 
 
@@ -216,11 +215,10 @@ status_t
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	%(BACKEND_PARENT_NAME) *fBackend = (%(BACKEND_PARENT_NAME)*)fView;
+	%(BACKEND_PARENT_NAME) *fView = (%(BACKEND_PARENT_NAME)*)fView;
 	
 	BoolValue boolval;
 	ColorValue colorval;
-	DoubleValue doubleval;
 	FloatValue floatval;
 	IntValue intval;
 	PointValue pointval;
@@ -248,7 +246,7 @@ void
 	
 ]]
 
-function ApplyObjectPlaceholders(str, obj)
+function ApplyObjectPlaceholders(str, obj, back)
 	if (not obj) then
 		return str
 	end
@@ -256,11 +254,15 @@ function ApplyObjectPlaceholders(str, obj)
 	local out = str
 	
 	if (obj.usesView) then
-		out = string.gsub(out, "%%%(USESVIEW_CONSTRUCTOR%)",
+		
+		local msgCode = 
 [[	BMessage viewmsg;
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
-		fView = (BView*)%(BACKEND_PARENT_NAME)::Instantiate(&viewmsg);
-]])
+		fView = (BView*)]]
+		
+		msgCode = msgCode .. back.name .. "::Instantiate(&viewmsg);\n"
+		
+		out = string.gsub(out, "%%%(USESVIEW_CONSTRUCTOR%)", msgCode)
 	else
 		out = string.gsub(out, "%%%(USESVIEW_CONSTRUCTOR%)", "")
 	end
@@ -363,7 +365,7 @@ private:
 #endif
 ]]
 	
-	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, obj)
+	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, obj, back)
 	
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(obj.name) .. "_H")
 	
@@ -384,7 +386,7 @@ private:
 	classDef = classDef .. privateInitCode .. "\n"
 	
 	if (not obj.usesView) then
-		classDef = classDef .. "\t" .. back.name .. " *fBackend;\n"
+		classDef = classDef .. "\t" .. back.name .. " *fView;\n"
 	end
 	
 	classDef = classDef .. tailCode .. "\n"
@@ -632,7 +634,7 @@ function GenerateGetProperty(obj, back)
 		return ""
 	end
 	
-	local out = ApplyObjectPlaceholders(PObjectGetPropertyCode, obj)
+	local out = ApplyObjectPlaceholders(PObjectGetPropertyCode, obj, back)
 	out = ApplyBackendPlaceholders(out, back)
 
 	local i = 1
@@ -660,7 +662,7 @@ function GenerateGetProperty(obj, back)
 				
 			else
 				propCode = propCode ..	"\t\t((" .. TypeToPropertyClass(prop[2]) ..
-							"*)prop)->SetValue(fBackend->" .. prop[3][1] .. "("
+							"*)prop)->SetValue(fView->" .. prop[3][1] .. "("
 		
 				if (prop[3][2] == "void") then
 					propCode = propCode .. "));"
@@ -696,7 +698,7 @@ function GenerateSetProperty(obj, back)
 		return ""
 	end
 	
-	local out = ApplyObjectPlaceholders(PObjectSetPropertyCode, obj)
+	local out = ApplyObjectPlaceholders(PObjectSetPropertyCode, obj, back)
 	out = ApplyBackendPlaceholders(out, back) .. "\n"
 	
 	local i = 1
@@ -704,7 +706,7 @@ function GenerateSetProperty(obj, back)
 	while (obj.properties[i]) do
 		local prop = obj.properties[i]
 		
-		if (prop[4][1]) then
+		if (prop[4][1] and prop[4][1]:len() > 0) then
 			local propCode = "\t"
 			if (i > 1) then
 				propCode = "\telse "
@@ -731,12 +733,14 @@ function GenerateSetProperty(obj, back)
 				end
 			else
 				propCode = propCode .. "\t\tprop->GetValue(&" .. valName .. ");\n" ..
-							"\t\tfBackend->" .. prop[4][1] .. "("
+							"\t\tfView->" .. prop[4][1] .. "("
 			
 				if (prop[2] == "enum") then
 					if (prop[4][2]:len() > 0 and prop[4][2] ~= "void") then
 						propCode = propCode .. prop[4][2]
 					end
+				elseif (prop[4][2]:sub(1,1) == "(") then
+					propCode = propCode .. prop[4][2]
 				end
 				propCode = propCode .. "*" .. valName .. ".value);\n" .. "\t}\n"
 			end
@@ -761,7 +765,7 @@ end
 
 
 function GenerateInitProperties(obj, back)
-	local out = ApplyObjectPlaceholders(PObjectInitPropertiesCode, obj)
+	local out = ApplyObjectPlaceholders(PObjectInitPropertiesCode, obj, back)
 	out = ApplyBackendPlaceholders(out, back)
 	
 	out = out .. '\tSetStringProperty("Description", "' .. obj.description .. '");\n\n'
@@ -799,7 +803,7 @@ function GenerateInitProperties(obj, back)
 						propCode = propCode .. '\tprop->AddValuePair("' .. prop[7][j].key ..
 									'", ' .. prop[7][j].value .. ");\n"
 					end
-					propCode = propCode .. "\tAddProperty(prop)\n\n"
+					propCode = propCode .. "\tAddProperty(prop);\n\n"
 				else
 					print("Property " .. prop[1] .. " is missing enumerated values definition. Skipping.")
 				end
@@ -827,7 +831,7 @@ end
 
 
 function GenerateInitMethods(obj, back)
-	local out = ApplyObjectPlaceholders(PObjectInitMethodsCode, obj)
+	local out = ApplyObjectPlaceholders(PObjectInitMethodsCode, obj, back)
 	out = ApplyBackendPlaceholders(out, back)
 	
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then
@@ -890,7 +894,7 @@ function GenerateInitMethods(obj, back)
 		local methodFunc = obj.name .. method[1]
 		out = out .. '\tAddMethod(new PMethod("' ..
 				method[1] .. '", ' .. methodFunc ..
-				', &pmi);\n\tpmi.MakeEmpty()\n\n'
+				', &pmi));\n\tpmi.MakeEmpty();\n\n'
 		
 		i = i + 1
 	end
@@ -949,7 +953,7 @@ function GenerateMethods(obj, back)
 ]]
 		else
 			methodCode = methodCode .. "\t" .. back.parent ..
-						" *backend = fBackend;\n"
+						" *backend = fView;\n"
 		end
 		
 		methodCode = methodCode .. "\n\tPArgs inArgs(in), outArgs(out);\n\n"
@@ -1027,7 +1031,7 @@ end
 
 
 function GeneratePObject(obj, back)
-	local pobjCode = ApplyObjectPlaceholders(PObjectMainCode, obj)
+	local pobjCode = ApplyObjectPlaceholders(PObjectMainCode, obj, back)
 	
 	if ((not obj.properties) or table.getn(obj.properties) == 0) then
 		pobjCode = pobjCode:gsub("\tInitProperties%(%);\n", "")

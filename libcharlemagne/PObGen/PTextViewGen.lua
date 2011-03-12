@@ -8,13 +8,13 @@
 	PObject methods, and the backend definitions
 ]]
 
-HeaderName = "PTextView.new.h"
-CodeFileName = "PTextView.new.cpp"
+HeaderName = "PTextView.h"
+CodeFileName = "PTextView.cpp"
 
 ParentHeaderName = [["PView.h"]]
 
 Includes = { "<Application.h>", "<TextView.h>", "<stdio.h>", '"PClipboard.h"',
-			'"PObjectBroker"' }
+			'"PObjectBroker.h"', "<Window.h>" }
 
 PObject = {}
 
@@ -47,48 +47,53 @@ PObject.initBackend = [[
 ]]
 PObject.properties =
 {
-	{ "Alignment", "enum", { "GetAlignment", "void" }, { "SetAlignment", "void" }, 
+	{ "Alignment", "enum", { "Alignment", "void" }, { "SetAlignment", "(alignment)" }, 
 		"The current alignment mode of the text view's contents",
-		"B_LEFT_ALIGN", { pair("Left", "B_LEFT_ALIGN"), pair("Center", "B_CENTER_ALIGN"),
-							pair("Right", "B_RIGHT_ALIGN") } },
-	{ "AutoIndent", "bool", { "", "void" }, { "", "void" },
+		"B_ALIGN_LEFT", { pair("Left", "B_ALIGN_LEFT"), pair("Center", "B_ALIGN_CENTER"),
+							pair("Right", "B_ALIGN_RIGHT") } },
+	{ "AutoIndent", "bool", { "DoesAutoindent", "void" }, { "SetAutoindent", "bool" },
 		"Toggles autoindenting of new lines", "false" },
-	{ "ColorSpace", "int", { "", "void" }, { "", "void" },
+	{ "ColorSpace", "int", { "ColorSpace", "void" }, { "SetColorSpace", "(color_space)" },
 		"Color space of the offscreen bitmap used to draw the text", "B_CMAP8" },
-	{ "CurrentLine", "int", { "", "void" }, { "", "void" },
+	{ "CurrentLine", "int", { "CurrentLine", "void" }, { "GoToLine", "int32" },
 		"The line containing the insertion point", "0" },
-	{ "Editable", "bool", { "", "void" }, { "", "void" },
+	{ "Editable", "bool", { "IsEditable", "void" }, { "MakeEditable", "bool" },
 		"If the text view accepts typing", "true" },
-	{ "FontColor", "color", { "", "void" }, { "", "void" },
-		"The color of the font at the insertion point", "rgb_color()" },
-	{ "FontFace", "int", { "", "void" }, { "", "void" },
-		"The style of the font at the insertion point", "B_REGULAR_FACE" },
-	{ "FontName", "string", { "", "void" }, { "", "void" },
-		"The name of the current font", '""' },
-	{ "HideTyping", "bool", { "", "void" }, { "", "void" },
+	
+	-- These need to be embedded properties because of the mixed changes
+--	{ "FontColor", "color", { "", "void" }, { "", "void" },
+--		"The color of the font at the insertion point", "rgb_color()" },
+--	{ "FontFace", "int", { "", "void" }, { "", "void" },
+--		"The style of the font at the insertion point", "B_REGULAR_FACE" },
+--	{ "FontName", "string", { "", "void" }, { "", "void" },
+--		"The name of the current font", '""' },
+	
+	{ "HideTyping", "bool", { "IsTypingHidden", "void" }, { "HideTyping", "bool" },
 		"Hides typing, such as for a password box", "false" },
-	{ "LineCount", "int", { "", "void" }, { "", "" },
+	{ "LineCount", "int", { "CountLines", "void" }, { "", "" },
 		"The current line count.", "0" },
-	{ "MaxBytes", "int", { "", "void" }, { "", "void" },
+	{ "MaxBytes", "int", { "MaxBytes", "void" }, { "SetMaxBytes", "int32" },
 		"The maximum number of bytes the text view will accept.", "0" },
-	{ "Resizable", "bool", { "", "void" }, { "", "void" },
+	{ "Resizable", "bool", { "IsResizable", "void" }, { "MakeResizable", "bool" },
 		"Whether or not the text view will resize itself to contain its contents", "false" },
-	{ "Selectable", "bool", { "", "void" }, { "", "void" },
+	{ "Selectable", "bool", { "IsSelectable", "void" }, { "MakeSelectable", "bool" },
 		"Whether or not the user can select the text view's contents", "true" },
-	{ "Stylable", "bool", { "", "void" }, { "", "void" },
+	{ "Stylable", "bool", { "IsStylable", "void" }, { "SetStylable", "bool" },
 		"Whether or not the text view will display multiple text styles", "false" },
-	{ "TabWidth", "float", { "", "void" }, { "", "void" },
+	{ "TabWidth", "float", { "TabWidth", "void" }, { "SetTabWidth", "float" },
 		"The number of pixels indented for each tab character", "10.0" },
-	{ "Text", "string", { "", "void" }, { "", "void" },
+	{ "Text", "string", { "Text", "void" }, { "SetText", "string" },
 		"The contents of the text view.", "NULL" },
-	{ "TextLength", "int", { "", "void" }, { "", "" },
+	{ "TextLength", "int", { "TextLength", "void" }, { "", "" },
 		"The number of bytes occupied by the text view's contents, excluding the NULL terminator", "0" },
-	{ "TextRect", "rect", { "", "void" }, { "", "void" },
+	{ "TextRect", "rect", { "TextRect", "void" }, { "SetTextRect", "rect" },
 		"The size and location of the area used to display text", "BRect(0, 0, 1, 1)" },
-	{ "Undoable", "bool", { "", "void" }, { "", "void" },
+	{ "Undoable", "bool", { "DoesUndo", "void" }, { "SetDoesUndo", "bool" },
 		"Whether or not the text view supports undo", "true" },
-	{ "UndoState", "int", { "", "void" }, { "", "" }, "", "(int32)B_UNDO_UNAVAILABLE" },
-	{ "UseWordWrap", "bool", { "", "void" }, { "", "void" },
+	
+	-- This one will also need to be embedded
+	--{ "UndoState", "int", { "UndoState", "embedded" }, { "", "" }, "", "(int32)B_UNDO_UNAVAILABLE" },
+	{ "UseWordWrap", "bool", { "DoesWordWrap", "void" }, { "SetWordWrap", "bool" },
 		"Whether or not the text view wraps text to fit its size", "true" },
 }
 
@@ -137,13 +142,19 @@ PObject.methods =
 {
 	-- Note that the data types are not the same as properties in that integers
 	-- have a specified bit size
-	{ "AllowChars", { triplet("chars", "string", "The set of characters to allow") }, { } },
+	
+	-- This will need to be an embedded method
+	-- { "AllowChars", { triplet("chars", "string", "The set of characters to allow") }, { } },
+	
 	{ "ByteAt", { triplet("offset", "int32", "Offset of the byte to get.") },
 				{ triplet("value", "char", "1-byte character at the specified offset.") } },
 	{ "CanEndLine", { triplet("offset", "int32", "Offset to test for line ending") },
 				{ triplet("value", "bool", "True if the character can be the last one on a line.") } },
-	{ "Copy", { triplet("clipid", "int64", "The id of a clipboard object") }, {} },
-	{ "Cut", { triplet("clipid", "int64", "The id of a clipboard object") }, {} },
+	
+	-- Also embedded. :(
+	--{ "Copy", { triplet("clipid", "int64", "The id of a clipboard object") }, {} },
+	--{ "Cut", { triplet("clipid", "int64", "The id of a clipboard object") }, {} },
+	
 	{ "Delete", { triplet("start", "int32", "Starting offset of the range to delete."),
 				  triplet("end", "int32", "Ending offset of the range to delete.") },
 				{ } },
@@ -171,7 +182,10 @@ PObject.methods =
 				triplet("point", "point", "Point to find the line for", "PMIFLAG_OPTIONAL") },
 				{ triplet("offsetline", "int32", "Line for the specified offset. Returned only if offset is specified"),
 				triplet("pointline", "int32", "Line for the specified point. Returned only if point is specified") } },
-	{ "Paste", { triplet("clipid", "int64", "Object ID of a PClipboard object") }, {} },
+	
+	-- Also embedded. :(
+	--{ "Paste", { triplet("clipid", "int64", "Object ID of a PClipboard object") }, {} },
+	
 	{ "PointAt", { triplet("offset", "int32", "Offset to get the point for") },
 				{ triplet("point", "point", "Point for the offset specified"),
 				triplet("height", "float", "Height of the line at the specified offset") } },
@@ -189,7 +203,9 @@ PObject.methods =
 	{ "TextHeight", { triplet("start", "int32", "Starting offset of the text to highlight"),
 							 triplet("end", "int32", "Ending offset of the text to highlight") },
 				{ triplet("height", "float", "Total height of the lines specified by the given offsets") } },
-	{ "Undo", { triplet("clipid", "int64", "Object ID of a PClipboard object") }, {} }
+	
+	-- Also embedded. :(
+	--{ "Undo", { triplet("clipid", "int64", "Object ID of a PClipboard object") }, {} }
 }
 
 

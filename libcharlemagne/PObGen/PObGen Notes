@@ -1,0 +1,19 @@
+PObGen Notes
+
+Create a Raw data type for properties and methods and integrate it into the code (KeyDown/KeyUp)
+
+Replace the if/then code in the conversion functions to simple table lookups internally
+
+Add support for defining data members
+
+Add support for custom (embedded) headers
+
+Add error handling code to detect problems in the specification
+
+Make possible conditional substitution -- PView vs non-PView controls
+
+Read-only properties use an empty table for the SetProperty section of their entry definitions
+Enumerated properties have the definitions of their types at index 7 of the entry
+
+Need to add the check for PView inheritance to pass the proper constructor initialization
+

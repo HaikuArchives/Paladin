@@ -93,47 +93,11 @@ PObject.embeddedProperties["LabelAlignment"].setCode = [[
 ]]
 
 
---[[-----------------------------------------------------------------------------------
----------------------------------------------------------------------------------------
-	The methods table is going to be tricky, I think
-
-	AddMethod(new PMethod("SetPreferredDivider", PTextControlSetPreferredDivider,
-							NULL, METHOD_SHOW_IN_EDITOR));
-
-	int32_t
-	PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out)
-	{
-		if (!pobject || !in || !out)
-			return B_ERROR;
-	
-		PTextControl *pcontrol = static_cast<PTextControl*>(pobject);
-		PObject *object = static_cast<PObject*>(pobject);
-	
-		if (!object->UsesInterface("PTextControl") || !pcontrol)
-			return B_BAD_TYPE;
-	
-		BTextControl *control = dynamic_cast<BTextControl*>(pcontrol->GetView());
-		if (!control)
-			return B_BAD_TYPE;
-	
-		if (control->Window())
-			control->Window()->Lock();
-	
-		if (strlen(control->Label()) > 0)
-			control->SetDivider(control->StringWidth(control->Label()));
-		else
-			control->SetDivider(0.0);
-	
-		if (control->Window())
-			control->Window()->Unlock();
-	
-		return B_OK;
-	}
-]]
 PObject.methods = 
 {
 	-- method name, function name, interface, flags
-	{ "SetPreferredDivider", "SetPreferredDivider", {}, "METHOD_SHOW_IN_EDITOR" }
+	{ "SetPreferredDivider", "SetPreferredDivider",
+		{ }, { }, "METHOD_SHOW_IN_EDITOR" }
 }
 
 ------------------------------------------------------------------------------
@@ -150,6 +114,7 @@ PBackend.eventHooks =
 	{ "void", "DetachedFromWindow", "void" },
 	{ "void", "AllAttached", "void" },
 	{ "void", "AllDetached", "void" },
+	{ "void", "Pulse", "void" },
 	{ "void", "MakeFocus", { pair("bool", "focus") } },
 	{ "void", "FrameMoved", { pair("BPoint", "where") } },
 	{ "void", "FrameResized", { pair("float", "width"), pair("float", "height") } },

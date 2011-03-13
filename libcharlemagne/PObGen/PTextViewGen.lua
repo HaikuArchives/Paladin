@@ -147,9 +147,9 @@ PObject.methods =
 	-- to the backend's method
 	-- { "AllowChars", { triplet("chars", "string", "The set of characters to allow") }, { } },
 	
-	{ "ByteAt", "ByteAt", { param("offset", "int32", "int32", 1, "Offset of the byte to get.") },
-				{ param("value", "char", "char", -1, "1-byte character at the specified offset.") } },
-
+	{ "ByteAt", "ByteAt",
+		{ param("offset", "int32", "int32", 1, "Offset of the byte to get.") },
+		{ param("value", "char", "char", -1, "1-byte character at the specified offset.") } },
 	{ "CanEndLine", "ByteAt", 
 		{ param("offset", "int32", "int32", 1, "Offset to test for line ending") },
 		{ param("value", "bool", "bool", -1, "True if the character can be the last one on a line.") } },
@@ -157,12 +157,10 @@ PObject.methods =
 	-- These need to be embedded because of the object lookup
 	--{ "Copy", { param("clipid", "int64", "The id of a clipboard object") }, {} },
 	--{ "Cut", { param("clipid", "int64", "The id of a clipboard object") }, {} },
-	
 	{ "Delete", "Delete",
 		{ param("start", "int32", "int32", 1, "Starting offset of the range to delete."),
 		  param("end", "int32", "int32", 2, "Ending offset of the range to delete.") },
 		{ } },
-	
 	{ "FindWord", "FindWord",
 		{ param("offset", "int32", "int32", 1, "Starting point for searching for a word") },
 		{ param("start", "int32", "&int32", 2, "Starting offset of the next word"),
@@ -197,7 +195,6 @@ PObject.methods =
 	{ "LineAtPoint", "LineAt",
 		{ param("point", "point", "point", 1, "Point to find the line for") },
 		{ param("pointline", "int32", "int32", -1, "Line for the specified point.") } },
-	
 	-- Another embedded function
 	--{ "Paste", { param("clipid", "int64", "Object ID of a PClipboard object") }, {} },
 	{ "PointAt", "PointAt",

@@ -7,6 +7,7 @@ BePTypeTable.bool = "bool"
 BePTypeTable["const char *"] = "string"
 BePTypeTable.BString = "string"
 BePTypeTable["char *"] = "string"
+BePTypeTable.char = "char"
 BePTypeTable.int8 = "int"
 BePTypeTable.int16 = "int"
 BePTypeTable.int32 = "int"
@@ -24,6 +25,7 @@ BePTypeTable.double = "double"
 PTypeBeTable = {}
 PTypeBeTable.bool = "bool"
 PTypeBeTable.string = "BString"
+PTypeBeTable.char = "char"
 PTypeBeTable.int8 = "int8"
 PTypeBeTable.int16 = "int16"
 PTypeBeTable.int32 = "int32"
@@ -311,12 +313,13 @@ function triplet(k, v, d, f)
 end
 
 
-function param(name, intype, outtype, desc, flags)
+function param(name, type, callType, callIndex, desc, flags)
 	local t = {}
 	
 	t.name = name
-	t.intype = intype
-	t.outtype = outtype
+	t.type = type
+	t.callIndex = callIndex
+	t.callType = callType
 	t.description = desc
 	t.flags = flags
 	
@@ -448,7 +451,18 @@ function GenerateBackendDef(back)
 						defString = defString .. ", "
 					end
 					
-					defString = defString .. inArgs[j].key .. " " ..
+					local castStart = nil
+					local castEnd = nil
+					castStart, castEnd = inArgs[j].key:find("%(.-%)")
+					
+					local paramType = nil
+					if (castEnd) then
+						paramType = inArgs[j].key:sub(castEnd + 1)
+					else
+						paramType = inArgs[j].key
+					end
+					
+					defString = defString .. paramType .. " " ..
 								"param" .. tostring(j)
 				else
 					defString = defString .. "void"
@@ -512,7 +526,17 @@ function GenerateBackendCode(back)
 						defString = defString .. ", "
 					end
 					
-					defString = defString .. inArgs[j].key .. " " ..
+					local castStart = nil
+					local castEnd = nil
+					castStart, castEnd = inArgs[j].key:find("%(.-%)")
+					
+					local paramType = nil
+					if (castEnd) then
+						paramType = inArgs[j].key:sub(castEnd + 1)
+					else
+						paramType = inArgs[j].key
+					end
+					defString = defString .. paramType .. " " ..
 								"param" .. tostring(j)
 					
 					paramCount = paramCount + 1
@@ -568,8 +592,12 @@ function GenerateBackendCode(back)
 					return nil
 				end
 				
-				pargCall = pargCall .. '"' .. inArgs[j].value .. '", param' ..
-							tostring(j) .. ");\n"
+				pargCall = pargCall .. '"' .. inArgs[j].value .. '", '
+				if (pargType == "pointer") then
+					pargCall = pargCall .. "(void*) "
+				end
+				
+				pargCall = pargCall .. "param" .. tostring(j) .. ");\n"
 				code = code .. pargCall
 			end
 			
@@ -588,11 +616,17 @@ function GenerateBackendCode(back)
 			else
 				local parentCall = "("
 				for j = 1, paramCount do
+					
 					if (j > 1) then
-						parentCall = parentCall .. ", param" .. tostring(j)
-					else
-						parentCall = parentCall .. "param1"
+						parentCall = parentCall .. ", "
 					end
+					
+					local castType = inArgs[j].key:match("(%(.-%))")
+					if (castType) then
+						parentCall = parentCall .. castType .. " "
+					end
+					
+					parentCall = parentCall .. "param" .. tostring(j)
 				end
 				code = code .. parentCall .. ");\n"
 			end
@@ -649,7 +683,11 @@ function GenerateGetProperty(obj, back)
 	
 	local out = ApplyObjectPlaceholders(PObjectGetPropertyCode, obj, back)
 	out = ApplyBackendPlaceholders(out, back)
-
+	
+	if (obj.usesView) then
+		out = out .. "\n\tif (fView->Window())\n\t\tfView->Window()->Lock();\n\n"
+	end
+	
 	local i = 1
 	local propertiesWritten = 0
 	while (obj.properties[i]) do
@@ -698,9 +736,20 @@ function GenerateGetProperty(obj, back)
 		return "}\n\n\n"
 	end
 	
-	out = out .. "\telse\n" ..
-				"\t\treturn " .. obj.parentClass .. "::GetProperty(name, value, index);\n\n" ..
-				"\treturn prop->GetValue(value);\n}\n\n\n"
+	out = out .. "\telse\n\t{\n"
+	
+	if (obj.usesView) then
+		out = out .. "\t\tif (fView->Window())\n\t\t\tfView->Window()->Unlock();\n\n"
+	end
+	
+	out = out .. "\t\treturn " .. obj.parentClass ..
+				"::GetProperty(name, value, index);\n\t}\n\n"
+	
+	if (obj.usesView) then
+		out = out .. "\tif (fView->Window())\n\t\tfView->Window()->Unlock();\n\n"
+	end
+	
+	out = out .. "\treturn prop->GetValue(value);\n}\n\n\n"
 	
 	return out
 end
@@ -713,6 +762,10 @@ function GenerateSetProperty(obj, back)
 	
 	local out = ApplyObjectPlaceholders(PObjectSetPropertyCode, obj, back)
 	out = ApplyBackendPlaceholders(out, back) .. "\n"
+	
+	if (obj.usesView) then
+		out = out .. "\tif (fView->Window())\n\t\tfView->Window()->Lock();\n\n"
+	end
 	
 	local i = 1
 	local propertiesWritten = 0
@@ -769,8 +822,13 @@ function GenerateSetProperty(obj, back)
 		return "}\n\n\n"
 	end
 	
-	out = out .. "\telse\n" ..
-				"\t\treturn " .. obj.parentClass .. "::SetProperty(name, value, index);\n\n" ..
+	out = out .. "\telse\n\t{\n"
+	
+	if (obj.usesView) then
+		out = out .. "\t\tif (fView->Window())\n\t\t\tfView->Window()->Unlock();\n\n"
+	end
+	
+	out = out .. "\t\treturn " .. obj.parentClass .. "::SetProperty(name, value, index);\n\n" ..
 				"\treturn prop->GetValue(value);\n}\n\n\n"
 	
 	return out
@@ -802,9 +860,10 @@ function GenerateInitProperties(obj, back)
 				if (prop[7]) then
 					if (not enumWritten) then
 						enumWritten = true
-						propCode = propCode .. "\n\tEnumProperty *prop = NULL;\n"
+						propCode = propCode .. "\n\tEnumProperty *prop = NULL;\n\n"
 					end
 					
+					propCode = propCode .. "\tprop = new EnumProperty();\n"
 					propCode = propCode .. '\tprop->SetName("' .. prop[1] .. '");\n' ..
 								"\tprop->SetValue((int32)" .. prop[6] .. ");\n"
 					if (prop[5]:len() > 0) then
@@ -856,13 +915,13 @@ function GenerateInitMethods(obj, back)
 	while (obj.methods[i]) do
 		local method = obj.methods[i]
 		
-		for j = 1, table.getn(method[2]) do
-			local entry = method[2][j]
+		for j = 1, table.getn(method[3]) do
+			local entry = method[3][j]
 			local methodCode = ""
-			local pargType = PTypeToConstant(entry.intype)
+			local pargType = PTypeToConstant(entry.type)
 			
 			if (not pargType) then
-				print("nil parg type: " .. entry.intype)
+				print("nil parg type: " .. entry.type)
 			end
 			
 			methodCode = '\tpmi.AddArg("' .. entry.name .. '", ' ..
@@ -871,22 +930,26 @@ function GenerateInitMethods(obj, back)
 			if (entry.description) then
 				methodCode = methodCode .. ', "' ..
 							entry.description .. '"'
+			else
+				methodCode = methodCode .. ', ""'
 			end
 			
 			if (entry.flags) then
 				methodCode = methodCode .. ', ' ..
 							entry.flags
+			else
+				methodCode = methodCode .. ', 0'
 			end
 			out = out .. methodCode .. ");\n"
 		end
 		
-		for j = 1, table.getn(method[3]) do
-			local entry = method[3][j]
+		for j = 1, table.getn(method[4]) do
+			local entry = method[4][j]
 			local methodCode = ""
-			local pargType = PTypeToConstant(entry.intype)
+			local pargType = PTypeToConstant(entry.type)
 			
 			if (not pargType) then
-				print("nil parg type: " .. entry.intype)
+				print("nil parg type: " .. entry.type)
 			end
 			
 			methodCode = '\tpmi.AddReturnValue("' .. entry.name .. '", ' ..
@@ -895,11 +958,8 @@ function GenerateInitMethods(obj, back)
 			if (entry.description) then
 				methodCode = methodCode .. ', "' ..
 							entry.description .. '"'
-			end
-			
-			if (entry.flags) then
-				methodCode = methodCode .. ', ' ..
-							entry.flags
+			else
+				methodCode = methodCode .. ', ""'
 			end
 			out = out .. methodCode .. ");\n"
 		end
@@ -952,10 +1012,14 @@ function GenerateMethods(obj, back)
 	while (obj.methods[i]) do
 		local method = obj.methods[i]
 		
+		-- Start with the top part of the function definition
 		local methodCode = "int32_t\n" .. obj.name .. method[1] ..
 						"(void *pobject, PArgList *in, PArgList *out)\n{\n" ..
 						"\tif (!pobject || !in || !out)\n\t\treturn B_ERROR;\n\n"
 		
+		-- If the object inherits from PView, we need to cast it to the backend
+		-- class' real class to call the method. Objects which do not inherit from
+		-- PView are expected to provide a private member named "backend".
 		if (obj.usesView) then
 			methodCode = methodCode .. [[
 	PView *parent = static_cast<PView*>(pobject);
@@ -969,70 +1033,137 @@ function GenerateMethods(obj, back)
 						" *backend = fView;\n"
 		end
 		
+		-- Declare the argument wrappers which we'll use to get input to the 
+		-- backend call
 		methodCode = methodCode .. "\n\tPArgs inArgs(in), outArgs(out);\n\n"
 		
-		-- Now comes the tough part... mapping the parameters to the call
 		
-		for j = 1, table.getn(method[2]) do
-			local entry = method[2][j]
+		-- For each input argument, declare a variable of the proper type and
+		-- attempt to get it from the input arguments. We will return B_ERROR if
+		-- it is not an optional argument and it is not found
+		for j = 1, table.getn(method[3]) do
+			local entry = method[3][j]
 			
 			-- Declare the variable to hold the value for each parameter
-			local beType = PTypeToBe(entry.intype)
+			local beType = PTypeToBe(entry.type)
 			local entryCode = "\t" .. beType .. " " .. entry.name .. ";\n"
 			
 			-- If a required argument, add a check to make sure that it
 			-- was found and return B_ERROR if it wasn't
-			if ((not entry.flags) or 
+			local capType = entry.type:sub(1,1):upper() .. entry.type:sub(2)
+			if ((not entry.flags) or
 				(entry.flags:find("PMIFLAG_OPTIONAL", 1, plain) == nil)) then
-				local capType = entry.intype:sub(1,1):upper() .. entry.intype:sub(2)
+				
 				entryCode = entryCode .. "\tif (inArgs.Find" .. capType ..
 							'("' .. entry.name .. '", &' .. entry.name ..
 							') != B_OK)\n\t\treturn B_ERROR;\n\n'
+			else
+				entryCode = entryCode .. "\tinArgs.Find" .. capType ..
+							'("' .. entry.name .. '", &' .. entry.name .. ');\n\n'
 			end
 			methodCode = methodCode .. entryCode
 		end
-
+		
 		-- If this is a view-based object, lock the parent window
 		if (obj.usesView) then
 			methodCode = methodCode .. "\tif (backend->Window())\n" ..
 						"\t\tbackend->Window()->Lock();\n\n"
 		end
 		
-		methodCode = methodCode .. "\t"
-		
-		-- Get the return value, if there is one, from the backend call
-		local returnVar = ""
-		if (table.getn(method[3]) > 0) then
-			local returnEntry = method[3][1]
-			returnVar = returnEntry.name
-			methodCode = methodCode .. returnEntry.intype .. " " ..
-						returnEntry.name .. " = "
+		-- Declare the variables for any output values
+		for j = 1, table.getn(method[4]) do
+			local entry = method[4][j]
+			local beType = PTypeToBe(entry.type)
+			methodCode = methodCode .. "\t" .. beType .. " outValue" .. j .. ";\n"
 		end
+		methodCode = methodCode .. "\n"
 		
-		methodCode = methodCode .. "backend->" .. method[1] .. "("
-		for j = 1, table.getn(method[2]) do
-			local entry = method[2][j]
-			
-			if (j > 1) then
-				methodCode = methodCode .. ", " .. entry.name
-			else
-				methodCode = methodCode .. entry.name
+		-- Now we construct the call to the backend. This is tricky because some
+		-- calls may require an out value to be passed by address, casting may
+		-- be necessary, and all sorts of other weirdness. First we will just create
+		-- a table containing the return value (if any) and the parameters, in order.
+		local argTable = {}
+		local returnArg = nil
+		for j = 1, table.getn(method[3]) do
+			local index = method[3][j].callIndex
+			if (index and index > 0) then
+				argTable[index] = method[3][j]
+				argTable[index].varName = argTable[index].name
 			end
 		end
-		methodCode = methodCode .. ");\n\n"
+		for j = 1, table.getn(method[4]) do
+			local index = method[4][j].callIndex
+			if (index) then
+				if (index > 0) then
+					argTable[index] = method[4][j]
+					argTable[index].varName = "outValue" .. j
+				elseif (index == -1)then
+					returnArg = method[4][j]
+					returnArg.varName = "outValue" .. j
+				end
+			end
+		end
 		
+		-- Now that the parameter table has been constructed in order, we will put together
+		-- the source line which makes the call
+		local callLine = "\t"
+		if (returnArg) then
+			callLine = callLine .. returnArg.varName .. " = "
+		end
+		
+		callLine = callLine .. "backend->" .. method[2] .. "("
+		for j = 1, table.getn(argTable) do
+			local param = ""
+			
+			local getAddress = false
+			local doCast = false
+			local prefix = argTable[j].callType:sub(1,1)
+			if (prefix == "&") then
+				-- Asked to pass the address of the parameter
+				getAddress = true
+				prefix = argTable[j].callType:sub(2,2)
+			end
+			
+			if (prefix == "(") then
+				-- Asked to cast the parameter
+				doCast = true
+			end
+			
+			if (doCast and getAddress) then
+				param = param .. "(" .. argTable[j].callType:sub(2) .. "&"
+			elseif(doCast) then
+				param = param .. argTable[j].callType
+			elseif(getAddress) then
+				param = param .. "&"
+			end
+			param = param .. argTable[j].varName
+			
+			if (argTable[j].type == "string" and argTable[j].callType == "string") then
+				param = param .. ".String()"
+			end
+			
+			if (j > 1) then
+				callLine = callLine .. ", " .. param
+			else
+				callLine = callLine .. param
+			end
+		end
+		callLine = callLine .. ");"
+		
+		methodCode = methodCode .. callLine .. "\n\n"
+
 		-- If this is a view-based object, we need to unlock the parent window now
 		if (obj.usesView) then
 			methodCode = methodCode .. "\tif (backend->Window())\n" ..
 						"\t\tbackend->Window()->Unlock();\n\n"
 		end
 		
-		local outEntry = method[3][1]
+		local outEntry = method[4][1]
 		if (outEntry) then
-			local outType = outEntry.intype:sub(1,1):upper() .. outEntry.intype:sub(2)
+			local outType = outEntry.type:sub(1,1):upper() .. outEntry.type:sub(2)
 			methodCode = methodCode .. "\toutArgs.MakeEmpty();\n" ..
 						"\toutArgs.Add" .. outType .. '("' .. outEntry.name ..
-						'", ' .. outEntry.name .. ");\n\n"
+						'", ' .. outEntry.varName .. ");\n\n"
 		end
 		
 		out = out .. methodCode .. "\treturn B_OK;\n}\n\n\n"
@@ -1080,7 +1211,8 @@ function GenerateCodeFile(obj, back)
 		includeString = includeString .. "#include " .. Includes[i] .. "\n"
 		i = i + 1
 	end
-	includeString = includeString .. '\n#include "PArgs.h"\n#include "EnumProperty.h"\n\n'
+	includeString = includeString .. '\n#include "PArgs.h"\n#include "EnumProperty.h"\n' ..
+					'#include "PMethod.h"\n\n'
 	
 	local methodDefs = GenerateMethodDefs(obj, back)
 	local backendDef = GenerateBackendDef(back)

@@ -95,6 +95,7 @@ PBackend.eventHooks =
 	{ "void", "DetachedFromWindow", "void" },
 	{ "void", "AllAttached", "void" },
 	{ "void", "AllDetached", "void" },
+	{ "void", "Pulse", "void" },
 	{ "void", "MakeFocus", { pair("bool", "focus") } },
 	{ "void", "FrameMoved", { pair("BPoint", "where") } },
 	{ "void", "FrameResized", { pair("float", "width"), pair("float", "height") } },

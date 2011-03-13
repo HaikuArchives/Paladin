@@ -1,5 +1,6 @@
 #include "PControl.h"
 #include <Window.h>
+#include <Control.h>
 #include <stdio.h>
 
 #include "CInterface.h"

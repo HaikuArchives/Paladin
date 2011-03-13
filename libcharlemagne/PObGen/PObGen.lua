@@ -988,7 +988,6 @@ function GenerateMethodDefs(obj, back)
 	local out = ""
 
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then
-		out = out .. "}\n\n\n"
 		return out
 	end
 		
@@ -1011,7 +1010,6 @@ function GenerateMethods(obj, back)
 	local out = ""
 	
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then
-		out = out .. "}\n\n\n"
 		return out
 	end
 		
@@ -1188,8 +1186,8 @@ function GeneratePObject(obj, back)
 		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW)", "true")
 		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW2)", ", true")
 	else
-		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW)", "false")
-		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW2)", ", false")
+		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW)", "")
+		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW2)", "")
 	end
 	
 	if ((not obj.properties) or table.getn(obj.properties) == 0) then

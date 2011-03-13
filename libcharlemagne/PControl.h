@@ -2,7 +2,6 @@
 #define PCONTROL_H
 
 #include "PView.h"
-#include <Control.h>
 
 /*
 	Control Properties:

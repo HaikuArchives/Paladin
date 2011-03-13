@@ -8,8 +8,8 @@
 	PObject methods, and the backend definitions
 ]]
 
-HeaderName = "PButton.new.h"
-CodeFileName = "PButton.new.cpp"
+HeaderName = "PButton.h"
+CodeFileName = "PButton.cpp"
 
 ParentHeaderName = [["PControl.h"]]
 
@@ -88,7 +88,7 @@ PBackend = {}
 PBackend.name = "PButtonBackend"
 PBackend.parent = "BButton"
 PBackend.access = "public"
-PBackend.init = [[BButton(BRect(0, 0, 1, 1), "", "", new BMessage)]]
+PBackend.init = [[BRect(0, 0, 1, 1), "", "", new BMessage]]
 PBackend.eventHooks =
 {
 	{ "void", "AttachedToWindow", "void" },

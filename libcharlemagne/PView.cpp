@@ -623,7 +623,7 @@ PView::InitMethods(void)
 	AddEvent("AllDetached", "All views have been removed from the window.");
 	
 	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the view currently has the focus.");
-	AddEvent("FocusChanged", "The view gained or lost focus.", &pmi);
+	AddEvent("MakeFocus", "The view gained or lost focus.", &pmi);
 	
 	pmi.SetArg(0, "where", PARG_POINT, "The new location of the view in its parent's coordinates.");
 	AddEvent("FrameMoved", "The view was moved.", &pmi);

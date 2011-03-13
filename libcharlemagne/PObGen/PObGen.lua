@@ -76,6 +76,9 @@ PTypeConstantTable.char = "PARG_CHAR"
 	HEADER_GUARD = name of the constant used for the header guard
 	
 	USESVIEW_CONSTRUCTOR = a utility placeholder for removing the view construction code
+	USESVIEW_BYPASSVIEW = another utility placeholder for skipping the backend by views
+						which inherit from PView directly
+	USESVIEW_BYPASSVIEW2 = as the first, but with a comma prefix
 ]]
 
 PObjectHeaderCode = [[
@@ -105,20 +108,20 @@ public:
 
 PObjectMainCode = [[
 %(POBJECTNAME)::%(POBJECTNAME)(void)
-	:	%(POBJECT_PARENT_NAME)()
+	:	%(POBJECT_PARENT_NAME)(%(USESVIEW_BYPASSVIEW))
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
 	AddInterface("%(POBJECTNAME)");
 	
+	InitBackend();
 	InitProperties();
 	InitMethods();
-	InitBackend();
 }
 
 
 %(POBJECTNAME)::%(POBJECTNAME)(BMessage *msg)
-	:	%(POBJECT_PARENT_NAME)(msg)
+	:	%(POBJECT_PARENT_NAME)(msg%(USESVIEW_BYPASSVIEW2))
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -131,7 +134,7 @@ PObjectMainCode = [[
 
 
 %(POBJECTNAME)::%(POBJECTNAME)(const char *name)
-	:	%(POBJECT_PARENT_NAME)(name)
+	:	%(POBJECT_PARENT_NAME)(name%(USESVIEW_BYPASSVIEW2))
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -143,7 +146,7 @@ PObjectMainCode = [[
 
 
 %(POBJECTNAME)::%(POBJECTNAME)(const %(POBJECTNAME) &from)
-	:	%(POBJECT_PARENT_NAME)(from)
+	:	%(POBJECT_PARENT_NAME)(from%(USESVIEW_BYPASSVIEW2))
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -257,8 +260,7 @@ function ApplyObjectPlaceholders(str, obj, back)
 	
 	if (obj.usesView) then
 		
-		local msgCode = 
-[[	BMessage viewmsg;
+		local msgCode = [[BMessage viewmsg;
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
 		fView = (BView*)]]
 		
@@ -685,7 +687,7 @@ function GenerateGetProperty(obj, back)
 	out = ApplyBackendPlaceholders(out, back)
 	
 	if (obj.usesView) then
-		out = out .. "\n\tif (fView->Window())\n\t\tfView->Window()->Lock();\n\n"
+		out = out .. "\n\tif (backend->Window())\n\t\tbackend->Window()->Lock();\n\n"
 	end
 	
 	local i = 1
@@ -739,14 +741,14 @@ function GenerateGetProperty(obj, back)
 	out = out .. "\telse\n\t{\n"
 	
 	if (obj.usesView) then
-		out = out .. "\t\tif (fView->Window())\n\t\t\tfView->Window()->Unlock();\n\n"
+		out = out .. "\t\tif (backend->Window())\n\t\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
 	out = out .. "\t\treturn " .. obj.parentClass ..
 				"::GetProperty(name, value, index);\n\t}\n\n"
 	
 	if (obj.usesView) then
-		out = out .. "\tif (fView->Window())\n\t\tfView->Window()->Unlock();\n\n"
+		out = out .. "\tif (backend->Window())\n\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
 	out = out .. "\treturn prop->GetValue(value);\n}\n\n\n"
@@ -764,7 +766,7 @@ function GenerateSetProperty(obj, back)
 	out = ApplyBackendPlaceholders(out, back) .. "\n"
 	
 	if (obj.usesView) then
-		out = out .. "\tif (fView->Window())\n\t\tfView->Window()->Lock();\n\n"
+		out = out .. "\tif (backend->Window())\n\t\tbackend->Window()->Lock();\n\n"
 	end
 	
 	local i = 1
@@ -825,14 +827,14 @@ function GenerateSetProperty(obj, back)
 	out = out .. "\telse\n\t{\n"
 	
 	if (obj.usesView) then
-		out = out .. "\t\tif (fView->Window())\n\t\t\tfView->Window()->Unlock();\n\n"
+		out = out .. "\t\tif (backend->Window())\n\t\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
 	out = out .. "\t\treturn " .. obj.parentClass ..
 				"::SetProperty(name, value, index);\n\t}\n\n"
 	
 	if (obj.usesView) then
-		out = out .. "\tif (fView->Window())\n\t\tfView->Window()->Unlock();\n\n"
+		out = out .. "\tif (backend->Window())\n\t\tbackend->Window()->Unlock();\n\n"
 	end
 	out = out .. "\treturn prop->GetValue(value);\n}\n\n\n"
 	
@@ -1181,6 +1183,14 @@ end
 
 function GeneratePObject(obj, back)
 	local pobjCode = ApplyObjectPlaceholders(PObjectMainCode, obj, back)
+	
+	if (obj.parentClass == "PView") then
+		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW)", "true")
+		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW2)", ", true")
+	else
+		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW)", "false")
+		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW2)", ", false")
+	end
 	
 	if ((not obj.properties) or table.getn(obj.properties) == 0) then
 		pobjCode = pobjCode:gsub("\tInitProperties%(%);\n", "")

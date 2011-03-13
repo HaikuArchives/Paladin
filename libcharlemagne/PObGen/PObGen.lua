@@ -985,13 +985,13 @@ end
 
 
 function GenerateMethodDefs(obj, back)
+	local out = ""
+
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then
 		out = out .. "}\n\n\n"
 		return out
 	end
 		
-	local out = ""
-
 	local i = 1
 	while (obj.methods[i]) do
 		local method = obj.methods[i]
@@ -1008,13 +1008,13 @@ end
 
 
 function GenerateMethods(obj, back)
+	local out = ""
+	
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then
 		out = out .. "}\n\n\n"
 		return out
 	end
 		
-	local out = ""
-	
 	local i = 1
 	while (obj.methods[i]) do
 		local method = obj.methods[i]

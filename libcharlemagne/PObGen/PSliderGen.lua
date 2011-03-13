@@ -8,12 +8,12 @@
 	PObject methods, and the backend definitions
 ]]
 
-HeaderName = "PSlider.new.h"
-CodeFileName = "PSlider.new.cpp"
+HeaderName = "PSlider.h"
+CodeFileName = "PSlider.cpp"
 
 ParentHeaderName = [["PControl.h"]]
 
-Includes = { "<Application.h>", "<Slider.h>", "<stdio.h>", }
+Includes = { "<Application.h>", "<Slider.h>", "<Window.h>", "<stdio.h>" }
 
 PObject = {}
 
@@ -50,9 +50,9 @@ PObject.properties =
 		"tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT)" },
 	{ "BarThickness", "float" , { "BarThickness", "void"}, { "SetBarThickness", "float" }, "", "6.0" },
 	{ "HashMarkCount", "int" , { "HashMarkCount", "void"}, { "SetHashMarkCount", "int" }, "", "0" },
-	{ "HashMarkLocation", "int" , { "HashMarks", "void"}, { "SetHashMarks", "int" }, "", "(int32)B_HASH_MARKS_NONE" },
-	{ "MinLimitLabel", "string" , { "MinLimitLabel", "void"}, { "SetMinLimitLabel", "string" }, "", "NULL" },
-	{ "MaxLimitLabel", "string" , { "MaxLimitLabel", "void"}, { "SetMaxLimitLabel", "string" }, "", "NULL" },
+	{ "HashMarkLocation", "int" , { "HashMarks", "void"}, { "SetHashMarks", "(hash_mark_location)" }, "", "(int32)B_HASH_MARKS_NONE" },
+	{ "MinLimitLabel", "string" , { "MinLimitLabel", "embedded"}, { "SetMinLimitLabel", "embedded" }, "", "NULL" },
+	{ "MaxLimitLabel", "string" , { "MaxLimitLabel", "embedded"}, { "SetMaxLimitLabel", "embedded" }, "", "NULL" },
 	{ "Position", "float" , { "Position", "void"}, { "SetPosition", "float" }, "", "0.0" },
 	{ "ThumbStyle", "enum", { "Style", "void" }, { "SetStyle", "(thumb_style)" }, "", "B_BLOCK_THUMB",
 		{ pair("Block", "B_BLOCK_THUMB"), pair("Triangle", "B_TRIANGLE_THUMB") } },
@@ -70,56 +70,76 @@ PObject.embeddedProperties = {}
 PObject.embeddedProperties["FillColor"] = {}
 PObject.embeddedProperties["FillColor"].getCode = [[
 		rgb_color fill;
-		fBackend->FillColor(&fill);
+		backend->FillColor(&fill);
 		((ColorProperty*)prop)->SetValue(fill);
 ]]
 PObject.embeddedProperties["FillColor"].setCode = [[
 		rgb_color c;
-		bool usingColor = fSlider->FillColor(&c);
+		bool usingColor = backend->FillColor(&c);
 		 
-		prop->GetValue(&cv);
-		fBackend->UseFillColor(usingColor, &c);
+		prop->GetValue(&colorval);
+		backend->UseFillColor(usingColor, &c);
 ]]
 
 
 PObject.embeddedProperties["MinLimit"] = {}
 PObject.embeddedProperties["MinLimit"].getCode = [[
 		int32 min, max;
-		fSlider->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		((IntProperty*)prop)->SetValue(min);
 ]]
 PObject.embeddedProperties["MinLimit"].setCode = [[
 		int32 min, max;
-		fBackend->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		
 		prop->GetValue(&intval);
-		fBackend->SetLimits(*intval.value, max);
+		backend->SetLimits(*intval.value, max);
 ]]
 
 
 PObject.embeddedProperties["MaxLimit"] = {}
 PObject.embeddedProperties["MaxLimit"].getCode = [[
 		int32 min, max;
-		fSlider->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		((IntProperty*)prop)->SetValue(max);
 ]]
 PObject.embeddedProperties["MaxLimit"].setCode = [[
 		int32 min, max;
-		fBackend->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		
 		prop->GetValue(&intval);
-		fBackend->SetLimits(*intval.value, max);
+		backend->SetLimits(*intval.value, max);
 ]]
 
 
 PObject.embeddedProperties["UsingFillColor"] = {}
 PObject.embeddedProperties["UsingFillColor"].getCode = [[
 		rgb_color dummy;
-		((BoolProperty*)prop)->SetValue(fSlider->FillColor(&dummy));
+		((BoolProperty*)prop)->SetValue(backend->FillColor(&dummy));
 ]]
 PObject.embeddedProperties["UsingFillColor"].setCode = [[
 		prop->GetValue(&boolval);
-		fBackend->UseFillColor(*boolval.value);
+		backend->UseFillColor(*boolval.value);
+]]
+
+
+PObject.embeddedProperties["MinLimitLabel"] = {}
+PObject.embeddedProperties["MinLimitLabel"].getCode = [[
+	((StringProperty*)prop)->SetValue(backend->MinLimitLabel());
+]]
+PObject.embeddedProperties["MinLimitLabel"].setCode = [[
+		prop->GetValue(&stringval);
+		backend->SetLimitLabels(*stringval.value, backend->MaxLimitLabel());
+]]
+
+
+PObject.embeddedProperties["MaxLimitLabel"] = {}
+PObject.embeddedProperties["MaxLimitLabel"].getCode = [[
+	((StringProperty*)prop)->SetValue(backend->MaxLimitLabel());
+]]
+PObject.embeddedProperties["MaxLimitLabel"].setCode = [[
+		prop->GetValue(&stringval);
+		backend->SetLimitLabels(backend->MinLimitLabel(), *stringval.value);
 ]]
 
 
@@ -131,13 +151,14 @@ PBackend = {}
 PBackend.name = "PSliderBackend"
 PBackend.parent = "BSlider"
 PBackend.access = "public"
-PBackend.init = [[BSlider(BRect(0, 0, 1, 1), "", "", new BMessage, 0.0, 100.0)]]
+PBackend.init = [[BRect(0, 0, 1, 1), "", "", new BMessage, 0.0, 100.0]]
 PBackend.eventHooks =
 {
 	{ "void", "AttachedToWindow", "void" },
 	{ "void", "DetachedFromWindow", "void" },
 	{ "void", "AllAttached", "void" },
 	{ "void", "AllDetached", "void" },
+	{ "void", "Pulse", "void" },
 	{ "void", "MakeFocus", { pair("bool", "focus") } },
 	{ "void", "FrameMoved", { pair("BPoint", "where") } },
 	{ "void", "FrameResized", { pair("float", "width"), pair("float", "height") } },

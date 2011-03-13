@@ -1,41 +1,40 @@
 #include "PSlider.h"
 
 #include <Application.h>
+#include <Slider.h>
+#include <Window.h>
 #include <stdio.h>
 
-#include "EnumProperty.h"
 #include "PArgs.h"
+#include "EnumProperty.h"
+#include "PMethod.h"
 
 class PSliderBackend : public BSlider
 {
 public:
 			PSliderBackend(PObject *owner);
-	void	AttachedToWindow(void);
-	void	AllAttached(void);
-	void	DetachedFromWindow(void);
-	void	AllDetached(void);
-	
-	void	MakeFocus(bool value);
-	
-	void	FrameMoved(BPoint pt);
-	void	FrameResized(float w, float h);
-	
+
+	void	AttachedToWindow();
+	void	DetachedFromWindow();
+	void	AllAttached();
+	void	AllDetached();
+	void	Pulse();
+	void	MakeFocus(bool param1);
+	void	FrameMoved(BPoint param1);
+	void	FrameResized(float param1, float param2);
+	void	MouseDown(BPoint param1);
+	void	MouseUp(BPoint param1);
+	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
+	void	WindowActivated(bool param1);
+	void	Draw(BRect param1);
+	void	DrawAfterChildren(BRect param1);
 	void	KeyDown(const char *bytes, int32 count);
 	void	KeyUp(const char *bytes, int32 count);
-	
-	void	MouseDown(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
-	void	MouseUp(BPoint pt);
-	
-	void	WindowActivated(bool active);
-	
-	void	Draw(BRect update);
-	void	DrawAfterChildren(BRect update);
-	void	MessageReceived(BMessage *msg);
-	
+
 private:
-	PObject	*fOwner;
+	PObject *fOwner;
 };
+
 
 PSlider::PSlider(void)
 	:	PControl()
@@ -45,6 +44,8 @@ PSlider::PSlider(void)
 	AddInterface("PSlider");
 	
 	InitBackend();
+	InitProperties();
+	InitMethods();
 }
 
 
@@ -56,8 +57,9 @@ PSlider::PSlider(BMessage *msg)
 	AddInterface("PSlider");
 	
 	BMessage viewmsg;
-	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		fView = (BView*)BSlider::Instantiate(&viewmsg);
+	if (msg->FindMessage("backend", &viewmsg) == B_OK)
+		fView = (BView*)PSliderBackend::Instantiate(&viewmsg);
+
 	
 	InitBackend();
 }
@@ -69,6 +71,8 @@ PSlider::PSlider(const char *name)
 	fType = "PSlider";
 	fFriendlyType = "Slider";
 	AddInterface("PSlider");
+	
+	InitMethods();
 	InitBackend();
 }
 
@@ -79,13 +83,14 @@ PSlider::PSlider(const PSlider &from)
 	fType = "PSlider";
 	fFriendlyType = "Slider";
 	AddInterface("PSlider");
+	
+	InitMethods();
 	InitBackend();
 }
 
 
 PSlider::~PSlider(void)
 {
-	// We don't have to worry about removing and deleting fView -- ~PView does that for us. :)
 }
 
 
@@ -112,25 +117,10 @@ PSlider::Duplicate(void) const
 	return new PSlider(*this);
 }
 
+
 status_t
 PSlider::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
-/*
-	PSlider Properties:
-		BarColor
-		BarThickness
-		FillColor
-		HashMarkCount
-		HashMarkLocation
-		MinLimit
-		MinLimitLabel
-		MaxLimit
-		MaxLimitLabel
-		Orientation
-		Position
-		ThumbStyle
-		UsingFillColor
-*/
 	if (!name || !value)
 		return B_ERROR;
 	
@@ -139,50 +129,67 @@ PSlider::GetProperty(const char *name, PValue *value, const int32 &index) const
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-	BSlider *fSlider = (BSlider*)fView;
-	
+	BSlider *backend = (BSlider*)fView;
+
+	if (backend->Window())
+		backend->Window()->Lock();
+
 	if (str.ICompare("BarColor") == 0)
-		((ColorProperty*)prop)->SetValue(fSlider->BarColor());
+		((ColorProperty*)prop)->SetValue(backend->BarColor());
 	else if (str.ICompare("BarThickness") == 0)
-		((FloatProperty*)prop)->SetValue(fSlider->BarThickness());
+		((FloatProperty*)prop)->SetValue(backend->BarThickness());
+	else if (str.ICompare("HashMarkCount") == 0)
+		((IntProperty*)prop)->SetValue(backend->HashMarkCount());
+	else if (str.ICompare("HashMarkLocation") == 0)
+		((IntProperty*)prop)->SetValue(backend->HashMarks());
+	else if (str.ICompare("MinLimitLabel") == 0)
+	{
+	((StringProperty*)prop)->SetValue(backend->MinLimitLabel());
+	}
+	else if (str.ICompare("MaxLimitLabel") == 0)
+	{
+	((StringProperty*)prop)->SetValue(backend->MaxLimitLabel());
+	}
+	else if (str.ICompare("Position") == 0)
+		((FloatProperty*)prop)->SetValue(backend->Position());
+	else if (str.ICompare("ThumbStyle") == 0)
+		((EnumProperty*)prop)->SetValue(backend->Style());
+	else if (str.ICompare("Orientation") == 0)
+		((EnumProperty*)prop)->SetValue(backend->Orientation());
 	else if (str.ICompare("FillColor") == 0)
 	{
 		rgb_color fill;
-		fSlider->FillColor(&fill);
+		backend->FillColor(&fill);
 		((ColorProperty*)prop)->SetValue(fill);
 	}
-	else if (str.ICompare("HashMarkCount") == 0)
-		((IntProperty*)prop)->SetValue(fSlider->HashMarkCount());
-	else if (str.ICompare("HashMarkLocation") == 0)
-		((IntProperty*)prop)->SetValue(fSlider->HashMarks());
 	else if (str.ICompare("MinLimit") == 0)
 	{
 		int32 min, max;
-		fSlider->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		((IntProperty*)prop)->SetValue(min);
 	}
-	else if (str.ICompare("MinLimitLabel") == 0)
-		((StringProperty*)prop)->SetValue(fSlider->MinLimitLabel());
 	else if (str.ICompare("MaxLimit") == 0)
 	{
 		int32 min, max;
-		fSlider->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		((IntProperty*)prop)->SetValue(max);
 	}
-	else if (str.ICompare("MaxLimitLabel") == 0)
-		((StringProperty*)prop)->SetValue(fSlider->MaxLimitLabel());
-	// Orientation
-	else if (str.ICompare("Position") == 0)
-		((FloatProperty*)prop)->SetValue(fSlider->Position());
-	// ThumbStyle
 	else if (str.ICompare("UsingFillColor") == 0)
 	{
 		rgb_color dummy;
-		((BoolProperty*)prop)->SetValue(fSlider->FillColor(&dummy));
+		((BoolProperty*)prop)->SetValue(backend->FillColor(&dummy));
 	}
 	else
-		return PObject::GetProperty(name,value,index);
-	
+	{
+		if (backend->Window())
+			backend->Window()->Unlock();
+
+		return PControl::GetProperty(name, value, index);
+	}
+
+	if (backend->Window())
+		backend->Window()->Unlock();
+
 	return prop->GetValue(value);
 }
 
@@ -190,25 +197,6 @@ PSlider::GetProperty(const char *name, PValue *value, const int32 &index) const
 status_t
 PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 {
-/*
-	PSlider Properties:
-		All PView Properties
-		All PControl Properties
-		
-		BarColor
-		BarThickness
-		FillColor
-		HashMarkCount
-		HashMarkLocation
-		MinLimit
-		MinLimitLabel
-		MaxLimit
-		MaxLimitLabel
-		Orientation
-		Position
-		ThumbStyle
-		UsingFillColor
-*/
 	if (!name || !value)
 		return B_ERROR;
 	
@@ -220,99 +208,112 @@ PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	BSlider *fSlider = (BSlider*)fView;
+	BSlider *backend = (BSlider*)fView;
 	
-	IntValue iv;
-	ColorValue cv;
-	FloatValue fv;
-	StringValue sv;
-	BoolValue bv;
+	BoolValue boolval;
+	ColorValue colorval;
+	FloatValue floatval;
+	IntValue intval;
+	PointValue pointval;
+	RectValue rectval;
+	StringValue stringval;
 	
 	status_t status = prop->SetValue(value);
 	if (status != B_OK)
 		return status;
-	
+
+	if (backend->Window())
+		backend->Window()->Lock();
+
 	if (str.ICompare("BarColor") == 0)
 	{
-		prop->GetValue(&cv);
-		fSlider->SetBarColor(*cv.value);
+		prop->GetValue(&colorval);
+		backend->SetBarColor(*colorval.value);
 	}
 	else if (str.ICompare("BarThickness") == 0)
 	{
-		prop->GetValue(&fv);
-		fSlider->SetBarThickness(*fv.value);
+		prop->GetValue(&floatval);
+		backend->SetBarThickness(*floatval.value);
+	}
+	else if (str.ICompare("HashMarkCount") == 0)
+	{
+		prop->GetValue(&intval);
+		backend->SetHashMarkCount(*intval.value);
+	}
+	else if (str.ICompare("HashMarkLocation") == 0)
+	{
+		prop->GetValue(&intval);
+		backend->SetHashMarks((hash_mark_location)*intval.value);
+	}
+	else if (str.ICompare("MinLimitLabel") == 0)
+	{
+		prop->GetValue(&stringval);
+		backend->SetLimitLabels(*stringval.value, backend->MaxLimitLabel());
+	}
+	else if (str.ICompare("MaxLimitLabel") == 0)
+	{
+		prop->GetValue(&stringval);
+		backend->SetLimitLabels(backend->MinLimitLabel(), *stringval.value);
+	}
+	else if (str.ICompare("Position") == 0)
+	{
+		prop->GetValue(&floatval);
+		backend->SetPosition(*floatval.value);
+	}
+	else if (str.ICompare("ThumbStyle") == 0)
+	{
+		prop->GetValue(&intval);
+		backend->SetStyle((thumb_style)*intval.value);
+	}
+	else if (str.ICompare("Orientation") == 0)
+	{
+		prop->GetValue(&intval);
+		backend->SetOrientation((orientation)*intval.value);
 	}
 	else if (str.ICompare("FillColor") == 0)
 	{
 		rgb_color c;
-		bool usingColor = fSlider->FillColor(&c);
+		bool usingColor = backend->FillColor(&c);
 		 
-		prop->GetValue(&cv);
-		fSlider->UseFillColor(usingColor, &c);
-	}
-	else if (str.ICompare("HashMarkCount") == 0)
-	{
-		prop->GetValue(&iv);
-		fSlider->SetHashMarkCount(*iv.value);
-	}
-	else if (str.ICompare("HashMarkLocation") == 0)
-	{
-		prop->GetValue(&iv);
-		fSlider->SetHashMarks((hash_mark_location)*iv.value);
+		prop->GetValue(&colorval);
+		backend->UseFillColor(usingColor, &c);
 	}
 	else if (str.ICompare("MinLimit") == 0)
 	{
 		int32 min, max;
-		fSlider->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		
-		prop->GetValue(&fv);
-		fSlider->SetLimits(*iv.value, max);
-	}
-	else if (str.ICompare("MinLimitLabel") == 0)
-	{
-		prop->GetValue(&sv);
-		fSlider->SetLimitLabels(*sv.value, fSlider->MaxLimitLabel());
+		prop->GetValue(&intval);
+		backend->SetLimits(*intval.value, max);
 	}
 	else if (str.ICompare("MaxLimit") == 0)
 	{
 		int32 min, max;
-		fSlider->GetLimits(&min, &max);
+		backend->GetLimits(&min, &max);
 		
-		prop->GetValue(&fv);
-		fSlider->SetLimits(min, *iv.value);
-	}
-	else if (str.ICompare("MaxLimitLabel") == 0)
-	{
-		prop->GetValue(&sv);
-		fSlider->SetLimitLabels(fSlider->MinLimitLabel(), *sv.value);
-	}
-	else if (str.ICompare("Orientation") == 0)
-	{
-		prop->GetValue(&iv);
-		fSlider->SetOrientation((orientation)*iv.value);
-	}
-	else if (str.ICompare("Position") == 0)
-	{
-		prop->GetValue(&fv);
-		fSlider->SetPosition(*fv.value);
-	}
-	else if (str.ICompare("ThumbStyle") == 0)
-	{
-		prop->GetValue(&iv);
-		fSlider->SetStyle((thumb_style)*iv.value);
+		prop->GetValue(&intval);
+		backend->SetLimits(*intval.value, max);
 	}
 	else if (str.ICompare("UsingFillColor") == 0)
 	{
-		prop->GetValue(&bv);
-		fSlider->UseFillColor(*bv.value);
+		prop->GetValue(&boolval);
+		backend->UseFillColor(*boolval.value);
 	}
 	else
-		return PControl::SetProperty(name,value,index);
-	
+	{
+		if (backend->Window())
+			backend->Window()->Unlock();
+
+		return PControl::SetProperty(name, value, index);
+	}
+
+	if (backend->Window())
+		backend->Window()->Unlock();
+
 	return prop->GetValue(value);
 }
 
-	
+
 void
 PSlider::InitBackend(void)
 {
@@ -324,73 +325,57 @@ PSlider::InitBackend(void)
 void
 PSlider::InitProperties(void)
 {
-/*
-	PSlider Properties:
-		All PView Properties
-		
-		BarColor
-		BarThickness
-		FillColor
-		HashMarkCount
-		HashMarkLocation
-		MinLimit
-		MinLimitLabel
-		MaxLimit
-		MaxLimitLabel
-		Orientation
-		Position
-		ThumbStyle
-		UsingFillColor
-*/
+	SetStringProperty("Description", "A slider");
 
-	StringValue sv("A slider");
-	SetProperty("Description",&sv);
-	
-	EnumProperty *prop = new EnumProperty();
-	prop->SetName("Orientation");
-	prop->AddValuePair("Vertical", B_VERTICAL);
-	prop->AddValuePair("Horizontal", B_HORIZONTAL);
-	prop->SetDescription("The slider's direction.");
-	prop->SetValue((int32)B_HORIZONTAL);
-	AddProperty(prop);
-	
-	prop = new EnumProperty();
-	prop->SetName("ThumbStyle");
-	prop->AddValuePair("Block", B_BLOCK_THUMB);
-	prop->AddValuePair("Triangle", B_TRIANGLE_THUMB);
-	prop->SetDescription("The slider's knob style.");
-	prop->SetValue((int32)B_BLOCK_THUMB);
-	AddProperty(prop);
-	
-	AddProperty(new ColorProperty("BarColor", 
-								tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-											B_DARKEN_4_TINT),
-								"The bar's color."));
+	AddProperty(new ColorProperty("BarColor", tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT), "The bar's color"));
 	AddProperty(new FloatProperty("BarThickness", 6.0));
-	AddProperty(new ColorProperty("FillColor", rgb_color(),
-								"The fill color, if it is being used."));
 	AddProperty(new IntProperty("HashMarkCount", 0));
 	AddProperty(new IntProperty("HashMarkLocation", (int32)B_HASH_MARKS_NONE));
-	AddProperty(new FloatProperty("MinLimit", 0.0));
 	AddProperty(new StringProperty("MinLimitLabel", NULL));
-	AddProperty(new FloatProperty("MaxLimit", 100.0));
 	AddProperty(new StringProperty("MaxLimitLabel", NULL));
 	AddProperty(new FloatProperty("Position", 0.0));
-	AddProperty(new BoolProperty("UsingFillColor", false));
 
+	EnumProperty *prop = NULL;
+
+	prop = new EnumProperty();
+	prop->SetName("ThumbStyle");
+	prop->SetValue((int32)B_BLOCK_THUMB);
+	prop->AddValuePair("Block", B_BLOCK_THUMB);
+	prop->AddValuePair("Triangle", B_TRIANGLE_THUMB);
+	AddProperty(prop);
+
+	prop = new EnumProperty();
+	prop->SetName("Orientation");
+	prop->SetValue((int32)B_HORIZONTAL);
+	prop->AddValuePair("Horizontal", B_HORIZONTAL);
+	prop->AddValuePair("Vertical", B_VERTICAL);
+	AddProperty(prop);
+
+	AddProperty(new ColorProperty("FillColor", rgb_color(), "The fill color, if it is being used"));
+	AddProperty(new FloatProperty("MinLimit", 0.0));
+	AddProperty(new FloatProperty("MaxLimit", 100.0));
+	AddProperty(new BoolProperty("UsingFillColor", false));
+}
+
+
+void
+PSlider::InitMethods(void)
+{
+	PMethodInterface pmi;
+	
 }
 
 
 PSliderBackend::PSliderBackend(PObject *owner)
-	:	BSlider(BRect(0,0,1,1),"", "", new BMessage, 0.0, 100.0),
+	:	BSlider(BRect(0, 0, 1, 1), "", "", new BMessage, 0.0, 100.0),
 		fOwner(owner)
 {
 }
+
+
 void
-PSliderBackend::AttachedToWindow(void)
+PSliderBackend::AttachedToWindow()
 {
-	BSlider::AttachedToWindow();
-	
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
@@ -401,19 +386,7 @@ PSliderBackend::AttachedToWindow(void)
 
 
 void
-PSliderBackend::AllAttached(void)
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllAttached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BSlider::AllAttached();
-}
-
-
-void
-PSliderBackend::DetachedFromWindow(void)
+PSliderBackend::DetachedFromWindow()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
@@ -425,7 +398,19 @@ PSliderBackend::DetachedFromWindow(void)
 
 
 void
-PSliderBackend::AllDetached(void)
+PSliderBackend::AllAttached()
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::AllAttached();
+}
+
+
+void
+PSliderBackend::AllDetached()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
@@ -437,43 +422,134 @@ PSliderBackend::AllDetached(void)
 
 
 void
-PSliderBackend::MakeFocus(bool value)
+PSliderBackend::Pulse()
 {
 	PArgs in, out;
-	in.AddBool("focus", value);
-	EventData *data = fOwner->FindEvent("FocusChanged");
+	EventData *data = fOwner->FindEvent("Pulse");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BSlider::MakeFocus(value);
+		BSlider::Pulse();
 }
 
 
 void
-PSliderBackend::FrameMoved(BPoint pt)
+PSliderBackend::MakeFocus(bool param1)
 {
 	PArgs in, out;
-	in.AddPoint("where", pt);
+	in.AddBool("focus", param1);
+	EventData *data = fOwner->FindEvent("MakeFocus");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::MakeFocus(param1);
+}
+
+
+void
+PSliderBackend::FrameMoved(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BSlider::FrameMoved(pt);
+		BSlider::FrameMoved(param1);
 }
 
 
 void
-PSliderBackend::FrameResized(float w, float h)
+PSliderBackend::FrameResized(float param1, float param2)
 {
-	BSlider::FrameResized(w, h);
 	PArgs in, out;
-	in.AddFloat("width", w);
-	in.AddFloat("height", h);
-	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	in.AddFloat("width", param1);
+	in.AddFloat("height", param2);
+	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BSlider::FrameResized(w, h);
+		BSlider::FrameResized(param1, param2);
+}
+
+
+void
+PSliderBackend::MouseDown(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::MouseDown(param1);
+}
+
+
+void
+PSliderBackend::MouseUp(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::MouseUp(param1);
+}
+
+
+void
+PSliderBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * param3)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	in.AddInt32("transit", param2);
+	in.AddPointer("message", (void*) param3);
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::MouseMoved(param1, param2, param3);
+}
+
+
+void
+PSliderBackend::WindowActivated(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("active", param1);
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::WindowActivated(param1);
+}
+
+
+void
+PSliderBackend::Draw(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("Draw");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::Draw(param1);
+}
+
+
+void
+PSliderBackend::DrawAfterChildren(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BSlider::DrawAfterChildren(param1);
 }
 
 
@@ -505,103 +581,3 @@ PSliderBackend::KeyUp(const char *bytes, int32 count)
 }
 
 
-void
-PSliderBackend::MouseDown(BPoint pt)
-{
-	BSlider::MouseDown(pt);
-	
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseDown");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BSlider::MouseDown(pt);
-}
-
-
-void
-PSliderBackend::MouseUp(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BSlider::MouseUp(pt);
-}
-
-
-void
-PSliderBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	in.AddInt32("transit", transit);
-	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
-}
-
-
-void
-PSliderBackend::WindowActivated(bool active)
-{
-	PArgs in, out;
-	in.AddBool("active", active);
-	EventData *data = fOwner->FindEvent("WindowActivated");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BSlider::WindowActivated(active);
-}
-
-
-void
-PSliderBackend::Draw(BRect update)
-{
-	EventData *data = fOwner->FindEvent("Draw");
-	if (!data->hook)
-		BSlider::Draw(update);
-	
-	PArgs in, out;
-	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
-	
-	if (IsFocus())
-	{
-		SetPenSize(5.0);
-		SetHighColor(0,0,0);
-		SetLowColor(128,128,128);
-		StrokeRect(Bounds(),B_MIXED_COLORS);
-	}
-}
-
-
-void
-PSliderBackend::DrawAfterChildren(BRect update)
-{
-	PArgs in, out;
-	in.AddRect("update", update);
-	EventData *data = fOwner->FindEvent("DrawAfterChildren");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BSlider::DrawAfterChildren(update);
-}
-
-
-void
-PSliderBackend::MessageReceived(BMessage *msg)
-{
-	PSlider *view = dynamic_cast<PSlider*>(fOwner);
-	if (view->GetMsgHandler(msg->what))
-	{
-		PArgs args;
-		view->ConvertMsgToArgs(*msg, args.ListRef());
-		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
-			return;
-	}
-	
-	BSlider::MessageReceived(msg);
-}

@@ -146,66 +146,64 @@ PObject.methods =
 	-- This will need to be an embedded method
 	-- { "AllowChars", { triplet("chars", "string", "The set of characters to allow") }, { } },
 	
-	{ "ByteAt", { triplet("offset", "int32", "Offset of the byte to get.") },
-				{ triplet("value", "char", "1-byte character at the specified offset.") } },
-	{ "CanEndLine", { triplet("offset", "int32", "Offset to test for line ending") },
-				{ triplet("value", "bool", "True if the character can be the last one on a line.") } },
+	{ "ByteAt", { param("offset", "int32", "int32", "Offset of the byte to get.") },
+				{ param("value", "char", "1-byte character at the specified offset.") } },
+--[[	
+	{ "CanEndLine", { param("offset", "int32", "Offset to test for line ending") },
+				{ param("value", "bool", "True if the character can be the last one on a line.") } },
+	{ "Copy", { param("clipid", "int64", "The id of a clipboard object") }, {} },
+	{ "Cut", { param("clipid", "int64", "The id of a clipboard object") }, {} },
 	
-	-- Also embedded. :(
-	--{ "Copy", { triplet("clipid", "int64", "The id of a clipboard object") }, {} },
-	--{ "Cut", { triplet("clipid", "int64", "The id of a clipboard object") }, {} },
-	
-	{ "Delete", { triplet("start", "int32", "Starting offset of the range to delete."),
-				  triplet("end", "int32", "Ending offset of the range to delete.") },
+	{ "Delete", { param("start", "int32", "Starting offset of the range to delete."),
+				  param("end", "int32", "Ending offset of the range to delete.") },
 				{ } },
-	{ "FindWord", { triplet("offset", "int32", "Starting point for searching for a word") },
-				{ triplet("start", "int32", "Starting offset of the next word"),
-				  triplet("end", "int32", "Ending offset of the next word") } },
-	{ "GetInsets", { }, { triplet("left", "float", "Left inset"),
-						  triplet("top", "float", "Top inset"),
-						  triplet("right", "float", "Right inset"),
-						  triplet("bottom", "float", "Bottom inset") } },
-	{ "GetSelection", { }, { triplet("start", "int32", "Starting offset of the selection"),
-							 triplet("end", "int32", "Ending offset of the selection") } },
-	{ "GetText", { triplet("start", "int32", "Starting offset of the text"),
-							 triplet("end", "int32", "Ending offset of the text") },
+	 More embedded
+	{ "FindWord", { param("offset", "int32", "Starting point for searching for a word") },
+				{ param("start", "int32", "Starting offset of the next word"),
+				  param("end", "int32", "Ending offset of the next word") } },
+	{ "GetInsets", { }, { param("left", "float", "Left inset"),
+						  param("top", "float", "Top inset"),
+						  param("right", "float", "Right inset"),
+						  param("bottom", "float", "Bottom inset") } },
+	{ "GetSelection", { }, { param("start", "int32", "Starting offset of the selection"),
+							 param("end", "int32", "Ending offset of the selection") } },
+	{ "GetText", { param("start", "int32", "Starting offset of the text"),
+							 param("end", "int32", "Ending offset of the text") },
 				{ } },
 	
-	{ "Highlight", { triplet("start", "int32", "Starting offset of the text to highlight"),
-							 triplet("end", "int32", "Ending offset of the text to highlight") },
+	{ "Highlight", { param("start", "int32", "Starting offset of the text to highlight"),
+							 param("end", "int32", "Ending offset of the text to highlight") },
 				{ } },
-	{ "Insert", { triplet("text", "string", "The text to insert"),
-					triplet("length", "int32", "How much of the string to insert", "PMIFLAG_OPTIONAL"),
-					triplet("offset", "int32", "Location to insert the text", "PMIFLAG_OPTIONAL") },
+	{ "Insert", { param("text", "string", "The text to insert"),
+					param("length", "int32", "How much of the string to insert", "PMIFLAG_OPTIONAL"),
+					param("offset", "int32", "Location to insert the text", "PMIFLAG_OPTIONAL") },
 				{ } },
-	{ "LineAt", { triplet("offset", "int32", "Offset to find the line for", "PMIFLAG_OPTIONAL"),
-				triplet("point", "point", "Point to find the line for", "PMIFLAG_OPTIONAL") },
-				{ triplet("offsetline", "int32", "Line for the specified offset. Returned only if offset is specified"),
-				triplet("pointline", "int32", "Line for the specified point. Returned only if point is specified") } },
+	{ "LineAt", { param("offset", "int32", "Offset to find the line for", "PMIFLAG_OPTIONAL"),
+				param("point", "point", "Point to find the line for", "PMIFLAG_OPTIONAL") },
+				{ param("offsetline", "int32", "Line for the specified offset. Returned only if offset is specified"),
+				param("pointline", "int32", "Line for the specified point. Returned only if point is specified") } },
 	
-	-- Also embedded. :(
-	--{ "Paste", { triplet("clipid", "int64", "Object ID of a PClipboard object") }, {} },
+	{ "Paste", { param("clipid", "int64", "Object ID of a PClipboard object") }, {} },
 	
-	{ "PointAt", { triplet("offset", "int32", "Offset to get the point for") },
-				{ triplet("point", "point", "Point for the offset specified"),
-				triplet("height", "float", "Height of the line at the specified offset") } },
-	{ "ScrollToOffset", { triplet("offset", "int32", "Offset to scroll to") }, { } },
+	{ "PointAt", { param("offset", "int32", "Offset to get the point for") },
+				{ param("point", "point", "Point for the offset specified"),
+				param("height", "float", "Height of the line at the specified offset") } },
+	{ "ScrollToOffset", { param("offset", "int32", "Offset to scroll to") }, { } },
 	{ "ScrollToSelection", { }, { } },
-	{ "Select", { triplet("start", "int32", "Starting offset of the next word"),
-				  triplet("end", "int32", "Ending offset of the next word") }, { } },
+	{ "Select", { param("start", "int32", "Starting offset of the next word"),
+				  param("end", "int32", "Ending offset of the next word") }, { } },
 	{ "SelectAll", { }, { } },
-	{ "SetInsets", { triplet("left", "float", "Left inset"),
-					  triplet("top", "float", "Top inset"),
-					  triplet("right", "float", "Right inset"),
-					  triplet("bottom", "float", "Bottom inset") }, { } },
-	{ "SetText", { triplet("text", "string", "Text to set the Text View to"),
-					triplet("length", "int32", "Length of the text to insert") }, { } },
-	{ "TextHeight", { triplet("start", "int32", "Starting offset of the text to highlight"),
-							 triplet("end", "int32", "Ending offset of the text to highlight") },
-				{ triplet("height", "float", "Total height of the lines specified by the given offsets") } },
-	
-	-- Also embedded. :(
-	--{ "Undo", { triplet("clipid", "int64", "Object ID of a PClipboard object") }, {} }
+	{ "SetInsets", { param("left", "float", "Left inset"),
+					  param("top", "float", "Top inset"),
+					  param("right", "float", "Right inset"),
+					  param("bottom", "float", "Bottom inset") }, { } },
+	{ "SetText", { param("text", "string", "Text to set the Text View to"),
+					param("length", "int32", "Length of the text to insert") }, { } },
+	{ "TextHeight", { param("start", "int32", "Starting offset of the text to highlight"),
+							 param("end", "int32", "Ending offset of the text to highlight") },
+				{ param("height", "float", "Total height of the lines specified by the given offsets") } },
+	{ "Undo", { param("clipid", "int64", "Object ID of a PClipboard object") }, {} }
+]]
 }
 
 
@@ -216,7 +214,7 @@ PBackend = {}
 PBackend.name = "PTextViewBackend"
 PBackend.parent = "BTextView"
 PBackend.access = "public"
-PBackend.init = [[BRect(0,0,99,99), "textview", BRect(5,5,94,94), B_FOLLOW_LEFT | B_FOLLOW_TOP)]]
+PBackend.init = [[BRect(0,0,99,99), "textview", BRect(5,5,94,94), B_FOLLOW_LEFT | B_FOLLOW_TOP]]
 PBackend.eventHooks =
 {
 	{ "void", "AttachedToWindow", "void" },
@@ -228,7 +226,9 @@ PBackend.eventHooks =
 	{ "void", "FrameResized", { pair("float", "width"), pair("float", "height") } },
 	{ "void", "MouseDown", { pair("BPoint", "where") } },
 	{ "void", "MouseUp", { pair("BPoint", "where") } },
-	{ "void", "MouseMoved", { pair("BPoint", "where"), pair("uint32", "transit"), pair("const BMessage *", "message") } },
+	
+	-- TODO: This needs fixed because of the casting needed (void*)
+	--{ "void", "MouseMoved", { pair("BPoint", "where"), pair("uint32", "transit"), pair("const BMessage *", "message") } },
 	{ "void", "WindowActivated", { pair("bool", "active") } },
 	{ "void", "Draw", { pair("BRect", "update") } },
 	{ "void", "DrawAfterChildren", { pair("BRect", "update") } },

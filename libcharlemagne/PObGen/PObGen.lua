@@ -196,7 +196,7 @@ status_t
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-	%(BACKEND_PARENT_NAME) *fView = (%(BACKEND_PARENT_NAME)*)fView;
+	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)fView;
 ]]
 
 
@@ -215,7 +215,7 @@ status_t
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	%(BACKEND_PARENT_NAME) *fView = (%(BACKEND_PARENT_NAME)*)fView;
+	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)fView;
 	
 	BoolValue boolval;
 	ColorValue colorval;
@@ -308,6 +308,19 @@ end
 
 function triplet(k, v, d, f)
 	return { ["key"]=k, ["value"]=v, ["description"]=d, ["flags"]=f }
+end
+
+
+function param(name, intype, outtype, desc, flags)
+	local t = {}
+	
+	t.name = name
+	t.intype = intype
+	t.outtype = outtype
+	t.description = desc
+	t.flags = flags
+	
+	return t
 end
 
 
@@ -475,8 +488,8 @@ function GenerateBackendCode(back)
 		return ""
 	end
 	
-	local code = "class " .. back.name .. "::" .. back.name .. "(PObject *owner)\n" ..
-		"\t:\t" .. back.init .. ",\n\t\tfOwner(owner)\n{\n}\n\n\n"
+	local code = back.name .. "::" .. back.name .. "(PObject *owner)\n" ..
+		"\t:\t" .. back.parent .. "(" ..back.init .. "),\n\t\tfOwner(owner)\n{\n}\n\n\n"
 	
 	-- Now that the constructor is done, write all of the hooks for events
 	local i = 1
@@ -540,7 +553,7 @@ function GenerateBackendCode(back)
 					pargCall = "\tin.AddPoint("
 				elseif (pargType == "rect") then
 					pargCall = "\tin.AddRect("
-				elseif (pargType == "float") then
+				elseif (pargType == "color") then
 					pargCall = "\tin.AddColor("
 				elseif (pargType == "float") then
 					pargCall = "\tin.AddFloat("
@@ -662,7 +675,7 @@ function GenerateGetProperty(obj, back)
 				
 			else
 				propCode = propCode ..	"\t\t((" .. TypeToPropertyClass(prop[2]) ..
-							"*)prop)->SetValue(fView->" .. prop[3][1] .. "("
+							"*)prop)->SetValue(backend->" .. prop[3][1] .. "("
 		
 				if (prop[3][2] == "void") then
 					propCode = propCode .. "));"
@@ -733,7 +746,7 @@ function GenerateSetProperty(obj, back)
 				end
 			else
 				propCode = propCode .. "\t\tprop->GetValue(&" .. valName .. ");\n" ..
-							"\t\tfView->" .. prop[4][1] .. "("
+							"\t\tbackend->" .. prop[4][1] .. "("
 			
 				if (prop[2] == "enum") then
 					if (prop[4][2]:len() > 0 and prop[4][2] ~= "void") then
@@ -846,13 +859,13 @@ function GenerateInitMethods(obj, back)
 		for j = 1, table.getn(method[2]) do
 			local entry = method[2][j]
 			local methodCode = ""
-			local pargType = PTypeToConstant(entry.value)
+			local pargType = PTypeToConstant(entry.intype)
 			
 			if (not pargType) then
-				print("nil parg type: " .. entry.value)
+				print("nil parg type: " .. entry.intype)
 			end
 			
-			methodCode = '\tpmi.AddArg("' .. entry.key .. '", ' ..
+			methodCode = '\tpmi.AddArg("' .. entry.name .. '", ' ..
 						pargType
 			
 			if (entry.description) then
@@ -870,13 +883,13 @@ function GenerateInitMethods(obj, back)
 		for j = 1, table.getn(method[3]) do
 			local entry = method[3][j]
 			local methodCode = ""
-			local pargType = PTypeToConstant(entry.value)
+			local pargType = PTypeToConstant(entry.intype)
 			
 			if (not pargType) then
-				print("nil parg type: " .. entry.value)
+				print("nil parg type: " .. entry.intype)
 			end
 			
-			methodCode = '\tpmi.AddReturnValue("' .. entry.key .. '", ' ..
+			methodCode = '\tpmi.AddReturnValue("' .. entry.name .. '", ' ..
 						pargType
 			
 			if (entry.description) then
@@ -964,16 +977,16 @@ function GenerateMethods(obj, back)
 			local entry = method[2][j]
 			
 			-- Declare the variable to hold the value for each parameter
-			local beType = PTypeToBe(entry.value)
-			local entryCode = "\t" .. beType .. " " .. entry.key .. ";\n"
+			local beType = PTypeToBe(entry.intype)
+			local entryCode = "\t" .. beType .. " " .. entry.name .. ";\n"
 			
 			-- If a required argument, add a check to make sure that it
 			-- was found and return B_ERROR if it wasn't
 			if ((not entry.flags) or 
 				(entry.flags:find("PMIFLAG_OPTIONAL", 1, plain) == nil)) then
-				local capType = entry.value:sub(1,1):upper() .. entry.value:sub(2)
+				local capType = entry.intype:sub(1,1):upper() .. entry.intype:sub(2)
 				entryCode = entryCode .. "\tif (inArgs.Find" .. capType ..
-							'("' .. entry.key .. '", &' .. entry.key ..
+							'("' .. entry.name .. '", &' .. entry.name ..
 							') != B_OK)\n\t\treturn B_ERROR;\n\n'
 			end
 			methodCode = methodCode .. entryCode
@@ -991,9 +1004,9 @@ function GenerateMethods(obj, back)
 		local returnVar = ""
 		if (table.getn(method[3]) > 0) then
 			local returnEntry = method[3][1]
-			returnVar = returnEntry.key
-			methodCode = methodCode .. returnEntry.value .. " " ..
-						returnEntry.key .. " = "
+			returnVar = returnEntry.name
+			methodCode = methodCode .. returnEntry.intype .. " " ..
+						returnEntry.name .. " = "
 		end
 		
 		methodCode = methodCode .. "backend->" .. method[1] .. "("
@@ -1001,9 +1014,9 @@ function GenerateMethods(obj, back)
 			local entry = method[2][j]
 			
 			if (j > 1) then
-				methodCode = methodCode .. ", " .. entry.key
+				methodCode = methodCode .. ", " .. entry.name
 			else
-				methodCode = methodCode .. entry.key
+				methodCode = methodCode .. entry.name
 			end
 		end
 		methodCode = methodCode .. ");\n\n"
@@ -1016,10 +1029,10 @@ function GenerateMethods(obj, back)
 		
 		local outEntry = method[3][1]
 		if (outEntry) then
-			local outType = outEntry.value:sub(1,1):upper() .. outEntry.value:sub(2)
+			local outType = outEntry.intype:sub(1,1):upper() .. outEntry.intype:sub(2)
 			methodCode = methodCode .. "\toutArgs.MakeEmpty();\n" ..
-						"\toutArgs.Add" .. outType .. '("' .. outEntry.key ..
-						'", ' .. outEntry.key .. ");\n\n"
+						"\toutArgs.Add" .. outType .. '("' .. outEntry.name ..
+						'", ' .. outEntry.name .. ");\n\n"
 		end
 		
 		out = out .. methodCode .. "\treturn B_OK;\n}\n\n\n"

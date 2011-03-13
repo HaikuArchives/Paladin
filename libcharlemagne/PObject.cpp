@@ -612,6 +612,21 @@ PObject::ReplaceMethod(const char *old, PMethod *newMethod)
 
 
 status_t
+PObject::AddInheritedMethod(PMethod *method)
+{
+	if (!method)
+		return B_ERROR;
+	
+	if (FindInheritedMethod(method->GetName().String()))
+		return B_NAME_IN_USE;
+	
+	fInheritedList->AddItem(method);
+	
+	return B_OK;
+}
+
+
+status_t
 PObject::AddEvent(const char *name, const char *description,
 				PMethodInterface *interface)
 {

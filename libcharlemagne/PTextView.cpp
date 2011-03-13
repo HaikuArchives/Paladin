@@ -150,6 +150,10 @@ PTextView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 		return B_NAME_NOT_FOUND;
 	
 	BTextView *backend = (BTextView*)fView;
+
+	if (fView->Window())
+		fView->Window()->Lock();
+
 	if (str.ICompare("Alignment") == 0)
 		((EnumProperty*)prop)->SetValue(backend->Alignment());
 	else if (str.ICompare("AutoIndent") == 0)
@@ -185,7 +189,15 @@ PTextView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 	else if (str.ICompare("UseWordWrap") == 0)
 		((BoolProperty*)prop)->SetValue(backend->DoesWordWrap());
 	else
+	{
+		if (fView->Window())
+			fView->Window()->Unlock();
+
 		return PView::GetProperty(name, value, index);
+	}
+
+	if (fView->Window())
+		fView->Window()->Unlock();
 
 	return prop->GetValue(value);
 }
@@ -218,6 +230,9 @@ PTextView::SetProperty(const char *name, PValue *value, const int32 &index)
 	status_t status = prop->SetValue(value);
 	if (status != B_OK)
 		return status;
+
+	if (fView->Window())
+		fView->Window()->Lock();
 
 	if (str.ICompare("Alignment") == 0)
 	{
@@ -295,7 +310,15 @@ PTextView::SetProperty(const char *name, PValue *value, const int32 &index)
 		backend->SetWordWrap(*boolval.value);
 	}
 	else
+	{
+		if (fView->Window())
+			fView->Window()->Unlock();
+
 		return PView::SetProperty(name, value, index);
+	}
+
+	if (fView->Window())
+		fView->Window()->Unlock();
 
 	return prop->GetValue(value);
 }

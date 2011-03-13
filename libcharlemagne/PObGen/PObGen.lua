@@ -828,8 +828,13 @@ function GenerateSetProperty(obj, back)
 		out = out .. "\t\tif (fView->Window())\n\t\t\tfView->Window()->Unlock();\n\n"
 	end
 	
-	out = out .. "\t\treturn " .. obj.parentClass .. "::SetProperty(name, value, index);\n\n" ..
-				"\treturn prop->GetValue(value);\n}\n\n\n"
+	out = out .. "\t\treturn " .. obj.parentClass ..
+				"::SetProperty(name, value, index);\n\t}\n\n"
+	
+	if (obj.usesView) then
+		out = out .. "\tif (fView->Window())\n\t\tfView->Window()->Unlock();\n\n"
+	end
+	out = out .. "\treturn prop->GetValue(value);\n}\n\n\n"
 	
 	return out
 end

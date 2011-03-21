@@ -1026,6 +1026,7 @@ function GenerateMethods(obj, back)
 		-- Start with the top part of the function definition
 		local methodCode = "int32_t\n" .. obj.name .. method[1] ..
 						"(void *pobject, PArgList *in, PArgList *out)\n{\n"
+		
 		if (method[2] == "embedded") then
 			if (obj.embeddedMethods[method[1]]) then
 				methodCode = methodCode .. obj.embeddedMethods[method[1]] .. "}\n\n\n"

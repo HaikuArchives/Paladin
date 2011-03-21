@@ -1,6 +1,6 @@
 PObGen Notes
 
-Write the embedded methods for PTextView
+Fix embedded support -- don't bail from the loop after the first embedded method
 
 Add support for defining data members
 
@@ -18,3 +18,6 @@ Read-only properties use an empty table for the SetProperty section of their ent
 Enumerated properties have the definitions of their types at index 7 of the entry
 
 Need to add the check for PView inheritance to pass the proper constructor initialization
+
+Embedded methods use "embedded" for the second entry in the method's definition entry. They
+are then placed in a corresponding field in the PObject.embeddedMethods[] table.

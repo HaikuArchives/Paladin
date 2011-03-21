@@ -8,12 +8,13 @@
 	PObject methods, and the backend definitions
 ]]
 
-HeaderName = "PTextControl.new.h"
-CodeFileName = "PTextControl.new.cpp"
+HeaderName = "PTextControl.h"
+CodeFileName = "PTextControl.cpp"
 
 ParentHeaderName = [["PControl.h"]]
 
-Includes = { "<Application.h>", "<Slider.h>", "<stdio.h>", }
+Includes = { "<Application.h>", "<Slider.h>", "<stdio.h>", "<Window.h>",
+			'"AutoTextControl.h"' }
 
 PObject = {}
 
@@ -53,11 +54,11 @@ PObject.properties =
 	{ "Text", "string" , { "Text", "void" }, { "SetText", "string" }, "The control's text", "NULL" },
 	{ "Divider", "float" , { "Divider", "void" }, { "SetDivider", "float" }, "", "0.0" },
 	{ "TextAlignment", "enum" , { "GetAlignment", "embedded" }, { "SetAlignment", "embedded" }, "",
-		"B_LEFT_ALIGN", { pair("Left", "B_LEFT_ALIGN"), pair("Center", "B_CENTER_ALIGN"),
-							pair("Right", "B_RIGHT_ALIGN" } },
+		"B_ALIGN_LEFT", { pair("Left", "B_ALIGN_LEFT"), pair("Center", "B_ALIGN_CENTER"),
+							pair("Right", "B_ALIGN_RIGHT") } },
 	{ "LabelAlignment", "enum" , { "GetAlignment", "embedded" }, { "SetAlignment", "embedded" }, "",
-		"B_LEFT_ALIGN", { pair("Left", "B_LEFT_ALIGN"), pair("Center", "B_CENTER_ALIGN"),
-							pair("Right", "B_RIGHT_ALIGN" } }
+		"B_ALIGN_LEFT", { pair("Left", "B_ALIGN_LEFT"), pair("Center", "B_ALIGN_CENTER"),
+							pair("Right", "B_ALIGN_RIGHT") } }
 }
 
 PObject.embeddedProperties = {}
@@ -65,40 +66,69 @@ PObject.embeddedProperties = {}
 PObject.embeddedProperties["TextAlignment"] = {}
 PObject.embeddedProperties["TextAlignment"].getCode = [[
 		alignment label, text;
-		control->GetAlignment(&label, &text);
+		backend->GetAlignment(&label, &text);
 		((IntProperty*)prop)->SetValue(text);
 ]]
 PObject.embeddedProperties["TextAlignment"].setCode = [[
 		prop->GetValue(&intval);
 		
 		alignment label,text;
-		control->GetAlignment(&label,&text);
+		backend->GetAlignment(&label,&text);
 		text = (alignment)*intval.value;
-		control->SetAlignment(label,text);
+		backend->SetAlignment(label,text);
 ]]
 
 PObject.embeddedProperties["LabelAlignment"] = {}
 PObject.embeddedProperties["LabelAlignment"].getCode = [[
 		alignment label, text;
-		control->GetAlignment(&label, &text);
+		backend->GetAlignment(&label, &text);
 		((IntProperty*)prop)->SetValue(text);
 ]]
 PObject.embeddedProperties["LabelAlignment"].setCode = [[
 		prop->GetValue(&intval);
 		
 		alignment label, text;
-		control->GetAlignment(&label, &text);
+		backend->GetAlignment(&label, &text);
 		label = (alignment)*intval.value;
-		control->SetAlignment(label, text);
+		backend->SetAlignment(label, text);
 ]]
 
 
 PObject.methods = 
 {
 	-- method name, function name, interface, flags
-	{ "SetPreferredDivider", "SetPreferredDivider",
+	{ "SetPreferredDivider", "embedded",
 		{ }, { }, "METHOD_SHOW_IN_EDITOR" }
 }
+
+PObject.embeddedMethods = {}
+PObject.embeddedMethods["SetPreferredDivider"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PTextControl *pcontrol = static_cast<PTextControl*>(pobject);
+	PObject *object = static_cast<PObject*>(pobject);
+	
+	if (!object->UsesInterface("PTextControl") || !pcontrol)
+		return B_BAD_TYPE;
+	
+	BTextControl *backend = dynamic_cast<BTextControl*>(pcontrol->GetView());
+	if (!backend)
+		return B_BAD_TYPE;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	if (strlen(backend->Label()) > 0)
+		backend->SetDivider(backend->StringWidth(backend->Label()));
+	else
+		backend->SetDivider(0.0);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
 
 ------------------------------------------------------------------------------
 -- Backend definitions
@@ -107,7 +137,7 @@ PBackend = {}
 PBackend.name = "PTextControlBackend"
 PBackend.parent = "AutoTextControl"
 PBackend.access = "public"
-PBackend.init = [[AutoTextControl(BRect(0, 0, 1, 1), "", "", "",new BMessage())]]
+PBackend.init = [[BRect(0, 0, 1, 1), "", "", "",new BMessage()]]
 PBackend.eventHooks =
 {
 	{ "void", "AttachedToWindow", "void" },

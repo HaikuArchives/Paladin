@@ -11,16 +11,22 @@
 #include "EnumProperty.h"
 #include "PMethod.h"
 
+int32_t PTextViewAllowChars(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewByteAt(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewCanEndLine(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewCopy(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewCut(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewDelete(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewDisallowChars(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewFindWord(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewGetInsets(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewGetSelection(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewGetText(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewHighlight(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewInsert(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewLineAtOffset(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewLineAtPoint(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewPaste(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewPointAt(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewScrollToOffset(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewScrollToSelection(void *pobject, PArgList *in, PArgList *out);
@@ -29,6 +35,7 @@ int32_t PTextViewSelectAll(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewSetInsets(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewSetText(void *pobject, PArgList *in, PArgList *out);
 int32_t PTextViewTextHeight(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextViewUndo(void *pobject, PArgList *in, PArgList *out);
 
 class PTextViewBackend : public BTextView
 {
@@ -374,6 +381,10 @@ PTextView::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
+	pmi.AddArg("chars", PARG_STRING, "", 0);
+	AddMethod(new PMethod("AllowChars", PTextViewAllowChars, &pmi));
+	pmi.MakeEmpty();
+
 	pmi.AddArg("offset", PARG_INT32, "Offset of the byte to get.", 0);
 	pmi.AddReturnValue("value", PARG_CHAR, "1-byte character at the specified offset.");
 	AddMethod(new PMethod("ByteAt", PTextViewByteAt, &pmi));
@@ -384,9 +395,21 @@ PTextView::InitMethods(void)
 	AddMethod(new PMethod("CanEndLine", PTextViewCanEndLine, &pmi));
 	pmi.MakeEmpty();
 
+	pmi.AddArg("clipid", PARG_INT64, "", 0);
+	AddMethod(new PMethod("Copy", PTextViewCopy, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddArg("clipid", PARG_INT64, "", 0);
+	AddMethod(new PMethod("Cut", PTextViewCut, &pmi));
+	pmi.MakeEmpty();
+
 	pmi.AddArg("start", PARG_INT32, "Starting offset of the range to delete.", 0);
 	pmi.AddArg("end", PARG_INT32, "Ending offset of the range to delete.", 0);
 	AddMethod(new PMethod("Delete", PTextViewDelete, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddArg("chars", PARG_STRING, "", 0);
+	AddMethod(new PMethod("DisallowChars", PTextViewDisallowChars, &pmi));
 	pmi.MakeEmpty();
 
 	pmi.AddArg("offset", PARG_INT32, "Starting point for searching for a word", 0);
@@ -407,6 +430,11 @@ PTextView::InitMethods(void)
 	AddMethod(new PMethod("GetSelection", PTextViewGetSelection, &pmi));
 	pmi.MakeEmpty();
 
+	pmi.AddArg("start", PARG_INT32, "Starting offset of the text", 0);
+	pmi.AddArg("end", PARG_INT32, "Ending offset of the text", 0);
+	AddMethod(new PMethod("GetText", PTextViewGetText, &pmi));
+	pmi.MakeEmpty();
+
 	pmi.AddArg("start", PARG_INT32, "Starting offset of the text to highlight", 0);
 	pmi.AddArg("end", PARG_INT32, "Ending offset of the text to highlight", 0);
 	AddMethod(new PMethod("Highlight", PTextViewHighlight, &pmi));
@@ -425,6 +453,10 @@ PTextView::InitMethods(void)
 	pmi.AddArg("point", PARG_POINT, "Point to find the line for", 0);
 	pmi.AddReturnValue("pointline", PARG_INT32, "Line for the specified point.");
 	AddMethod(new PMethod("LineAtPoint", PTextViewLineAtPoint, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddArg("clipid", PARG_INT64, "", 0);
+	AddMethod(new PMethod("Paste", PTextViewPaste, &pmi));
 	pmi.MakeEmpty();
 
 	pmi.AddArg("offset", PARG_INT32, "Offset to get the point for", 0);
@@ -466,624 +498,43 @@ PTextView::InitMethods(void)
 	AddMethod(new PMethod("TextHeight", PTextViewTextHeight, &pmi));
 	pmi.MakeEmpty();
 
+	pmi.AddArg("clipid", PARG_INT64, "", 0);
+	AddMethod(new PMethod("Undo", PTextViewUndo, &pmi));
+	pmi.MakeEmpty();
+
 }
 
 
 int32_t
-PTextViewByteAt(void *pobject, PArgList *in, PArgList *out)
+PTextViewAllowChars(void *pobject, PArgList *in, PArgList *out)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
-
+	
 	PView *parent = static_cast<PView*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
 	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	char outValue1;
-
-	outValue1 = backend->ByteAt(offset);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddChar("value", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewCanEndLine(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
 	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
+	PArgs args(in);
+	BString string;
+	if (args.FindString("chars", &string) != B_OK)
 		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	bool outValue1;
-
-	outValue1 = backend->ByteAt(offset);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewDelete(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
 	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 start;
-	if (inArgs.FindInt32("start", &start) != B_OK)
-		return B_ERROR;
-
-	int32 end;
-	if (inArgs.FindInt32("end", &end) != B_OK)
-		return B_ERROR;
-
 	if (backend->Window())
 		backend->Window()->Lock();
-
-
-	backend->Delete(start, end);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewFindWord(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
 	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	int32 outValue1;
-	int32 outValue2;
-
-	backend->FindWord(offset, &outValue1, &outValue2);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("start", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewGetInsets(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
+	for (int32 i = 0; i < string.CountChars(); i++)
+	{
+		char c = string.ByteAt(i);
+		if (c)
+			backend->AllowChar(c);
+	}
 	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	float outValue1;
-	float outValue2;
-	float outValue3;
-	float outValue4;
-
-	backend->GetInsets(&outValue1, &outValue2, &outValue3, &outValue4);
-
 	if (backend->Window())
 		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddFloat("left", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewGetSelection(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
 	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	int32 outValue1;
-	int32 outValue2;
-
-	backend->GetSelection(&outValue1, &outValue2);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("start", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewHighlight(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 start;
-	if (inArgs.FindInt32("start", &start) != B_OK)
-		return B_ERROR;
-
-	int32 end;
-	if (inArgs.FindInt32("end", &end) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->Highlight(start, end);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewInsert(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	BString text;
-	if (inArgs.FindString("text", &text) != B_OK)
-		return B_ERROR;
-
-	int32 length;
-	inArgs.FindInt32("length", &length);
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->Insert(text.String(), length);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewLineAtOffset(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	int32 outValue1;
-
-	outValue1 = backend->LineAt(offset);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("line", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewLineAtPoint(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	BPoint point;
-	if (inArgs.FindPoint("point", &point) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	int32 outValue1;
-
-	outValue1 = backend->LineAt(point);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("pointline", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewPointAt(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	BPoint outValue1;
-	float outValue2;
-
-	outValue1 = backend->PointAt(offset, &outValue2);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddPoint("point", outValue1);
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewScrollToOffset(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->ScrollToOffset(offset);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewScrollToSelection(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->ScrollToSelection();
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewSelect(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 start;
-	if (inArgs.FindInt32("start", &start) != B_OK)
-		return B_ERROR;
-
-	int32 end;
-	if (inArgs.FindInt32("end", &end) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->Select(start, end);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewSelectAll(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->SelectAll();
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewSetInsets(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	float left;
-	if (inArgs.FindFloat("left", &left) != B_OK)
-		return B_ERROR;
-
-	float top;
-	if (inArgs.FindFloat("top", &top) != B_OK)
-		return B_ERROR;
-
-	float right;
-	if (inArgs.FindFloat("right", &right) != B_OK)
-		return B_ERROR;
-
-	float bottom;
-	if (inArgs.FindFloat("bottom", &bottom) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->SetInsets(left, top, right, bottom);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewSetText(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	BString text;
-	if (inArgs.FindString("text", &text) != B_OK)
-		return B_ERROR;
-
-	int32 length;
-	if (inArgs.FindInt32("length", &length) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-
-	backend->SetText(text.String(), length);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	return B_OK;
-}
-
-
-int32_t
-PTextViewTextHeight(void *pobject, PArgList *in, PArgList *out)
-{
-	if (!pobject || !in || !out)
-		return B_ERROR;
-
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BTextView *backend = (BTextView*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
-	int32 start;
-	if (inArgs.FindInt32("start", &start) != B_OK)
-		return B_ERROR;
-
-	int32 end;
-	if (inArgs.FindInt32("end", &end) != B_OK)
-		return B_ERROR;
-
-	if (backend->Window())
-		backend->Window()->Lock();
-
-	float outValue1;
-
-	outValue1 = backend->TextHeight(start, end);
-
-	if (backend->Window())
-		backend->Window()->Unlock();
-
-	outArgs.MakeEmpty();
-	outArgs.AddFloat("height", outValue1);
-
 	return B_OK;
 }
 

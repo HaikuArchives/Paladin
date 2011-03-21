@@ -925,6 +925,12 @@ function GenerateInitMethods(obj, back)
 		for j = 1, table.getn(method[3]) do
 			local entry = method[3][j]
 			local methodCode = ""
+			
+			if (not entry.type) then
+				print("Bad type in entry " .. method[1] .. " in GenerateInitMethods")
+				return ""
+			end
+			
 			local pargType = PTypeToConstant(entry.type)
 			
 			if (not pargType) then
@@ -1019,8 +1025,18 @@ function GenerateMethods(obj, back)
 		
 		-- Start with the top part of the function definition
 		local methodCode = "int32_t\n" .. obj.name .. method[1] ..
-						"(void *pobject, PArgList *in, PArgList *out)\n{\n" ..
-						"\tif (!pobject || !in || !out)\n\t\treturn B_ERROR;\n\n"
+						"(void *pobject, PArgList *in, PArgList *out)\n{\n"
+		if (method[2] == "embedded") then
+			if (obj.embeddedMethods[method[1]]) then
+				methodCode = methodCode .. obj.embeddedMethods[method[1]] .. "}\n\n\n"
+				return methodCode
+			else
+				print("Method " .. method[1] .. " is embedded but missing definition. ")
+				return ""
+			end
+		else
+			methodCode = methodCode .. "\tif (!pobject || !in || !out)\n\t\treturn B_ERROR;\n\n"
+		end
 		
 		-- If the object inherits from PView, we need to cast it to the backend
 		-- class' real class to call the method. Objects which do not inherit from
@@ -1050,6 +1066,11 @@ function GenerateMethods(obj, back)
 			local entry = method[3][j]
 			
 			-- Declare the variable to hold the value for each parameter
+			if (not entry.name) then
+				print("Missing name for entry " .. method[1] .. " in GenerateMethods")
+				return ""
+			end
+			
 			local beType = PTypeToBe(entry.type)
 			local entryCode = "\t" .. beType .. " " .. entry.name .. ";\n"
 			

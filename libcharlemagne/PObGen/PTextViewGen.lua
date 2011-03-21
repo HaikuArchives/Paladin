@@ -143,9 +143,9 @@ PObject.methods =
 	-- Note that the data types are not the same as properties in that integers
 	-- have a specified bit size
 	
-	-- This will need to be an embedded method because it doesn't exactly map
-	-- to the backend's method
-	-- { "AllowChars", { triplet("chars", "string", "The set of characters to allow") }, { } },
+	-- This is an embedded method because it doesn't exactly map to the backend's method
+	{ "AllowChars", "embedded",
+		{ param("chars", "string", "The set of characters to allow") }, { } },
 	
 	{ "ByteAt", "ByteAt",
 		{ param("offset", "int32", "int32", 1, "Offset of the byte to get.") },
@@ -155,12 +155,17 @@ PObject.methods =
 		{ param("value", "bool", "bool", -1, "True if the character can be the last one on a line.") } },
 	
 	-- These need to be embedded because of the object lookup
-	--{ "Copy", { param("clipid", "int64", "The id of a clipboard object") }, {} },
-	--{ "Cut", { param("clipid", "int64", "The id of a clipboard object") }, {} },
+	{ "Copy", "embedded",
+		{ param("clipid", "int64", "The id of a clipboard object") }, {} },
+	{ "Cut", "embedded",
+		{ param("clipid", "int64", "The id of a clipboard object") }, {} },
 	{ "Delete", "Delete",
 		{ param("start", "int32", "int32", 1, "Starting offset of the range to delete."),
 		  param("end", "int32", "int32", 2, "Ending offset of the range to delete.") },
 		{ } },
+	-- This is an embedded method because it doesn't exactly map to the backend's method
+	{ "DisallowChars", "embedded",
+		{ param("chars", "string", "The set of characters to disallow") }, { } },
 	{ "FindWord", "FindWord",
 		{ param("offset", "int32", "int32", 1, "Starting point for searching for a word") },
 		{ param("start", "int32", "&int32", 2, "Starting offset of the next word"),
@@ -177,9 +182,9 @@ PObject.methods =
 		  param("end", "int32", "&int32", 2, "Ending offset of the selection") } },
 	
 	-- This needs to be an embedded method because of returning a string using a char *
---	{ "GetText", { param("start", "int32", "int32", 1, "Starting offset of the text"),
---							 param("end", "int32", "int32", 2, "Ending offset of the text") },
---				{ } },
+	{ "GetText", "embedded",
+		{ param("start", "int32", "int32", 1, "Starting offset of the text"),
+				 param("end", "int32", "int32", 2, "Ending offset of the text") }, { } },
 	
 	{ "Highlight", "Highlight",
 		{ param("start", "int32", "int32", 1, "Starting offset of the text to highlight"),
@@ -195,8 +200,10 @@ PObject.methods =
 	{ "LineAtPoint", "LineAt",
 		{ param("point", "point", "point", 1, "Point to find the line for") },
 		{ param("pointline", "int32", "int32", -1, "Line for the specified point.") } },
-	-- Another embedded function
-	--{ "Paste", { param("clipid", "int64", "Object ID of a PClipboard object") }, {} },
+	
+	-- This is also embedded because of the object lookup
+	{ "Paste", "embedded",
+		{ param("clipid", "int64", "Object ID of a PClipboard object") }, {} },
 	{ "PointAt", "PointAt",
 		{ param("offset", "int32", "int32", 1, "Offset to get the point for") },
 		{ param("point", "point", "point", -1, "Point for the offset specified"),
@@ -224,11 +231,240 @@ PObject.methods =
 		{ param("start", "int32", "int32", 1, "Starting offset of the text to highlight"),
 		  param("end", "int32", "int32", 2, "Ending offset of the text to highlight") },
 		{ param("height", "float", "float", -1, "Total height of the lines specified by the given offsets") } },
---[[
-	-- Another embedded method
-	-- { "Undo", { param("clipid", "int64", "Object ID of a PClipboard object") }, {} }
-]]
+	{ "Undo", "embedded",
+		{ param("clipid", "int64", "Object ID of a PClipboard object") }, {} }
 }
+
+PObject.embeddedMethods = {}
+
+PObject.embeddedMethods["AllowChars"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in);
+	BString string;
+	if (args.FindString("chars", &string) != B_OK)
+		return B_ERROR;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	for (int32 i = 0; i < string.CountChars(); i++)
+	{
+		char c = string.ByteAt(i);
+		if (c)
+			backend->AllowChar(c);
+	}
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
+
+PObject.embeddedMethods["Copy"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	backend->Copy(clip->GetBackend());
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
+
+PObject.embeddedMethods["Cut"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	backend->Cut(clip->GetBackend());
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
+
+PObject.embeddedMethods["DisallowChars"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in);
+	BString string;
+	if (args.FindString("chars", &string) != B_OK)
+		return B_ERROR;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	for (int32 i = 0; i < string.CountChars(); i++)
+	{
+		char c = string.ByteAt(i);
+		if (c)
+			backend->DisallowChar(c);
+	}
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
+
+PObject.embeddedMethods["GetText"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	int32 start, length;
+	if (args.FindInt32("start", &start) != B_OK ||
+		args.FindInt32("length", &length) != B_OK)
+		return B_ERROR;
+	
+	char *buffer = new char[length + 1];
+	
+	backend->GetText(start, length, buffer);
+	
+	outargs.MakeEmpty();
+	outargs.AddString("text", buffer);
+	
+	delete [] buffer;
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
+
+PObject.embeddedMethods["Paste"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	backend->Paste(clip->GetBackend());
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
+
+PObject.embeddedMethods["Undo"] = [[
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
+	
+	PArgs args(in), outargs(out);
+	
+	uint64 id = 0;
+	if (args.FindInt64("clipid", (int64*)&id) != B_OK)
+		return B_ERROR;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PClipboard") != 0)
+		return B_BAD_DATA;
+	
+	PClipboard *clip = dynamic_cast<PClipboard*>(obj);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	backend->Undo(clip->GetBackend());
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	return B_OK;
+]]
 
 
 ------------------------------------------------------------------------------

@@ -551,3 +551,15 @@ AlertError(const char *message, const char *button1, const char *button2,
 }
 
 
+DPath
+GetSystemPath(directory_which which)
+{
+	DPath out;
+	
+	BPath path;
+	if (find_directory(which, &path) != B_OK)
+		return out;
+	
+	out << path.Path();
+	return out;
+}

@@ -191,7 +191,9 @@ LibraryWindow::ScanThread(void *data)
 	
 	r.OffsetBy(0,r.Height() + 10);
 	
-	BRect out = win->ScanFolder(r.LeftTop(),"/boot/develop/lib/x86",&maxwidth);
+	DPath sysPath = GetSystemPath(B_COMMON_DEVELOP_DIRECTORY);
+	sysPath << "lib/x86";
+	BRect out = win->ScanFolder(r.LeftTop(),sysPath.GetFullPath(),&maxwidth);
 	if (out != BRect(0,0,-1,-1));
 	{
 		r = out;
@@ -208,7 +210,8 @@ LibraryWindow::ScanThread(void *data)
 		
 		r.OffsetBy(0,r.Height() + 10);
 		
-		out = win->ScanFolder(r.LeftTop(),"/boot/common/lib",&maxwidth);
+		out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_COMMON_LIB_DIRECTORY).GetFullPath(),
+							&maxwidth);
 		if (out != BRect(0,0,-1,-1));
 		{
 			r = out;
@@ -224,7 +227,8 @@ LibraryWindow::ScanThread(void *data)
 	
 	r.OffsetBy(0,r.Height() + 10);
 	
-	out = win->ScanFolder(r.LeftTop(),"/boot/home/config/lib",&maxwidth);
+	out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
+						&maxwidth);
 	if (out != BRect(0,0,-1,-1));
 	{
 		r = out;

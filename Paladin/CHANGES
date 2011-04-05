@@ -15,4 +15,4 @@ Shell scripts are now executed properly
 Automatically adjust types on .rsrc files so Edit Program Settings always works right.
 
 Internal changes
-
+Removed some hardcoded paths from certain parts of the code

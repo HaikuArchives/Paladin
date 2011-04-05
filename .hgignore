@@ -17,3 +17,4 @@ libpaladin.so
 .depends-all
 ccache/ccache
 fastdep-0.16/fastdep
+PFind/PFind

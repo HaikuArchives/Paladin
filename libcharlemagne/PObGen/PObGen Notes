@@ -1,7 +1,5 @@
 PObGen Notes
 
-Fix embedded support -- don't bail from the loop after the first embedded method
-
 Add support for defining data members
 
 Add support for custom (embedded) headers

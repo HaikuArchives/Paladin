@@ -8,8 +8,8 @@
 	PObject methods, and the backend definitions
 ]]
 
-HeaderName = "PClipboard.new.h"
-CodeFileName = "PClipboard.new.cpp"
+HeaderName = "PClipboard.h"
+CodeFileName = "PClipboard.cpp"
 
 ParentHeaderName = [["PHandler.h"]]
 
@@ -23,6 +23,7 @@ PObject.description = "A representation of the clipboard"
 -- This is for graphical controls which inherit PView somehow. It's
 -- to make sure that the backend is handled as a BView derivative
 PObject.usesView = false
+PObject.getBackend = true
 PObject.friendlyName = "Clipboard"
 PObject.parentClass = "PHandler"
 PObject.parentAccess = "public"
@@ -63,44 +64,5 @@ PObject.embeddedProperties["Locked"].setCode = [[
 ]]
 
 
-PObject.embeddedProperties["MinLimit"] = {}
-PObject.embeddedProperties["MinLimit"].getCode = [[
-		int32 min, max;
-		fSlider->GetLimits(&min, &max);
-		((IntProperty*)prop)->SetValue(min);
-]]
-PObject.embeddedProperties["MinLimit"].setCode = [[
-		int32 min, max;
-		fBackend->GetLimits(&min, &max);
-		
-		prop->GetValue(&intval);
-		fBackend->SetLimits(*intval.value, max);
-]]
-
-
-PObject.embeddedProperties["MaxLimit"] = {}
-PObject.embeddedProperties["MaxLimit"].getCode = [[
-		int32 min, max;
-		fSlider->GetLimits(&min, &max);
-		((IntProperty*)prop)->SetValue(max);
-]]
-PObject.embeddedProperties["MaxLimit"].setCode = [[
-		int32 min, max;
-		fBackend->GetLimits(&min, &max);
-		
-		prop->GetValue(&intval);
-		fBackend->SetLimits(*intval.value, max);
-]]
-
-
-PObject.embeddedProperties["UsingFillColor"] = {}
-PObject.embeddedProperties["UsingFillColor"].getCode = [[
-		rgb_color dummy;
-		((BoolProperty*)prop)->SetValue(fSlider->FillColor(&dummy));
-]]
-PObject.embeddedProperties["UsingFillColor"].setCode = [[
-		prop->GetValue(&boolval);
-		fBackend->UseFillColor(*boolval.value);
-]]
-
-
+PBackend = {}
+PBackend.name = "BClipboard"

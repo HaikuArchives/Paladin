@@ -75,6 +75,8 @@ PTypeConstantTable.char = "PARG_CHAR"
 	
 	HEADER_GUARD = name of the constant used for the header guard
 	
+	PBOJECT_GET_BACKEND = placeholder code related to GetBackend()
+	
 	USESVIEW_CONSTRUCTOR = a utility placeholder for removing the view construction code
 	USESVIEW_BYPASSVIEW = another utility placeholder for skipping the backend by views
 						which inherit from PView directly
@@ -184,8 +186,6 @@ PObject *
 {
 	return new %(POBJECTNAME)(*this);
 }
-
-
 ]]
 
 
@@ -201,7 +201,7 @@ status_t
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)fView;
+	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)%(BACKEND_FVIEW_NAME);
 ]]
 
 
@@ -220,7 +220,7 @@ status_t
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)fView;
+	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)%(BACKEND_FVIEW_NAME);
 	
 	BoolValue boolval;
 	ColorValue colorval;
@@ -281,13 +281,27 @@ function ApplyObjectPlaceholders(str, obj, back)
 end
 
 
-function ApplyBackendPlaceholders(str, back)
+function ApplyBackendPlaceholders(str, obj, back)
 	if (not back) then
 		return str
 	end
 	
 	local out = string.gsub(str, "%%%(BACKENDNAME%)", back.name)
-	out = string.gsub(out, "%%%(BACKEND_PARENT_NAME%)", back.parent)
+	
+	local parentPattern = back.name
+	if (back.parent) then
+		parentPattern = back.parent
+	end
+	out = string.gsub(out, "%%%(BACKEND_PARENT_NAME%)", parentPattern)
+	
+	local fViewName = ""
+	if (obj.usesView) then
+		fViewName = "fView"
+	else
+		fViewName = "fBackend"
+	end
+	out = string.gsub(out, "%%%(BACKEND_FVIEW_NAME%)", fViewName)
+	
 	return out
 end
 
@@ -396,15 +410,19 @@ private:
 	if (obj.properties and table.getn(obj.properties) > 0) then
 		classDef = classDef .. getSetCode .. "\n"
 	end
+	
+	if (obj.getBackend) then
+		classDef = classDef .. "\t\t\t" .. back.name .. " *\tGetBackend(void) const;\n"
+	end
 		
-	if (obj.usesView) then
+	if (obj.initBackend) then
 		classDef = classDef .. initBackendCode .. "\n"
 	end
 	
 	classDef = classDef .. privateInitCode .. "\n"
 	
 	if (not obj.usesView) then
-		classDef = classDef .. "\t" .. back.name .. " *fView;\n"
+		classDef = classDef .. "\t" .. back.name .. " *fBackend;\n"
 	end
 	
 	classDef = classDef .. tailCode .. "\n"
@@ -644,7 +662,7 @@ function GenerateBackendCode(back)
 			print("Embedded hook " .. i .. " is missing its implementation. Aborting")
 			return nil
 		else
-			code = code .. ApplyBackendPlaceholders(back.embeddedHooks[i].code, back)
+			code = code .. ApplyBackendPlaceholders(back.embeddedHooks[i].code, obj, back)
 		end
 		i = i + 1
 	end
@@ -684,7 +702,7 @@ function GenerateGetProperty(obj, back)
 	end
 	
 	local out = ApplyObjectPlaceholders(PObjectGetPropertyCode, obj, back)
-	out = ApplyBackendPlaceholders(out, back)
+	out = ApplyBackendPlaceholders(out, obj, back)
 	
 	if (obj.usesView) then
 		out = out .. "\n\tif (backend->Window())\n\t\tbackend->Window()->Lock();\n\n"
@@ -763,7 +781,7 @@ function GenerateSetProperty(obj, back)
 	end
 	
 	local out = ApplyObjectPlaceholders(PObjectSetPropertyCode, obj, back)
-	out = ApplyBackendPlaceholders(out, back) .. "\n"
+	out = ApplyBackendPlaceholders(out, obj, back) .. "\n"
 	
 	if (obj.usesView) then
 		out = out .. "\tif (backend->Window())\n\t\tbackend->Window()->Lock();\n\n"
@@ -844,7 +862,7 @@ end
 
 function GenerateInitProperties(obj, back)
 	local out = ApplyObjectPlaceholders(PObjectInitPropertiesCode, obj, back)
-	out = ApplyBackendPlaceholders(out, back)
+	out = ApplyBackendPlaceholders(out, obj, back)
 	
 	out = out .. '\tSetStringProperty("Description", "' .. obj.description .. '");\n\n'
 	
@@ -911,7 +929,7 @@ end
 
 function GenerateInitMethods(obj, back)
 	local out = ApplyObjectPlaceholders(PObjectInitMethodsCode, obj, back)
-	out = ApplyBackendPlaceholders(out, back)
+	out = ApplyBackendPlaceholders(out, obj, back)
 	
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then
 		out = out .. "}\n\n\n"
@@ -1044,8 +1062,13 @@ if (!parent)
 BTextView *backend = (BTextView*)parent->GetView();
 ]]
 	else
-		methodCode = methodCode .. "\t" .. back.parent ..
-					" *backend = fView;\n"
+		local parentName = back.parent
+		if (not parentName) then
+			parentName = back.name
+		end
+		
+		methodCode = methodCode .. "\t" .. parentName ..
+					" *backend = fBackend;\n"
 	end
 	
 	-- Declare the argument wrappers which we'll use to get input to the 
@@ -1227,6 +1250,22 @@ function GeneratePObject(obj, back)
 	
 	local getCode = GenerateGetProperty(obj, back)
 	local setCode = GenerateSetProperty(obj, back)
+	
+	local getBackendCode = ""
+	if (obj.getBackend) then
+		getBackendCode = [[
+%(BACKENDNAME) *
+%(POBJECTNAME)::GetBackend(void) const
+{
+	return fBackend;
+}
+
+
+]]
+		getBackendCode = ApplyObjectPlaceholders(getBackendCode, obj, back)
+		getBackendCode = ApplyBackendPlaceholders(getBackendCode, obj, back)
+	end
+	
 	local initPropCode = GenerateInitProperties(obj, back)
 	local initMethodsCode = GenerateInitMethods(obj, back)
 	local methodsCode = GenerateMethods(obj, back)
@@ -1235,7 +1274,7 @@ function GeneratePObject(obj, back)
 		return nil
 	end
 	
-	pobjCode = pobjCode .. getCode .. setCode
+	pobjCode = pobjCode .. getCode .. setCode .. getBackendCode
 	
 	if (obj.initBackend) then
 		pobjCode = pobjCode .. "void\n" .. obj.name .. "::InitBackend(void)\n{\n" .. 
@@ -1259,10 +1298,16 @@ function GenerateCodeFile(obj, back)
 					'#include "PMethod.h"\n\n'
 	
 	local methodDefs = GenerateMethodDefs(obj, back)
-	local backendDef = GenerateBackendDef(back)
 	local pobjectCode = GeneratePObject(obj, back)
-	local backendCode = GenerateBackendCode(back)
 	
+	local backendDef = ""
+	local backendCode = ""
+	
+	if (back.parent and back.access) then
+		backendDef = GenerateBackendDef(back)
+		backendCode = GenerateBackendCode(back)
+	end
+
 	if ((not backendDef) or (not pobjectCode) or (not backendCode)) then
 		return nil
 	end

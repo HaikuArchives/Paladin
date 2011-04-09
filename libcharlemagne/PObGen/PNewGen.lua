@@ -14,7 +14,7 @@ LoadGenProperties()
 
 ------------------------------------------------------------------------------
 -- Other functions which don't need their own file
-function GenerateBackendDef(back)
+function GenerateBackendDef(obj, back)
 	local def = ""
 	
 	if (not back) then
@@ -90,7 +90,7 @@ function GenerateBackendDef(back)
 end
 
 
-function GenerateBackendCode(back)
+function GenerateBackendCode(obj, back)
 	if (not back) then
 		return ""
 	end
@@ -316,7 +316,7 @@ function GenerateCodeFile(obj, back)
 	
 	if (back.parent and back.access) then
 		backendDef = GenerateBackendDef(back)
-		backendCode = GenerateBackendCode(back)
+		backendCode = GenerateBackendCode(obj, back)
 	end
 
 	if ((not backendDef) or (not pobjectCode) or (not backendCode)) then

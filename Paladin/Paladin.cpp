@@ -546,93 +546,12 @@ App::OpenFile(entry_ref ref, int32 line)
 void
 App::OpenPartner(entry_ref ref)
 {
+	entry_ref partnerRef = GetPartnerRef(ref);
 	DPath refpath(BPath(&ref).Path());
-	BString ext(refpath.GetExtension());
-	if (ext.CountChars() < 1)
-		return;
-	
-	BString pathbase = refpath.GetFullPath();
-	pathbase.Truncate(pathbase.FindLast(".") + 1);
-	
-	const char *cpp_ext[] = { "cpp","c","cxx","cc", NULL };
-	const char *hpp_ext[] = { "h","hpp","hxx","hh", NULL };
-	
-	bool is_source = false;
-	bool is_header = false;
-	
-	int i = 0;
-	while (cpp_ext[i])
-	{
-		if (ext == cpp_ext[i])
-		{
-			is_source = true;
-			break;
-		}
-		i++;
-	}
-	
-	if (!is_source)
-	{
-		i = 0;
-		while (hpp_ext[i])
-		{
-			if (ext == hpp_ext[i])
-			{
-				is_header = true;
-				break;
-			}
-			i++;
-		}
-	}
-	else
-	{
-		i = 0;
-		while (hpp_ext[i])
-		{
-			BString partpath = pathbase;
-			partpath << hpp_ext[i];
-			BEntry entry(partpath.String());
-			if (entry.Exists())
-			{
-				entry_ref header_ref;
-				entry.GetRef(&header_ref);
-				OpenFile(header_ref);
-				return;
-			}
-			i++;
-		}
-	}
-	
-	if (is_header)
-	{
-		i = 0;
-		while (cpp_ext[i])
-		{
-			BString partpath = pathbase;
-			partpath << cpp_ext[i];
-			BEntry entry(partpath.String());
-			if (entry.Exists())
-			{
-				entry_ref source_ref;
-				entry.GetRef(&source_ref);
-				OpenFile(source_ref);
-				return;
-			}
-			i++;
-		}
-	}
 	
 	BString errmsg;
-	if (is_source)
-		errmsg	<< "Couldn't find a corresponding header file for " << ref.name
-				<< " in " << refpath.GetFolder() << "/ .";
-	else
-	if (is_header)
-		errmsg	<< "Couldn't find a corresponding source file for " << ref.name
-				<< " in " << refpath.GetFolder() << "/ .";
-	else
-		errmsg	<< 	TR("You can only find the partner file for C/C++ files and their "
-					"headers.");
+	errmsg	<< "Couldn't find a partner file for " << ref.name
+			<< " in " << refpath.GetFolder() << "/ .";
 	BAlert *alert = new BAlert("Paladin",errmsg.String(),"OK");
 	alert->Go();
 }
@@ -647,7 +566,6 @@ App::CreateNewProject(const char *projname, const char *target,	int32 type,
 		return NULL;
 	
 	scm_t detectedSCM = DetectSCM(path);
-printf("SCM: %d\n", detectedSCM);
 	proj->SetSourceControl(detectedSCM == SCM_NONE ? (scm_t)scmType : detectedSCM);
 	
 	gCurrentProject = proj;

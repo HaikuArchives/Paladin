@@ -37,6 +37,7 @@ bool		IsBeIDEProject(const entry_ref &ref);
 int32		AlertError(const char *message, const char *button1,
 						const char *button2 = NULL, const char *button3 = NULL);
 DPath		GetSystemPath(directory_which which);
+entry_ref	GetPartnerRef(entry_ref ref);
 
 extern Project *gCurrentProject;
 extern LockableList<Project> *gProjectList;

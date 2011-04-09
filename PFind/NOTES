@@ -1,8 +1,0 @@
-The basic concept behind PFind is a project-wide file search. It is implemented as a separate program so that other programs can take advantage of it, if desired.
-
-Features:
-
-Regular expression search and replace
-Search multiple files
-Integration with Pe/PalEdit
-Better UI than Pe/PalEdit without sacrificing flexibility

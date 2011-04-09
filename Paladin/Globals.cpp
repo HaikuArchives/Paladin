@@ -563,3 +563,86 @@ GetSystemPath(directory_which which)
 	out << path.Path();
 	return out;
 }
+
+
+entry_ref
+GetPartnerRef(entry_ref ref)
+{
+	DPath refpath(BPath(&ref).Path());
+	BString ext(refpath.GetExtension());
+	if (ext.CountChars() < 1)
+		return entry_ref();
+	
+	BString pathbase = refpath.GetFullPath();
+	pathbase.Truncate(pathbase.FindLast(".") + 1);
+	
+	const char *cpp_ext[] = { "cpp","c","cxx","cc", NULL };
+	const char *hpp_ext[] = { "h","hpp","hxx","hh", NULL };
+	
+	bool isSource = false;
+	bool isHeader = false;
+	
+	int i = 0;
+	while (cpp_ext[i])
+	{
+		if (ext == cpp_ext[i])
+		{
+			isSource = true;
+			break;
+		}
+		i++;
+	}
+	
+	if (!isSource)
+	{
+		i = 0;
+		while (hpp_ext[i])
+		{
+			if (ext == hpp_ext[i])
+			{
+				isHeader = true;
+				break;
+			}
+			i++;
+		}
+	}
+	else
+	{
+		i = 0;
+		while (hpp_ext[i])
+		{
+			BString partpath = pathbase;
+			partpath << hpp_ext[i];
+			BEntry entry(partpath.String());
+			if (entry.Exists())
+			{
+				entry_ref header_ref;
+				entry.GetRef(&header_ref);
+				return header_ref;
+			}
+			i++;
+		}
+	}
+	
+	if (isHeader)
+	{
+		i = 0;
+		while (cpp_ext[i])
+		{
+			BString partpath = pathbase;
+			partpath << cpp_ext[i];
+			BEntry entry(partpath.String());
+			if (entry.Exists())
+			{
+				entry_ref source_ref;
+				entry.GetRef(&source_ref);
+				return source_ref;
+			}
+			i++;
+		}
+	}
+	
+	return entry_ref();
+}
+
+

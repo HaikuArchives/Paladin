@@ -2,7 +2,11 @@
 #define MAINWINDOW_H
 
 #include <Window.h>
+
+#include <Button.h>
 #include <MenuBar.h>
+#include <TextView.h>
+
 
 class MainWindow : public BWindow
 {
@@ -13,6 +17,14 @@ public:
 			
 private:
 			BMenuBar	*fMenuBar;
+			BButton		*fFind,
+						*fReplace,
+						*fReplaceFind,
+						*fReplaceAll;
+						
+			BTextView	*fFindBox,
+						*fReplaceBox;
 };
+
 
 #endif

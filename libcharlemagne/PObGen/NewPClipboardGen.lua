@@ -1,18 +1,15 @@
-HeaderName = "PClipboard.h"
-CodeFileName = "PClipboard.cpp"
+Module = MakeModule("PClipboard")
+Module.headerName = "PClipboard.h"
+Module.codeFileName = "PClipboard.cpp"
 
-ParentHeaderName = [["PHandler.h"]]
+Module.parentHeaderName = [["PHandler.h"]]
 
-Includes = { "<Application.h>", "<Clipboard.h>", "<Window.h>", }
+Module.Includes = { "<Application.h>", "<Clipboard.h>", "<Window.h>", }
 
-PObject = {}
-
-PObject.name = "PClipboard"
-PObject.description = "A representation of the clipboard"
+PObject = MakePObject("PClipboard", "A representation of the clipboard")
 
 -- This is for graphical controls which inherit PView somehow. It's
 -- to make sure that the backend is handled as a BView derivative
-PObject.usesView = false
 PObject.getBackend = true
 PObject.friendlyName = "Clipboard"
 PObject.parentClass = "PHandler"

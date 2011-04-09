@@ -851,26 +851,11 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		{
 			bool save = false;
 			
-			bool removeFromSCM = false;
-			if (fProjectList->CountItems() > 0 && fSourceControl)
-			{
-				BAlert *alert = new BAlert("Paladin", "Would you like to also remove these "
-													"files from source control?", "No", "Yes");
-				if (alert->Go() == 1)
-					removeFromSCM = true;
-			}
-			
 			for (int32 i = 0; i < fProjectList->CountItems(); i++)
 			{
 				SourceFileItem *item = dynamic_cast<SourceFileItem*>(fProjectList->ItemAt(i));
 				if (item && item->IsSelected())
 				{
-					if (removeFromSCM)
-					{
-						fSourceControl->RemoveFromRepository(
-													item->GetData()->GetPath().GetFullPath());
-					}
-					
 					fProjectList->RemoveItem(item);
 					fProject->RemoveFile(item->GetData());
 					delete item;
@@ -1311,6 +1296,18 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 				relPath.RemoveFirst("/");
 			}
 			
+			BString relPartnerPath;
+			entry_ref partnerRef = GetPartnerRef(file->GetPath().GetRef());
+			if (partnerRef.name)
+			{
+				DPath partnerPath(partnerRef);
+				relPartnerPath = partnerPath.GetFullPath();
+				if (relPartnerPath.FindFirst(fProject->GetPath().GetFolder()) == 0)
+				{
+					relPartnerPath.RemoveFirst(fProject->GetPath().GetFolder());
+					relPartnerPath.RemoveFirst("/");
+				}
+			}
 			switch (command)
 			{
 				case M_REBUILD_FILE:
@@ -1326,11 +1323,15 @@ ProjectWindow::ActOnSelectedFiles(const int32 &command)
 				case M_ADD_SELECTION_TO_REPO:
 				{
 					fSourceControl->AddToRepository(relPath.String());
+					if (relPartnerPath.CountChars() > 0)
+						fSourceControl->AddToRepository(relPartnerPath.String());
 					break;
 				}
 				case M_REMOVE_SELECTION_FROM_REPO:
 				{
 					fSourceControl->RemoveFromRepository(relPath.String());
+					if (relPartnerPath.CountChars() > 0)
+						fSourceControl->RemoveFromRepository(relPartnerPath.String());
 					break;
 				}
 				case M_REVERT_SELECTION:

@@ -549,6 +549,12 @@ App::OpenPartner(entry_ref ref)
 	entry_ref partnerRef = GetPartnerRef(ref);
 	DPath refpath(BPath(&ref).Path());
 	
+	if (partnerRef.name)
+	{
+		OpenFile(partnerRef);
+		return;
+	}
+	
 	BString errmsg;
 	errmsg	<< "Couldn't find a partner file for " << ref.name
 			<< " in " << refpath.GetFolder() << "/ .";

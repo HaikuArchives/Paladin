@@ -165,68 +165,6 @@ PObject *
 ]]
 
 
-PObjectGetPropertyCode = [[
-status_t
-%(POBJECTNAME)::GetProperty(const char *name, PValue *value, const int32 &index) const
-{
-	if (!name || !value)
-		return B_ERROR;
-	
-	BString str(name);
-	PProperty *prop = FindProperty(name,index);
-	if (!prop)
-		return B_NAME_NOT_FOUND;
-	
-	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)%(BACKEND_FVIEW_NAME);
-]]
-
-
-PObjectSetPropertyCode = [[
-status_t
-%(POBJECTNAME)::SetProperty(const char *name, PValue *value, const int32 &index)
-{
-	if (!name || !value)
-		return B_ERROR;
-	
-	BString str(name);
-	PProperty *prop = FindProperty(name,index);
-	if (!prop)
-		return B_NAME_NOT_FOUND;
-	
-	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
-		return B_READ_ONLY;
-	
-	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)%(BACKEND_FVIEW_NAME);
-	
-	BoolValue boolval;
-	ColorValue colorval;
-	FloatValue floatval;
-	IntValue intval;
-	PointValue pointval;
-	RectValue rectval;
-	StringValue stringval;
-	
-	status_t status = prop->SetValue(value);
-	if (status != B_OK)
-		return status;
-]]
-
-
-PObjectInitPropertiesCode = [[
-void
-%(POBJECTNAME)::InitProperties(void)
-{
-]]
-
-
-PObjectInitMethodsCode = [[
-void
-%(POBJECTNAME)::InitMethods(void)
-{
-	PMethodInterface pmi;
-	
-]]
-
 function ApplyObjectPlaceholders(str, obj, back)
 	if (not obj) then
 		return str

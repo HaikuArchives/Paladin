@@ -1787,15 +1787,6 @@ ProjectWindow::AddFileThread(void *data)
 {
 	add_file_struct *addstruct = (add_file_struct*)data;
 	
-	bool addToSCM = false;
-	if (addstruct->parent->fSourceControl)
-	{
-		BAlert *alert = new BAlert("Paladin", "Would you like to also add these files to "
-												"source control?", "No", "Yes");
-		if (alert->Go() == 1)
-			addToSCM = true;
-	}
-	
 	int32 i = 0;
 	entry_ref addref;
 	while (addstruct->refmsg.FindRef("refs",i,&addref) == B_OK)
@@ -1814,17 +1805,11 @@ ProjectWindow::AddFileThread(void *data)
 		BEntry entry(&addref);
 		DPath path(addref);
 		if (entry.IsDirectory())
-		{
 			addstruct->parent->AddFolder(addref);
-			if (addToSCM)
-				addstruct->parent->fSourceControl->AddToRepository(path.GetFullPath());
-		}
 		else
 		{
 			addstruct->parent->Lock();
 			addstruct->parent->AddFile(addref,&addstruct->droppt);
-			if (addToSCM)
-				addstruct->parent->fSourceControl->AddToRepository(path.GetFullPath());
 			addstruct->parent->Unlock();
 		}
 		

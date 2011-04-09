@@ -18,3 +18,11 @@ libpaladin.so
 ccache/ccache
 fastdep-0.16/fastdep
 PFind/PFind
+*.log
+*.db
+*.swg
+PDesigner/PDesigner
+libcharlemagne/testlib
+libcharlemagne/libcharlemagne.so
+libcharlemagne/CPPInterface_wrap.cxx
+PDesigner/libcharlemagne

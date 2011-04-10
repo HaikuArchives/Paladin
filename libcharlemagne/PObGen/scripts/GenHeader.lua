@@ -118,6 +118,10 @@ function GenerateHeader(obj, back)
 	end
 	
 	if (obj.getBackend and (not obj.usesView)) then
+		if (not back.parent) then
+			print("PBackend.parent may not be empty if GetBackend() is to be used. Aborting.")
+			return nil
+		end
 		classDef = classDef .. "\t\t\t" .. back.parent .. " *\tGetBackend(void) const;\n"
 	end
 	

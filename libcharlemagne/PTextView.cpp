@@ -144,8 +144,6 @@ PTextView::Duplicate(void) const
 {
 	return new PTextView(*this);
 }
-
-
 status_t
 PTextView::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -335,8 +333,6 @@ PTextView::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PTextView::InitBackend(void)
 {
-	if (!fView)
-		fView = new PTextViewBackend(this);
 }
 
 

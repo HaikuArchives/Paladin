@@ -119,8 +119,6 @@ PTextControl::Duplicate(void) const
 {
 	return new PTextControl(*this);
 }
-
-
 status_t
 PTextControl::GetProperty(const char *name, PValue *value, const int32 &index) const
 {

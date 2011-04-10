@@ -116,8 +116,6 @@ PSlider::Duplicate(void) const
 {
 	return new PSlider(*this);
 }
-
-
 status_t
 PSlider::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -317,8 +315,6 @@ PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PSlider::InitBackend(void)
 {
-	if (!fView)
-		fView = new PSliderBackend(this);
 }
 
 

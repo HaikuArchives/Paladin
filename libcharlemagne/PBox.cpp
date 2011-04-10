@@ -116,8 +116,6 @@ PBox::Duplicate(void) const
 {
 	return new PBox(*this);
 }
-
-
 status_t
 PBox::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -205,8 +203,6 @@ PBox::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PBox::InitBackend(void)
 {
-	if (!fView)
-		fView = new PBoxBackend(this);
 }
 
 

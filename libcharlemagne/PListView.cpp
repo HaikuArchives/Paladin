@@ -1,92 +1,96 @@
 #include "PListView.h"
 
 #include <Application.h>
+#include <ListView.h>
+#include <stdio.h>
 #include <Window.h>
 
-#include "EnumProperty.h"
 #include "PArgs.h"
+#include "EnumProperty.h"
+#include "PMethod.h"
 
 class PListViewBackend : public BListView
 {
 public:
 			PListViewBackend(PObject *owner);
-	void	AttachedToWindow(void);
-	void	AllAttached(void);
-	void	DetachedFromWindow(void);
-	void	AllDetached(void);
-	
-	void	MakeFocus(bool value);
-	
-	void	FrameMoved(BPoint pt);
-	void	FrameResized(float w, float h);
-	
+
+	void	AttachedToWindow();
+	void	DetachedFromWindow();
+	void	AllAttached();
+	void	AllDetached();
+	void	Pulse();
+	void	MakeFocus(bool param1);
+	void	FrameMoved(BPoint param1);
+	void	FrameResized(float param1, float param2);
+	void	MouseDown(BPoint param1);
+	void	MouseUp(BPoint param1);
+	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
+	void	WindowActivated(bool param1);
+	void	Draw(BRect param1);
+	void	DrawAfterChildren(BRect param1);
 	void	KeyDown(const char *bytes, int32 count);
 	void	KeyUp(const char *bytes, int32 count);
-	
-	void	MouseDown(BPoint pt);
-	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
-	
-	void	WindowActivated(bool active);
-	
-	void	Draw(BRect update);
-	void	DrawAfterChildren(BRect update);
-	void	MessageReceived(BMessage *msg);
-	
+
 private:
-	PObject	*fOwner;
+	PObject *fOwner;
 };
 
 
 PListView::PListView(void)
-	:	PView(false)
+	:	PView(true)
 {
 	fType = "PListView";
+	fFriendlyType = "List";
 	AddInterface("PListView");
 	
 	InitBackend();
 	InitProperties();
+	InitMethods();
 }
 
 
 PListView::PListView(BMessage *msg)
-	:	PView(msg, false)
+	:	PView(msg, true)
 {
 	fType = "PListView";
+	fFriendlyType = "List";
 	AddInterface("PListView");
 	
 	BMessage viewmsg;
-	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		fView = (BView*)BListView::Instantiate(&viewmsg);
+	if (msg->FindMessage("backend", &viewmsg) == B_OK)
+		fView = (BView*)PListViewBackend::Instantiate(&viewmsg);
+
 	
 	InitBackend();
-	InitProperties();
 }
 
 
 PListView::PListView(const char *name)
-	:	PView(name, false)
+	:	PView(name, true)
 {
 	fType = "PListView";
+	fFriendlyType = "List";
 	AddInterface("PListView");
+	
+	InitMethods();
 	InitBackend();
-	InitProperties();
 }
 
 
 PListView::PListView(const PListView &from)
-	:	PView(from, false)
+	:	PView(from, true)
 {
 	fType = "PListView";
+	fFriendlyType = "List";
 	AddInterface("PListView");
+	
+	InitMethods();
 	InitBackend();
-	InitProperties();
 }
 
 
 PListView::~PListView(void)
 {
-	// We don't have to worry about removing and deleting fView -- ~PView does that for us. :)
 }
 
 
@@ -112,8 +116,6 @@ PListView::Duplicate(void) const
 {
 	return new PListView(*this);
 }
-
-	
 status_t
 PListView::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -125,35 +127,23 @@ PListView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-	BListView *fListView = (BListView*)fView;
-	
+	BListView *backend = (BListView*)fView;
+
+	if (backend->Window())
+		backend->Window()->Lock();
+
 	if (str.ICompare("ItemCount") == 0)
-		((IntProperty*)prop)->SetValue(fListView->CountItems());
+		((IntProperty*)prop)->SetValue(backend->CountItems());
 	else if (str.ICompare("SelectionType") == 0)
-		((IntProperty*)prop)->SetValue(fListView->ListType());
-	else if (str.ICompare("PreferredWidth") == 0)
-	{
-		if (fListView->CountItems() == 0)
-			((FloatProperty*)prop)->SetValue(100);
-		else
-		{
-			float pw, ph;
-			fListView->GetPreferredSize(&pw, &ph);
-			if (pw < 10)
-				pw = 100;
-			if (ph < 10)
-				ph = 30;
-			((FloatProperty*)prop)->SetValue(pw);
-		}
-	}
+		((EnumProperty*)prop)->SetValue(backend->ListType());
 	else if (str.ICompare("PreferredHeight") == 0)
 	{
-		if (fListView->CountItems() == 0)
+		if (backend->CountItems() == 0)
 			((FloatProperty*)prop)->SetValue(30);
 		else
 		{
 			float pw, ph;
-			fListView->GetPreferredSize(&pw, &ph);
+			backend->GetPreferredSize(&pw, &ph);
 			if (pw < 10)
 				pw = 100;
 			if (ph < 10)
@@ -161,9 +151,32 @@ PListView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 			((FloatProperty*)prop)->SetValue(ph);
 		}
 	}
+	else if (str.ICompare("PreferredWidth") == 0)
+	{
+		if (backend->CountItems() == 0)
+			((FloatProperty*)prop)->SetValue(100);
+		else
+		{
+			float pw, ph;
+			backend->GetPreferredSize(&pw, &ph);
+			if (pw < 10)
+				pw = 100;
+			if (ph < 10)
+				ph = 30;
+			((FloatProperty*)prop)->SetValue(pw);
+		}
+	}
 	else
-		return PObject::GetProperty(name,value,index);
-	
+	{
+		if (backend->Window())
+			backend->Window()->Unlock();
+
+		return PView::GetProperty(name, value, index);
+	}
+
+	if (backend->Window())
+		backend->Window()->Unlock();
+
 	return prop->GetValue(value);
 }
 
@@ -171,14 +184,6 @@ PListView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 status_t
 PListView::SetProperty(const char *name, PValue *value, const int32 &index)
 {
-/*
-	PListView Properties:
-		All PView Properties
-		
-		ItemCount
-		SelectionType
-*/
-	// ItemCount is read-only
 	if (!name || !value)
 		return B_ERROR;
 	
@@ -190,57 +195,74 @@ PListView::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	BListView *fListView = (BListView*)fView;
+	BListView *backend = (BListView*)fView;
 	
-	IntValue iv;
+	BoolValue boolval;
+	ColorValue colorval;
+	FloatValue floatval;
+	IntValue intval;
+	PointValue pointval;
+	RectValue rectval;
+	StringValue stringval;
 	
 	status_t status = prop->SetValue(value);
 	if (status != B_OK)
 		return status;
-	
-	if (str.ICompare("SelectionType") == 0)
+
+	if (backend->Window())
+		backend->Window()->Lock();
+
+	else if (str.ICompare("SelectionType") == 0)
 	{
-		prop->GetValue(&iv);
-		fListView->SetListType((list_view_type)*iv.value);
+		prop->GetValue(&intval);
+		backend->SetListType((list_view_type)*intval.value);
 	}
 	else
-		return PView::SetProperty(name,value,index);
-	
+	{
+		if (backend->Window())
+			backend->Window()->Unlock();
+
+		return PView::SetProperty(name, value, index);
+	}
+
+	if (backend->Window())
+		backend->Window()->Unlock();
+
 	return prop->GetValue(value);
 }
 
-	
+
 void
 PListView::InitBackend(void)
 {
-	if (!fView)
-		fView = new PListViewBackend(this);
 }
 
 
 void
 PListView::InitProperties(void)
 {
-/*
-	PListView Properties:
-		All PView Properties
-		
-		ItemCount
-		SelectionType
-*/
-	StringValue sv("An item-based list control");
-	SetProperty("Description",&sv);
-	
-	AddProperty(new IntProperty("ItemCount",0,"The number of the items in the view. Read-only"),
-				PROPERTY_READ_ONLY);
+	SetStringProperty("Description", "A list");
 
-	EnumProperty *prop = new EnumProperty();
+	AddProperty(new IntProperty("ItemCount", 0, "The number of items in the list. Read-only."));
+
+	EnumProperty *prop = NULL;
+
+	prop = new EnumProperty();
 	prop->SetName("SelectionType");
+	prop->SetValue((int32)B_SINGLE_SELECTION_LIST);
+	prop->SetDescription("The list's selection mode");
 	prop->AddValuePair("Single", B_SINGLE_SELECTION_LIST);
 	prop->AddValuePair("Multiple", B_MULTIPLE_SELECTION_LIST);
-	prop->SetDescription("The list's item selection mode.");
-	prop->SetValue((int32)B_SINGLE_SELECTION_LIST);
 	AddProperty(prop);
+
+}
+
+
+void
+PListView::InitMethods(void)
+{
+	PMethodInterface pmi;
+	
 }
 
 
@@ -252,9 +274,8 @@ PListViewBackend::PListViewBackend(PObject *owner)
 
 
 void
-PListViewBackend::AttachedToWindow(void)
+PListViewBackend::AttachedToWindow()
 {
-	BListView::AttachedToWindow();
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
@@ -265,19 +286,7 @@ PListViewBackend::AttachedToWindow(void)
 
 
 void
-PListViewBackend::AllAttached(void)
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllAttached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BListView::AllAttached();
-}
-
-
-void
-PListViewBackend::DetachedFromWindow(void)
+PListViewBackend::DetachedFromWindow()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
@@ -289,7 +298,19 @@ PListViewBackend::DetachedFromWindow(void)
 
 
 void
-PListViewBackend::AllDetached(void)
+PListViewBackend::AllAttached()
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::AllAttached();
+}
+
+
+void
+PListViewBackend::AllDetached()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
@@ -301,43 +322,134 @@ PListViewBackend::AllDetached(void)
 
 
 void
-PListViewBackend::MakeFocus(bool value)
+PListViewBackend::Pulse()
 {
 	PArgs in, out;
-	in.AddBool("focus", value);
-	EventData *data = fOwner->FindEvent("FocusChanged");
+	EventData *data = fOwner->FindEvent("Pulse");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BListView::MakeFocus(value);
+		BListView::Pulse();
 }
 
 
 void
-PListViewBackend::FrameMoved(BPoint pt)
+PListViewBackend::MakeFocus(bool param1)
 {
 	PArgs in, out;
-	in.AddPoint("where", pt);
+	in.AddBool("focus", param1);
+	EventData *data = fOwner->FindEvent("MakeFocus");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MakeFocus(param1);
+}
+
+
+void
+PListViewBackend::FrameMoved(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BListView::FrameMoved(pt);
+		BListView::FrameMoved(param1);
 }
 
 
 void
-PListViewBackend::FrameResized(float w, float h)
+PListViewBackend::FrameResized(float param1, float param2)
 {
-	BListView::FrameResized(w,h);
 	PArgs in, out;
-	in.AddFloat("width", w);
-	in.AddFloat("height", h);
+	in.AddFloat("width", param1);
+	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BListView::FrameResized(w, h);
+		BListView::FrameResized(param1, param2);
+}
+
+
+void
+PListViewBackend::MouseDown(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MouseDown(param1);
+}
+
+
+void
+PListViewBackend::MouseUp(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MouseUp(param1);
+}
+
+
+void
+PListViewBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * param3)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	in.AddInt32("transit", param2);
+	in.AddPointer("message", (void*) param3);
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::MouseMoved(param1, param2, param3);
+}
+
+
+void
+PListViewBackend::WindowActivated(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("active", param1);
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::WindowActivated(param1);
+}
+
+
+void
+PListViewBackend::Draw(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("Draw");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::Draw(param1);
+}
+
+
+void
+PListViewBackend::DrawAfterChildren(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BListView::DrawAfterChildren(param1);
 }
 
 
@@ -369,107 +481,3 @@ PListViewBackend::KeyUp(const char *bytes, int32 count)
 }
 
 
-void
-PListViewBackend::MouseDown(BPoint pt)
-{
-	BListView::MouseDown(pt);
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseDown");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BListView::MouseDown(pt);
-}
-
-
-void
-PListViewBackend::MouseUp(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BListView::MouseUp(pt);
-}
-
-
-void
-PListViewBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	in.AddInt32("transit", transit);
-	in.AddPointer("message", (void*)msg);
-	EventData *data = fOwner->FindEvent("AttachedToWindow");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BListView::MouseMoved(pt, transit, msg);
-}
-
-
-void
-PListViewBackend::WindowActivated(bool active)
-{
-	BListView::WindowActivated(active);
-	PArgs in, out;
-	in.AddBool("active", active);
-	EventData *data = fOwner->FindEvent("WindowActivated");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BListView::WindowActivated(active);
-}
-
-
-void
-PListViewBackend::Draw(BRect update)
-{
-	EventData *data = fOwner->FindEvent("Draw");
-	if (!data->hook)
-		BListView::Draw(update);
-	
-	PArgs in, out;
-	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
-	
-	if (IsFocus())
-	{
-		SetPenSize(5.0);
-		SetHighColor(0,0,0);
-		SetLowColor(128,128,128);
-		StrokeRect(Bounds(),B_MIXED_COLORS);
-	}
-}
-
-
-void
-PListViewBackend::DrawAfterChildren(BRect update)
-{
-	PArgs in, out;
-	in.AddRect("update", update);
-	EventData *data = fOwner->FindEvent("DrawAfterChildren");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BListView::DrawAfterChildren(update);
-}
-
-
-void
-PListViewBackend::MessageReceived(BMessage *msg)
-{
-	PListView *view = dynamic_cast<PListView*>(fOwner);
-	if (view->GetMsgHandler(msg->what))
-	{
-		PArgs args;
-		view->ConvertMsgToArgs(*msg, args.ListRef());
-		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
-			return;
-	}
-	
-	BListView::MessageReceived(msg);
-}

@@ -217,6 +217,10 @@ PColorControl::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PColorControl::InitBackend(void)
 {
+	if (!fView)
+		fView = new PColorControlBackend(this);
+	StringValue sv("A button");
+	SetProperty("Description", &sv);
 }
 
 

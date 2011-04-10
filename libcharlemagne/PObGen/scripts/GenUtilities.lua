@@ -72,6 +72,8 @@ PTypeConstantTable.char = "PARG_CHAR"
 	BACKENDNAME = name of the backend class
 	BACKEND_PARENT_NAME = name of the backend's parent class
 	BACKEND_CLASS_DECL = the declaration of the backend's class
+	BACKEND_FVIEW_NAME = the name of the backend variable. fView if
+						the object inherits PView, fBackend if not.
 	
 	HEADER_GUARD = name of the constant used for the header guard
 	

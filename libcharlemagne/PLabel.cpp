@@ -210,6 +210,10 @@ PLabel::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PLabel::InitBackend(void)
 {
+	if (!fView)
+		fView = new PLabelBackend(this);
+	StringValue sv("A text label");
+	SetProperty("Description", &sv);
 }
 
 

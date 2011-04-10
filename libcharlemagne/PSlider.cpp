@@ -315,6 +315,10 @@ PSlider::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PSlider::InitBackend(void)
 {
+	if (!fView)
+		fView = new PSliderBackend(this);
+	StringValue sv("A slider");
+	SetProperty("Description", &sv);
 }
 
 

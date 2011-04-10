@@ -94,7 +94,7 @@ function GenerateBackendCode(obj, back)
 	if (not back) then
 		return ""
 	end
-	
+
 	local code = back.name .. "::" .. back.name .. "(PObject *owner)\n" ..
 		"\t:\t" .. back.parent .. "(" ..back.init .. "),\n\t\tfOwner(owner)\n{\n}\n\n\n"
 	
@@ -245,6 +245,19 @@ end
 
 
 function GeneratePObject(obj, back)
+
+	local initBackendTemplate = [[
+void
+%(POBJECTNAME)::InitBackend(void)
+{
+	if (!%(BACKEND_FVIEW_NAME))
+		%(BACKEND_FVIEW_NAME) = new %(BACKENDNAME)(this);
+	StringValue sv("%(POBJECT_DESCRIPTION)");
+	SetProperty("Description", &sv);
+}
+
+
+]]
 	local pobjCode = ApplyObjectPlaceholders(PObjectMainCode, obj, back)
 	
 	if (obj.parentClass == "PView") then
@@ -288,8 +301,16 @@ function GeneratePObject(obj, back)
 	pobjCode = pobjCode .. getCode .. setCode .. getBackendCode
 	
 	if (obj.initBackend) then
-		pobjCode = pobjCode .. "void\n" .. obj.name .. "::InitBackend(void)\n{\n" .. 
-					obj.initBackend .. "}\n\n\n"
+		if (string.len(obj.initBackend) > 0) then
+			pobjCode = pobjCode .. "void\n" .. obj.name .. "::InitBackend(void)\n{\n" .. 
+						obj.initBackend .. "}\n\n\n"
+		else
+			initBackendTemplate = ApplyObjectPlaceholders(initBackendTemplate, obj, back);
+			initBackendTemplate = ApplyBackendPlaceholders(initBackendTemplate, obj, back);
+			initBackendTemplate = ApplyCustomPlaceholder(initBackendTemplate,
+														"%(POBJECT_DESCRIPTION)", obj.description);
+			pobjCode = pobjCode .. initBackendTemplate
+		end
 	end
 	
 	pobjCode = pobjCode .. initPropCode .. initMethodsCode .. methodsCode

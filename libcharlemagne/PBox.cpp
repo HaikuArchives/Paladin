@@ -203,6 +203,10 @@ PBox::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PBox::InitBackend(void)
 {
+	if (!fView)
+		fView = new PBoxBackend(this);
+	StringValue sv("A group box");
+	SetProperty("Description", &sv);
 }
 
 

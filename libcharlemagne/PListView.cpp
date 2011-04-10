@@ -235,6 +235,10 @@ PListView::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PListView::InitBackend(void)
 {
+	if (!fView)
+		fView = new PListViewBackend(this);
+	StringValue sv("A list");
+	SetProperty("Description", &sv);
 }
 
 

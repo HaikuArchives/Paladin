@@ -333,6 +333,10 @@ PTextView::SetProperty(const char *name, PValue *value, const int32 &index)
 void
 PTextView::InitBackend(void)
 {
+	if (!fView)
+		fView = new PTextViewBackend(this);
+	StringValue sv("A multi-line text editing control");
+	SetProperty("Description", &sv);
 }
 
 

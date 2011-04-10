@@ -118,6 +118,10 @@ PRadioButton::Duplicate(void) const
 void
 PRadioButton::InitBackend(void)
 {
+	if (!fView)
+		fView = new PRadioButtonBackend(this);
+	StringValue sv("A radio button");
+	SetProperty("Description", &sv);
 }
 
 

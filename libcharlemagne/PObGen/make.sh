@@ -6,7 +6,7 @@ lua PObGen.lua PClipboardGen.lua
 lua PObGen.lua PColorControlGen.lua
 lua PObGen.lua PLabelGen.lua
 lua PObGen.lua PListViewGen.lua
-lua PObGen.lua PRadioButton.lua
+lua PObGen.lua PRadioButtonGen.lua
 lua PObGen.lua PSliderGen.lua
 lua PObGen.lua PTextControlGen.lua
 lua PObGen.lua PTextViewGen.lua

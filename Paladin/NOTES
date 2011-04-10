@@ -1,6 +1,7 @@
 TODO:
 	
-	Issue: Printing output for hg push doesn't happen until after the fact
+	Issue: Printing output for hg push doesn't happen until after the fact. This is mitigated by
+		setting the preoutgoing hook in the [hooks] section of .hgrc to echo something.
 	Need to handle password requests for SCMs.
 	Bug: Dragging an item from one project to another causes a crash because of the
 		assumptions made when the drag is performed -- pointers are used.

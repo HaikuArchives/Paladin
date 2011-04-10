@@ -1,7 +1,5 @@
 PObGen Notes
 
-Add support for custom (embedded) headers
-
 Add error handling code to detect problems in the specification
 
 

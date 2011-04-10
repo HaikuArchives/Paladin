@@ -299,14 +299,26 @@ end
 
 
 function GenerateCodeFile(obj, back)
+	-- The source file for a PObject is in sections as follows:
+	-- Includes
+	-- Method function declarations
+	-- Backend class 
+	-- PObject code
+	-- Method function definitions
+	-- Backend class code
+		
+	-- Start with the includes
 	local includeString = '#include "' .. Module.headerName .. '"\n\n'
 	i = 1
 	while (Module.includes[i]) do
 		includeString = includeString .. "#include " .. Module.includes[i] .. "\n"
 		i = i + 1
 	end
+	
+	-- These includes are used by a *lot* of PObjects
 	includeString = includeString .. '\n#include "PArgs.h"\n#include "EnumProperty.h"\n' ..
 					'#include "PMethod.h"\n\n'
+	
 	
 	local methodDefs = GenerateMethodDefs(obj, back)
 	local pobjectCode = GeneratePObject(obj, back)
@@ -318,7 +330,7 @@ function GenerateCodeFile(obj, back)
 		backendDef = GenerateBackendDef(back)
 		backendCode = GenerateBackendCode(obj, back)
 	end
-
+	
 	if ((not backendDef) or (not pobjectCode) or (not backendCode)) then
 		return nil
 	end

@@ -1,50 +1,50 @@
 #include "PRadioButton.h"
 
-#include "PArgs.h"
-
 #include <Application.h>
+#include <RadioButton.h>
 #include <stdio.h>
+#include <Window.h>
+
+#include "PArgs.h"
+#include "EnumProperty.h"
+#include "PMethod.h"
 
 class PRadioButtonBackend : public BRadioButton
 {
 public:
-				PRadioButtonBackend(PObject *owner);
-	void		AttachedToWindow(void);
-	void		AllAttached(void);
-	void		DetachedFromWindow(void);
-	void		AllDetached(void);
-	
-	void		MakeFocus(bool value);
-	
-	void		FrameMoved(BPoint pt);
-	void		FrameResized(float w, float h);
-	
-	void		KeyDown(const char *bytes, int32 count);
-	void		KeyUp(const char *bytes, int32 count);
-	
-	void		MouseDown(BPoint pt);
-	void		MouseUp(BPoint pt);
-	void		MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
-	
-	void		WindowActivated(bool active);
-	
-	void		Draw(BRect update);
-	void		DrawAfterChildren(BRect update);
-	status_t	Invoke(BMessage *msg = NULL);
-	void		MessageReceived(BMessage *msg);
+			PRadioButtonBackend(PObject *owner);
+
+	void	AttachedToWindow();
+	void	DetachedFromWindow();
+	void	AllAttached();
+	void	AllDetached();
+	void	Pulse();
+	void	MakeFocus(bool param1);
+	void	FrameMoved(BPoint param1);
+	void	FrameResized(float param1, float param2);
+	void	MouseDown(BPoint param1);
+	void	MouseUp(BPoint param1);
+	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
+	void	WindowActivated(bool param1);
+	void	Draw(BRect param1);
+	void	DrawAfterChildren(BRect param1);
+	void	KeyDown(const char *bytes, int32 count);
+	void	KeyUp(const char *bytes, int32 count);
 
 private:
-	PObject		*fOwner;
+	PObject *fOwner;
 };
+
 
 PRadioButton::PRadioButton(void)
 	:	PControl()
 {
 	fType = "PRadioButton";
-	fFriendlyType = "Radio Button";
+	fFriendlyType = "RadioButton";
 	AddInterface("PRadioButton");
 	
 	InitBackend();
+	InitMethods();
 }
 
 
@@ -52,12 +52,13 @@ PRadioButton::PRadioButton(BMessage *msg)
 	:	PControl(msg)
 {
 	fType = "PRadioButton";
-	fFriendlyType = "Radio Button";
+	fFriendlyType = "RadioButton";
 	AddInterface("PRadioButton");
 	
 	BMessage viewmsg;
-	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		fView = (BView*)BRadioButton::Instantiate(&viewmsg);
+	if (msg->FindMessage("backend", &viewmsg) == B_OK)
+		fView = (BView*)PRadioButtonBackend::Instantiate(&viewmsg);
+
 	
 	InitBackend();
 }
@@ -67,8 +68,10 @@ PRadioButton::PRadioButton(const char *name)
 	:	PControl(name)
 {
 	fType = "PRadioButton";
-	fFriendlyType = "Radio Button";
+	fFriendlyType = "RadioButton";
 	AddInterface("PRadioButton");
+	
+	InitMethods();
 	InitBackend();
 }
 
@@ -77,15 +80,16 @@ PRadioButton::PRadioButton(const PRadioButton &from)
 	:	PControl(from)
 {
 	fType = "PRadioButton";
-	fFriendlyType = "Radio Button";
+	fFriendlyType = "RadioButton";
 	AddInterface("PRadioButton");
+	
+	InitMethods();
 	InitBackend();
 }
 
 
 PRadioButton::~PRadioButton(void)
 {
-	// We don't have to worry about removing and deleting fView -- ~PView does that for us. :)
 }
 
 
@@ -111,30 +115,38 @@ PRadioButton::Duplicate(void) const
 {
 	return new PRadioButton(*this);
 }
-
 void
 PRadioButton::InitBackend(void)
 {
-	if (!fView)
-		fView = new PRadioButtonBackend(this);
-	StringValue sv("A one-from-many decisionmaking control.");
-	SetProperty("Description",&sv);
+}
+
+
+void
+PRadioButton::InitProperties(void)
+{
+	SetStringProperty("Description", "A radio button");
+
+}
+
+
+void
+PRadioButton::InitMethods(void)
+{
+	PMethodInterface pmi;
+	
 }
 
 
 PRadioButtonBackend::PRadioButtonBackend(PObject *owner)
-	:	BRadioButton(BRect(0,0,1,1),"","",new BMessage),
+	:	BRadioButton(BRect(0, 0, 1, 1), "", "", new BMessage),
 		fOwner(owner)
 {
-	
 }
 
 
 void
-PRadioButtonBackend::AttachedToWindow(void)
+PRadioButtonBackend::AttachedToWindow()
 {
-	fOwner->SetColorProperty("BackColor",Parent()->ViewColor());
-	
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
@@ -145,19 +157,7 @@ PRadioButtonBackend::AttachedToWindow(void)
 
 
 void
-PRadioButtonBackend::AllAttached(void)
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllAttached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::AllAttached();
-}
-
-
-void
-PRadioButtonBackend::DetachedFromWindow(void)
+PRadioButtonBackend::DetachedFromWindow()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
@@ -169,7 +169,19 @@ PRadioButtonBackend::DetachedFromWindow(void)
 
 
 void
-PRadioButtonBackend::AllDetached(void)
+PRadioButtonBackend::AllAttached()
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::AllAttached();
+}
+
+
+void
+PRadioButtonBackend::AllDetached()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
@@ -181,42 +193,134 @@ PRadioButtonBackend::AllDetached(void)
 
 
 void
-PRadioButtonBackend::MakeFocus(bool value)
+PRadioButtonBackend::Pulse()
 {
 	PArgs in, out;
-	in.AddBool("focus", value);
-	EventData *data = fOwner->FindEvent("FocusChanged");
+	EventData *data = fOwner->FindEvent("Pulse");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BRadioButton::MakeFocus(value);
+		BRadioButton::Pulse();
 }
 
 
 void
-PRadioButtonBackend::FrameMoved(BPoint pt)
+PRadioButtonBackend::MakeFocus(bool param1)
 {
 	PArgs in, out;
-	in.AddPoint("where", pt);
+	in.AddBool("focus", param1);
+	EventData *data = fOwner->FindEvent("MakeFocus");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::MakeFocus(param1);
+}
+
+
+void
+PRadioButtonBackend::FrameMoved(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BRadioButton::FrameMoved(pt);
+		BRadioButton::FrameMoved(param1);
 }
 
 
 void
-PRadioButtonBackend::FrameResized(float w, float h)
+PRadioButtonBackend::FrameResized(float param1, float param2)
 {
 	PArgs in, out;
-	in.AddFloat("width", w);
-	in.AddFloat("height", h);
+	in.AddFloat("width", param1);
+	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BRadioButton::FrameResized(w, h);
+		BRadioButton::FrameResized(param1, param2);
+}
+
+
+void
+PRadioButtonBackend::MouseDown(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::MouseDown(param1);
+}
+
+
+void
+PRadioButtonBackend::MouseUp(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::MouseUp(param1);
+}
+
+
+void
+PRadioButtonBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * param3)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	in.AddInt32("transit", param2);
+	in.AddPointer("message", (void*) param3);
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::MouseMoved(param1, param2, param3);
+}
+
+
+void
+PRadioButtonBackend::WindowActivated(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("active", param1);
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::WindowActivated(param1);
+}
+
+
+void
+PRadioButtonBackend::Draw(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("Draw");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::Draw(param1);
+}
+
+
+void
+PRadioButtonBackend::DrawAfterChildren(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BRadioButton::DrawAfterChildren(param1);
 }
 
 
@@ -247,122 +351,4 @@ PRadioButtonBackend::KeyUp(const char *bytes, int32 count)
 		BRadioButton::KeyUp(bytes, count);
 }
 
-
-void
-PRadioButtonBackend::MouseDown(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseDown");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::MouseDown(pt);
-}
-
-
-void
-PRadioButtonBackend::MouseUp(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::MouseUp(pt);
-}
-
-
-void
-PRadioButtonBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	in.AddInt32("transit", transit);
-	in.AddPointer("message", (void*)msg);
-	EventData *data = fOwner->FindEvent("MouseMoved");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::MouseMoved(pt, transit, msg);
-}
-
-
-void
-PRadioButtonBackend::WindowActivated(bool active)
-{
-	PArgs in, out;
-	in.AddBool("active", active);
-	EventData *data = fOwner->FindEvent("WindowActivated");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::WindowActivated(active);
-}
-
-
-void
-PRadioButtonBackend::Draw(BRect update)
-{
-	EventData *data = fOwner->FindEvent("Draw");
-	if (!data->hook)
-		BRadioButton::Draw(update);
-	
-	PArgs in, out;
-	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
-	
-	if (IsFocus())
-	{
-		SetPenSize(5.0);
-		SetHighColor(0,0,0);
-		SetLowColor(128,128,128);
-		StrokeRect(Bounds(),B_MIXED_COLORS);
-	}
-}
-
-
-void
-PRadioButtonBackend::DrawAfterChildren(BRect update)
-{
-	PArgs in, out;
-	in.AddRect("update", update);
-	EventData *data = fOwner->FindEvent("DrawAfterChildren");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::DrawAfterChildren(update);
-}
-
-
-status_t
-PRadioButtonBackend::Invoke(BMessage *msg)
-{
-	PArgs in, out;
-	in.AddPointer("message", msg);
-	EventData *data = fOwner->FindEvent("Invoke");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BRadioButton::Invoke(msg);
-	
-	return B_OK;
-}
-
-
-void
-PRadioButtonBackend::MessageReceived(BMessage *msg)
-{
-	PRadioButton *view = dynamic_cast<PRadioButton*>(fOwner);
-	if (view->GetMsgHandler(msg->what))
-	{
-		PArgs args;
-		view->ConvertMsgToArgs(*msg, args.ListRef());
-		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
-			return;
-	}
-	
-	BRadioButton::MessageReceived(msg);
-}
 

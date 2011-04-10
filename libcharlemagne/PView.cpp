@@ -832,7 +832,7 @@ PViewBackend::MakeFocus(bool value)
 	PArgs in, out;
 	in.AddBool("focus", value);
 	EventData *data = fOwner->FindEvent("FocusChanged");
-	if (data->hook)
+	if (data && data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
 		BView::MakeFocus(value);

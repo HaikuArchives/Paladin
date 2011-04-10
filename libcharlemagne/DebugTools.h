@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define ENABLE_DEBUGTOOLS
+//#define ENABLE_DEBUGTOOLS
 
 extern unsigned long gDebugLevel;
 

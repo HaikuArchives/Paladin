@@ -19,12 +19,13 @@ public:
 	static	PObject *		Create(void);
 	virtual	PObject *		Duplicate(void) const;
 	
+
 protected:
 	virtual	void			InitBackend(void);
 
 private:
-	void					InitProperties(void);
-	void					InitMethods(void);
+			void			InitProperties(void);
+			void			InitMethods(void);
 
 };
 

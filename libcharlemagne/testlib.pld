@@ -77,6 +77,7 @@ DEPENDENCY=	projects/paladin/libcharlemagne/PRoster.h|projects/paladin/libcharle
 GROUP=Build
 EXPANDGROUP=yes
 SOURCEFILE=testlib.cpp
+DEPENDENCY=/boot/home/projects/paladin/libcharlemagne/PObject.h|/boot/home/projects/paladin/libcharlemagne/CInterface.h|/boot/home/projects/paladin/libcharlemagne/ObjectList.h|/boot/home/projects/paladin/libcharlemagne/PArgs.h|/boot/home/projects/paladin/libcharlemagne/PData.h|/boot/home/projects/paladin/libcharlemagne/PProperty.h|/boot/home/projects/paladin/libcharlemagne/PValue.h|/boot/home/projects/paladin/libcharlemagne/PMethod.h
 SOURCEFILE=NOTES
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp

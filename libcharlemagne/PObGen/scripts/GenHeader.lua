@@ -108,7 +108,7 @@ function GenerateHeader(obj, back)
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(obj.name) .. "_H")
 	
 	if (not obj.usesView) then
-		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. back.name .. ";")
+		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. back.parent .. ";")
 	else
 		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "")
 	end
@@ -117,8 +117,8 @@ function GenerateHeader(obj, back)
 		classDef = classDef .. getSetCode .. "\n"
 	end
 	
-	if (obj.getBackend) then
-		classDef = classDef .. "\t\t\t" .. back.name .. " *\tGetBackend(void) const;\n"
+	if (obj.getBackend and (not obj.usesView)) then
+		classDef = classDef .. "\t\t\t" .. back.parent .. " *\tGetBackend(void) const;\n"
 	end
 	
 	classDef = classDef .. "\n" .. GenerateProtectedSection(obj, back) .. GeneratePrivateSection(obj, back)

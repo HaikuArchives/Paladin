@@ -403,7 +403,7 @@ function MakePBackend(backName)
 	back.name = backName
 	back.parent = ""
 	back.access = ""
-	back.ini = ""
+	back.init = ""
 	back.eventHooks = {}
 	back.embeddedHooks = {}
 	

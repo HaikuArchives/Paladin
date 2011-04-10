@@ -114,8 +114,6 @@ PButton::Duplicate(void) const
 {
 	return new PButton(*this);
 }
-
-
 void
 PButton::InitBackend(void)
 {

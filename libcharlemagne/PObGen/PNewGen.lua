@@ -263,9 +263,9 @@ function GeneratePObject(obj, back)
 	local setCode = GenerateSetProperty(obj, back)
 	
 	local getBackendCode = ""
-	if (obj.getBackend) then
+	if (obj.getBackend and (not obj.usesView)) then
 		getBackendCode = [[
-%(BACKENDNAME) *
+%(BACKEND_PARENT_NAME) *
 %(POBJECTNAME)::GetBackend(void) const
 {
 	return fBackend;
@@ -327,7 +327,7 @@ function GenerateCodeFile(obj, back)
 	local backendCode = ""
 	
 	if (back.parent and back.access) then
-		backendDef = GenerateBackendDef(back)
+		backendDef = GenerateBackendDef(obj, back)
 		backendCode = GenerateBackendCode(obj, back)
 	end
 	
@@ -362,12 +362,11 @@ dofile(fileName)
 
 print("Generating files for module " .. Module.name)
 
---[[
 print("Generating " .. Module.headerName)
 if (not GenerateHeader(PObject, PBackend)) then
 	return -1
 end
-]]
+
 
 print("Generating " .. Module.codeFileName)
 if (not GenerateCodeFile(PObject, PBackend)) then

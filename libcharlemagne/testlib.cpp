@@ -18,12 +18,13 @@ AppSetup(void *obj, PArgList *inList, PArgList *outList)
 	args.AddInt64("id", top->GetID());
 	win->RunMethod("AddChild", args.ListRef(), foo.ListRef());
 	
-	PObject *tview = MakeObject("PTextView");
+	PObject *tview = MakeObject("PButton");
 	args.MakeEmpty();
 	args.AddInt64("id", tview->GetID());
 	top->RunMethod("AddChild", args.ListRef(), foo.ListRef());
 	
 	tview->SetRectProperty("Frame", BRect(10,10,110,110));
+	tview->SetStringProperty("Label", "MyButton");
 //	tview->SetRectProperty("TextRect", BRect(5,5,95,95));
 	
 	return B_OK;

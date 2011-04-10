@@ -1,96 +1,96 @@
 #include "PLabel.h"
 
 #include <Application.h>
+#include <StringView.h>
+#include <stdio.h>
 #include <Window.h>
 
-#include "EnumProperty.h"
 #include "PArgs.h"
+#include "EnumProperty.h"
+#include "PMethod.h"
 
 class PLabelBackend : public BStringView
 {
 public:
 			PLabelBackend(PObject *owner);
-	void	AttachedToWindow(void);
-	void	AllAttached(void);
-	void	DetachedFromWindow(void);
-	void	AllDetached(void);
-	
-	void	MakeFocus(bool value);
-	
-	void	FrameMoved(BPoint pt);
-	void	FrameResized(float w, float h);
-	
+
+	void	AttachedToWindow();
+	void	DetachedFromWindow();
+	void	AllAttached();
+	void	AllDetached();
+	void	Pulse();
+	void	MakeFocus(bool param1);
+	void	FrameMoved(BPoint param1);
+	void	FrameResized(float param1, float param2);
+	void	MouseDown(BPoint param1);
+	void	MouseUp(BPoint param1);
+	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
+	void	WindowActivated(bool param1);
+	void	Draw(BRect param1);
+	void	DrawAfterChildren(BRect param1);
 	void	KeyDown(const char *bytes, int32 count);
 	void	KeyUp(const char *bytes, int32 count);
-	
-	void	MouseDown(BPoint pt);
-	void	MouseUp(BPoint pt);
-	void	MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
-	
-	void	WindowActivated(bool active);
-	
-	void	Draw(BRect update);
-	void	DrawAfterChildren(BRect update);
-	void	MessageReceived(BMessage *msg);
 
 private:
-	PObject	*fOwner;
+	PObject *fOwner;
 };
 
+
 PLabel::PLabel(void)
-	:	PView()
+	:	PView(true)
 {
 	fType = "PLabel";
 	fFriendlyType = "Label";
 	AddInterface("PLabel");
 	
-	InitProperties();
 	InitBackend();
+	InitProperties();
+	InitMethods();
 }
 
 
 PLabel::PLabel(BMessage *msg)
-	:	PView(msg)
+	:	PView(msg, true)
 {
 	fType = "PLabel";
 	fFriendlyType = "Label";
 	AddInterface("PLabel");
 	
 	BMessage viewmsg;
-	if (msg->FindMessage("backend",&viewmsg) == B_OK)
-		fView = (BView*)BStringView::Instantiate(&viewmsg);
+	if (msg->FindMessage("backend", &viewmsg) == B_OK)
+		fView = (BView*)PLabelBackend::Instantiate(&viewmsg);
+
 	
 	InitBackend();
 }
 
 
 PLabel::PLabel(const char *name)
-	:	PView(name)
+	:	PView(name, true)
 {
 	fType = "PLabel";
 	fFriendlyType = "Label";
 	AddInterface("PLabel");
 	
-	InitProperties();
+	InitMethods();
 	InitBackend();
 }
 
 
 PLabel::PLabel(const PLabel &from)
-	:	PView(from)
+	:	PView(from, true)
 {
 	fType = "PLabel";
 	fFriendlyType = "Label";
 	AddInterface("PLabel");
 	
-	InitProperties();
+	InitMethods();
 	InitBackend();
 }
 
 
 PLabel::~PLabel(void)
 {
-	// We don't have to worry about removing and deleting fView -- ~PView does that for us. :)
 }
 
 
@@ -101,99 +101,6 @@ PLabel::Instantiate(BMessage *data)
 		return new PLabel(data);
 
 	return NULL;
-}
-
-
-status_t
-PLabel::GetProperty(const char *name, PValue *value, const int32 &index) const
-{
-	if (!name || !value)
-		return B_ERROR;
-	
-	BString str(name);
-	PProperty *prop = FindProperty(name,index);
-	if (!prop)
-		return B_NAME_NOT_FOUND;
-	
-	if (fView->Window())
-		fView->Window()->Lock();
-	
-	BStringView *fLabel = (BStringView*)fView;
-	
-	if (str.ICompare("Alignment") == 0)
-		((EnumProperty*)prop)->SetValue(fLabel->Alignment());
-	else if (str.ICompare("Text") == 0)
-		((StringProperty*)prop)->SetValue(fLabel->Text());
-	else
-	{
-		if (fView->Window())
-			fView->Window()->Unlock();
-		
-		return PObject::GetProperty(name,value,index);
-	}
-
-	if (fView->Window())
-		fView->Window()->Unlock();
-	
-	return prop->GetValue(value);
-}
-
-
-status_t
-PLabel::SetProperty(const char *name, PValue *value, const int32 &index)
-{
-/*
-	PLabel Properties:
-		All PView Properties
-		
-		Alignment
-		Text
-*/
-	if (!name || !value)
-		return B_ERROR;
-	
-	BString str(name);
-	PProperty *prop = FindProperty(name,index);
-	if (!prop)
-		return B_NAME_NOT_FOUND;
-	
-	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
-		return B_READ_ONLY;
-	
-	IntValue iv;
-	StringValue sv;
-	
-	status_t status = prop->SetValue(value);
-	if (status != B_OK)
-		return status;
-	
-	if (fView->Window())
-		fView->Window()->Lock();
-	
-	BStringView *fLabel = (BStringView*)fView;
-	
-	if (str.ICompare("Alignment") == 0)
-	{
-		prop->GetValue(&iv);
-		fLabel->SetAlignment((alignment)*iv.value);
-	}
-	else if (str.ICompare("Text") == 0)
-	{
-		prop->GetValue(&sv);
-		fLabel->SetText(sv.value->String());
-		fLabel->Invalidate();
-	}
-	else
-	{
-		if (fView->Window())
-			fView->Window()->Unlock();
-		return PView::SetProperty(name,value,index);
-	}
-	
-	if (fView->Window())
-		fView->Window()->Unlock();
-	
-	return prop->GetValue(value);
 }
 
 
@@ -209,40 +116,128 @@ PLabel::Duplicate(void) const
 {
 	return new PLabel(*this);
 }
+status_t
+PLabel::GetProperty(const char *name, PValue *value, const int32 &index) const
+{
+	if (!name || !value)
+		return B_ERROR;
+	
+	BString str(name);
+	PProperty *prop = FindProperty(name,index);
+	if (!prop)
+		return B_NAME_NOT_FOUND;
+	
+	BStringView *backend = (BStringView*)fView;
+
+	if (backend->Window())
+		backend->Window()->Lock();
+
+	if (str.ICompare("Text") == 0)
+		((StringProperty*)prop)->SetValue(backend->Text());
+	else if (str.ICompare("Alignment") == 0)
+		((EnumProperty*)prop)->SetValue(backend->Alignment());
+	else
+	{
+		if (backend->Window())
+			backend->Window()->Unlock();
+
+		return PView::GetProperty(name, value, index);
+	}
+
+	if (backend->Window())
+		backend->Window()->Unlock();
+
+	return prop->GetValue(value);
+}
+
+
+status_t
+PLabel::SetProperty(const char *name, PValue *value, const int32 &index)
+{
+	if (!name || !value)
+		return B_ERROR;
+	
+	BString str(name);
+	PProperty *prop = FindProperty(name,index);
+	if (!prop)
+		return B_NAME_NOT_FOUND;
+	
+	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
+		return B_READ_ONLY;
+	
+	BStringView *backend = (BStringView*)fView;
+	
+	BoolValue boolval;
+	ColorValue colorval;
+	FloatValue floatval;
+	IntValue intval;
+	PointValue pointval;
+	RectValue rectval;
+	StringValue stringval;
+	
+	status_t status = prop->SetValue(value);
+	if (status != B_OK)
+		return status;
+
+	if (backend->Window())
+		backend->Window()->Lock();
+
+	if (str.ICompare("Text") == 0)
+	{
+		prop->GetValue(&stringval);
+		backend->SetText(*stringval.value);
+	}
+	else if (str.ICompare("Alignment") == 0)
+	{
+		prop->GetValue(&intval);
+		backend->SetAlignment((alignment)*intval.value);
+	}
+	else
+	{
+		if (backend->Window())
+			backend->Window()->Unlock();
+
+		return PView::SetProperty(name, value, index);
+	}
+
+	if (backend->Window())
+		backend->Window()->Unlock();
+
+	return prop->GetValue(value);
+}
+
 
 void
 PLabel::InitBackend(void)
 {
-	if (!fView)
-		fView = new PLabelBackend(this);
-	StringValue sv("A basic button object. It sends a message when clicked.");
-	SetProperty("Description",&sv);
 }
 
 
 void
 PLabel::InitProperties(void)
 {
-/*
-	PLabel Properties:
-		All PView Properties
-		
-		Alignment
-		Text
-*/
+	SetStringProperty("Description", "A text label");
 
-	StringValue sv("A string label");
-	SetProperty("Description", &sv);
-	
-	EnumProperty *prop = new EnumProperty();
+	AddProperty(new StringProperty("Text", NULL, "The label's text"));
+
+	EnumProperty *prop = NULL;
+
+	prop = new EnumProperty();
 	prop->SetName("Alignment");
-	prop->AddValuePair("Left", B_ALIGN_LEFT);
-	prop->AddValuePair("Right", B_ALIGN_RIGHT);
-	prop->AddValuePair("Center", B_ALIGN_CENTER);
 	prop->SetValue((int32)B_ALIGN_LEFT);
+	prop->AddValuePair("Left", B_ALIGN_LEFT);
+	prop->AddValuePair("Center", B_ALIGN_CENTER);
+	prop->AddValuePair("Right", B_ALIGN_RIGHT);
 	AddProperty(prop);
+
+}
+
+
+void
+PLabel::InitMethods(void)
+{
+	PMethodInterface pmi;
 	
-	AddProperty(new StringProperty("Text", "", "The label's text"));
 }
 
 
@@ -254,92 +249,182 @@ PLabelBackend::PLabelBackend(PObject *owner)
 
 
 void
-PLabelBackend::AttachedToWindow(void)
+PLabelBackend::AttachedToWindow()
 {
-	fOwner->SetColorProperty("BackColor",Parent()->ViewColor());
-	
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		PLabelBackend::AttachedToWindow();
+		BStringView::AttachedToWindow();
 }
 
 
 void
-PLabelBackend::AllAttached(void)
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllAttached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		PLabelBackend::AllAttached();
-}
-
-
-void
-PLabelBackend::DetachedFromWindow(void)
+PLabelBackend::DetachedFromWindow()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		PLabelBackend::DetachedFromWindow();
+		BStringView::DetachedFromWindow();
 }
 
 
 void
-PLabelBackend::AllDetached(void)
+PLabelBackend::AllAttached()
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::AllAttached();
+}
+
+
+void
+PLabelBackend::AllDetached()
 {
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		PLabelBackend::AllDetached();
+		BStringView::AllDetached();
 }
 
 
 void
-PLabelBackend::MakeFocus(bool value)
+PLabelBackend::Pulse()
 {
 	PArgs in, out;
-	in.AddBool("focus", value);
-	EventData *data = fOwner->FindEvent("FocusChanged");
+	EventData *data = fOwner->FindEvent("Pulse");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BStringView::MakeFocus(value);
+		BStringView::Pulse();
 }
 
 
 void
-PLabelBackend::FrameMoved(BPoint pt)
+PLabelBackend::MakeFocus(bool param1)
 {
 	PArgs in, out;
-	in.AddPoint("where", pt);
+	in.AddBool("focus", param1);
+	EventData *data = fOwner->FindEvent("MakeFocus");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MakeFocus(param1);
+}
+
+
+void
+PLabelBackend::FrameMoved(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BStringView::FrameMoved(pt);
+		BStringView::FrameMoved(param1);
 }
 
 
 void
-PLabelBackend::FrameResized(float w, float h)
+PLabelBackend::FrameResized(float param1, float param2)
 {
 	PArgs in, out;
-	in.AddFloat("width", w);
-	in.AddFloat("height", h);
+	in.AddFloat("width", param1);
+	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		BStringView::FrameResized(w,h);
+		BStringView::FrameResized(param1, param2);
+}
+
+
+void
+PLabelBackend::MouseDown(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MouseDown(param1);
+}
+
+
+void
+PLabelBackend::MouseUp(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MouseUp(param1);
+}
+
+
+void
+PLabelBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * param3)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	in.AddInt32("transit", param2);
+	in.AddPointer("message", (void*) param3);
+	EventData *data = fOwner->FindEvent("MouseMoved");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::MouseMoved(param1, param2, param3);
+}
+
+
+void
+PLabelBackend::WindowActivated(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("active", param1);
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::WindowActivated(param1);
+}
+
+
+void
+PLabelBackend::Draw(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("Draw");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::Draw(param1);
+}
+
+
+void
+PLabelBackend::DrawAfterChildren(BRect param1)
+{
+	PArgs in, out;
+	in.AddRect("update", param1);
+	EventData *data = fOwner->FindEvent("DrawAfterChildren");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		BStringView::DrawAfterChildren(param1);
 }
 
 
@@ -371,105 +456,3 @@ PLabelBackend::KeyUp(const char *bytes, int32 count)
 }
 
 
-void
-PLabelBackend::MouseDown(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseDown");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BStringView::MouseDown(pt);
-}
-
-
-void
-PLabelBackend::MouseUp(BPoint pt)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	EventData *data = fOwner->FindEvent("MouseUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BStringView::MouseUp(pt);
-}
-
-
-void
-PLabelBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
-{
-	PArgs in, out;
-	in.AddPoint("where", pt);
-	in.AddInt32("transit", transit);
-	in.AddPointer("message", (void*)msg);
-	EventData *data = fOwner->FindEvent("MouseMoved");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BStringView::MouseMoved(pt, transit, msg);
-}
-
-
-void
-PLabelBackend::WindowActivated(bool active)
-{
-	PArgs in, out;
-	in.AddBool("active", active);
-	EventData *data = fOwner->FindEvent("WindowActivated");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BStringView::WindowActivated(active);
-}
-
-
-void
-PLabelBackend::Draw(BRect update)
-{
-	EventData *data = fOwner->FindEvent("Draw");
-	if (!data->hook)
-		BStringView::Draw(update);
-	
-	PArgs in, out;
-	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
-	
-	if (IsFocus())
-	{
-		SetPenSize(5.0);
-		SetHighColor(0,0,0);
-		SetLowColor(128,128,128);
-		StrokeRect(Bounds(),B_MIXED_COLORS);
-	}
-}
-
-
-void
-PLabelBackend::DrawAfterChildren(BRect update)
-{
-	PArgs in, out;
-	in.AddRect("update", update);
-	EventData *data = fOwner->FindEvent("DrawAfterChildren");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BStringView::DrawAfterChildren(update);
-}
-
-
-void
-PLabelBackend::MessageReceived(BMessage *msg)
-{
-	PLabel *view = dynamic_cast<PLabel*>(fOwner);
-	if (view->GetMsgHandler(msg->what))
-	{
-		PArgs args;
-		view->ConvertMsgToArgs(*msg, args.ListRef());
-		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
-			return;
-	}
-	
-	BStringView::MessageReceived(msg);
-}

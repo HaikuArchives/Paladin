@@ -1,7 +1,8 @@
 PObGen Notes
 
-Add error handling code to detect problems in the specification
+Finish the variable and function generation code
 
+Add error handling code to detect problems in the specification
 
 Spec-writing information
 

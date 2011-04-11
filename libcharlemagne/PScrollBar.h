@@ -3,6 +3,11 @@
 
 #include "PView.h"
 
+// PScrollBar is not automatically generated because it doesn't follow the same
+// style as other controls. The V and H scrollbar classes inherit from PScrollBar.
+// It's more elegant that way. There are a lot of what would be embedded properties,
+// as well.
+
 /*
 	Scrollbar Properties:
 		LargeStep

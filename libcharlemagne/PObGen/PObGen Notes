@@ -2,6 +2,8 @@ PObGen Notes
 
 Finish the variable and function generation code
 
+Add support for creating events
+
 Add error handling code to detect problems in the specification
 
 Spec-writing information

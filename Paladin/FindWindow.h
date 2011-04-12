@@ -18,14 +18,9 @@ public:
 			void		MessageReceived(BMessage *msg);
 			
 private:
-			BMenuBar	*fMenuBar;
-			BButton		*fFind,
-						*fReplace,
-						*fReplaceFind,
-						*fReplaceAll;
+			BButton		*fFind;
 						
-			BTextView	*fFindBox,
-						*fReplaceBox;
+			BTextView	*fFindBox;
 			
 			BMenu		*fProjectMenu;
 			

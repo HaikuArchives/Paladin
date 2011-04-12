@@ -25,34 +25,24 @@ enum
 
 
 FindWindow::FindWindow(void)
-	:	DWindow(BRect(100,100,500,400), TR("Find"), B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	:	DWindow(BRect(100,100,500,400), TR("Find in Project"), B_TITLED_WINDOW,
+				B_ASYNCHRONOUS_CONTROLS)
 {
 	BView *top = GetBackgroundView();
-	
-	BRect r(Bounds());
-	r.bottom = 20;
-	fMenuBar = new BMenuBar(r,"menubar");
-	top->AddChild(fMenuBar);
-	
-	r = Bounds();
-	r.top = 20;
 	
 	BStringView *findLabel = new BStringView(BRect(0,0,1,1), "findLabel", TR("Find:"));
 	findLabel->ResizeToPreferred();
 	top->AddChild(findLabel);
 	
-	BStringView *replaceLabel = new BStringView(BRect(0,0,1,1), "replaceLabel", TR("Replace:"));
-	replaceLabel->ResizeToPreferred();
-	top->AddChild(replaceLabel);
+	findLabel->MoveTo(10.0, 10.0);
 	
-	findLabel->MoveTo(10.0, fMenuBar->Bounds().bottom + 5.0);
-	
-	fFind = new BButton(BRect(0,0,1,1), "find", TR("Replace & Find"), new BMessage(M_FIND),
+	fFind = new BButton(BRect(0,0,1,1), "find", TR("Find"), new BMessage(M_FIND),
 						B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fFind->ResizeToPreferred();
 	fFind->SetLabel(TR("Find"));
 	fFind->MoveTo(Bounds().right - fFind->Bounds().Width() - 10.0, findLabel->Frame().top);
 	
+	BRect r(Bounds());
 	r.left = 10.0;
 	r.top = findLabel->Frame().bottom + 3.0;
 	r.right = fFind->Frame().left - B_V_SCROLL_BAR_WIDTH - 10.0;
@@ -65,30 +55,7 @@ FindWindow::FindWindow(void)
 											B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, 0, false, true);
 	top->AddChild(scroll);
 	
-	replaceLabel->MoveTo(10.0, scroll->Frame().bottom + 5.0);
-	r.OffsetTo(10.0, replaceLabel->Frame().bottom + 3.0);
-	fReplaceBox = new BTextView(r, "replacebox", textRect, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	scroll = new BScrollView("replacescroll", fReplaceBox, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-							0, false, true);
-	top->AddChild(scroll);
-	
 	top->AddChild(fFind);
-	
-	r = fFind->Frame();
-	r.OffsetBy(0.0, r.Height() + 5.0);
-	fReplace = new BButton(r, "replace", TR("Replace"), new BMessage(M_REPLACE),
-						B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	top->AddChild(fReplace);
-	
-	r.OffsetBy(0.0, r.Height() + 5.0);
-	fReplaceFind = new BButton(r, "replacefind", TR("Replace & Find"), new BMessage(M_REPLACE_FIND),
-						B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	top->AddChild(fReplaceFind);
-	
-	r.OffsetBy(0.0, r.Height() + 5.0);
-	fReplaceAll = new BButton(r, "replaceall", TR("Replace All"), new BMessage(M_REPLACE_ALL),
-						B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	top->AddChild(fReplaceAll);
 	
 	BStringView *listLabel = new BStringView(BRect(0,0,1,1), "listLabel", TR("Files to Search:"));
 	listLabel->ResizeToPreferred();
@@ -126,6 +93,8 @@ FindWindow::FindWindow(void)
 	fFileList = new RefListView(r, "filelist", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
 	scroll = fFileList->MakeScrollView("listscroll", true, true);
 	top->AddChild(scroll);
+	
+	ResizeTo(Bounds().Width(), fUseOtherText->Frame().bottom + 10.0);
 	
 	fFindBox->MakeFocus(true);
 }

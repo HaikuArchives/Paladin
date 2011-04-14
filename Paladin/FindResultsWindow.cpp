@@ -16,9 +16,22 @@ enum
 	M_TOGGLE_MATCH_WORD = 'tgmw'
 };
 
+enum
+{
+	THREAD_FIND = 0,
+	THREAD_REPLACE,
+	THREAD_REPLACE_ALL
+};
+
 
 FindResultsWindow::FindResultsWindow(void)
-	:	DWindow(BRect(100,100,600,500), "Find Results")
+	:	DWindow(BRect(100,100,600,500), "Find Results"),
+		fIsRegEx(false),
+		fMatchCase(false),
+		fMatchWord(false),
+		fThreadID(-1),
+		fThreadMode(0),
+		fThreadQuitFlag(0)
 {
 	MakeCenteredOnShow(true);
 	BView *top = GetBackgroundView();
@@ -94,19 +107,157 @@ FindResultsWindow::FindResultsWindow(void)
 	menu->AddItem(new BMenuItem("Ignore Case", new BMessage(M_TOGGLE_CASE_INSENSITIVE)));
 	menu->AddItem(new BMenuItem("Match Whole Word", new BMessage(M_TOGGLE_MATCH_WORD)));
 	fMenuBar->AddItem(menu);
+	
+	fFindBox->MakeFocus(true);
 }
 
 
 void
 FindResultsWindow::MessageReceived(BMessage *msg)
 {
+	BMenuItem *item = NULL;
 	switch (msg->what)
 	{
+		case M_FIND:
+		{
+			SpawnThread(THREAD_FIND);
+			break;
+		}
+		case M_REPLACE:
+		{
+			SpawnThread(THREAD_REPLACE);
+			break;
+		}
+		case M_REPLACE_ALL:
+		{
+			SpawnThread(THREAD_REPLACE_ALL);
+			break;
+		}
+		case M_TOGGLE_REGEX:
+		{
+			fIsRegEx = !fIsRegEx;
+			item = fMenuBar->FindItem("Regular Expression");
+			item->SetMarked(fIsRegEx);
+			break;
+		}
+		case M_TOGGLE_CASE_INSENSITIVE:
+		{
+			fMatchCase = !fMatchCase;
+			item = fMenuBar->FindItem("Ignore Case");
+			item->SetMarked(!fMatchCase);
+			break;
+		}
+		case M_TOGGLE_MATCH_WORD:
+		{
+			fMatchWord = !fMatchWord;
+			item = fMenuBar->FindItem("Match Whole Word");
+			item->SetMarked(fMatchWord);
+			break;
+		}
 		default:
 		{
 			DWindow::MessageReceived(msg);
 			break;
 		}
 	}
+}
+
+
+void
+FindResultsWindow::SpawnThread(int8 findMode)
+{
+	AbortThread();
+	
+	fThreadID = spawn_thread(FinderThread, "search_thread", B_NORMAL_PRIORITY, this);
+	if (fThreadID > 0)
+	{
+		fThreadMode = findMode;
+		resume_thread(fThreadID);
+	}
+	else
+		fThreadID = -1;
+}
+
+
+void
+FindResultsWindow::AbortThread(void)
+{
+	if (fThreadID > 0)
+	{
+		atomic_add(&fThreadQuitFlag, 1);
+		int32 out;
+		wait_for_thread(fThreadID, &out);
+		
+		// fThreadQuitID and fThreadID are reset by the extra thread
+	}
+}
+
+
+int32
+FindResultsWindow::FinderThread(void *data)
+{
+	FindResultsWindow *win = static_cast<FindResultsWindow*>(data);
+	if (win)
+	{
+		win->Lock();
+		int8 mode = win->fThreadMode;
+		win->Unlock();
+		
+		switch (mode)
+		{
+			case THREAD_FIND:
+			{
+				win->FindResults();
+				break;
+			}
+			case THREAD_REPLACE:
+			{
+				win->Replace();
+				break;
+			}
+			case THREAD_REPLACE_ALL:
+			{
+				win->ReplaceAll();
+				break;
+			}
+			default:
+				break;
+		}
+	}
+	
+	win->Lock();
+	win->fThreadID = -1;
+	win->fThreadQuitFlag = 0;
+	win->Unlock();
+	
+	return 0;
+}
+
+
+void
+FindResultsWindow::FindResults(void)
+{
+	// This function is called from the FinderThread function, so locking is
+	// required when accessing any member variables.
+	
+	
+}
+
+void
+FindResultsWindow::Replace(void)
+{
+	// This function is called from the FinderThread function, so locking is
+	// required when accessing any member variables.
+	
+	
+}
+
+void
+FindResultsWindow::ReplaceAll(void)
+{
+	// This function is called from the FinderThread function, so locking is
+	// required when accessing any member variables.
+	
+	
 }
 

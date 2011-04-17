@@ -108,7 +108,8 @@ function GenerateHeader(obj, back)
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(obj.name) .. "_H")
 	
 	if (not obj.usesView) then
-		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. back.parent .. ";")
+		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. back.name .. ";\n" ..
+																			"class " .. back.parent .. ";")
 	else
 		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "")
 	end

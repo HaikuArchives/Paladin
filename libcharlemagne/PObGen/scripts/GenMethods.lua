@@ -313,9 +313,15 @@ function GenerateMethods(obj, back)
 	end
 		
 	local i = 1
-	while (obj.methods[i]) do
+	for i = 1, table.getn(obj.methods) do
 		local method = obj.methods[i]
-		out = out .. GenerateMethod(obj, back, method)
+		local methodCode = GenerateMethod(obj, back, method)
+		
+		if (methodCode) then
+			out = out .. methodCode
+		else
+			return nil
+		end
 		i = i + 1
 	end
 	

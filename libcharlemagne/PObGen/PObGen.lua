@@ -100,7 +100,7 @@ function GenerateBackendCode(obj, back)
 	
 	-- Now that the constructor is done, write all of the hooks for events
 	local i = 1
-	while (back.eventHooks[i]) do
+	for i = 1, table.getn(back.eventHooks) do
 		local hookDef = back.eventHooks[i]
 		
 		if (hookDef[1] and hookDef[2]) then

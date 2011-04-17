@@ -1,10 +1,12 @@
 #include "FindResultsWindow.h"
 
 #include <Font.h>
+#include <stdio.h>
 #include <StringView.h>
 
 #include "DListView.h"
 #include "DTextView.h"
+#include "LaunchHelper.h"
 
 enum
 {
@@ -13,7 +15,9 @@ enum
 	M_REPLACE_ALL = 'rpla',
 	M_TOGGLE_REGEX = 'tgrx',
 	M_TOGGLE_CASE_INSENSITIVE = 'tgci',
-	M_TOGGLE_MATCH_WORD = 'tgmw'
+	M_TOGGLE_MATCH_WORD = 'tgmw',
+	M_FIND_CHANGED = 'fnch',
+	M_SET_PROJECT = 'stpj'
 };
 
 enum
@@ -23,6 +27,48 @@ enum
 	THREAD_REPLACE_ALL
 };
 
+void
+TokenizeToList(const char *string, BObjectList<BString> &stringList)
+{
+	if (!string)
+		return;
+	
+	char *workstr = new char[strlen(string) + 1];
+	strcpy(workstr, string);
+	strtok(workstr, "\n");
+	
+	char *token = strtok(NULL,"\n");
+	char *lasttoken = workstr;
+	
+	if (!token)
+	{
+		delete [] workstr;
+		stringList.AddItem(new BString(string));
+		return;
+	}
+	
+	int32 length = 0;
+	BString *newword = NULL;
+	
+	while (token)
+	{
+		length = token - lasttoken;
+		
+		newword = new BString(lasttoken, length + 1);
+		lasttoken = token;
+		stringList.AddItem(newword);
+
+		token = strtok(NULL,"\n");
+	}
+	
+	length = strlen(lasttoken);
+	newword = new BString(lasttoken, length + 1);
+	lasttoken = token;
+	stringList.AddItem(newword);
+		
+	delete [] workstr;
+}
+
 
 FindResultsWindow::FindResultsWindow(void)
 	:	DWindow(BRect(100,100,600,500), "Find Results"),
@@ -31,8 +77,24 @@ FindResultsWindow::FindResultsWindow(void)
 		fMatchWord(false),
 		fThreadID(-1),
 		fThreadMode(0),
-		fThreadQuitFlag(0)
+		fThreadQuitFlag(0),
+		fFileList(20, true)
 {
+/***********************************************************************************
+************************************************************************************
+								TEST CODE START
+************************************************************************************
+***********************************************************************************/
+	fWorkingDir = "/boot/home/projects/FindResults/TestFiles/";
+	fFileList.AddItem(new BString("App.h"));
+	fFileList.AddItem(new BString("EditView.h"));
+	fFileList.AddItem(new BString("MainWindow.h"));
+
+/***********************************************************************************
+************************************************************************************
+								TEST CODE END
+************************************************************************************
+***********************************************************************************/
 	MakeCenteredOnShow(true);
 	BView *top = GetBackgroundView();
 	
@@ -108,6 +170,17 @@ FindResultsWindow::FindResultsWindow(void)
 	menu->AddItem(new BMenuItem("Match Whole Word", new BMessage(M_TOGGLE_MATCH_WORD)));
 	fMenuBar->AddItem(menu);
 	
+	BMenuItem *item = fMenuBar->FindItem("Ignore Case");
+	if (fMatchCase)
+		item->SetMarked(true);
+	
+	menu = new BMenu("Project");
+	fMenuBar->AddItem(menu);
+	
+	// The search terms box will tell us whenever it has been changed at every keypress
+	fFindBox->SetMessage(new BMessage(M_FIND_CHANGED));
+	fFindBox->SetTarget(this);
+	fFindBox->SetChangeNotifications(true);
 	fFindBox->MakeFocus(true);
 }
 
@@ -152,6 +225,22 @@ FindResultsWindow::MessageReceived(BMessage *msg)
 			fMatchWord = !fMatchWord;
 			item = fMenuBar->FindItem("Match Whole Word");
 			item->SetMarked(fMatchWord);
+			break;
+		}
+		case M_FIND_CHANGED:
+		{
+			if (fFindBox->Text() && strlen(fFindBox->Text()) > 0)
+			{
+				fFindButton->SetEnabled(true);
+				fReplaceButton->SetEnabled(true);
+				fReplaceAllButton->SetEnabled(true);
+			}
+			else
+			{
+				fFindButton->SetEnabled(false);
+				fReplaceButton->SetEnabled(false);
+				fReplaceAllButton->SetEnabled(false);
+			}
 			break;
 		}
 		default:
@@ -239,7 +328,73 @@ FindResultsWindow::FindResults(void)
 {
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
+	Lock();
+	for (int32 i = fResultList->CountItems() - 1; i >= 0; i--)
+	{
+		// We don't want to hog the window lock, but we also don't want
+		// tons of context switches, either. Yielding the lock every 5 items
+		// should give us sufficient responsiveness.
+		if (i % 5 == 0)
+		{
+			Unlock();
+			Lock();
+		}
+		
+		BListItem *item = fResultList->RemoveItem(i);
+		delete item;
+	}
+	Unlock();
+
+
+	ShellHelper shell;
+	shell << "cd";
+	shell.AddEscapedArg(fWorkingDir.GetFullPath());
+	shell << ";" << "grep" << "-n";
 	
+	if (!fMatchCase)
+		shell << "-i";
+	
+	if (fMatchWord)
+		shell << "-w";
+	
+	if (!fIsRegEx)
+		shell << "-F";
+	
+	shell.AddEscapedArg(fFindBox->Text());
+	
+	for (int32 i = 0; i < fFileList.CountItems(); i++)
+	{
+		BString *item = fFileList.ItemAt(i);
+		shell.AddEscapedArg(item->String());
+	}
+	
+	if (fThreadQuitFlag)
+		return;
+	
+	BString out;
+	shell.RunInPipe(out, false);
+	
+	if (fThreadQuitFlag)
+		return;
+	
+	BObjectList<BString> resultList(20, true);
+	TokenizeToList(out.String(), resultList);
+	
+	Lock();
+	for (int32 i = 0; i < resultList.CountItems(); i++)
+	{
+		// We don't want to hog the window lock, but we also don't want
+		// tons of context switches, either. Yielding the lock every 5 items
+		// should give us sufficient responsiveness.
+		if (i % 5 == 0)
+		{
+			Unlock();
+			Lock();
+		}
+		
+		fResultList->AddItem(new BStringItem(resultList.ItemAt(i)->String()));
+	}
+	Unlock();
 	
 }
 
@@ -249,7 +404,7 @@ FindResultsWindow::Replace(void)
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	
-	
+	// This one will require some messaging work with PalEdit.
 }
 
 void
@@ -258,6 +413,8 @@ FindResultsWindow::ReplaceAll(void)
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	
-	
+	// Just make sure you escape single quotes and underscores before constructing
+	// the sed command
+	// sed 's_SEARCHTERM_REPLACETERM_g' < INPUTFILE > OUTPUTFILE
 }
 

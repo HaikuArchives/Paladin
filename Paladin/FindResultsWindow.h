@@ -6,6 +6,9 @@
 #include <Button.h>
 #include <MenuBar.h>
 
+#include "DPath.h"
+#include "ObjectList.h"
+
 class DTextView;
 class DListView;
 
@@ -40,6 +43,9 @@ private:
 	thread_id		fThreadID;
 	int8			fThreadMode;
 	vint32			fThreadQuitFlag;
+	
+	BObjectList<BString>	fFileList;
+	DPath					fWorkingDir;
 };
 
 

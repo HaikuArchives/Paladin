@@ -116,6 +116,7 @@ DEPENDENCY=/boot/home/projects/paladin/Paladin/ThirdParty/DNode.h
 SOURCEFILE=ThirdParty/DPath.cpp
 DEPENDENCY=/boot/home/projects/paladin/Paladin/ThirdParty/DPath.h
 SOURCEFILE=ThirdParty/DTextView.cpp
+DEPENDENCY=/boot/home/projects/paladin/Paladin/ThirdParty/DTextView.h
 SOURCEFILE=ThirdParty/DWindow.cpp
 DEPENDENCY=/boot/home/projects/paladin/Paladin/ThirdParty/DWindow.h
 SOURCEFILE=ThirdParty/DelayedMessenger.cpp

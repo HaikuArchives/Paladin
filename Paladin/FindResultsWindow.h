@@ -25,6 +25,7 @@ private:
 			void	FindResults(void);
 			void	Replace(void);
 			void	ReplaceAll(void);
+			void	EnableReplace(bool value);
 	
 	DTextView		*fFindBox,
 					*fReplaceBox;

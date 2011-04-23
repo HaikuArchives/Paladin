@@ -1,5 +1,6 @@
 #include "FindResultsWindow.h"
 
+#include <Alert.h>
 #include <Font.h>
 #include <stdio.h>
 #include <StringView.h>
@@ -152,7 +153,7 @@ FindResultsWindow::FindResultsWindow(void)
 	r.top = resultLabel->Frame().bottom + 5.0;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	fResultList = new DListView(r, "resultlist", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
+	fResultList = new DListView(r, "resultlist", B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL);
 	scroll = fResultList->MakeScrollView("resultscroll", true, true);
 	top->AddChild(scroll);
 	
@@ -176,6 +177,8 @@ FindResultsWindow::FindResultsWindow(void)
 	
 	menu = new BMenu("Project");
 	fMenuBar->AddItem(menu);
+	
+	EnableReplace(false);
 	
 	// The search terms box will tell us whenever it has been changed at every keypress
 	fFindBox->SetMessage(new BMessage(M_FIND_CHANGED));
@@ -230,17 +233,9 @@ FindResultsWindow::MessageReceived(BMessage *msg)
 		case M_FIND_CHANGED:
 		{
 			if (fFindBox->Text() && strlen(fFindBox->Text()) > 0)
-			{
 				fFindButton->SetEnabled(true);
-				fReplaceButton->SetEnabled(true);
-				fReplaceAllButton->SetEnabled(true);
-			}
 			else
-			{
 				fFindButton->SetEnabled(false);
-				fReplaceButton->SetEnabled(false);
-				fReplaceAllButton->SetEnabled(false);
-			}
 			break;
 		}
 		default:
@@ -329,6 +324,7 @@ FindResultsWindow::FindResults(void)
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	Lock();
+	EnableReplace(false);
 	for (int32 i = fResultList->CountItems() - 1; i >= 0; i--)
 	{
 		// We don't want to hog the window lock, but we also don't want
@@ -392,8 +388,12 @@ FindResultsWindow::FindResults(void)
 			Lock();
 		}
 		
+		//*****************************************************
+		// TODO: properly add file name using a RefItem or a subclass of it
 		fResultList->AddItem(new BStringItem(resultList.ItemAt(i)->String()));
 	}
+	if (fResultList->CountItems() > 0)
+		EnableReplace(true);
 	Unlock();
 	
 }
@@ -415,6 +415,65 @@ FindResultsWindow::ReplaceAll(void)
 	
 	// Just make sure you escape single quotes and underscores before constructing
 	// the sed command
-	// sed 's_SEARCHTERM_REPLACETERM_g' < INPUTFILE > OUTPUTFILE
+	
+	Lock();
+	BString errorLog;
+	
+	for (int32 i = 0; i < fResultList->CountItems(); i++)
+	{
+		BString replaceTerms;
+		replaceTerms << "'s_" << fFindBox->Text() << "_" << fReplaceBox->Text()
+					<< "_g";
+		
+		
+		//*****************************************************
+		// TODO: get the file name from the results
+		BString infileName, outfileName;
+		
+		ShellHelper shell;
+		shell << "cd";
+		shell.AddEscapedArg(fWorkingDir.GetFullPath());
+		shell << ";" << "sed" << replaceTerms << "<" << infileName << ">"
+				<< outfileName;
+		
+		int32 outvalue = shell.Run();
+		if (outvalue)
+		{
+			// append file name to list of files with error conditions and notify
+			// user of problems at the end so as not to annoy them.
+			errorLog << "\t" << infileName << "\n";
+		}
+		
+		// Allow window updates from time to time
+		if (i % 5 == 0)
+		{
+			Unlock();
+			Lock();
+		}
+	}
+	Unlock();
+	
+	if (errorLog.CountChars() > 0)
+	{
+		BString errorString = "The following files had problems replacing the search terms:\n";
+		errorString << errorLog;
+		
+		BAlert *alert = new BAlert("Paladin", errorString.String(), "OK");
+		alert->Go();
+	}
+}
+
+
+void
+FindResultsWindow::EnableReplace(bool value)
+{
+	fReplaceButton->SetEnabled(value);
+	fReplaceAllButton->SetEnabled(value);
+	BMenuItem *item = fMenuBar->FindItem("Replace");
+	if (item)
+		item->SetEnabled(value);
+	item = fMenuBar->FindItem("Replace All");
+	if (item)
+		item->SetEnabled(value);
 }
 

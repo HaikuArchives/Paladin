@@ -1,0 +1,73 @@
+#!lua
+
+-- Luare: A Lua-based regular expression replacement tool similar
+-- in function to sed.
+
+-- Copyright (c) 2011 DarkWyrm
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- THE SOFTWARE.
+
+interactiveMode = false
+if (arg[1] == "-i") then
+	interactiveMode = true
+end
+
+if (interactiveMode) then
+	argIndex = 2
+else
+	pattern = arg[1]
+	replacement = arg[2]
+	argIndex = 3
+end
+filePath = arg[argIndex]
+
+if (filePath == nil) then
+	print("Usage:\n\tluasub -i file [newname]")
+	print("\tluasub pattern replacement file [newname]")
+	return 0
+end
+
+if (interactiveMode) then
+	print("Enter the pattern to use: ")
+	pattern = io.stdin:read()
+	print("Enter the replacement pattern: ")
+	replacement = io.stdin:read()
+end
+
+filePath = arg[argIndex]
+newPath = arg[argIndex + 1]
+if (newPath == nil) then
+	newPath = filePath.. ".new"
+end
+
+file = io.open(filePath)
+if (file == nil) then
+	print("Couldn't open " .. filePath)
+	return 1
+end
+
+fileData = file:read("*all*")
+file:close()
+
+outData = string.gsub(fileData, pattern, replacement)
+
+local outFile = io.open(newPath, "w+")
+outFile:write(outData)
+outFile:close()
+

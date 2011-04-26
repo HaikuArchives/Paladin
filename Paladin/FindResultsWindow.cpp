@@ -3,6 +3,7 @@
 #include <Alert.h>
 #include <Font.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <StringView.h>
 
 #include "DListView.h"
@@ -26,6 +27,17 @@ enum
 	THREAD_FIND = 0,
 	THREAD_REPLACE,
 	THREAD_REPLACE_ALL
+};
+
+class GrepListItem : public RefListItem
+{
+public:
+			GrepListItem(entry_ref ref, int32 line, const char *linestr);
+	int32	GetLine(void) const;
+
+private:
+	int32	fLine;
+	BString	fLineString;
 };
 
 void
@@ -74,7 +86,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 FindResultsWindow::FindResultsWindow(void)
 	:	DWindow(BRect(100,100,600,500), "Find Results"),
 		fIsRegEx(false),
-		fMatchCase(false),
+		fIgnoreCase(true),
 		fMatchWord(false),
 		fThreadID(-1),
 		fThreadMode(0),
@@ -88,8 +100,8 @@ FindResultsWindow::FindResultsWindow(void)
 ***********************************************************************************/
 	fWorkingDir = "/boot/home/projects/FindResults/TestFiles/";
 	fFileList.AddItem(new BString("App.h"));
-	fFileList.AddItem(new BString("EditView.h"));
-	fFileList.AddItem(new BString("MainWindow.h"));
+	fFileList.AddItem(new BString("DListView.h"));
+	fFileList.AddItem(new BString("DPath.h"));
 
 /***********************************************************************************
 ************************************************************************************
@@ -120,6 +132,7 @@ FindResultsWindow::FindResultsWindow(void)
 	r.right = fFindButton->Frame().left - 10.0 - B_V_SCROLL_BAR_WIDTH;
 	r.bottom = r.top + (lineHeight * 2.0) + 10.0 + B_H_SCROLL_BAR_HEIGHT;
 	fFindBox = new DTextView(r, "findbox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fFindBox->SetFlags(fFindBox->Flags() | B_NAVIGABLE_JUMP);
 	
 	BScrollView *scroll = fFindBox->MakeScrollView("findscroll", true, true);
 	top->AddChild(scroll);
@@ -128,6 +141,7 @@ FindResultsWindow::FindResultsWindow(void)
 	
 	r.OffsetTo(10.0, fFindBox->Parent()->Frame().bottom + 10.0);
 	fReplaceBox = new DTextView(r, "replacebox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fReplaceBox->SetFlags(fFindBox->Flags() | B_NAVIGABLE_JUMP);
 	
 	scroll = fReplaceBox->MakeScrollView("replacescroll", true, true);
 	top->AddChild(scroll);
@@ -172,7 +186,7 @@ FindResultsWindow::FindResultsWindow(void)
 	fMenuBar->AddItem(menu);
 	
 	BMenuItem *item = fMenuBar->FindItem("Ignore Case");
-	if (fMatchCase)
+	if (fIgnoreCase)
 		item->SetMarked(true);
 	
 	menu = new BMenu("Project");
@@ -218,9 +232,9 @@ FindResultsWindow::MessageReceived(BMessage *msg)
 		}
 		case M_TOGGLE_CASE_INSENSITIVE:
 		{
-			fMatchCase = !fMatchCase;
+			fIgnoreCase = !fIgnoreCase;
 			item = fMenuBar->FindItem("Ignore Case");
-			item->SetMarked(!fMatchCase);
+			item->SetMarked(fIgnoreCase);
 			break;
 		}
 		case M_TOGGLE_MATCH_WORD:
@@ -347,7 +361,7 @@ FindResultsWindow::FindResults(void)
 	shell.AddEscapedArg(fWorkingDir.GetFullPath());
 	shell << ";" << "grep" << "-n";
 	
-	if (!fMatchCase)
+	if (fIgnoreCase)
 		shell << "-i";
 	
 	if (fMatchWord)
@@ -388,9 +402,27 @@ FindResultsWindow::FindResults(void)
 			Lock();
 		}
 		
-		//*****************************************************
-		// TODO: properly add file name using a RefItem or a subclass of it
-		fResultList->AddItem(new BStringItem(resultList.ItemAt(i)->String()));
+		BString entryString(resultList.ItemAt(i)->String());
+		
+		BString filename(entryString);
+		int32 pos = filename.FindFirst(":");
+		if (pos < 0)
+			continue;
+		filename.Truncate(pos);
+		
+		BString lineString;
+		entryString.CopyInto(lineString, pos + 1, entryString.CountChars() - pos);
+		int32 pos2 = lineString.FindFirst(":");
+		
+		BString locationString;
+		lineString.CopyInto(locationString, pos2 + 1, lineString.CountChars() - pos2);
+		lineString.Truncate(pos2);
+		
+		DPath entryPath(fWorkingDir);
+		entryPath << filename;
+		
+		fResultList->AddItem(new GrepListItem(entryPath.GetRef(), atol(lineString.String()),
+											locationString.String()));
 	}
 	if (fResultList->CountItems() > 0)
 		EnableReplace(true);
@@ -416,32 +448,31 @@ FindResultsWindow::ReplaceAll(void)
 	// Just make sure you escape single quotes and underscores before constructing
 	// the sed command
 	
+	
 	Lock();
 	BString errorLog;
 	
 	for (int32 i = 0; i < fResultList->CountItems(); i++)
 	{
 		BString replaceTerms;
-		replaceTerms << "'s_" << fFindBox->Text() << "_" << fReplaceBox->Text()
-					<< "_g";
+		replaceTerms << "'" << fFindBox->Text() << "' '" << fReplaceBox->Text()
+					<< "'";
 		
 		
-		//*****************************************************
-		// TODO: get the file name from the results
-		BString infileName, outfileName;
-		
+		GrepListItem *gitem = (GrepListItem*)fResultList->ItemAt(i);
+		DPath file(gitem->GetRef());
+
 		ShellHelper shell;
-		shell << "cd";
-		shell.AddEscapedArg(fWorkingDir.GetFullPath());
-		shell << ";" << "sed" << replaceTerms << "<" << infileName << ">"
-				<< outfileName;
+		shell << "luare" << replaceTerms;
+		shell.AddEscapedArg(file.GetFullPath());
+		shell.AddEscapedArg(file.GetFullPath());
 		
 		int32 outvalue = shell.Run();
 		if (outvalue)
 		{
 			// append file name to list of files with error conditions and notify
 			// user of problems at the end so as not to annoy them.
-			errorLog << "\t" << infileName << "\n";
+			errorLog << "\t" << file.GetFileName() << "\n";
 		}
 		
 		// Allow window updates from time to time
@@ -461,6 +492,8 @@ FindResultsWindow::ReplaceAll(void)
 		BAlert *alert = new BAlert("Paladin", errorString.String(), "OK");
 		alert->Go();
 	}
+	
+	PostMessage(M_FIND);
 }
 
 
@@ -477,3 +510,21 @@ FindResultsWindow::EnableReplace(bool value)
 		item->SetEnabled(value);
 }
 
+
+GrepListItem::GrepListItem(entry_ref ref, int32 line, const char *linestr)
+	:	RefListItem(ref, REFITEM_OTHER),
+		fLine(line),
+		fLineString(linestr)
+{
+	fLine = line;
+	BString text = ref.name;
+	text << ", Line " << line << ": " << linestr;
+	SetText(text.String());
+}
+
+
+int32
+GrepListItem::GetLine(void) const
+{
+	return fLine;
+}

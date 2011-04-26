@@ -38,7 +38,7 @@ private:
 	BMenuBar		*fMenuBar;
 	
 	bool			fIsRegEx,
-					fMatchCase,
+					fIgnoreCase,
 					fMatchWord;
 	
 	thread_id		fThreadID;

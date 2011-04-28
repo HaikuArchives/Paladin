@@ -103,15 +103,15 @@ function GenerateGetProperty(obj, back)
 				
 			else
 				propCode = propCode ..	"\t\t((" .. TypeToPropertyClass(prop[2]) ..
-							"*)prop)->SetValue(backend->" .. prop[3][1] .. "("
-		
-				if (prop[3][2] == "void") then
-					propCode = propCode .. "));"
-				else
+							"*)prop)->SetValue("
+				
+				if (prop[3][2]:sub(1,1) == "(") then
+					propCode = propCode .. prop[3][2]
+				elseif (prop[3][2] ~= "void") then
 					print("prop type is " .. prop[3][2])
 				end
 				
-				propCode = propCode .. "\n"
+				propCode = propCode .. "backend->" .. prop[3][1] .. "());\n"
 			end
 			
 		
@@ -209,7 +209,9 @@ function GenerateSetProperty(obj, back)
 	end
 	
 	if (propertiesWritten == 0) then
-		return "}\n\n\n"
+		out = out .. "\treturn " .. obj.parentClass ..
+				"::SetProperty(name, value, index);\n}\n\n\n"
+		return out
 	end
 	
 	out = out .. "\telse\n\t{\n"

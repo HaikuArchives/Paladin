@@ -299,7 +299,7 @@ void
 	end
 	
 	pobjCode = pobjCode .. getCode .. setCode .. getBackendCode
-	
+
 	if (obj.initBackend) then
 		if (string.len(obj.initBackend) > 0) then
 			pobjCode = pobjCode .. "void\n" .. obj.name .. "::InitBackend(void)\n{\n" .. 

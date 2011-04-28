@@ -1,3 +1,8 @@
+Implement a ListValue class. It is needed for a number of different methods for stuff like BRoster's
+methods and other stuff. It shouldn't accept anything except ListValue values.
+
+Look into implementing a MapValue class, as well.
+
 Finish PRoster class
 
 Add Set/GetMode methods to PScreen

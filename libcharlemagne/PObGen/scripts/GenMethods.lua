@@ -145,11 +145,11 @@ function GenerateMethod(obj, back, method)
 	-- PView are expected to provide a private member named "backend".
 	if (obj.usesView) then
 		methodCode = methodCode .. [[
-PView *parent = static_cast<PView*>(pobject);
-if (!parent)
-	return B_BAD_TYPE;
-
-BTextView *backend = (BTextView*)parent->GetView();
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BTextView *backend = (BTextView*)parent->GetView();
 ]]
 	else
 		local parentName = back.parent
@@ -157,8 +157,16 @@ BTextView *backend = (BTextView*)parent->GetView();
 			parentName = back.name
 		end
 		
-		methodCode = methodCode .. "\t" .. parentName ..
-					" *backend = fBackend;\n"
+--		methodCode = methodCode .. "\t" .. parentName .. " *backend = fBackend;\n"
+		local tempCode = [[
+	%(POBJECTNAME) *parent = static_cast<%(POBJECTNAME)*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)parent->GetBackend();
+]]
+		tempCode = ApplyObjectPlaceholders(tempCode, obj, back)
+		methodCode = methodCode .. ApplyBackendPlaceholders(tempCode, obj, back)
 	end
 	
 	-- Declare the argument wrappers which we'll use to get input to the 

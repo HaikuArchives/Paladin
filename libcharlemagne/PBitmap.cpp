@@ -7,6 +7,15 @@
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
+#include "PView.h"
+
+int32_t PBitmapInitialize(void *pobject, PArgList *in, PArgList *out);
+int32_t PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out);
+int32_t PBitmapSetBits(void *pobject, PArgList *in, PArgList *out);
+int32_t PBitmapAddChild(void *pobject, PArgList *in, PArgList *out);
+int32_t PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out);
+int32_t PBitmapCountChildren(void *pobject, PArgList *in, PArgList *out);
 
 class PBitmapBackend
 {
@@ -27,7 +36,7 @@ public:
 	void		Initialize(const BRect &bounds, uint32 flags,
 							color_space space, int32 bytesPerRow,
 							screen_id screenID);
-	void		Initialize(const BBitmap &source, uint32 flags);
+	void		Initialize(PBitmapBackend *source, uint32 flags);
 	
 	void		SetBits(const void *data, int32 length,
 						int32 offset, color_space colorSpace);
@@ -149,6 +158,8 @@ PBitmap::GetProperty(const char *name, PValue *value, const int32 &index) const
 		((IntProperty*)prop)->SetValue(backend->Flags());
 	else if (str.ICompare("Frame") == 0)
 		((RectProperty*)prop)->SetValue(backend->Bounds());
+	else if (str.ICompare("InitStatus") == 0)
+		((IntProperty*)prop)->SetValue(backend->InitCheck());
 	else if (str.ICompare("IsValid") == 0)
 		((BoolProperty*)prop)->SetValue(backend->IsValid());
 	else if (str.ICompare("Locked") == 0)
@@ -247,6 +258,38 @@ PBitmap::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
+	pmi.AddArg("bounds", PARG_RECT, "Size of the bitmap");
+	pmi.AddArg("flags", PARG_INT32, "Bitmap flags");
+	pmi.AddArg("space", PARG_INT32, "Color space of the bitmap");
+	pmi.AddArg("bytesperrow", PARG_INT32, "Optional: number of bytes per row",
+				PMIFLAG_OPTIONAL);
+	pmi.AddArg("screenID", PARG_INT32, "Optional: ID of the screen for the bitmap",
+				PMIFLAG_OPTIONAL);
+	AddMethod(new PMethod("Initialize", PBitmapInitialize, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("bitmapID", PARG_INT64, "ID of the source PBitmap");
+	pmi.AddArg("flags", PARG_INT32, "Behavior flags for the bitmap");
+	AddMethod(new PMethod("InitializeFrom", PBitmapInitializeFrom, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("data", PARG_POINTER, "Pointer to the data from which to copy");
+	pmi.AddArg("length", PARG_INT32, "Number of bytes to copy");
+	pmi.AddArg("offset", PARG_INT32, "Offset to start copying");
+	pmi.AddArg("colorspace", PARG_INT32, "Color space of the source data");
+	AddMethod(new PMethod("SetBits", PBitmapSetBits, &pmi));
+	
+	pmi.AddArg("id", PARG_INT64, "ID of the child PView to add");
+	AddMethod(new PMethod("AddChild", PBitmapAddChild, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("id", PARG_INT64, "ID of the child PView to remove");
+	AddMethod(new PMethod("RemoveChild", PBitmapRemoveChild, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddReturnValue("value", PARG_INT32, "Number of children found");
+	AddMethod(new PMethod("CountChildren", PBitmapCountChildren, &pmi));
+	pmi.MakeEmpty();
 }
 
 
@@ -332,10 +375,10 @@ PBitmapBackend::Initialize(const BRect &bounds, uint32 flags,
 
 
 void
-PBitmapBackend::Initialize(const BBitmap &source, uint32 flags)
+PBitmapBackend::Initialize(PBitmapBackend *source, uint32 flags)
 {
-	if (!fBitmap)
-		fBitmap = new BBitmap(source, flags);
+	if (!fBitmap && source && source->fBitmap)
+		fBitmap = new BBitmap(*source->fBitmap, flags);
 }
 
 
@@ -411,4 +454,227 @@ PBitmapBackend::IsLocked(void) const
 {
 	return fBitmap ? fBitmap->IsLocked() : false;
 }
+
+
+int32_t
+PBitmapInitialize(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PBitmap *parent = static_cast<PBitmap*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	PBitmapBackend *backend = (PBitmapBackend*)parent->GetBackend();
+	
+	PArgs args(in);
+	
+	BRect bounds;
+	if (args.FindRect("bounds", &bounds) != B_OK)
+		return B_ERROR;
+	
+	int32 flags;
+	if (args.FindInt32("flags", &flags) != B_OK)
+		return B_ERROR;
+	
+	int32 colorSpace;
+	if (args.FindInt32("space", &colorSpace) != B_OK)
+		return B_ERROR;
+	
+	int32 bytesPerRow;
+	if (args.FindInt32("bytesperrow", &bytesPerRow) != B_OK)
+		bytesPerRow = B_ANY_BYTES_PER_ROW;
+	
+	int32 screenID;
+	if (args.FindInt32("screenID", &screenID) != B_OK)
+		screenID = B_MAIN_SCREEN_ID.id;
+	
+	screen_id idStruct;
+	idStruct.id = screenID;
+	
+	backend->Initialize(bounds, flags, (color_space)colorSpace,
+						bytesPerRow, idStruct);
+	
+	return B_OK;
+}
+
+
+int32_t
+PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PBitmap *parent = static_cast<PBitmap*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	PBitmapBackend *backend = (PBitmapBackend*)parent->GetBackend();
+	
+	PArgs args(in);
+	int64 sourceID;
+	if (args.FindInt64("id", &sourceID) != B_OK)
+		return B_ERROR;
+	
+	int32 flags;
+	if (args.FindInt32("flags", &flags) != B_OK)
+		return B_ERROR;
+	
+	PObject *sourceObj = BROKER->FindObject(sourceID);
+	if (!sourceObj->UsesInterface("PBitmap"))
+		return B_BAD_DATA;
+	
+	PBitmap *sourceBitmap = (PBitmap*)sourceObj;
+	
+	backend->Initialize(sourceBitmap->GetBackend(), flags);
+	
+	return B_OK;
+}
+
+
+int32_t
+PBitmapSetBits(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PBitmap *parent = static_cast<PBitmap*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	PBitmapBackend *backend = (PBitmapBackend*)parent->GetBackend();
+	
+	PArgs args(in);
+	void *data;
+	if (args.FindPointer("data", &data) != B_OK)
+		return B_ERROR;
+	
+	int32 length;
+	if (args.FindInt32("length", &length) != B_OK)
+		return B_ERROR;
+	
+	int32 offset;
+	if (args.FindInt32("offset", &offset) != B_OK)
+		return B_ERROR;
+	
+	int32 colorSpace;
+	if (args.FindInt32("colorspace", &colorSpace) != B_OK)
+		return B_ERROR;
+	
+	backend->SetBits(data, length, offset, (color_space)colorSpace);
+	
+	return B_OK;
+}
+
+
+int32_t
+PBitmapAddChild(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PBitmap *parent = static_cast<PBitmap*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	PBitmapBackend *backend = (PBitmapBackend*)parent->GetBackend();
+	
+	PArgs args(in);
+	int64 childID;
+	if (args.FindInt64("id", &childID) != B_OK)
+		return B_ERROR;
+	
+	PObject *childObj = BROKER->FindObject(childID);
+	if (!childObj->UsesInterface("PView"))
+		return B_BAD_DATA;
+	
+	PView *childPView = (PView*)childObj;
+	
+	status_t status = B_OK;
+	if (backend->Lock())
+	{
+		if (backend->Flags() & B_BITMAP_ACCEPTS_VIEWS)
+			backend->AddChild(childPView->GetView());
+		else
+			status = B_NOT_ALLOWED;
+		
+		backend->Unlock();
+	}
+	else
+		status = B_ERROR;
+	
+	return status;
+}
+
+
+int32_t
+PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PBitmap *parent = static_cast<PBitmap*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	PBitmapBackend *backend = (PBitmapBackend*)parent->GetBackend();
+	
+	PArgs args(in);
+	int64 childID;
+	if (args.FindInt64("id", &childID) != B_OK)
+		return B_ERROR;
+	
+	PObject *childObj = BROKER->FindObject(childID);
+	if (!childObj->UsesInterface("PView"))
+		return B_BAD_DATA;
+	
+	PView *childPView = (PView*)childObj;
+	
+	status_t status = B_OK;
+	if (backend->Lock())
+	{
+		if (backend->Flags() & B_BITMAP_ACCEPTS_VIEWS)
+			backend->RemoveChild(childPView->GetView());
+		else
+			status = B_NOT_ALLOWED;
+		
+		backend->Unlock();
+	}
+	else
+		status = B_ERROR;
+	
+	return status;
+}
+
+
+int32_t
+PBitmapCountChildren(void *pobject, PArgList *in, PArgList *out)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PBitmap *parent = static_cast<PBitmap*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	PBitmapBackend *backend = (PBitmapBackend*)parent->GetBackend();
+	
+	PArgs args(out);
+	int32 count = -1;
+	
+	if (backend->Lock())
+	{
+		count = backend->CountChildren();
+		backend->Unlock();
+	}
+	else
+		return B_ERROR;
+	
+	args.MakeEmpty();
+	args.AddInt32("value", count);
+	
+	return B_OK;
+}
+
 

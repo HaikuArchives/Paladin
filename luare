@@ -72,36 +72,43 @@ else
 end
 
 -- Operate on all instances if a line was not specified
-file = io.open(filePath)
-if (file == nil) then
-	print("Couldn't open " .. filePath)
-	return 1
-end
-
-local outFile = io.open(newPath, "w+")
-
 if (matchLine < 0) then
-	local fileData = file:read("*all*")
+	local file = io.open(filePath)
+	if (file == nil) then
+		print("Couldn't open " .. filePath)
+		return 1
+	end
 	
-	outData = string.gsub(fileData, pattern, replacement)
-	outFile:write(outData)
+	local fileData = file:read("*all*")
+	file:close()
+	
+	local outFile = io.open(newPath, "w+")
+	outFile:write(string.gsub(fileData, pattern, replacement))
+	outFile:close()
 else
 	local fileTable = {}
+	
+	file = io.open(filePath)
+	if (file == nil) then
+		print("Couldn't open " .. filePath)
+		return 1
+	end
+	
 	for line in file:lines() do
 		table.insert(fileTable, line)
 	end
+	file:close()
 	
 	if (fileTable[matchLine]) then
 		fileTable[matchLine] = string.gsub(fileTable[matchLine], pattern,
 											replacement)
 	end
 	
+	local outFile = io.open(newPath, "w+")
 	local lineCount = table.maxn(fileTable)
 	for line = 1, lineCount do
 		outFile:write(fileTable[line] .. "\n")
 	end
+	outFile:close()
 end
-
-file:close()
-outFile:close()
 

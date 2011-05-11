@@ -2,6 +2,7 @@
 
 #include <Alert.h>
 #include <Font.h>
+#include <Roster.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <StringView.h>
@@ -15,6 +16,7 @@ enum
 	M_FIND = 'find',
 	M_REPLACE = 'repl',
 	M_REPLACE_ALL = 'rpla',
+	M_SHOW_RESULT = 'shrs',
 	M_TOGGLE_REGEX = 'tgrx',
 	M_TOGGLE_CASE_INSENSITIVE = 'tgci',
 	M_TOGGLE_MATCH_WORD = 'tgmw',
@@ -170,6 +172,7 @@ FindResultsWindow::FindResultsWindow(void)
 	fResultList = new DListView(r, "resultlist", B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL);
 	scroll = fResultList->MakeScrollView("resultscroll", true, true);
 	top->AddChild(scroll);
+	fResultList->SetInvocationMessage(new BMessage(M_SHOW_RESULT));
 	
 	BMenu *menu = new BMenu("Search");
 	menu->AddItem(new BMenuItem("Find", new BMessage(M_FIND), 'F', B_COMMAND_KEY));
@@ -221,6 +224,22 @@ FindResultsWindow::MessageReceived(BMessage *msg)
 		case M_REPLACE_ALL:
 		{
 			SpawnThread(THREAD_REPLACE_ALL);
+			break;
+		}
+		case M_SHOW_RESULT:
+		{
+			GrepListItem *item = (GrepListItem*)fResultList->ItemAt(
+													fResultList->CurrentSelection());
+			if (item)
+			{
+				LaunchHelper launcher("application/x-vnd.dw-PalEdit");
+				BString arg;
+				DPath path(item->GetRef());
+				
+				arg << "+" << (item->GetLine() + 1);
+				launcher << arg << path.GetFullPath();
+				launcher.Launch();
+			}
 			break;
 		}
 		case M_TOGGLE_REGEX:
@@ -436,7 +455,62 @@ FindResultsWindow::Replace(void)
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	
-	// This one will require some messaging work with PalEdit.
+	// Luare really makes things *so* much easier than messing around with sed. :)
+	
+	Lock();
+	BString errorLog;
+	
+	int32 i = 0;
+	GrepListItem *gitem = (GrepListItem*)fResultList->ItemAt(fResultList->CurrentSelection(i));
+	i++;
+	while (gitem)
+	{
+		BString replaceTerms;
+		replaceTerms << "'" << fFindBox->Text() << "' '" << fReplaceBox->Text()
+					<< "'";
+		
+		
+		DPath file(gitem->GetRef());
+
+		ShellHelper shell;
+		shell << "luare" << replaceTerms;
+		shell.AddEscapedArg(file.GetFullPath());
+		shell.AddEscapedArg(file.GetFullPath());
+		
+		BString lineArg;
+		lineArg << "+" << (gitem->GetLine());
+		shell.AddArg(lineArg);
+		
+		int32 outvalue = shell.Run();
+		if (outvalue)
+		{
+			// append file name to list of files with error conditions and notify
+			// user of problems at the end so as not to annoy them.
+			errorLog << "\t" << file.GetFileName() << "\n";
+		}
+		
+		// Allow window updates from time to time
+		if (i % 5 == 0)
+		{
+			Unlock();
+			Lock();
+		}
+
+		gitem = (GrepListItem*)fResultList->ItemAt(fResultList->CurrentSelection(i));
+		i++;
+	}
+	Unlock();
+	
+	if (errorLog.CountChars() > 0)
+	{
+		BString errorString = "The following files had problems replacing the search terms:\n";
+		errorString << errorLog;
+		
+		BAlert *alert = new BAlert("Paladin", errorString.String(), "OK");
+		alert->Go();
+	}
+	
+	PostMessage(M_FIND);
 }
 
 void

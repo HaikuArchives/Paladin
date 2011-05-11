@@ -4,31 +4,49 @@
 #include "DWindow.h"
 
 #include <Button.h>
-#include <CheckBox.h>
-#include <Menu.h>
 #include <MenuBar.h>
-#include <TextView.h>
 
-class RefListView;
+#include "DPath.h"
+#include "ObjectList.h"
+
+class DTextView;
+class DListView;
 
 class FindWindow : public DWindow
 {
 public:
 						FindWindow(void);
 			void		MessageReceived(BMessage *msg);
-			
+
 private:
-			BButton		*fFind;
-						
-			BTextView	*fFindBox;
-			
-			BMenu		*fProjectMenu;
-			
-			BCheckBox	*fUseSources,
-						*fUseHeaders,
-						*fUseOtherText;
-			
-			RefListView	*fFileList;
+			void	SpawnThread(int8 findMode);
+			void	AbortThread(void);
+	static	int32	FinderThread(void *data);
+			void	FindResults(void);
+			void	Replace(void);
+			void	ReplaceAll(void);
+			void	EnableReplace(bool value);
+	
+	DTextView		*fFindBox,
+					*fReplaceBox;
+	
+	BButton			*fFindButton,
+					*fReplaceButton,
+					*fReplaceAllButton;
+	
+	DListView		*fResultList;
+	BMenuBar		*fMenuBar;
+	
+	bool			fIsRegEx,
+					fIgnoreCase,
+					fMatchWord;
+	
+	thread_id		fThreadID;
+	int8			fThreadMode;
+	vint32			fThreadQuitFlag;
+	
+	BObjectList<BString>	fFileList;
+	DPath					fWorkingDir;
 };
 
 

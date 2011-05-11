@@ -133,29 +133,13 @@ fi
 jam -q -j"$CPUCOUNT"
 cd ..
 
-#cd PDesigner
-
-# PDesigner needs a link to libcharlemagne's directory for the includes
-#ln -s ../libcharlemagne
-#BuildNoDebug PDesigner
-#cd ..
-
-cd PInstallEngine
-BuildNoDebug PInstallEngine
-cd ..
-
-cd PSfx
-BuildNoDebug PSfx
-
-# Make sure there's a link to make calling it easier
-if [ ! -e /boot/home/config/bin/PSfx ]
-then
-	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/PSfx"
-fi
-cd ..
-
 cd SymbolFinder
 BuildNoDebug SymbolFinder
+cd ..
+
+cd uncrustify
+configure --prefix=`finddir B_COMMON_DIRECTORY`
+make -j$CPUCOUNT
 cd ..
 
 # ----------------------------------------------------------------------------

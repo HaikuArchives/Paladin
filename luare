@@ -39,7 +39,7 @@ filePath = arg[argIndex]
 
 if (filePath == nil) then
 	print("Usage:\n\tluasub -i file [newname]")
-	print("\tluasub pattern replacement file [newname]")
+	print("\tluasub pattern replacement file [newname] [+line]")
 	return 0
 end
 
@@ -52,22 +52,56 @@ end
 
 filePath = arg[argIndex]
 newPath = arg[argIndex + 1]
+matchLine = arg[argIndex + 2]
+
 if (newPath == nil) then
 	newPath = filePath.. ".new"
 end
 
+if (newPath:sub(1,1) == "+") then
+	matchLine = tonumber(newPath:sub(2))
+	newPath = filePath.. ".new"
+	
+	print("Matching at line " .. matchLine)
+else
+	if (not matchLine) then
+		matchLine = -1
+	else
+		matchLine = tonumber(matchLine)
+	end
+end
+
+-- Operate on all instances if a line was not specified
 file = io.open(filePath)
 if (file == nil) then
 	print("Couldn't open " .. filePath)
 	return 1
 end
 
-fileData = file:read("*all*")
-file:close()
-
-outData = string.gsub(fileData, pattern, replacement)
-
 local outFile = io.open(newPath, "w+")
-outFile:write(outData)
+
+if (matchLine < 0) then
+	local fileData = file:read("*all*")
+	
+	outData = string.gsub(fileData, pattern, replacement)
+	outFile:write(outData)
+else
+	local fileTable = {}
+	for line in file:lines() do
+		table.insert(fileTable, line)
+	end
+	
+	if (fileTable[matchLine]) then
+		fileTable[matchLine] = string.gsub(fileTable[matchLine], pattern,
+											replacement)
+	end
+	
+	local lineCount = table.maxn(fileTable)
+	for line = 1, lineCount do
+		outFile:write(fileTable[line] .. "\n")
+	end
+end
+
+file:close()
 outFile:close()
 

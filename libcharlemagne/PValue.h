@@ -6,6 +6,8 @@
 #include <String.h>
 #include <Message.h>
 
+#include "ObjectList.h"
+
 class PObject;
 
 class PValue
@@ -19,6 +21,8 @@ public:
 		
 		virtual	status_t	SetValue(PValue *pval) { return B_OK; }
 		virtual	status_t	GetValue(PValue *pval) { return B_OK; }
+		
+		virtual	PValue *	Duplicate(void) const { return new PValue(); }
 		
 				BString		*type;
 };
@@ -37,6 +41,8 @@ public:
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
+		
+		virtual	PValue *	Duplicate(void) const;
 		
 		inline	bool 		operator==(const BoolValue &from) { return *value = *from.value; }
 		inline	bool 		operator==(const bool &from) { return *value = from; }
@@ -62,6 +68,8 @@ public:
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
+		
+		virtual	PValue *	Duplicate(void) const;
 		
 		inline	StringValue &	operator=(const StringValue &from) { *value = *from.value; return *this; }
 		inline	StringValue &	operator=(const BString &from) { *value = from; return *this; }
@@ -95,6 +103,8 @@ public:
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
+		
+		virtual	PValue *	Duplicate(void) const;
 		
 		inline	IntValue &	operator=(const IntValue &from) { *value = *from.value; return *this; }
 		inline	IntValue &	operator=(const int64 &from) { *value = from; return *this; }
@@ -141,6 +151,8 @@ public:
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
 		
+		virtual	PValue *	Duplicate(void) const;
+		
 		inline	FloatValue &	operator=(const FloatValue &from) { *value = *from.value; return *this; }
 		inline	FloatValue &	operator=(const float &from) { *value = from; return *this; }
 		
@@ -186,6 +198,8 @@ public:
 				void		SetValue(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255);
 		virtual	status_t	GetValue(PValue *value);
 		
+		virtual	PValue *	Duplicate(void) const;
+		
 		ColorValue &	operator=(const ColorValue &from);
 		ColorValue &	operator=(const rgb_color &from);
 		
@@ -221,6 +235,8 @@ public:
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
 		
+		virtual	PValue *	Duplicate(void) const;
+		
 		inline	BRect 		operator==(const RectValue &from) { return *value = *from.value; }
 		inline	BRect 		operator==(const BRect &from) { return *value = from; }
 		inline	RectValue &	operator=(const RectValue &from) { *value = *from.value; return *this; }
@@ -243,6 +259,8 @@ public:
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
+		
+		virtual	PValue *	Duplicate(void) const;
 		
 		inline	BPoint 		operator==(const PointValue &from) { return *value = *from.value; }
 		inline	BPoint 		operator==(const BPoint &from) { return *value = from; }
@@ -268,6 +286,8 @@ public:
 		virtual	status_t		SetValue(PValue *value);
 		virtual	status_t		GetValue(PValue *value);
 		
+		virtual	PValue *		Duplicate(void) const;
+		
 		inline	BMessage 		operator==(const MessageValue &from) { return *value = *from.value; }
 		inline	BMessage 		operator==(const BMessage &from) { return *value = from; }
 		inline	MessageValue &	operator=(const MessageValue &from) { *value = *from.value; return *this; }
@@ -276,5 +296,26 @@ public:
 				BMessage		*value;
 };
 
+
+class ListValue : public PValue
+{
+public:
+							ListValue(void);
+							ListValue(const ListValue &from);
+							ListValue(BObjectList<PValue> from);
+							~ListValue(void);
+		
+		virtual bool		AcceptsType(PValue *pval);
+		virtual bool		ReturnsType(PValue *pval);
+		
+		virtual	status_t	SetValue(PValue *value);
+		virtual	status_t	GetValue(PValue *value);
+		
+		virtual	PValue *	Duplicate(void) const;
+		
+		inline	ListValue &	operator=(const ListValue &from);
+		
+				BObjectList<PValue>	*value;
+};
 
 #endif

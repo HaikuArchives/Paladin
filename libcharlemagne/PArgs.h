@@ -40,6 +40,8 @@ public:
 								uint8 blue, uint8 alpha = 255);
 	int32				AddColor(const char *name, rgb_color color);
 	int32				AddPointer(const char *name, void *arg);
+	int32				AddList(const char *name, const PArgList *list);
+	int32				AddList(const char *name, const PArgs &list);
 	
 	PArgListItem *		FindItem(const char *name, int32 index = 0);
 	int32				FindInt8(const char *name, int8 *out);

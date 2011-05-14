@@ -44,6 +44,14 @@ destroy_pargitem(PArgListItem *node)
 	if (node->next && node->next->prev == node)
 		node->next->prev = node->prev;
 	
+	if (node->data)
+	{
+		if (node->type == PARG_LIST)
+			destroy_parglist((PArgList*)node->data);
+		else
+			free(node->data);
+	}
+	
 	free(node->name);
 	
 	free(node);
@@ -178,6 +186,11 @@ print_pargitem(PArgListItem *node)
 			printf("Type: pointer\t%p\n",node->data);
 			break;
 		}
+		case PARG_LIST:
+		{
+			printf("Type: list\t%p\n",node->data);
+			break;
+		}
 		default:
 			break;
 	}
@@ -221,7 +234,7 @@ destroy_parglist(PArgList *list)
 
 
 void
-copy_parglist(PArgList *from, PArgList *to)
+copy_parglist(const PArgList *from, PArgList *to)
 {
 	/* Empties the target list and makes it a duplicate copy of data */
 	if (!from || !to)
@@ -370,18 +383,32 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 	
 	if (!arg || argsize < 1 || type >= PARG_END)
 	{
-		free(node->data);
+		if (node->type == PARG_LIST)
+			destroy_parglist((PArgList*)node->data);
+		else
+			free(node->data);
+		
 		node->data = NULL;
 		node->datasize = 0;
 		node->type = PARG_END;
 		return;
 	}
 	
-	if (node->data)
-		node->data = realloc(node->data, argsize);
+	if (type == PARG_LIST)
+	{
+		if (node->data)
+			empty_parglist((PArgList*)node->data);
+		else
+			node->data = create_parglist();
+	}
 	else
-		node->data = malloc(argsize);
-	
+	{
+		if (node->data)
+			node->data = realloc(node->data, argsize);
+		else
+			node->data = malloc(argsize);
+	}
+		
 	switch (type)
 	{
 		case PARG_RAW:
@@ -481,6 +508,13 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 		case PARG_POINTER:
 		{
 			*((void**)node->data) = *((void**)arg);
+			node->datasize = argsize;
+			node->type = type;
+			break;
+		}
+		case PARG_LIST:
+		{
+			copy_parglist((PArgList*)arg, (PArgList*)node->data);
 			node->datasize = argsize;
 			node->type = type;
 			break;
@@ -602,6 +636,13 @@ int32_t
 add_parg_pointer(PArgList *list, const char *name, void *arg)
 {
 	return add_parg(list, name, &arg, sizeof(void *), PARG_POINTER);
+}
+
+
+int32_t
+add_parg_list(PArgList *list, const char *name, const PArgList *childlist)
+{
+	return add_parg(list, name, &childlist, sizeof(void *), PARG_LIST);
 }
 
 
@@ -764,7 +805,7 @@ find_parg_float(PArgList *list, const char *name, float *out)
 		return B_ERROR;
 	
 	PArgListItem *item = find_parg(list, name, NULL);
-	if (!item || item->type != PARG_INT64)
+	if (!item || item->type != PARG_FLOAT)
 		return B_NAME_NOT_FOUND;
 	
 	*out = *((float*)item->data);
@@ -779,7 +820,7 @@ find_parg_double(PArgList *list, const char *name, double *out)
 		return B_ERROR;
 	
 	PArgListItem *item = find_parg(list, name, NULL);
-	if (!item || item->type != PARG_INT64)
+	if (!item || item->type != PARG_DOUBLE)
 		return B_NAME_NOT_FOUND;
 	
 	*out = *((double*)item->data);
@@ -794,7 +835,7 @@ find_parg_bool(PArgList *list, const char *name, bool *out)
 		return B_ERROR;
 	
 	PArgListItem *item = find_parg(list, name, NULL);
-	if (!item || item->type != PARG_INT64)
+	if (!item || item->type != PARG_BOOL)
 		return B_NAME_NOT_FOUND;
 	
 	*out = *((bool*)item->data);
@@ -809,7 +850,7 @@ find_parg_char(PArgList *list, const char *name, char *out)
 		return B_ERROR;
 	
 	PArgListItem *item = find_parg(list, name, NULL);
-	if (!item || item->type != PARG_INT64)
+	if (!item || item->type != PARG_CHAR)
 		return B_NAME_NOT_FOUND;
 	
 	*out = *((char*)item->data);
@@ -900,10 +941,25 @@ find_parg_pointer(PArgList *list, const char *name, void **out)
 		return B_ERROR;
 	
 	PArgListItem *item = find_parg(list, name, NULL);
-	if (!item || item->type != PARG_INT64)
+	if (!item || item->type != PARG_POINTER)
 		return B_NAME_NOT_FOUND;
 	
 	*out = item->data;
+	return B_OK;
+}
+
+
+int32_t
+find_parg_list(PArgList *list, const char *name, PArgList **out)
+{
+	if (!list || !name || !out)
+		return B_ERROR;
+	
+	PArgListItem *item = find_parg(list, name, NULL);
+	if (!item || item->type != PARG_LIST)
+		return B_NAME_NOT_FOUND;
+	
+	*out = (PArgList*)item->data;
 	return B_OK;
 }
 

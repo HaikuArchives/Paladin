@@ -175,7 +175,21 @@ PArgs::AddColor(const char *name, rgb_color color)
 int32
 PArgs::AddPointer(const char *name, void *arg)
 {
-	return add_parg(fArgList, name, &arg, sizeof(void *), PARG_POINTER);
+	return add_parg_pointer(fArgList, name, &arg);
+}
+
+
+int32
+PArgs::AddList(const char *name, const PArgList *list)
+{
+	return add_parg_list(fArgList, name, list);
+}
+
+
+int32
+PArgs::AddList(const char *name, const PArgs &list)
+{
+	return add_parg_list(fArgList, name, list.fArgList);
 }
 
 

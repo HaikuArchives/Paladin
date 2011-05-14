@@ -132,6 +132,13 @@ BoolValue::GetValue(PValue *pval)
 }
 
 
+PValue *
+BoolValue::Duplicate(void) const
+{
+	return new BoolValue(*this);
+}
+
+
 StringValue::StringValue(const StringValue &from)
 {
 	value = new BString(*from.value);
@@ -274,6 +281,13 @@ StringValue::GetValue(PValue *pval)
 }
 
 
+PValue *
+StringValue::Duplicate(void) const
+{
+	return new StringValue(*this);
+}
+
+
 IntValue::IntValue(void)
 {
 	value = new int64(0LL);
@@ -389,6 +403,13 @@ IntValue::GetValue(PValue *pval)
 		return B_BAD_VALUE;
 	
 	return B_OK;
+}
+
+
+PValue *
+IntValue::Duplicate(void) const
+{
+	return new IntValue(*this);
 }
 
 
@@ -510,6 +531,13 @@ FloatValue::GetValue(PValue *pval)
 }
 
 
+PValue *
+FloatValue::Duplicate(void) const
+{
+	return new FloatValue(*this);
+}
+
+
 ColorValue::ColorValue(void)
 {
 	value = new rgb_color;
@@ -617,6 +645,13 @@ ColorValue::GetValue(PValue *pval)
 		return B_BAD_VALUE;
 	
 	return B_OK;
+}
+
+
+PValue *
+ColorValue::Duplicate(void) const
+{
+	return new ColorValue(*this);
 }
 
 
@@ -875,6 +910,14 @@ RectValue::GetValue(PValue *pval)
 }
 
 
+PValue *
+RectValue::Duplicate(void) const
+{
+	return new RectValue(*this);
+}
+
+
+
 PointValue::PointValue(void)
 {
 	value = new BPoint(0,0);
@@ -958,6 +1001,14 @@ PointValue::GetValue(PValue *pval)
 	
 	return B_OK;
 }
+
+
+PValue *
+PointValue::Duplicate(void) const
+{
+	return new PointValue(*this);
+}
+
 
 
 MessageValue::MessageValue(void)
@@ -1044,3 +1095,115 @@ MessageValue::GetValue(PValue *pval)
 	
 	return B_OK;
 }
+
+
+PValue *
+MessageValue::Duplicate(void) const
+{
+	return new MessageValue(*this);
+}
+
+
+
+ListValue::ListValue(void)
+{
+	value = new BObjectList<PValue>(20, true);
+	*type = "list";
+}
+
+ListValue::ListValue(const ListValue &from)
+{
+	value = new BObjectList<PValue>(20, true);
+	*type = "list";
+	*this = from;
+}
+
+
+ListValue::ListValue(BObjectList<PValue> from)
+{
+	value = new BObjectList<PValue>(20, true);
+	*type = "list";
+}
+
+
+ListValue::~ListValue(void)
+{
+	delete value;
+}
+
+
+bool
+ListValue::AcceptsType(PValue *pval)
+{
+	return (pval->type->ICompare("list") == 0);
+}
+
+
+bool
+ListValue::ReturnsType(PValue *pval)
+{
+	return (pval->type->ICompare("list") == 0);
+}
+
+		
+status_t
+ListValue::SetValue(PValue *pval)
+{
+	if (!pval)
+		return B_ERROR;
+	
+	if (pval->type->ICompare("list") == 0)
+	{
+		ListValue *from = dynamic_cast<ListValue*>(pval);
+		if (!from)
+			return B_BAD_VALUE;
+		
+		*this = *from->value;
+	}
+	else
+		return B_BAD_VALUE;
+	
+	return B_OK;
+}
+
+
+status_t
+ListValue::GetValue(PValue *pval)
+{
+	if (!pval)
+		return B_ERROR;
+	
+	if (pval->type->ICompare("list") == 0)
+	{
+		ListValue *list = dynamic_cast<ListValue*>(pval);
+		if (!list)
+			return B_BAD_VALUE;
+		
+		*list = *this;
+	}
+	else
+		return B_BAD_VALUE;
+	
+	return B_OK;
+}
+
+
+PValue *
+ListValue::Duplicate(void) const
+{
+	return new ListValue(*this);
+}
+
+
+ListValue &
+ListValue::operator=(const ListValue &from)
+{
+	value->MakeEmpty();
+	
+	for (int32 i = 0; i < from.value->CountItems(); i++)
+		value->AddItem(from.value->ItemAt(i)->Duplicate());
+	
+	return *this;
+}
+
+

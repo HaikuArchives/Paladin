@@ -44,6 +44,8 @@ enum parg_type_t
 	PARG_COLOR,
 	PARG_POINTER,
 	
+	PARG_LIST,
+	
 	PARG_END
 };
 
@@ -95,7 +97,7 @@ void				print_pargitem(PArgListItem *node);
 PArgList *			create_parglist(void);
 void				destroy_parglist(PArgList *list);
 void				empty_parglist(PArgList *list);
-void				copy_parglist(PArgList *from, PArgList *to);
+void				copy_parglist(const PArgList *from, PArgList *to);
 void				print_parglist(PArgList *list);
 
 int32_t				add_pargitem(PArgList *list, PArgListItem *item);
@@ -124,6 +126,7 @@ int32_t				add_parg_rect(PArgList *list, const char *name, float left,
 int32_t				add_parg_color(PArgList *list, const char *name, uint8_t red,
 									uint8_t green, uint8_t blue, uint8_t alpha);
 int32_t				add_parg_pointer(PArgList *list, const char *name, void *ptr);
+int32_t				add_parg_list(PArgList *list, const char *name, const PArgList *childlist);
 
 PArgListItem *		get_parg_first(PArgList *list);
 PArgListItem *		get_parg_last(PArgList *list);

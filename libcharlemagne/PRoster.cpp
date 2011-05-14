@@ -102,47 +102,61 @@ void
 PRoster::InitMethods(void)
 {
 /*
-			ActivateApp
-			AddToRecentDocuments
-			AddToRecentFolders
-			Broadcast
-			FindApp
-			GetActiveAppInfo
-			GetRecentApps
-			GetRecentDocuments
-			GetRecentFolders
-			GetRunningAppInfo
-			Launch
-			StartWatching
-			StopWatching
+	AddToRecentDocuments
+	AddToRecentFolders
+	GetRecentApps
+	GetRecentDocuments
+	GetRecentFolders
+	GetRunningAppInfo
+	Launch
 */
 	PMethodInterface pmi;
 	
-	// TODO: This needs to be finished once the ListValue interface is complete for
-			argument passing
-	pmi.AddArgument("mimetype", PARG_STRING, "Optional MIME type of a running app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("team", PARG_INT32, "Team ID of the app to activate");
+	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	AddMethod(new PMethod("ActivateApp", PRosterActivateApp, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("list", PARG_LIST, "Argument list containing the message data");
+	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	AddMethod(new PMethod("Broadcast", PRosterBroadcast, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("mimetype", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("list", PARG_LIST, "List containing entry_ref information");
+	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	AddMethod(new PMethod("FindApp", PRosterFindApp, &pmi));
+	pmi.MakeEmpty();
+	
+	pmi.AddArg("mimetype", PARG_STRING, "Optional MIME type of a running app", PMIFLAG_OPTIONAL);
 	pmi.AddReturnValue("list", PARG_LIST, "List of team_id values");
-	AddMethod(new PMethod("GetAppList", PRosterGetAppList, &pmi))
+	AddMethod(new PMethod("GetAppList", PRosterGetAppList, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArgument("mimetype", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddArgument("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
-	AddMethod(new PMethod("GetAppInfo", PRosterGetAppInfo, &pmi))
+	pmi.AddArg("mimetype", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("list", PARG_LIST, "List of lists containing the app_info information");
+	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	AddMethod(new PMethod("GetAppInfo", PRosterGetAppInfo, &pmi));
 	pmi.MakeEmpty();
 	
-	AddMethod(new PMethod("GetActiveAppInfo", PRosterGetActiveAppInfo, &pmi))
+	pmi.AddReturnValue("list", PARG_LIST, "List containing the app_info information");
+	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	AddMethod(new PMethod("GetActiveAppInfo", PRosterGetActiveAppInfo, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArgument("mimetype", PARG_STRING, "MIME type of the possibly running app", PMIFLAG_OPTIONAL);
-	pmi.AddArgument("path", PARG_STRING, "path of the possibly running app", PMIFLAG_OPTIONAL);
-	AddMethod(new PMethod("IsRunning", PRosterIsRunning, &pmi))
+	pmi.AddArg("mimetype", PARG_STRING, "MIME type of the possibly running app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", PARG_STRING, "path of the possibly running app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("value", PARG_BOOL, "True if the specified app is running");
+	AddMethod(new PMethod("IsRunning", PRosterIsRunning, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArgument("mimetype", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddArgument("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
-	AddMethod(new PMethod("TeamFor", PRosterTeamFor, &pmi))
+	pmi.AddArg("mimetype", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("value", PARG_INT32, "team_id of the specified app");
+	AddMethod(new PMethod("TeamFor", PRosterTeamFor, &pmi));
 	pmi.MakeEmpty();
-	
 }
 
 

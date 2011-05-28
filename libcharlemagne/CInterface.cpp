@@ -14,6 +14,10 @@
 
 #pragma mark - argument list item functions
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
 PArgListItem *
 create_pargitem(void)
 {
@@ -130,7 +134,7 @@ print_pargitem(PArgListItem *node)
 		}
 		case PARG_INT32:
 		{
-			printf("Type: int32\t%d\n",*((int32_t*)node->data));
+			printf("Type: int32\t%d\n",*((int*)node->data));
 			break;
 		}
 		case PARG_INT64:
@@ -294,7 +298,7 @@ print_parglist(PArgList *list)
 }
 
 
-int32_t
+int
 add_pargitem(PArgList *list, PArgListItem *item)
 {
 	/* Appends a PArgListItem node to the list */
@@ -319,7 +323,7 @@ add_pargitem(PArgList *list, PArgListItem *item)
 }
 
 
-int32_t
+int
 add_parg(PArgList *list, const char *name, void *arg, size_t argsize, PArgType type)
 {
 	/* Appends an argument to the list */
@@ -347,7 +351,7 @@ add_parg(PArgList *list, const char *name, void *arg, size_t argsize, PArgType t
 }
 
 
-int32_t
+int
 remove_parg(PArgList *list, PArgListItem *node)
 {
 	/* Removes an argument from the list */
@@ -434,7 +438,7 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 		}
 		case PARG_INT32:
 		{
-			*((int32_t*)node->data) = *((int32_t*)arg);
+			*((int*)node->data) = *((int*)arg);
 			node->datasize = argsize;
 			node->type = type;
 			break;
@@ -527,63 +531,63 @@ set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
 }
 
 
-int32_t
+int
 add_parg_int8(PArgList *list, const char *name, int8_t arg)
 {
 	return add_parg(list, name, &arg, sizeof(int8_t), PARG_INT8);
 }
 
 
-int32_t
+int
 add_parg_int16(PArgList *list, const char *name, int16_t arg)
 {
 	return add_parg(list, name, &arg, sizeof(int16_t), PARG_INT16);
 }
 
 
-int32_t
-add_parg_int32(PArgList *list, const char *name, int32_t arg)
+int
+add_parg_int32(PArgList *list, const char *name, int arg)
 {
-	return add_parg(list, name, &arg, sizeof(int32_t), PARG_INT32);
+	return add_parg(list, name, &arg, sizeof(int), PARG_INT32);
 }
 
 
-int32_t
+int
 add_parg_int64(PArgList *list, const char *name, int64_t arg)
 {
 	return add_parg(list, name, &arg, sizeof(int64_t), PARG_INT64);
 }
 
 
-int32_t
+int
 add_parg_float(PArgList *list, const char *name, float arg)
 {
 	return add_parg(list, name, &arg, sizeof(float), PARG_FLOAT);
 }
 
 
-int32_t
+int
 add_parg_double(PArgList *list, const char *name, double arg)
 {
 	return add_parg(list, name, &arg, sizeof(double), PARG_DOUBLE);
 }
 
 
-int32_t
+int
 add_parg_bool(PArgList *list, const char *name, bool arg)
 {
 	return add_parg(list, name, &arg, sizeof(bool), PARG_BOOL);
 }
 
 
-int32_t
+int
 add_parg_char(PArgList *list, const char *name, char arg)
 {
 	return add_parg(list, name, &arg, sizeof(char), PARG_CHAR);
 }
 
 
-int32_t
+int
 add_parg_string(PArgList *list, const char *name, const char *arg)
 {
 	if (!arg)
@@ -593,7 +597,7 @@ add_parg_string(PArgList *list, const char *name, const char *arg)
 }
 
 
-int32_t
+int
 add_parg_point(PArgList *list, const char *name, float x, float y)
 {
 	float data[2];
@@ -604,7 +608,7 @@ add_parg_point(PArgList *list, const char *name, float x, float y)
 }
 
 
-int32_t
+int
 add_parg_rect(PArgList *list, const char *name, float left, float top,
 			float right, float bottom)
 {
@@ -618,28 +622,28 @@ add_parg_rect(PArgList *list, const char *name, float left, float top,
 }
 
 
-int32_t
-add_parg_color(PArgList *list, const char *name, uint8_t red, uint8_t green,
-				uint8_t blue, uint8_t alpha)
+int
+add_parg_color(PArgList *list, const char *name, unsigned char red, unsigned char green,
+				unsigned char blue, unsigned char alpha)
 {
-	uint8_t data[4];
+	unsigned char data[4];
 	data[0] = red;
 	data[1] = green;
 	data[2] = blue;
 	data[3] = alpha;
 	
-	return add_parg(list, name, data, sizeof(uint8_t) * 4, PARG_COLOR);
+	return add_parg(list, name, data, sizeof(unsigned char) * 4, PARG_COLOR);
 }
 
 
-int32_t
+int
 add_parg_pointer(PArgList *list, const char *name, void *arg)
 {
 	return add_parg(list, name, &arg, sizeof(void *), PARG_POINTER);
 }
 
 
-int32_t
+int
 add_parg_list(PArgList *list, const char *name, const PArgList *childlist)
 {
 	return add_parg(list, name, &childlist, sizeof(void *), PARG_LIST);
@@ -675,7 +679,7 @@ get_parg_previous(PArgList *list, PArgListItem *item)
 
 
 PArgListItem *
-get_parg_at(PArgList *list, int32_t index)
+get_parg_at(PArgList *list, int index)
 {
 	if (!list || index < 0 || index > list->itemcount - 1)
 		return NULL;
@@ -716,13 +720,13 @@ find_parg(PArgList *list, const char *name, PArgListItem *startItem)
 
 
 PArgListItem *
-find_parg_index(PArgList *list, int32_t index)
+find_parg_index(PArgList *list, int index)
 {
 	/* Returns an item at the specified index or NULL if the index is out of range */
 	if (!list || index < 0 || index >= list->itemcount)
 		return NULL;
 	
-	int32_t i = 0;
+	int i = 0;
 	PArgListItem *current = list->head;
 	while (i < index)
 	{
@@ -738,7 +742,7 @@ find_parg_index(PArgList *list, int32_t index)
 }
 
 
-int32_t
+int
 find_parg_int8(PArgList *list, const char *name, int8_t *out)
 {
 	if (!list || !name || !out)
@@ -753,7 +757,7 @@ find_parg_int8(PArgList *list, const char *name, int8_t *out)
 }
 
 
-int32_t
+int
 find_parg_int16(PArgList *list, const char *name, int16_t *out)
 {
 	if (!list || !name || !out)
@@ -768,8 +772,8 @@ find_parg_int16(PArgList *list, const char *name, int16_t *out)
 }
 
 
-int32_t
-find_parg_int32(PArgList *list, const char *name, int32_t *out)
+int
+find_parg_int32(PArgList *list, const char *name, int *out)
 {
 	if (!list || !name || !out)
 		return B_ERROR;
@@ -778,12 +782,12 @@ find_parg_int32(PArgList *list, const char *name, int32_t *out)
 	if (!item || item->type != PARG_INT32)
 		return B_NAME_NOT_FOUND;
 	
-	*out = *((int32_t*)item->data);
+	*out = *((int*)item->data);
 	return B_OK;
 }
 
 
-int32_t
+int
 find_parg_int64(PArgList *list, const char *name, int64_t *out)
 {
 	if (!list || !name || !out)
@@ -798,7 +802,7 @@ find_parg_int64(PArgList *list, const char *name, int64_t *out)
 }
 
 
-int32_t
+int
 find_parg_float(PArgList *list, const char *name, float *out)
 {
 	if (!list || !name || !out)
@@ -813,7 +817,7 @@ find_parg_float(PArgList *list, const char *name, float *out)
 }
 
 
-int32_t
+int
 find_parg_double(PArgList *list, const char *name, double *out)
 {
 	if (!list || !name || !out)
@@ -828,7 +832,7 @@ find_parg_double(PArgList *list, const char *name, double *out)
 }
 
 
-int32_t
+int
 find_parg_bool(PArgList *list, const char *name, bool *out)
 {
 	if (!list || !name || !out)
@@ -843,7 +847,7 @@ find_parg_bool(PArgList *list, const char *name, bool *out)
 }
 
 
-int32_t
+int
 find_parg_char(PArgList *list, const char *name, char *out)
 {
 	if (!list || !name || !out)
@@ -858,7 +862,7 @@ find_parg_char(PArgList *list, const char *name, char *out)
 }
 
 
-int32_t
+int
 find_parg_string(PArgList *list, const char *name, char **out)
 {
 	if (!list || !name || !out)
@@ -873,7 +877,7 @@ find_parg_string(PArgList *list, const char *name, char **out)
 }
 
 
-int32_t
+int
 find_parg_point(PArgList *list, const char *name, float *x, float *y)
 {
 	if (!list || !name || !x || !y)
@@ -891,7 +895,7 @@ find_parg_point(PArgList *list, const char *name, float *x, float *y)
 }
 
 
-int32_t
+int
 find_parg_rect(PArgList *list, const char *name, float *left, float *top,
 				float *right, float *bottom)
 {
@@ -912,9 +916,9 @@ find_parg_rect(PArgList *list, const char *name, float *left, float *top,
 }
 
 
-int32_t
-find_parg_color(PArgList *list, const char *name, uint8_t *red, uint8_t *green,
-				uint8_t *blue, uint8_t *alpha)
+int
+find_parg_color(PArgList *list, const char *name, unsigned char *red, unsigned char *green,
+				unsigned char *blue, unsigned char *alpha)
 {
 	if (!list || !name || !red || !green || !blue)
 		return B_ERROR;
@@ -923,7 +927,7 @@ find_parg_color(PArgList *list, const char *name, uint8_t *red, uint8_t *green,
 	if (!item || item->type != PARG_COLOR)
 		return B_NAME_NOT_FOUND;
 	
-	uint8_t *args = (uint8_t*)item->data;
+	unsigned char *args = (unsigned char*)item->data;
 	*red = args[0];
 	*green = args[1];
 	*blue = args[2];
@@ -934,7 +938,7 @@ find_parg_color(PArgList *list, const char *name, uint8_t *red, uint8_t *green,
 }
 
 
-int32_t
+int
 find_parg_pointer(PArgList *list, const char *name, void **out)
 {
 	if (!list || !name || !out)
@@ -949,7 +953,7 @@ find_parg_pointer(PArgList *list, const char *name, void **out)
 }
 
 
-int32_t
+int
 find_parg_list(PArgList *list, const char *name, PArgList **out)
 {
 	if (!list || !name || !out)
@@ -969,25 +973,23 @@ find_parg_list(PArgList *list, const char *name, PArgList **out)
 
 
 bool
-pvalue_accepts_type(void *pval, void *testval)
+pvalue_accepts_type(void *pval, char *type)
 {
 	PValue *value = static_cast<PValue*>(pval);
-	PValue *testvalue = static_cast<PValue*>(testval);
-	return (value && testvalue) ? value->AcceptsType(testvalue) : false;
+	return (value && type) ? value->AcceptsType(type) : false;
 }
 
 
 bool
-pvalue_returns_type(void *pval, void *testval)
+pvalue_returns_type(void *pval, char *type)
 {
 	PValue *value = static_cast<PValue*>(pval);
-	PValue *testvalue = static_cast<PValue*>(testval);
-	return (value && testvalue) ? value->ReturnsType(testvalue) : false;
+	return (value && type) ? value->ReturnsType(type) : false;
 }
 
 
 
-int32_t
+int
 pvalue_copy_value(void *from, void *to)
 {
 	PValue *src = static_cast<PValue*>(from);
@@ -1102,7 +1104,7 @@ pproperty_is_enabled(void *prop)
 
 
 
-int32_t
+int
 pproperty_set_value(void *prop, void *pvalue)
 {
 	PProperty *p = static_cast<PProperty*>(prop);
@@ -1111,7 +1113,7 @@ pproperty_set_value(void *prop, void *pvalue)
 }
 
 
-int32_t
+int
 pproperty_get_value(void *prop, void *pvalue)
 {
 	PProperty *p = static_cast<PProperty*>(prop);
@@ -1164,7 +1166,7 @@ pdata_create(void)
 
 
 void
-pdata_destory(void *pdata)
+pdata_destroy(void *pdata)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	if (pd)
@@ -1191,7 +1193,7 @@ pdata_copy(void *from, void *to)
 
 
 
-int32_t
+int
 pdata_count_properties(void *pdata, const char *name)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1200,14 +1202,14 @@ pdata_count_properties(void *pdata, const char *name)
 
 
 void *
-pdata_property_at(void *pdata, int32_t index)
+pdata_property_at(void *pdata, int index)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	return pd ? pd->PropertyAt(index) : NULL;
 }
 
 
-int32_t
+int
 pdata_index_of_property(void *pdata, void *prop)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1225,7 +1227,7 @@ pdata_find_property(void *pdata, const char *name)
 
 
 bool
-pdata_add_property(void *pdata, void *prop, uint32_t flags, int32_t index)
+pdata_add_property(void *pdata, void *prop, unsigned int flags, int index)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	PProperty *val = static_cast<PProperty*>(prop);
@@ -1234,7 +1236,7 @@ pdata_add_property(void *pdata, void *prop, uint32_t flags, int32_t index)
 
 
 void *
-pdata_remove_property_at(void *pdata, int32_t index)
+pdata_remove_property_at(void *pdata, int index)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	return pd ? pd->RemoveProperty(index) : NULL;
@@ -1251,8 +1253,8 @@ pdata_remove_property(void *pdata, void *prop)
 }
 
 
-uint32_t
-pdata_property_flags_at(void *pdata, int32_t index)
+unsigned int
+pdata_property_flags_at(void *pdata, int index)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	return pd ? pd->PropertyFlagsAt(index) : 0;
@@ -1260,7 +1262,7 @@ pdata_property_flags_at(void *pdata, int32_t index)
 
 
 void
-pdata_set_flags_for_property(void *pdata, void *prop, int32_t flags)
+pdata_set_flags_for_property(void *pdata, void *prop, int flags)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	PProperty *val = static_cast<PProperty*>(prop);
@@ -1269,7 +1271,7 @@ pdata_set_flags_for_property(void *pdata, void *prop, int32_t flags)
 }
 
 
-uint32_t
+unsigned int
 pdata_flags_for_property(void *pdata, void *prop)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1279,7 +1281,7 @@ pdata_flags_for_property(void *pdata, void *prop)
 
 
 
-int32_t
+int
 pdata_set_value_for_property(void *pdata, const char *name, void *pvalue)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1288,7 +1290,7 @@ pdata_set_value_for_property(void *pdata, const char *name, void *pvalue)
 }
 
 
-int32_t
+int
 pdata_get_value_for_property(void *pdata, const char *name, void **pvalue)
 {
 	// TODO: Test this sucker
@@ -1300,7 +1302,7 @@ pdata_get_value_for_property(void *pdata, const char *name, void **pvalue)
 }
 
 
-int32_t
+int
 pdata_set_string_property(void *pdata, const char *name, const char *value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1308,7 +1310,7 @@ pdata_set_string_property(void *pdata, const char *name, const char *value)
 }
 
 
-int32_t
+int
 pdata_set_int_property(void *pdata, const char *name, int64_t value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1316,7 +1318,7 @@ pdata_set_int_property(void *pdata, const char *name, int64_t value)
 }
 
 
-int32_t
+int
 pdata_set_bool_property(void *pdata, const char *name, bool value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1324,7 +1326,7 @@ pdata_set_bool_property(void *pdata, const char *name, bool value)
 }
 
 
-int32_t
+int
 pdata_set_float_property(void *pdata, const char *name, float value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1332,7 +1334,7 @@ pdata_set_float_property(void *pdata, const char *name, float value)
 }
 
 
-int32_t
+int
 pdata_set_rect_property(void *pdata, const char *name, float left, float top,
 						float right, float bottom)
 {
@@ -1342,7 +1344,7 @@ pdata_set_rect_property(void *pdata, const char *name, float left, float top,
 }
 
 
-int32_t
+int
 pdata_set_point_property(void *pdata, const char *name, float x, float y)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1351,9 +1353,9 @@ pdata_set_point_property(void *pdata, const char *name, float x, float y)
 }
 
 
-int32_t
-pdata_set_color_property(void *pdata, const char *name, uint8_t red,
-						uint8_t green, uint8_t blue, uint8_t alpha)
+int
+pdata_set_color_property(void *pdata, const char *name, unsigned char red,
+						unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	rgb_color color = { red, green, blue, alpha };
@@ -1362,7 +1364,7 @@ pdata_set_color_property(void *pdata, const char *name, uint8_t red,
 
 
 
-int32_t
+int
 pdata_get_string_property(void *pdata, const char *name, char **out)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1384,7 +1386,7 @@ pdata_get_string_property(void *pdata, const char *name, char **out)
 }
 
 
-int32_t
+int
 pdata_get_int_property(void *pdata, const char *name, int64_t *value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1392,7 +1394,7 @@ pdata_get_int_property(void *pdata, const char *name, int64_t *value)
 }
 
 
-int32_t
+int
 pdata_get_bool_property(void *pdata, const char *name, bool *value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1400,7 +1402,7 @@ pdata_get_bool_property(void *pdata, const char *name, bool *value)
 }
 
 
-int32_t
+int
 pdata_get_float_property(void *pdata, const char *name, float *value)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1408,7 +1410,7 @@ pdata_get_float_property(void *pdata, const char *name, float *value)
 }
 
 
-int32_t
+int
 pdata_get_rect_property(void *pdata, const char *name, float *left, float *top,
 						float *right, float *bottom)
 {
@@ -1432,7 +1434,7 @@ pdata_get_rect_property(void *pdata, const char *name, float *left, float *top,
 }
 
 
-int32_t
+int
 pdata_get_point_property(void *pdata, const char *name, float *x, float *y)
 {
 	PData *pd = static_cast<PData*>(pdata);
@@ -1453,9 +1455,9 @@ pdata_get_point_property(void *pdata, const char *name, float *x, float *y)
 }
 
 
-int32_t
-pdata_get_color_property(void *pdata, const char *name, uint8_t *red,
-						uint8_t *green, uint8_t *blue, uint8_t *alpha)
+int
+pdata_get_color_property(void *pdata, const char *name, unsigned char *red,
+						unsigned char *green, unsigned char *blue, unsigned char *alpha)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	if (pd && red && green && blue)
@@ -1520,7 +1522,7 @@ pobjectspace_shutdown(void)
 
 
 	
-int32_t
+int
 pobjectspace_count_types(void)
 {
 	return BROKER->CountTypes();
@@ -1528,7 +1530,7 @@ pobjectspace_count_types(void)
 
 
 void
-pobjectspace_type_at(int32_t index, char **out)
+pobjectspace_type_at(int index, char **out)
 {
 	BString string(BROKER->TypeAt(index));
 	*out = string.CountChars() ? strdup(string.String()) : NULL;
@@ -1536,7 +1538,7 @@ pobjectspace_type_at(int32_t index, char **out)
 
 
 void
-pobjectspace_friendly_type_at(int32_t index, char **out)
+pobjectspace_friendly_type_at(int index, char **out)
 {
 	BString string(BROKER->FriendlyTypeAt(index));
 	*out = string.CountChars() ? strdup(string.String()) : NULL;
@@ -1550,7 +1552,7 @@ pobjectspace_find_object(uint64_t id)
 }
 
 
-int32_t
+int
 run_app(const char *signature, MethodFunction setupFunc)
 {
 	PApplication *app = (PApplication*)MakeObject("PApplication");
@@ -1558,7 +1560,7 @@ run_app(const char *signature, MethodFunction setupFunc)
 	if (setupFunc)
 		app->ConnectEvent("AppSetup", setupFunc);
 	
-	return (int32_t)app->Run(signature);
+	return (int)app->Run(signature);
 }
 
 
@@ -1595,7 +1597,7 @@ pobject_delete(void *pobj)
 }
 
 
-uint64_t
+unsigned long
 pobject_get_id(void *pobj)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
@@ -1603,7 +1605,7 @@ pobject_get_id(void *pobj)
 }
 
 
-int32_t
+int
 pobject_run_method(void *pobj, const char *name, PArgList *in,
 										PArgList *out)
 {
@@ -1621,14 +1623,14 @@ pobject_find_method(void *pobj, const char *name)
 
 
 void *
-pobject_method_at(void *pobj, int32_t index)
+pobject_method_at(void *pobj, int index)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
 	return obj ? obj->MethodAt(index) : NULL;
 }
 
 
-int32_t
+int
 pobject_count_methods(void *pobj)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
@@ -1645,7 +1647,7 @@ pobject_uses_interface(void *pobj, const char *name)
 
 
 void
-pobject_interface_at(void *pobj, int32_t index, char **out)
+pobject_interface_at(void *pobj, int index, char **out)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
 	if (!obj)
@@ -1656,7 +1658,7 @@ pobject_interface_at(void *pobj, int32_t index, char **out)
 }
 
 
-int32_t
+int
 pobject_count_interfaces(void *pobj)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
@@ -1681,7 +1683,7 @@ pobject_find_event(void *pobj, const char *name)
 }
 
 
-int32_t
+int
 pobject_run_event(void *pobj, const char *name, PArgList *in,
 										PArgList *out)
 {
@@ -1691,14 +1693,14 @@ pobject_run_event(void *pobj, const char *name, PArgList *in,
 
 
 void *
-pobject_event_at(void *pobj, int32_t index)
+pobject_event_at(void *pobj, int index)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
 	return obj ? obj->MethodAt(index) : NULL;
 }
 
 
-int32_t
+int
 pobject_count_events(void *pobj)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
@@ -1706,7 +1708,7 @@ pobject_count_events(void *pobj)
 }
 
 
-int32_t
+int
 pobject_connect_event(void *pobj, const char *name,
 						MethodFunction func)
 {
@@ -1735,7 +1737,7 @@ pmethodinterface_destroy(void *pminterface)
 
 
 void 
-pmethodinterface_set_arg(void *pminterface, int32_t index, const char *name,
+pmethodinterface_set_arg(void *pminterface, int index, const char *name,
 											PArgType type, const char *description)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1755,7 +1757,7 @@ pmethodinterface_add_arg(void *pminterface, const char *name, PArgType type,
 
 
 void 
-pmethodinterface_remove_arg(void *pminterface, int32_t index, const char *name,
+pmethodinterface_remove_arg(void *pminterface, int index, const char *name,
 											PArgType type, const char *description)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1765,7 +1767,7 @@ pmethodinterface_remove_arg(void *pminterface, int32_t index, const char *name,
 
 
 void 
-pmethodinterface_arg_name_at(void *pminterface, int32_t index, char **out)
+pmethodinterface_arg_name_at(void *pminterface, int index, char **out)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
@@ -1774,7 +1776,7 @@ pmethodinterface_arg_name_at(void *pminterface, int32_t index, char **out)
 
 
 PArgType
-pmethodinterface_arg_type_at(void *pminterface, int32_t index)
+pmethodinterface_arg_type_at(void *pminterface, int index)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
@@ -1785,7 +1787,7 @@ pmethodinterface_arg_type_at(void *pminterface, int32_t index)
 
 
 void 
-pmethodinterface_arg_desc_at(void *pminterface, int32_t index, char **out)
+pmethodinterface_arg_desc_at(void *pminterface, int index, char **out)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
@@ -1793,7 +1795,7 @@ pmethodinterface_arg_desc_at(void *pminterface, int32_t index, char **out)
 }
 
 
-int32_t 
+int 
 pmethodinterface_count_args(void *pminterface)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1803,7 +1805,7 @@ pmethodinterface_count_args(void *pminterface)
 }
 
 
-int32_t 
+int 
 pmethodinterface_find_arg(void *pminterface, const char *name)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1814,7 +1816,7 @@ pmethodinterface_find_arg(void *pminterface, const char *name)
 
 
 void 
-pmethodinterface_set_rval(void *pminterface, int32_t index, const char *name,
+pmethodinterface_set_rval(void *pminterface, int index, const char *name,
 											PArgType type, const char *description)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1834,7 +1836,7 @@ pmethodinterface_add_rval(void *pminterface, const char *name, PArgType type,
 
 
 void 
-pmethodinterface_remove_rval(void *pminterface, int32_t index, const char *name,
+pmethodinterface_remove_rval(void *pminterface, int index, const char *name,
 											PArgType type, const char *description)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1844,7 +1846,7 @@ pmethodinterface_remove_rval(void *pminterface, int32_t index, const char *name,
 
 
 void 
-pmethodinterface_rval_name_at(void *pminterface, int32_t index, char **out)
+pmethodinterface_rval_name_at(void *pminterface, int index, char **out)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
@@ -1853,7 +1855,7 @@ pmethodinterface_rval_name_at(void *pminterface, int32_t index, char **out)
 
 
 PArgType
-pmethodinterface_rval_type_at(void *pminterface, int32_t index)
+pmethodinterface_rval_type_at(void *pminterface, int index)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
@@ -1864,7 +1866,7 @@ pmethodinterface_rval_type_at(void *pminterface, int32_t index)
 
 
 void 
-pmethodinterface_rval_desc_at(void *pminterface, int32_t index, char **out)
+pmethodinterface_rval_desc_at(void *pminterface, int index, char **out)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)
@@ -1872,7 +1874,7 @@ pmethodinterface_rval_desc_at(void *pminterface, int32_t index, char **out)
 }
 
 
-int32_t 
+int 
 pmethodinterface_count_rvals(void *pminterface)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1882,7 +1884,7 @@ pmethodinterface_count_rvals(void *pminterface)
 }
 
 
-int32_t 
+int 
 pmethodinterface_find_rval(void *pminterface, const char *name)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
@@ -1983,7 +1985,7 @@ pmethod_get_function(void *pmethod)
 }
 
 
-int32_t 
+int 
 pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out)
 {
 	PMethod *pm = static_cast<PMethod*>(pmethod);
@@ -1992,3 +1994,6 @@ pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out)
 }
 
 
+#ifdef __cplusplus
+	}
+#endif

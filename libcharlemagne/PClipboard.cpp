@@ -128,8 +128,6 @@ PClipboard::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	BClipboard *backend = (BClipboard*)fBackend;
-	
 	BoolValue boolval;
 	ColorValue colorval;
 	FloatValue floatval;

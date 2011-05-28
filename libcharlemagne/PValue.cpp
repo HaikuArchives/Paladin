@@ -43,24 +43,24 @@ BoolValue::~BoolValue(void)
 
 
 bool
-BoolValue::AcceptsType(PValue *pval)
+BoolValue::AcceptsType(char *type)
 {
-	if (pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
 
 
 bool
-BoolValue::ReturnsType(PValue *pval)
+BoolValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
@@ -167,27 +167,27 @@ StringValue::~StringValue(void)
 
 
 bool
-StringValue::AcceptsType(PValue *pval)
+StringValue::AcceptsType(char *type)
 {
-	if (pval->type->ICompare("string") == 0 ||
-		pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("rect") == 0 ||
-		pval->type->ICompare("point") == 0 ||
-		pval->type->ICompare("color") == 0)
+	if (strcasecmp(type, "string") == 0 ||
+		strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "rect") == 0 ||
+		strcasecmp(type, "point") == 0 ||
+		strcasecmp(type, "color") == 0)
 		return true;
 	return false;
 }
 
 
 bool
-StringValue::ReturnsType(PValue *pval)
+StringValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("string") == 0 ||
-		pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0)
+	if (strcasecmp(type, "string") == 0 ||
+		strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0)
 		return true;
 	return false;
 }
@@ -316,24 +316,24 @@ IntValue::~IntValue(void)
 
 
 bool
-IntValue::AcceptsType(PValue *pval)
+IntValue::AcceptsType(char *type)
 {
-	if (pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
 
 
 bool
-IntValue::ReturnsType(PValue *pval)
+IntValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
@@ -441,24 +441,24 @@ FloatValue::~FloatValue(void)
 
 
 bool
-FloatValue::AcceptsType(PValue *pval)
+FloatValue::AcceptsType(char *type)
 {
-	if (pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
 
 
 bool
-FloatValue::ReturnsType(PValue *pval)
+FloatValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("bool") == 0 ||
-		pval->type->ICompare("int") == 0 ||
-		pval->type->ICompare("float") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
@@ -579,17 +579,17 @@ ColorValue::~ColorValue(void)
 
 
 bool
-ColorValue::AcceptsType(PValue *pval)
+ColorValue::AcceptsType(char *type)
 {
-	return (pval->type->ICompare("color") == 0);
+	return (strcasecmp(type, "color") == 0);
 }
 
 
 bool
-ColorValue::ReturnsType(PValue *pval)
+ColorValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("color") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "color") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
@@ -851,17 +851,17 @@ RectValue::~RectValue(void)
 
 
 bool
-RectValue::AcceptsType(PValue *pval)
+RectValue::AcceptsType(char *type)
 {
-	return (pval->type->ICompare("rect") == 0);
+	return (strcasecmp(type, "rect") == 0);
 }
 
 
 bool
-RectValue::ReturnsType(PValue *pval)
+RectValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("rect") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "rect") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
@@ -945,17 +945,17 @@ PointValue::~PointValue(void)
 
 
 bool
-PointValue::AcceptsType(PValue *pval)
+PointValue::AcceptsType(char *type)
 {
-	return (pval->type->ICompare("point") == 0);
+	return (strcasecmp(type, "point") == 0);
 }
 
 
 bool
-PointValue::ReturnsType(PValue *pval)
+PointValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("point") == 0 ||
-		pval->type->ICompare("string") == 0)
+	if (strcasecmp(type, "point") == 0 ||
+		strcasecmp(type, "string") == 0)
 		return true;
 	return false;
 }
@@ -1046,16 +1046,16 @@ MessageValue::~MessageValue(void)
 
 
 bool
-MessageValue::AcceptsType(PValue *pval)
+MessageValue::AcceptsType(char *type)
 {
-	return (pval->type->ICompare("message") == 0);
+	return (strcasecmp(type, "message") == 0);
 }
 
 
 bool
-MessageValue::ReturnsType(PValue *pval)
+MessageValue::ReturnsType(char *type)
 {
-	if (pval->type->ICompare("message") == 0)
+	if (strcasecmp(type, "message") == 0)
 		return true;
 	return false;
 }
@@ -1133,16 +1133,16 @@ ListValue::~ListValue(void)
 
 
 bool
-ListValue::AcceptsType(PValue *pval)
+ListValue::AcceptsType(char *type)
 {
-	return (pval->type->ICompare("list") == 0);
+	return (strcasecmp(type, "list") == 0);
 }
 
 
 bool
-ListValue::ReturnsType(PValue *pval)
+ListValue::ReturnsType(char *type)
 {
-	return (pval->type->ICompare("list") == 0);
+	return (strcasecmp(type, "list") == 0);
 }
 
 		

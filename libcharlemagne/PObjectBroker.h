@@ -66,4 +66,6 @@ private:
 
 #define BROKER PObjectBroker::GetBrokerInstance()
 
+PObjectBroker *	GetBrokerInstance(void);
+
 #endif

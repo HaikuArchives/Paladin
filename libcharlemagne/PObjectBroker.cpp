@@ -252,3 +252,10 @@ PObjectBroker::FindObjectInfo(const char *type)
 	return NULL;
 }
 
+
+PObjectBroker *
+GetBrokerInstance(void)
+{
+	return PObjectBroker::GetBrokerInstance();
+}
+

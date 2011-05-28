@@ -16,8 +16,8 @@ public:
 							PValue(void);
 		virtual				~PValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval) { return true; }
-		virtual bool		ReturnsType(PValue *pval) { return false; }
+		virtual bool		AcceptsType(char *type) { return true; }
+		virtual bool		ReturnsType(char *type) { return false; }
 		
 		virtual	status_t	SetValue(PValue *pval) { return B_OK; }
 		virtual	status_t	GetValue(PValue *pval) { return B_OK; }
@@ -36,8 +36,8 @@ public:
 							BoolValue(bool from);
 							~BoolValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -63,8 +63,8 @@ public:
 							StringValue(const char *from);
 							~StringValue(void);
 							
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -98,8 +98,8 @@ public:
 							IntValue(int64 from);
 							~IntValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -145,8 +145,8 @@ public:
 							FloatValue(float from);
 							~FloatValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -191,8 +191,8 @@ public:
 							ColorValue(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255);
 							~ColorValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 				void		SetValue(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255);
@@ -229,8 +229,8 @@ public:
 							RectValue(BRect from);
 							~RectValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -254,8 +254,8 @@ public:
 							PointValue(BPoint from);
 							~PointValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -280,8 +280,8 @@ public:
 								MessageValue(BMessage from);
 								~MessageValue(void);
 		
-		virtual bool			AcceptsType(PValue *pval);
-		virtual bool			ReturnsType(PValue *pval);
+		virtual bool			AcceptsType(char *type);
+		virtual bool			ReturnsType(char *type);
 		
 		virtual	status_t		SetValue(PValue *value);
 		virtual	status_t		GetValue(PValue *value);
@@ -305,8 +305,8 @@ public:
 							ListValue(BObjectList<PValue> from);
 							~ListValue(void);
 		
-		virtual bool		AcceptsType(PValue *pval);
-		virtual bool		ReturnsType(PValue *pval);
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);

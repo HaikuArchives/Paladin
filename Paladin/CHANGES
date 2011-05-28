@@ -2,6 +2,7 @@ Changes in Paladin 1.4
 
 New Features
 The luare command has been added -- a sed replacement which uses Lua regular expressions.
+Project-wide file search and replace...FINALLY.
 
 User Interface
 Files are now sorted first by type and then by name

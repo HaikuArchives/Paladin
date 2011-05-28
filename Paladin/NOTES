@@ -5,20 +5,22 @@ TODO:
 	Need to handle password requests for SCMs.
 	Bug: Dragging an item from one project to another causes a crash because of the
 		assumptions made when the drag is performed -- pointers are used.
-	Need to handle SCM setup -- bzr, hg, and git all require an e-mail address The user should be asked what it is upon first use of any of these SCMs and have the information saved and re-used for each SCM.
+	Need to handle SCM setup -- bzr, hg, and git all require an e-mail address The user should
+		be asked what it is upon first use of any of these SCMs and have the information saved
+		and re-used for each SCM.
 	Track down hardcoded path locations and replace them
 
 Features to implement / consider:
-	Bazaar support
+	Bazaar support?
 	CVS import support
-	Possibly implement a command-line-only build tool with more options or expand the current program's options
+	Possibly implement a command-line-only build tool with more options or expand the current
+		program's options
 	A finished online import via SCM feature
 	Tooltip for errors / warnings in the error window
 	File rename command in project window (tied to SCM rename command)
 	Finish Haiku localization when Locale kit settles down
 	Improve library window to handle such a large set of libraries in Haiku
 	Add keyboard acceleration to library window
-	Project-wide find-and-replace -- create Find in Project (Cmd+Shift+F)
 	Rudimentary profiling
 	Add New Class (add custom classes) - this one is quite hard!
 	Code completion

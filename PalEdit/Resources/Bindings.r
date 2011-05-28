@@ -199,7 +199,8 @@ resource rtyp_Cmnd (rid_Cmnd_ProjectMenu, "Project Menu") {
 		msg_IdeRunInTerminal,						"Run in Terminal",
 		msg_IdeRunInDebugger,						"Run in Debugger",
 		msg_IdeForceRebuild,						"Force Rebuild",
-		msg_IdeToggleErrors,						"Toggle Errors…"
+		msg_IdeToggleErrors,						"Toggle Errors…",
+		msg_IdeFindInProjectFiles,					"Find in Project Files…"
 	}
 };
 
@@ -368,8 +369,8 @@ resource rtyp_Bind (rid_Bind_SearchMenu, "Bindings for Search Menu") {
 		Cmd,			0x40,	0,		0,			msg_FindAgain,
 		Cmd,			0x3f,	0,		0,			msg_FindCmd,
 		Cmd,			0x2e,	0,	 	0,		 	msg_IncSearch,
-		Cmd|Shift,		0x2e,	0,		0,			msg_IncSearchBackward,
-		Cmd|Shift,		0x3f,	0,		0,			msg_FindFunction
+		Cmd|Shift,		0x2e,	0,		0,			msg_IncSearchBackward
+//		0,				0,		0,		0,			msg_FindFunction
 	}
 };
 
@@ -395,7 +396,8 @@ resource rtyp_Bind (rid_Bind_ProjectMenu, "Bindings for Project Menu") {
 		Cmd,			0x52,		0,			0,			msg_IdeMake,
 //		0,				0,			0,			0,			msg_IdeRemove,
 //		0,				0,			0,			0,			msg_IdeAdd,
-		Cmd,			0x2e,		0,			0,			msg_IdeToggleErrors
+		Cmd,			0x2e,		0,			0,			msg_IdeToggleErrors,
+		Shift|Cmd,		0x3f,		0,			0,			msg_IdeFindInProjectFiles
 	}
 };
 

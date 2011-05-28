@@ -172,6 +172,7 @@ private:
 			void IDERunInTerminal();
 			void IDERunInDebugger();
 			void IDEToggleErrors();
+			void IDEFindInProjectFiles();
 //			bool IDEOpenSourceHeader(entry_ref& ref);
 
 			void ShowRecentMenu(BPoint where, bool showalways);

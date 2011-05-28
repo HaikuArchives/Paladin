@@ -117,7 +117,7 @@ resource rtyp_Menu (rid_Menu_DwSearch, "Search Menu") {
 		Separator	{																			},
 		Item		{ "Jump to Next Error",		msg_FindNextError,				none,	noKey	},
 		Item		{ "Go To Line…",			msg_GoToLine,					none,	','		},
-		Item		{ "Find Function…",			msg_FindFunction,				shift,	'F'		},
+		Item		{ "Find Function…",			msg_FindFunction,				none,	noKey	},
 		Item		{ "Previous Function",		msg_PreviousFunction,			none,	noKey	},
 		Item		{ "Next Function",			msg_NextFunction,				none,	noKey   },
  		Separator	{																			},
@@ -151,6 +151,8 @@ resource rtyp_Menu (rid_Menu_DwProject, "Project") {
 	{
 		Item		{ "Add File",				msg_IdeAdd,						none,	noKey	},
 		Item		{ "Remove File",			msg_IdeRemove,					none,	noKey	},
+		Separator	{																			},
+		Item		{ "Find in Project Files…",	msg_IdeFindInProjectFiles,		shift,	'F'		},
 		Separator	{																			},
 		Item		{ "Make",					msg_IdeMake,					none,	'M'		},
 		Separator	{																			},

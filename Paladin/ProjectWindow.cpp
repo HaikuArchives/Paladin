@@ -61,7 +61,6 @@ enum
 	M_SHOW_RUN_ARGS = 'srag',
 	M_SHOW_LIBRARIES = 'slbw',
 	M_SHOW_PROJECT_FOLDER = 'shpf',
-	M_SHOW_FIND = 'shfn',
 	M_RUN_TOOL = 'rntl',
 	M_UPDATE_DEPENDENCIES = 'updp',
 	M_BUILD_PROJECT = 'blpj',
@@ -819,7 +818,7 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			anfwin->Show();
 			break;
 		}
-		case M_SHOW_FIND:
+		case M_SHOW_FIND_IN_PROJECT_FILES:
 		{
 			FindWindow *findwin = new FindWindow();
 			findwin->Show();
@@ -1411,8 +1410,9 @@ ProjectWindow::SetupMenus(void)
 	fProjectMenu->AddItem(new BMenuItem(TR("Change System Libraries…"),
 										new BMessage(M_SHOW_LIBRARIES)));
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Find" B_UTF8_ELLIPSIS),
-											new BMessage(M_SHOW_FIND), 'F', B_COMMAND_KEY));
+	fProjectMenu->AddItem(new BMenuItem(TR("Find in Project Files" B_UTF8_ELLIPSIS),
+											new BMessage(M_SHOW_FIND_IN_PROJECT_FILES), 'F',
+														B_COMMAND_KEY | B_SHIFT_KEY));
 	
 	#ifdef BUILD_CODE_LIBRARY
 	fProjectMenu->AddSeparatorItem();

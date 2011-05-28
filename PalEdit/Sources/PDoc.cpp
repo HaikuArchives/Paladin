@@ -1339,6 +1339,11 @@ void PDoc::MessageReceived(BMessage *msg)
 				IDEProject2Group();
 				break;
 			}
+			case msg_IdeFindInProjectFiles:
+			{
+				IDEFindInProjectFiles();
+				break;
+			}
 			case msg_New:
 			case msg_Open:
 			case msg_NewGroup:
@@ -1779,6 +1784,13 @@ void PDoc::IDEToggleErrors()
 	SendToIDE(msg);
 	
 } /* PDoc::IDEToggleErrors */
+
+void PDoc::IDEFindInProjectFiles()
+{
+	BMessage msg(PALADIN_SHOW_FIND_IN_PROJECT_FILES);
+	SendToIDE(msg);
+	
+} /* PDoc::IDEFindInProjectFiles */
 
 void PDoc::IDEProject2Group()
 {

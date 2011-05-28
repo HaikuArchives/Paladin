@@ -170,6 +170,7 @@
 #define msg_IdeBringToFront				'IdFr'
 #define msg_IdeProjectToGroup			'IdGr'
 #define msg_IdeToggleErrors				'IdTe'
+#define msg_IdeFindInProjectFiles		'IdFn'
 
 #define msg_CancelCommand				'Cncl'
 

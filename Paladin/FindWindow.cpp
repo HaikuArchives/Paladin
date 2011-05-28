@@ -9,7 +9,10 @@
 
 #include "DListView.h"
 #include "DTextView.h"
+#include "Globals.h"
 #include "LaunchHelper.h"
+#include "Project.h"
+#include "SourceFile.h"
 
 enum
 {
@@ -86,14 +89,16 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 
 
 FindWindow::FindWindow(void)
-	:	DWindow(BRect(100,100,600,500), "Find in Project"),
+	:	DWindow(BRect(100,100,600,500), "Find in Project", B_TITLED_WINDOW,
+				B_CLOSE_ON_ESCAPE),
 		fIsRegEx(false),
 		fIgnoreCase(true),
 		fMatchWord(false),
 		fThreadID(-1),
 		fThreadMode(0),
 		fThreadQuitFlag(0),
-		fFileList(20, true)
+		fFileList(20, true),
+		fProject(NULL)
 {
 	MakeCenteredOnShow(true);
 	BView *top = GetBackgroundView();
@@ -178,7 +183,25 @@ FindWindow::FindWindow(void)
 		item->SetMarked(true);
 	
 	menu = new BMenu("Project");
+	menu->SetRadioMode(true);
+	gProjectList->Lock();
+	for (int32 i = 0; i < gProjectList->CountItems(); i++)
+	{
+		Project *proj = gProjectList->ItemAt(i);
+		BMessage *msg = new BMessage(M_SET_PROJECT);
+		msg->AddPointer("project", proj);
+		BMenuItem *projItem = new BMenuItem(proj->GetName(), msg);
+		menu->AddItem(projItem);
+		if (gCurrentProject == proj)
+		{
+			projItem->SetMarked(true);
+			fProject = proj;
+		}
+	}
+	gProjectList->Unlock();
 	fMenuBar->AddItem(menu);
+	
+	SetProject(fProject);
 	
 	EnableReplace(false);
 	
@@ -254,6 +277,14 @@ FindWindow::MessageReceived(BMessage *msg)
 				fFindButton->SetEnabled(true);
 			else
 				fFindButton->SetEnabled(false);
+			break;
+		}
+		case M_SET_PROJECT:
+		{
+			Project *proj;
+			if (msg->FindPointer("project", (void**)&proj) != B_OK)
+				break;
+			
 			break;
 		}
 		default:
@@ -567,6 +598,25 @@ FindWindow::EnableReplace(bool value)
 	item = fMenuBar->FindItem("Replace All");
 	if (item)
 		item->SetEnabled(value);
+}
+
+
+void
+FindWindow::SetProject(Project *proj)
+{
+	fFileList.MakeEmpty();
+	if (!proj)
+		return;
+	
+	for (int32 i = 0; i < proj->CountGroups(); i++)
+	{
+		SourceGroup *group = proj->GroupAt(i);
+		for (int32 j = 0; j < group->filelist.CountItems(); j++)
+		{
+			SourceFile *file = group->filelist.ItemAt(j);
+			fFileList.AddItem(new BString(file->GetPath().GetFullPath()));
+		}
+	}
 }
 
 

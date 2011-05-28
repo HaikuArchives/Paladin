@@ -321,6 +321,7 @@ App::MessageReceived(BMessage *msg)
 		case M_FORCE_REBUILD:
 		case M_SHOW_ADD_NEW_PANEL:
 		case M_SHOW_FIND_AND_OPEN_PANEL:
+		case M_SHOW_FIND_IN_PROJECT_FILES:
 		case M_SHOW_ERROR_WINDOW:
 		case M_TOGGLE_ERROR_WINDOW:
 		{

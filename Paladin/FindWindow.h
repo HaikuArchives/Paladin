@@ -11,6 +11,7 @@
 
 class DTextView;
 class DListView;
+class Project;
 
 class FindWindow : public DWindow
 {
@@ -26,6 +27,7 @@ private:
 			void	Replace(void);
 			void	ReplaceAll(void);
 			void	EnableReplace(bool value);
+			void	SetProject(Project *proj);
 	
 	DTextView		*fFindBox,
 					*fReplaceBox;
@@ -47,6 +49,7 @@ private:
 	
 	BObjectList<BString>	fFileList;
 	DPath					fWorkingDir;
+	Project			*fProject;
 };
 
 

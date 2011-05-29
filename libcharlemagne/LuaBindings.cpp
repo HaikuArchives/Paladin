@@ -156,10 +156,7 @@ lua_pproperty_set_name(lua_State *L)
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	BString name = lua_tostring(L, 2);
 	if (prop && prop->type == USERDATA_PROPERTY)
-	{
-		printf("set_name: %s\n", name.String());
 		pproperty_set_name(prop->data, name.String());
-	}
 	return 0;
 }
 
@@ -222,7 +219,7 @@ lua_pproperty_is_read_only(lua_State *L)
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	if (prop && prop->type == USERDATA_PROPERTY)
 	{
-		bool value = pproperty_is_read_only(prop);
+		bool value = pproperty_is_read_only(prop->data);
 		lua_pushboolean(L, value ? 1 : 0);
 		return 1;
 	}
@@ -254,7 +251,7 @@ lua_pproperty_set_read_only(lua_State *L)
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	int value = lua_toboolean(L, 2);
 	if (prop && prop->type == USERDATA_PROPERTY)
-		pproperty_set_read_only(prop, value);
+		pproperty_set_read_only(prop->data, value);
 	
 	return 0;
 }
@@ -283,7 +280,7 @@ lua_pproperty_is_enabled(lua_State *L)
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	if (prop && prop->type == USERDATA_PROPERTY)
 	{
-		bool value = pproperty_is_enabled(prop);
+		bool value = pproperty_is_enabled(prop->data);
 		lua_pushboolean(L, value ? 1 : 0);
 		return 1;
 	}
@@ -315,7 +312,7 @@ lua_pproperty_set_enabled(lua_State *L)
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	int value = lua_toboolean(L, 2);
 	if (prop && prop->type == USERDATA_PROPERTY)
-		pproperty_set_enabled(prop, value);
+		pproperty_set_enabled(prop->data, value);
 	
 	return 0;
 }
@@ -345,7 +342,7 @@ lua_pproperty_get_value(lua_State *L)
 	if (prop && prop->type == USERDATA_PROPERTY)
 	{
 		StringValue value;
-		int status = pproperty_get_value(prop, &value);
+		int status = pproperty_get_value(prop->data, &value);
 		if (status)
 		{
 			lua_pushstring(L, value.value->String());
@@ -400,7 +397,7 @@ lua_pproperty_set_value(lua_State *L)
 			val = &sval;
 		}
 		
-		pproperty_set_value(prop, val);
+		pproperty_set_value(prop->data, val);
 	}
 	
 	return 0;
@@ -431,7 +428,7 @@ lua_pproperty_get_description(lua_State *L)
 	if (prop && prop->type == USERDATA_PROPERTY)
 	{
 		char *desc;
-		pproperty_get_description(prop, &desc);
+		pproperty_get_description(prop->data, &desc);
 		if (desc)
 		{
 			lua_pushstring(L, desc);
@@ -468,7 +465,7 @@ lua_pproperty_set_description(lua_State *L)
 	
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	if (prop && prop->type == USERDATA_PROPERTY)
-		pproperty_set_description(prop, lua_tostring(L, 2));
+		pproperty_set_description(prop->data, lua_tostring(L, 2));
 	
 	return 0;
 }

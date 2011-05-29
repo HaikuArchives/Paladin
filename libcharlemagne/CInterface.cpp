@@ -1149,7 +1149,7 @@ pproperty_get_description(void *prop, char **out)
 	PProperty *p = static_cast<PProperty*>(prop);
 	if (p)
 	{
-		BString desc(p->GetValueAsString());
+		BString desc(p->GetDescription());
 		*out = desc.CountChars() ? strdup(desc.String()) : NULL;
 	}
 }

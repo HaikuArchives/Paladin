@@ -257,7 +257,7 @@ PApplication::InitProperties(void)
 	AddProperty(new IntProperty("Port", -1, "ID of the main communications port for the app."),
 								PROPERTY_READ_ONLY);
 	AddProperty(new IntProperty("PulseRate",0,"The length of time between B_PULSE ticks in microseconds"));
-	AddProperty(new StringProperty("Signature","The signature of the app. This is read-only once set."));
+	AddProperty(new StringProperty("Signature","", "The signature of the app. This is read-only once set."));
 	AddProperty(new IntProperty("Team",-1,"ID for this instance of the app."));
 	AddProperty(new IntProperty("WindowCount", 0, "The number of windows in the app, visible or otherwise."));
 }

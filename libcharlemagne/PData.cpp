@@ -152,6 +152,9 @@ PData::CountProperties(const char *name) const
 PProperty *
 PData::PropertyAt(const int32 &index) const
 {
+	if (index < 0 || index > fPropertyList->CountItems() - 1)
+		return NULL;
+	
 	PropertyData *d = fPropertyList->ItemAt(index);
 	return d ? d->value : NULL;
 }

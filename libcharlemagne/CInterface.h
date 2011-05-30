@@ -242,6 +242,7 @@ int					pdata_get_color_property(void *pdata, const char *name,
 											unsigned char *blue, unsigned char *alpha);
 void				pdata_get_type(void *pdata, char **out);
 void				pdata_get_friendly_type(void *pdata, char **out);
+void				pdata_print_to_stream(void *pdata);
 
 
 /* -------------------------------------------------------------------------------------

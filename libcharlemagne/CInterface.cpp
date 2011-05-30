@@ -1504,6 +1504,17 @@ pdata_get_friendly_type(void *pdata, char **out)
 }
 
 
+void
+pdata_print_to_stream(void *pdata)
+{
+	PData *pd = static_cast<PData*>(pdata);
+	if (!pd)
+		return;
+	
+	pd->PrintToStream();
+}
+
+
 #pragma mark - object broker and object functions
 
 

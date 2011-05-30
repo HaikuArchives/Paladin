@@ -14,7 +14,11 @@
 
 enum
 {
-	USERDATA_PROPERTY = 0
+	USERDATA_PROPERTY = 0,
+	USERDATA_PROPERTY_PTR,
+	USERDATA_DATA,
+	USERDATA_DATA_PTR,
+	USERDATA_OBJECT_PTR
 };
 
 struct UserData
@@ -25,11 +29,84 @@ struct UserData
 
 #define ISPOINTER(L,I) (lua_isuserdata(L,I) || lua_isnil(L,I))
 
+#pragma mark - PObjectBroker functions
+
+static
+int
+lua_objectspace_count_types(lua_State *L)
+{
+	lua_pushnumber(L, pobjectspace_count_types());
+	return 1;
+}
+
+
+int
+lua_objectspace_type_at(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in objectspace_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isnumber(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in objectspace_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	char *out;
+	pobjectspace_type_at(lua_tonumber(L, 1) - 1, &out);
+	if (out)
+	{
+		lua_pushstring(L, out);
+		free(out);
+	}
+	else
+		lua_pushstring(L, "");
+	
+	return 1;
+}
+
+
+int
+lua_objectspace_friendly_type_at(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in objectspace_friendly_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isnumber(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in objectspace_friendly_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	char *out;
+	pobjectspace_type_at(lua_tonumber(L, 1) - 1, &out);
+	if (out)
+	{
+		lua_pushstring(L, out);
+		free(out);
+	}
+	else
+		lua_pushstring(L, "");
+	
+	return 1;
+}
+
+
 #pragma mark - PProperty functions
 
 static
 int
-lua_pproperty_create(lua_State *L)
+lua_property_create(lua_State *L)
 {
 	UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
 	ud->data = pproperty_create();
@@ -41,7 +118,7 @@ lua_pproperty_create(lua_State *L)
 
 static
 int
-lua_pproperty_destroy(lua_State *L)
+lua_property_destroy(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -69,7 +146,7 @@ lua_pproperty_destroy(lua_State *L)
 
 
 int
-lua_pproperty_duplicate(lua_State *L)
+lua_property_duplicate(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -89,7 +166,7 @@ lua_pproperty_duplicate(lua_State *L)
 		return 0;
 	
 	UserData *ud = (UserData*)lua_touserdata(L, 1);
-	if (ud && ud->type == USERDATA_PROPERTY)
+	if (ud && (ud->type == USERDATA_PROPERTY || ud->type == USERDATA_PROPERTY_PTR))
 	{
 		UserData *dup = (UserData*)lua_newuserdata(L, sizeof(UserData));
 		dup->data = pproperty_duplicate(ud->data);
@@ -102,7 +179,7 @@ lua_pproperty_duplicate(lua_State *L)
 
 
 int
-lua_pproperty_copy(lua_State *L)
+lua_property_copy(lua_State *L)
 {
 	if (lua_gettop(L) != 2)
 	{
@@ -123,7 +200,8 @@ lua_pproperty_copy(lua_State *L)
 	
 	UserData *from = (UserData*)lua_touserdata(L, 1);
 	UserData *to = (UserData*)lua_touserdata(L, 2);
-	if (from && to && from->type == USERDATA_PROPERTY && to->type == USERDATA_PROPERTY)
+	if (from && to && (from->type == USERDATA_PROPERTY || from->type == USERDATA_PROPERTY_PTR) &&
+		(to->type == USERDATA_PROPERTY || to->type == USERDATA_PROPERTY_PTR))
 	{
 		pproperty_copy(from->data, to->data);
 		return 1;
@@ -134,7 +212,7 @@ lua_pproperty_copy(lua_State *L)
 
 
 int
-lua_pproperty_set_name(lua_State *L)
+lua_property_set_name(lua_State *L)
 {
 	if (lua_gettop(L) != 2)
 	{
@@ -162,7 +240,7 @@ lua_pproperty_set_name(lua_State *L)
 
 
 int
-lua_pproperty_get_name(lua_State *L)
+lua_property_get_name(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -182,8 +260,7 @@ lua_pproperty_get_name(lua_State *L)
 		return 0;
 	
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
-	BString name = lua_tostring(L, 2);
-	if (prop && prop->type == USERDATA_PROPERTY)
+	if (prop && (prop->type == USERDATA_PROPERTY || prop->type == USERDATA_PROPERTY_PTR))
 	{
 		char *outname;
 		pproperty_get_name(prop->data, &outname);
@@ -197,7 +274,7 @@ lua_pproperty_get_name(lua_State *L)
 
 
 int
-lua_pproperty_is_read_only(lua_State *L)
+lua_property_is_read_only(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -229,7 +306,7 @@ lua_pproperty_is_read_only(lua_State *L)
 
 
 int
-lua_pproperty_set_read_only(lua_State *L)
+lua_property_set_read_only(lua_State *L)
 {
 	if (lua_gettop(L) != 2)
 	{
@@ -258,7 +335,7 @@ lua_pproperty_set_read_only(lua_State *L)
 
 
 int
-lua_pproperty_is_enabled(lua_State *L)
+lua_property_is_enabled(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -290,7 +367,7 @@ lua_pproperty_is_enabled(lua_State *L)
 
 
 int
-lua_pproperty_set_enabled(lua_State *L)
+lua_property_set_enabled(lua_State *L)
 {
 	if (lua_gettop(L) != 2)
 	{
@@ -319,7 +396,7 @@ lua_pproperty_set_enabled(lua_State *L)
 
 
 int
-lua_pproperty_get_value(lua_State *L)
+lua_property_get_value(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -339,11 +416,11 @@ lua_pproperty_get_value(lua_State *L)
 		return 0;
 	
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
-	if (prop && prop->type == USERDATA_PROPERTY)
+	if (prop && (prop->type == USERDATA_PROPERTY || prop->type == USERDATA_PROPERTY_PTR))
 	{
 		StringValue value;
 		int status = pproperty_get_value(prop->data, &value);
-		if (status)
+		if (!status)
 		{
 			lua_pushstring(L, value.value->String());
 			return 1;
@@ -361,7 +438,7 @@ lua_pproperty_get_value(lua_State *L)
 
 
 int
-lua_pproperty_set_value(lua_State *L)
+lua_property_set_value(lua_State *L)
 {
 	if (lua_gettop(L) != 2)
 	{
@@ -381,7 +458,7 @@ lua_pproperty_set_value(lua_State *L)
 		return 0;
 	
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
-	if (prop && prop->type == USERDATA_PROPERTY)
+	if (prop && (prop->type == USERDATA_PROPERTY || prop->type == USERDATA_PROPERTY_PTR))
 	{
 		PValue *val;
 		IntValue ival;
@@ -405,7 +482,7 @@ lua_pproperty_set_value(lua_State *L)
 
 
 int
-lua_pproperty_get_description(lua_State *L)
+lua_property_get_description(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
@@ -444,7 +521,7 @@ lua_pproperty_get_description(lua_State *L)
 
 
 int
-lua_pproperty_set_description(lua_State *L)
+lua_property_set_description(lua_State *L)
 {
 	if (lua_gettop(L) != 2)
 	{
@@ -470,25 +547,290 @@ lua_pproperty_set_description(lua_State *L)
 	return 0;
 }
 
+#pragma mark - PData functions
+
+static
+int
+lua_data_create(lua_State *L)
+{
+	UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
+	ud->data = pdata_create();
+	ud->type = USERDATA_DATA;
+	
+	return 1;
+}
+
+
+static
+int
+lua_data_destroy(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_destroy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in data_destroy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && ud->type == USERDATA_DATA)
+		pdata_destroy(ud->data);
+	
+	return 0;
+}
+
+
+int
+lua_data_duplicate(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_duplicate()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in data_duplicate()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && ud->type == USERDATA_DATA)
+	{
+		UserData *dup = (UserData*)lua_newuserdata(L, sizeof(UserData));
+		dup->data = pdata_duplicate(ud->data);
+		dup->type = USERDATA_DATA;
+		return 1;
+	}
+	
+	return 0;
+}
+
+
+int
+lua_data_copy(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_copy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !ISPOINTER(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_copy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1) || lua_isnil(L, 2))
+		return 0;
+	
+	UserData *from = (UserData*)lua_touserdata(L, 1);
+	UserData *to = (UserData*)lua_touserdata(L, 2);
+	if (from && to && from->type == USERDATA_DATA && to->type == USERDATA_DATA)
+	{
+		pdata_copy(from->data, to->data);
+		return 1;
+	}
+	
+	return 0;
+}
+
+
+static
+int
+lua_data_count_properties(lua_State *L)
+{
+	if (lua_gettop(L) < 1 || lua_gettop(L) > 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_copy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && (ud->type == USERDATA_DATA || ud->type == USERDATA_DATA_PTR ||
+				ud->type == USERDATA_OBJECT_PTR))
+	{
+		const char *name = lua_tostring(L, 2);
+		lua_pushnumber(L, pdata_count_properties(ud->data, name));
+		return 1;
+	}
+	
+	return 0;
+}
+
+
+static
+int
+lua_data_property_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_property_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_property_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		void *prop = pdata_property_at(pdata->data, lua_tonumber(L, 2) - 1);
+		if (prop)
+		{		
+			UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
+			ud->data = prop;
+			ud->type = USERDATA_PROPERTY_PTR;
+		}
+		else
+			lua_pushnil(L);
+		return 1;
+	}
+	return 0;
+}
+
+
+
+/*
+int					pdata_index_of_property(void *pdata, void *property);
+void *				pdata_find_property(void *pdata, const char *name);
+
+bool				pdata_add_property(void *pdata, void *prop, uint flags,
+										int index);
+void *				pdata_remove_property_at(void *pdata, int index);
+void				pdata_remove_property(void *pdata, void *prop);
+unsigned int		pdata_property_flags_at(void *pdata, int index);
+void				pdata_set_flags_for_property(void *pdata, void *prop, int flags);
+unsigned int		pdata_flags_for_property(void *pdata, void *prop);
+
+int					pdata_set_value_for_property(void *pdata, const char *name,
+													void *pvalue);
+int					pdata_get_value_for_property(void *pdata, const char *name,
+*/
+
+#pragma mark - PObject functions
+
+static
+int
+lua_object_create(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_create()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isstring(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_create()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	void *pobj = pobject_create(lua_tostring(L, 1));
+	if (!pobj)
+		return 0;
+	
+	UserData *ud = (UserData*)lua_newuserdata(L, 1);
+	ud->data = pobj;
+	ud->type = USERDATA_OBJECT_PTR;
+	
+	return 1;
+}
+
+
+static
+int
+lua_object_delete(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_delete()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_delete()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && ud->type == USERDATA_OBJECT_PTR)
+		pobject_delete(ud->data);
+	
+	return 0;
+}
+
 
 
 #pragma mark - Module registration
 
 static const luaL_Reg charlemagnelib[] = {
-	{ "property_create", lua_pproperty_create },
-	{ "property_destroy", lua_pproperty_destroy },
-	{ "property_duplicate", lua_pproperty_duplicate },
-	{ "property_copy", lua_pproperty_copy },
-	{ "property_get_name", lua_pproperty_get_name },
-	{ "property_set_name", lua_pproperty_set_name },
-	{ "property_is_read_only", lua_pproperty_is_read_only },
-	{ "property_set_read_only", lua_pproperty_set_read_only },
-	{ "property_is_enabled", lua_pproperty_is_enabled },
-	{ "property_set_enabled", lua_pproperty_set_enabled },
-	{ "property_get_value", lua_pproperty_get_value },
-	{ "property_set_value", lua_pproperty_set_value },
-	{ "property_get_description", lua_pproperty_get_description },
-	{ "property_set_description", lua_pproperty_set_description },
+	{ "objectspace_count_types", lua_objectspace_count_types },
+	{ "objectspace_type_at", lua_objectspace_type_at },
+	{ "objectspace_friendly_type_at", lua_objectspace_friendly_type_at },
+	
+	{ "property_create", lua_property_create },
+	{ "property_destroy", lua_property_destroy },
+	{ "property_duplicate", lua_property_duplicate },
+	{ "property_copy", lua_property_copy },
+	{ "property_get_name", lua_property_get_name },
+	{ "property_set_name", lua_property_set_name },
+	{ "property_is_read_only", lua_property_is_read_only },
+	{ "property_set_read_only", lua_property_set_read_only },
+	{ "property_is_enabled", lua_property_is_enabled },
+	{ "property_set_enabled", lua_property_set_enabled },
+	{ "property_get_value", lua_property_get_value },
+	{ "property_set_value", lua_property_set_value },
+	{ "property_get_description", lua_property_get_description },
+	{ "property_set_description", lua_property_set_description },
+	
+	{ "data_create", lua_data_create },
+	{ "data_destroy", lua_data_destroy },
+	{ "data_duplicate", lua_data_duplicate },
+	{ "data_copy", lua_data_copy },
+	{ "data_count_properties", lua_data_count_properties },
+	{ "data_property_at", lua_data_property_at },
+	
+	{ "object_create", lua_object_create },
+	{ "object_delete", lua_object_delete },
+	
 	{ NULL, NULL}
 };
 
@@ -496,6 +838,8 @@ static const luaL_Reg charlemagnelib[] = {
 int
 luaopen_charlemagne(lua_State *L)
 {
+	pobjectspace_init();
+	
 	luaL_register(L, "charlemagne", charlemagnelib);
 	return 1;
 }

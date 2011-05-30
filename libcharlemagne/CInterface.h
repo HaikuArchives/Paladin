@@ -198,7 +198,7 @@ void *				pdata_property_at(void *pdata, int index);
 int					pdata_index_of_property(void *pdata, void *property);
 void *				pdata_find_property(void *pdata, const char *name);
 
-bool				pdata_add_property(void *pdata, void *prop, uint flags,
+bool				pdata_add_property(void *pdata, void *prop, unsigned int flags,
 										int index);
 void *				pdata_remove_property_at(void *pdata, int index);
 void				pdata_remove_property(void *pdata, void *prop);

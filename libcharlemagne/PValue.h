@@ -18,6 +18,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type) { return true; }
 		virtual bool		ReturnsType(char *type) { return false; }
+		virtual	bool		Name(void) const { return "PValue"; }
 		
 		virtual	status_t	SetValue(PValue *pval) { return B_OK; }
 		virtual	status_t	GetValue(PValue *pval) { return B_OK; }
@@ -38,6 +39,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "BoolValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -65,6 +67,7 @@ public:
 							
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "StringValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -100,6 +103,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "IntValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -147,6 +151,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "FloatValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -193,6 +198,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "ColorValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 				void		SetValue(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255);
@@ -231,6 +237,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "RectValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -256,6 +263,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "PointValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -282,6 +290,7 @@ public:
 		
 		virtual bool			AcceptsType(char *type);
 		virtual bool			ReturnsType(char *type);
+		virtual	bool			Name(void) const { return "MessageValue"; }
 		
 		virtual	status_t		SetValue(PValue *value);
 		virtual	status_t		GetValue(PValue *value);
@@ -307,6 +316,7 @@ public:
 		
 		virtual bool		AcceptsType(char *type);
 		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "ListValue"; }
 		
 		virtual	status_t	SetValue(PValue *value);
 		virtual	status_t	GetValue(PValue *value);
@@ -317,5 +327,8 @@ public:
 		
 				BObjectList<PValue>	*value;
 };
+
+PValue *	CreatePValue(const char *type);
+void		DestroyPValue(PValue *val);
 
 #endif

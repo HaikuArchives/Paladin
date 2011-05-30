@@ -1207,3 +1207,38 @@ ListValue::operator=(const ListValue &from)
 }
 
 
+PValue *
+CreatePValue(const char *type)
+{
+	if (!type)
+		return NULL;
+	
+	if (strcasecmp(type, "StringValue") == 0)
+		return new StringValue;
+	else if (strcasecmp(type, "IntValue") == 0)
+		return new IntValue;
+	else if (strcasecmp(type, "BoolValue") == 0)
+		return new BoolValue;
+	else if (strcasecmp(type, "ColorValue") == 0)
+		return new ColorValue;
+	else if (strcasecmp(type, "RectValue") == 0)
+		return new RectValue;
+	else if (strcasecmp(type, "PointValue") == 0)
+		return new PointValue;
+	else if (strcasecmp(type, "FloatValue") == 0)
+		return new FloatValue;
+	else if (strcasecmp(type, "ListValue") == 0)
+		return new ListValue;
+	else if (strcasecmp(type, "MessageValue") == 0)
+		return new MessageValue;
+	else if (strcasecmp(type, "PValue") == 0)
+		return new PValue;
+	
+	return NULL;
+}
+
+void
+DestroyPValue(PValue *val)
+{
+	delete val;
+}

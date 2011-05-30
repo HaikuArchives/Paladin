@@ -716,19 +716,284 @@ lua_data_property_at(lua_State *L)
 }
 
 
+static
+int
+lua_data_find_property(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_find_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_find_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		void *prop = pdata_find_property(pdata->data, lua_tostring(L, 2));
+		if (prop)
+		{		
+			UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
+			ud->data = prop;
+			ud->type = USERDATA_PROPERTY_PTR;
+		}
+		else
+			lua_pushnil(L);
+		return 1;
+	}
+	return 0;
+}
+
+
+static
+int
+lua_data_add_property(lua_State *L)
+{
+	if (lua_gettop(L) < 2 || lua_gettop(L) > 4)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_add_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !ISPOINTER(L, 2) ||
+		(lua_gettop(L) >= 3 && !lua_isnumber(L, 3)) ||
+		(lua_gettop(L) == 4 && !lua_isnumber(L, 4)))
+	{
+		lua_pushfstring(L, "Bad argument type in data_add_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (!pdata || (pdata->type != USERDATA_DATA && pdata->type != USERDATA_DATA_PTR &&
+					pdata->type != USERDATA_OBJECT_PTR))
+		return 0;
+	
+	// We don't accept PROPERTY_PTR because we only get those when we get a property
+	// from an existing object. This way we only accept properties which don't have an
+	// owner
+	UserData *prop = (UserData*)lua_touserdata(L, 2);
+	if (!prop || pdata->type != USERDATA_PROPERTY)
+		return 0;
+	
+	unsigned int flags = lua_isnil(L, 3) ? 0 : lua_tonumber(L, 3);
+	int index = lua_isnil(L, 4) ? -1 : lua_tonumber(L, 4);
+	
+	bool success = pdata_add_property(pdata->data, prop->data, flags, index);
+	lua_pushboolean(L, success);
+	return 1;
+}
+
+
+static
+int
+lua_data_remove_property_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_remove_property_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_remove_property_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		void *prop = pdata_remove_property_at(pdata->data, lua_tonumber(L, 2) - 1);
+		if (prop)
+		{	
+			// This is the only PData property-related method which returns something
+			// other than a PROPERTY_PTR because this removes the property from the PData
+			// object without deleting it, resulting in an ownerless property.
+			UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
+			ud->data = prop;
+			ud->type = USERDATA_PROPERTY;
+		}
+		else
+			lua_pushnil(L);
+		return 1;
+	}
+	return 0;
+}
+
+
+static
+int
+lua_data_remove_property(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_remove_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !ISPOINTER(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_remove_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (!pdata || (pdata->type != USERDATA_DATA && pdata->type != USERDATA_DATA_PTR &&
+					pdata->type != USERDATA_OBJECT_PTR))
+		return 0;
+	
+	UserData *prop = (UserData*)lua_touserdata(L, 2);
+	if (!prop || (pdata->type != USERDATA_PROPERTY && pdata->type != USERDATA_PROPERTY_PTR))
+		return 0;
+	
+	pdata_remove_property(pdata->data, prop->data);
+	return 0;
+}
+
+
+static
+int
+lua_data_property_flags_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_property_flags_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_property_flags_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		unsigned int flags = pdata_property_flags_at(pdata->data, lua_tonumber(L, 2) - 1);
+		lua_pushnumber(L, flags);
+		return 1;
+	}
+	return 0;
+}
+
+
+static
+int
+lua_data_set_flags_for_property(lua_State *L)
+{
+	if (lua_gettop(L) != 3)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_set_flags_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !ISPOINTER(L, 2) || !lua_isnumber(L, 3))
+	{
+		lua_pushfstring(L, "Bad argument type in data_set_flags_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (!pdata || (pdata->type != USERDATA_DATA && pdata->type != USERDATA_DATA_PTR &&
+					pdata->type != USERDATA_OBJECT_PTR))
+		return 0;
+	
+	UserData *prop = (UserData*)lua_touserdata(L, 2);
+	if (!prop || (pdata->type != USERDATA_PROPERTY && pdata->type != USERDATA_PROPERTY_PTR))
+		return 0;
+	
+	unsigned int flags = lua_tonumber(L, 3);
+	
+	pdata_set_flags_for_property(pdata->data, prop->data, flags);
+	return 0;
+}
+
+
+static
+int
+lua_data_flags_for_property(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_flags_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !ISPOINTER(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_flags_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (!pdata || (pdata->type != USERDATA_DATA && pdata->type != USERDATA_DATA_PTR &&
+					pdata->type != USERDATA_OBJECT_PTR))
+		return 0;
+	
+	UserData *prop = (UserData*)lua_touserdata(L, 2);
+	if (!prop || (pdata->type != USERDATA_PROPERTY && pdata->type != USERDATA_PROPERTY_PTR))
+		return 0;
+	
+	unsigned int flags = pdata_flags_for_property(pdata->data, prop->data);
+	lua_pushnumber(L, flags);
+	return 1;
+}
+
 
 /*
-int					pdata_index_of_property(void *pdata, void *property);
-void *				pdata_find_property(void *pdata, const char *name);
+static
+int
+lua_data_set_value_for_property(lua_State *L)
+{
+	if (lua_gettop(L) != 3)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_set_value_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_set_value_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (!pdata || (pdata->type != USERDATA_DATA && pdata->type != USERDATA_DATA_PTR &&
+					pdata->type != USERDATA_OBJECT_PTR))
+		return 0;
+	
+	BString propName = lua_tostring(L, 2);
+	
+	return 1;
+}
+*/
 
-bool				pdata_add_property(void *pdata, void *prop, uint flags,
-										int index);
-void *				pdata_remove_property_at(void *pdata, int index);
-void				pdata_remove_property(void *pdata, void *prop);
-unsigned int		pdata_property_flags_at(void *pdata, int index);
-void				pdata_set_flags_for_property(void *pdata, void *prop, int flags);
-unsigned int		pdata_flags_for_property(void *pdata, void *prop);
-
+/*
 int					pdata_set_value_for_property(void *pdata, const char *name,
 													void *pvalue);
 int					pdata_get_value_for_property(void *pdata, const char *name,
@@ -827,6 +1092,13 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "data_copy", lua_data_copy },
 	{ "data_count_properties", lua_data_count_properties },
 	{ "data_property_at", lua_data_property_at },
+	{ "data_find_property", lua_data_find_property },
+	{ "data_add_property", lua_data_add_property },
+	{ "data_remove_property_at", lua_data_remove_property_at },
+	{ "data_remove_property", lua_data_remove_property },
+	{ "data_property_flags_at", lua_data_property_flags_at },
+	{ "data_set_flags_for_property", lua_data_set_flags_for_property },
+	{ "data_flags_for_property", lua_data_flags_for_property },
 	
 	{ "object_create", lua_object_create },
 	{ "object_delete", lua_object_delete },

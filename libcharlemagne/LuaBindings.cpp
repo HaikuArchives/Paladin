@@ -29,6 +29,90 @@ struct UserData
 
 #define ISPOINTER(L,I) (lua_isuserdata(L,I) || lua_isnil(L,I))
 
+int
+PushArgList(lua_State *L, PArgList *list)
+{
+	if (!list)
+		return 0;
+	
+	PArgListItem *item = get_parg_first(list);
+	if (item)
+		lua_newtable(L);
+	
+	while (item)
+	{
+		if (item->name)
+		{
+			lua_pushstring(L, item->name);
+			switch (item->type)
+			{
+				case PARG_INT8:
+				{
+					break;
+				}
+				case PARG_INT16:
+				{
+					break;
+				}
+				case PARG_INT32:
+				{
+					break;
+				}
+				case PARG_INT64:
+				{
+					break;
+				}
+				case PARG_FLOAT:
+				{
+					break;
+				}
+				case PARG_DOUBLE:
+				{
+					break;
+				}
+				case PARG_BOOL:
+				{
+					break;
+				}
+				case PARG_CHAR:
+				{
+					break;
+				}
+				case PARG_STRING:
+				{
+					break;
+				}
+				case PARG_RECT:
+				{
+					break;
+				}
+				case PARG_POINT:
+				{
+					break;
+				}
+				case PARG_COLOR:
+				{
+					break;
+				}
+				case PARG_POINTER:
+				{
+					break;
+				}
+				default:
+				{
+					// Undo our push. This shouldn't happen often -- just for RAW
+					// values, which are not supported.
+					lua_pop(L, 1);
+					break;
+				}
+			}
+		}
+		
+		item = get_parg_next(list, item);
+	}
+}
+
+
 #pragma mark - PObjectBroker functions
 
 static
@@ -1166,6 +1250,71 @@ lua_object_create(lua_State *L)
 }
 
 
+int
+lua_object_duplicate(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_duplicate()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_duplicate()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && ud->type == USERDATA_OBJECT_PTR)
+	{
+		UserData *dup = (UserData*)lua_newuserdata(L, sizeof(UserData));
+		dup->data = pobject_duplicate(ud->data);
+		dup->type = USERDATA_DATA;
+		return 1;
+	}
+	
+	return 0;
+}
+
+
+int
+lua_object_copy(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_copy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !ISPOINTER(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_copy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1) || lua_isnil(L, 2))
+		return 0;
+	
+	UserData *from = (UserData*)lua_touserdata(L, 1);
+	UserData *to = (UserData*)lua_touserdata(L, 2);
+	if (from && to && from->type == USERDATA_OBJECT_PTR && to->type == USERDATA_OBJECT_PTR)
+	{
+		pobject_copy(from->data, to->data);
+		return 1;
+	}
+	
+	return 0;
+}
+
+
 static
 int
 lua_object_delete(lua_State *L)
@@ -1195,6 +1344,54 @@ lua_object_delete(lua_State *L)
 }
 
 
+static
+int
+lua_object_get_id(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_get_id()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_get_id()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	unsigned long id = pobject_get_id(pobj->data);
+	lua_pushnumber(L, id);
+	return 1;
+}
+
+/*
+int					pobject_run_method(void *pobj, const char *name, PArgList *in,
+										PArgList *out);
+void *				pobject_find_method(void *pobj, const char *name);
+void *				pobject_method_at(void *pobj, int index);
+int					pobject_count_methods(void *pobj);
+
+bool				pobject_uses_interface(void *pobj, const char *name);
+void				pobject_interface_at(void *pobj, int index,
+										char **out);
+int					pobject_count_interfaces(void *pobj);
+void				pobject_print_to_stream(void *pobj);
+
+void *				pobject_find_event(void *pobj, const char *name);
+void *				pobject_event_at(void *pobj, int index);
+int					pobject_count_events(void *pobj);
+int					pobject_run_event(void *pobj, const char *name, PArgList *in,
+										PArgList *out);
+int					pobject_connect_event(void *pobj, const char *name,
+										MethodFunction func);
+*/
 
 #pragma mark - Module registration
 
@@ -1238,7 +1435,10 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "data_print_to_stream", lua_data_print_to_stream },
 		
 	{ "object_create", lua_object_create },
+	{ "object_copy", lua_object_copy },
+	{ "object_duplicate", lua_object_duplicate },
 	{ "object_delete", lua_object_delete },
+	{ "object_get_id", lua_object_get_id },
 	
 	{ NULL, NULL}
 };

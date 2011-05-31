@@ -963,7 +963,6 @@ lua_data_flags_for_property(lua_State *L)
 }
 
 
-/*
 static
 int
 lua_data_set_value_for_property(lua_State *L)
@@ -975,7 +974,7 @@ lua_data_set_value_for_property(lua_State *L)
 		return 0;
 	}
 	
-	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || (!lua_isstring(L, 3) && !lua_isnumber(L, 3)))
 	{
 		lua_pushfstring(L, "Bad argument type in data_set_value_for_property()");
 		lua_error(L);
@@ -989,15 +988,148 @@ lua_data_set_value_for_property(lua_State *L)
 	
 	BString propName = lua_tostring(L, 2);
 	
+	StringValue value(lua_tostring(L, 3));
+	int status = pdata_set_value_for_property(pdata->data, propName.String(), &value);
+	lua_pushnumber(L, status);
+	
 	return 1;
 }
-*/
 
-/*
-int					pdata_set_value_for_property(void *pdata, const char *name,
-													void *pvalue);
-int					pdata_get_value_for_property(void *pdata, const char *name,
-*/
+
+static
+int
+lua_data_get_value_for_property(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_get_value_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_get_value_for_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (!pdata || (pdata->type != USERDATA_DATA && pdata->type != USERDATA_DATA_PTR &&
+					pdata->type != USERDATA_OBJECT_PTR))
+		return 0;
+	
+	BString propName = lua_tostring(L, 2);
+	
+	StringValue value;
+	int status = pdata_get_value_for_property(pdata->data, propName.String(), &value);
+	lua_pushstring(L, value.value->String());
+	lua_pushnumber(L, status);
+	
+	return 2;
+}
+
+
+static
+int
+lua_data_get_type(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_get_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in data_get_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		char *out;
+		pdata_get_type(pdata->data, &out);
+		if (out)
+		{		
+			lua_pushstring(L, out);
+			free(out);
+		}
+		else
+			lua_pushnil(L);
+		return 1;
+	}
+	return 0;
+}
+
+
+static
+int
+lua_data_get_friendly_type(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_get_friendly_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in data_get_friendly_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		char *out;
+		pdata_get_friendly_type(pdata->data, &out);
+		if (out)
+		{		
+			lua_pushstring(L, out);
+			free(out);
+		}
+		else
+			lua_pushnil(L);
+		return 1;
+	}
+	return 0;
+}
+
+
+static
+int
+lua_data_print_to_stream(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_get_friendly_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in data_get_friendly_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+		pdata_print_to_stream(pdata->data);
+	
+	return 0;
+}
+
 
 #pragma mark - PObject functions
 
@@ -1099,7 +1231,12 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "data_property_flags_at", lua_data_property_flags_at },
 	{ "data_set_flags_for_property", lua_data_set_flags_for_property },
 	{ "data_flags_for_property", lua_data_flags_for_property },
-	
+	{ "data_set_value_for_property", lua_data_set_value_for_property },
+	{ "data_get_value_for_property", lua_data_get_value_for_property },
+	{ "data_get_type", lua_data_get_type },
+	{ "data_get_friendly_type", lua_data_get_friendly_type },
+	{ "data_print_to_stream", lua_data_print_to_stream },
+		
 	{ "object_create", lua_object_create },
 	{ "object_delete", lua_object_delete },
 	

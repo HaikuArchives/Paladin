@@ -1,3 +1,5 @@
+Implement type-specific bindings for PData in LuaBindings.cpp
+
 Look into implementing a MapValue class, as well.
 
 Finish PRoster class

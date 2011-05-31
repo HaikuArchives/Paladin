@@ -1291,12 +1291,12 @@ pdata_set_value_for_property(void *pdata, const char *name, void *pvalue)
 
 
 int
-pdata_get_value_for_property(void *pdata, const char *name, void **pvalue)
+pdata_get_value_for_property(void *pdata, const char *name, void *pvalue)
 {
 	// TODO: Test this sucker
 	PData *pd = static_cast<PData*>(pdata);
-	if (pd && static_cast<PValue*>(*pvalue))
-		return pd->GetProperty(name, static_cast<PValue*>(*pvalue));
+	if (pd && static_cast<PValue*>(pvalue))
+		return pd->GetProperty(name, static_cast<PValue*>(pvalue));
 	else
 		return B_BAD_DATA;
 }

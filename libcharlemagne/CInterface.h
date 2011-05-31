@@ -209,7 +209,7 @@ unsigned int		pdata_flags_for_property(void *pdata, void *prop);
 int					pdata_set_value_for_property(void *pdata, const char *name,
 													void *pvalue);
 int					pdata_get_value_for_property(void *pdata, const char *name,
-													void **pvalue);
+													void *pvalue);
 int					pdata_set_string_property(void *pdata, const char *name,
 											const char *value);
 int					pdata_set_int_property(void *pdata, const char *name,

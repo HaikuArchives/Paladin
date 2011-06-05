@@ -1646,9 +1646,74 @@ lua_object_run_method(lua_State *L)
 	return 1;
 }
 
+
+static
+int
+lua_object_find_method(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_find_method()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_find_method()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	BString methodName = lua_tostring(L, 2);
+	if (methodName.CountChars() < 1)
+		return 0;
+	
+	void *method = pobject_find_method(pobj, methodName.String());
+	if (!method)
+		return 0;
+	
+	lua_pushlightuserdata(L, method);
+	return 1;
+}
+
+
+static
+int
+lua_object_method_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_method_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_method_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	int32 index = lua_tointeger(L, 2);
+	
+	void *method = pobject_method_at(pobj, index);
+	if (!method)
+		return 0;
+	
+	lua_pushlightuserdata(L, method);
+	return 1;
+}
 /*
-void *				pobject_find_method(void *pobj, const char *name);
-void *				pobject_method_at(void *pobj, int index);
 int					pobject_count_methods(void *pobj);
 
 bool				pobject_uses_interface(void *pobj, const char *name);
@@ -1712,6 +1777,9 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "object_duplicate", lua_object_duplicate },
 	{ "object_delete", lua_object_delete },
 	{ "object_get_id", lua_object_get_id },
+	{ "object_run_method", lua_object_run_method },
+	{ "object_find_method", lua_object_find_method },
+	{ "object_method_at", lua_object_method_at },
 	
 	{ NULL, NULL}
 };

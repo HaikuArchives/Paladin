@@ -1,8 +1,10 @@
 Implement type-specific bindings for PData in LuaBindings.cpp
 
-Look into implementing a MapValue class, as well.
+Reimplement PMethodInteface's backend using a map instead of a list.
 
 Finish PRoster class
+
+Look into implementing a MapValue class, as well.
 
 Add Set/GetMode methods to PScreen
 

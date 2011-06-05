@@ -404,6 +404,34 @@ PArgs::FindPointer(const char *name, void **out)
 
 
 PArgListItem *
+PArgs::GetFirstItem(void)
+{
+	return get_parg_first(fArgList);
+}
+
+
+PArgListItem *
+PArgs::GetLastItem(void)
+{
+	return get_parg_last(fArgList);
+}
+
+
+PArgListItem *
+PArgs::GetNextItem(PArgListItem *item)
+{
+	return get_parg_next(fArgList, item);
+}
+
+
+PArgListItem *
+PArgs::GetPreviousItem(PArgListItem *item)
+{
+	return get_parg_previous(fArgList, item);
+}
+
+
+PArgListItem *
 PArgs::ItemAt(int32 index)
 {
 	return find_parg_index(fArgList, index);

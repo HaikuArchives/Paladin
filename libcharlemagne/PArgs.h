@@ -63,6 +63,11 @@ public:
 	
 	PArgListItem *		ItemAt(int32 index);
 	
+	PArgListItem *		GetFirstItem(void);
+	PArgListItem *		GetLastItem(void);
+	PArgListItem *		GetNextItem(PArgListItem *item);
+	PArgListItem *		GetPreviousItem(PArgListItem *item);
+	
 	PArgList *			List(void);
 	PArgList &			ListRef(void);
 	

@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <String.h>
 
+#include "PArgs.h"
+#include "PMethod.h"
 #include "PValue.h"
 
 #ifdef __cplusplus
@@ -28,6 +30,12 @@ struct UserData
 };
 
 #define ISPOINTER(L,I) (lua_isuserdata(L,I) || lua_isnil(L,I))
+#define PUSH_TABLE_FLOAT(state,key,value) {lua_pushstring(state,key); \
+						lua_pushnumber(state,value); lua_settable(state, -3);}
+#define PUSH_TABLE_STRING(state,key,value) {lua_pushstring(state,key); \
+						lua_pushstring(state,value); lua_settable(state, -3);}
+#define PUSH_TABLE_INT(state,key,value) {lua_pushstring(state,key); \
+						lua_pushinteger(state,value); lua_settable(state, -3);}
 
 int
 PushArgList(lua_State *L, PArgList *list)
@@ -38,6 +46,8 @@ PushArgList(lua_State *L, PArgList *list)
 	PArgListItem *item = get_parg_first(list);
 	if (item)
 		lua_newtable(L);
+	else
+		return 0;
 	
 	while (item)
 	{
@@ -48,54 +58,93 @@ PushArgList(lua_State *L, PArgList *list)
 			{
 				case PARG_INT8:
 				{
+					lua_pushinteger(L, *((int8*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_INT16:
 				{
+					lua_pushinteger(L, *((int16*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_INT32:
 				{
+					lua_pushinteger(L, *((int32*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_INT64:
 				{
+					lua_pushinteger(L, *((int64*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_FLOAT:
 				{
+					lua_pushnumber(L, *((float*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_DOUBLE:
 				{
+					lua_pushnumber(L, *((double*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_BOOL:
 				{
+					lua_pushboolean(L, *((bool*)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_CHAR:
 				{
+					char str[2];
+					str[0] = *((char*)item->data);
+					str[1] = 0;
+					lua_pushstring(L, str);
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_STRING:
 				{
+					lua_pushstring(L, (const char *)item->data);
+					lua_settable(L, -3);
 					break;
 				}
 				case PARG_RECT:
 				{
+					BRect *r = (BRect*)item->data;
+					lua_newtable(L);
+					PUSH_TABLE_FLOAT(L,"left",r->left);
+					PUSH_TABLE_FLOAT(L,"top",r->top);
+					PUSH_TABLE_FLOAT(L,"right",r->right);
+					PUSH_TABLE_FLOAT(L,"bottom",r->bottom);
 					break;
 				}
 				case PARG_POINT:
 				{
+					BPoint *p = (BPoint*)item->data;
+					lua_newtable(L);
+					PUSH_TABLE_FLOAT(L,"x",p->x);
+					PUSH_TABLE_FLOAT(L,"y",p->y);
 					break;
 				}
 				case PARG_COLOR:
 				{
+					rgb_color *c = (rgb_color*)item->data;
+					lua_newtable(L);
+					PUSH_TABLE_INT(L,"red",c->red);
+					PUSH_TABLE_INT(L,"green",c->green);
+					PUSH_TABLE_INT(L,"blue",c->blue);
+					PUSH_TABLE_INT(L,"alpha",c->blue);
 					break;
 				}
 				case PARG_POINTER:
 				{
+					lua_pushlightuserdata(L, *((void**)item->data));
+					lua_settable(L, -3);
 					break;
 				}
 				default:
@@ -110,6 +159,172 @@ PushArgList(lua_State *L, PArgList *list)
 		
 		item = get_parg_next(list, item);
 	}
+	
+	return 1;
+}
+
+
+int32
+ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex)
+{
+	// This function is for reading in all of the necessary data to call a
+	// method owned by a PObject.
+	
+	if (!list)
+		return B_ERROR;
+	
+	if (pmi.CountArgs() == 0 && pmi.CountReturnValues() == 0)
+		return 0;
+	
+	PArgs args(list);
+	int32 argCount = 0;
+	for (int32 i = 0; i < pmi.CountArgs(); i++)
+	{
+		BString name = pmi.ArgNameAt(i);
+		if (name.CountChars() < 1)
+			continue;
+		
+		lua_pushstring(L, name);
+		lua_gettable(L, tableIndex);
+		switch (pmi.ArgTypeAt(i))
+		{
+			case PARG_INT8:
+			{
+				args.AddInt8(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_INT16:
+			{
+				args.AddInt16(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_INT32:
+			{
+				args.AddInt32(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_INT64:
+			{
+				args.AddInt64(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_FLOAT:
+			{
+				args.AddFloat(name.String(), lua_tonumber(L, -1));
+				break;
+			}
+			case PARG_DOUBLE:
+			{
+				args.AddDouble(name.String(), lua_tonumber(L, -1));
+				break;
+			}
+			case PARG_BOOL:
+			{
+				args.AddBool(name.String(), lua_toboolean(L, -1));
+				break;
+			}
+			case PARG_CHAR:
+			{
+				args.AddChar(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_STRING:
+			{
+				args.AddString(name.String(), lua_tostring(L, -1));
+				break;
+			}
+			case PARG_RECT:
+			{
+				BRect r;
+				
+				lua_pushstring(L, "left");
+				lua_gettable(L, -1);
+				r.left = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "top");
+				lua_gettable(L, -1);
+				r.top = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "right");
+				lua_gettable(L, -1);
+				r.right = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "bottom");
+				lua_gettable(L, -1);
+				r.bottom = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				args.AddRect(name.String(), r);
+				break;
+			}
+			case PARG_POINT:
+			{
+				BPoint pt;
+				
+				lua_pushstring(L, "x");
+				lua_gettable(L, -1);
+				pt.x = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "y");
+				lua_gettable(L, -1);
+				pt.y = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				args.AddPoint(name.String(), pt);
+				break;
+			}
+			case PARG_COLOR:
+			{
+				rgb_color c;
+				
+				lua_pushstring(L, "reg");
+				lua_gettable(L, -1);
+				c.red = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "green");
+				lua_gettable(L, -1);
+				c.green = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "blue");
+				lua_gettable(L, -1);
+				c.blue = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "alpha");
+				lua_gettable(L, -1);
+				c.alpha = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				args.AddColor(name.String(), c);
+				break;
+			}
+			case PARG_POINTER:
+			{
+				args.AddPointer(name.String(), (void*)lua_topointer(L, -1));
+				break;
+			}
+			case PARG_LIST:
+			{
+				debugger("List handling unimplemented for argument passing from Lua. Sorry!");
+				break;
+			}
+			default:
+			{
+				printf("Unsupported arg type set to method\n");
+				lua_pop(L, 1);
+				break;
+			}			
+		}
+		lua_pop(L, 1);
+		argCount++;
+	}
+	return argCount;
 }
 
 
@@ -119,7 +334,7 @@ static
 int
 lua_objectspace_count_types(lua_State *L)
 {
-	lua_pushnumber(L, pobjectspace_count_types());
+	lua_pushinteger(L, pobjectspace_count_types());
 	return 1;
 }
 
@@ -755,7 +970,7 @@ lua_data_count_properties(lua_State *L)
 				ud->type == USERDATA_OBJECT_PTR))
 	{
 		const char *name = lua_tostring(L, 2);
-		lua_pushnumber(L, pdata_count_properties(ud->data, name));
+		lua_pushinteger(L, pdata_count_properties(ud->data, name));
 		return 1;
 	}
 	
@@ -973,7 +1188,7 @@ lua_data_property_flags_at(lua_State *L)
 					pdata->type == USERDATA_OBJECT_PTR))
 	{
 		unsigned int flags = pdata_property_flags_at(pdata->data, lua_tonumber(L, 2) - 1);
-		lua_pushnumber(L, flags);
+		lua_pushinteger(L, flags);
 		return 1;
 	}
 	return 0;
@@ -1042,7 +1257,7 @@ lua_data_flags_for_property(lua_State *L)
 		return 0;
 	
 	unsigned int flags = pdata_flags_for_property(pdata->data, prop->data);
-	lua_pushnumber(L, flags);
+	lua_pushinteger(L, flags);
 	return 1;
 }
 
@@ -1074,7 +1289,7 @@ lua_data_set_value_for_property(lua_State *L)
 	
 	StringValue value(lua_tostring(L, 3));
 	int status = pdata_set_value_for_property(pdata->data, propName.String(), &value);
-	lua_pushnumber(L, status);
+	lua_pushinteger(L, status);
 	
 	return 1;
 }
@@ -1108,7 +1323,7 @@ lua_data_get_value_for_property(lua_State *L)
 	StringValue value;
 	int status = pdata_get_value_for_property(pdata->data, propName.String(), &value);
 	lua_pushstring(L, value.value->String());
-	lua_pushnumber(L, status);
+	lua_pushinteger(L, status);
 	
 	return 2;
 }
@@ -1367,9 +1582,39 @@ lua_object_get_id(lua_State *L)
 		return 0;
 	
 	unsigned long id = pobject_get_id(pobj->data);
-	lua_pushnumber(L, id);
+	lua_pushinteger(L, id);
 	return 1;
 }
+
+
+/*
+static
+int
+lua_object_run_method(lua_State *L)
+{
+	if (lua_gettop(L) != 4)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_run_method()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !ISPOINTER(L, 3) || !ISPOINTER(L, 4))
+	{
+		lua_pushfstring(L, "Bad argument type in object_run_method()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	BString name = lua_tostring(L, 2);
+	
+	return 1;
+}
+*/
 
 /*
 int					pobject_run_method(void *pobj, const char *name, PArgList *in,

@@ -1954,7 +1954,7 @@ pmethod_get_interface(void *pmethod, void *pminterface)
 	PMethod *pm = static_cast<PMethod*>(pmethod);
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pm && pmi)
-		pm->GetInterface(*pmi);
+		*pmi = pm->GetInterface();
 }
 
 

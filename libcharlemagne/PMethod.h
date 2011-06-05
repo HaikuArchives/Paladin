@@ -56,7 +56,7 @@ class PMethodInterface
 {
 public:
 							PMethodInterface(void);
-							PMethodInterface(PMethodInterface &from);
+							PMethodInterface(const PMethodInterface &from);
 	virtual					~PMethodInterface(void);
 	
 			PMethodInterface &	operator=(const PMethodInterface &from);
@@ -111,8 +111,8 @@ public:
 			void			SetName(const BString &name);
 			BString			GetName(void) const;
 	
-	virtual	void			SetInterface(PMethodInterface &interface);
-			void			GetInterface(PMethodInterface &interface);
+	virtual	void				SetInterface(PMethodInterface &interface);
+			PMethodInterface	GetInterface(void) const;
 	
 	virtual	void			SetDescription(const char *string);
 			void			SetDescription(const BString &string);

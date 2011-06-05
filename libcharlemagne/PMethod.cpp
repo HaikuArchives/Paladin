@@ -50,13 +50,14 @@ PMethod::GetName(void) const
 void
 PMethod::SetInterface(PMethodInterface &interface)
 {
-	
+	fInterface = interface;
 }
 
 
-void
-PMethod::GetInterface(PMethodInterface &interface)
+PMethodInterface
+PMethod::GetInterface(void) const
 {
+	return fInterface;
 }
 
 	
@@ -109,11 +110,11 @@ PMethodInterface::PMethodInterface(void)
 }
 
 
-PMethodInterface::PMethodInterface(PMethodInterface &from)
+PMethodInterface::PMethodInterface(const PMethodInterface &from)
 	:	fIn(20, true),
 		fOut(20, true)
 {
-	// TODO: Implement copy constructor
+	*this = from;
 }
 
 

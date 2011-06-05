@@ -177,6 +177,8 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 		return 0;
 	
 	PArgs args(list);
+	args.MakeEmpty();
+	
 	int32 argCount = 0;
 	for (int32 i = 0; i < pmi.CountArgs(); i++)
 	{
@@ -186,6 +188,15 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 		
 		lua_pushstring(L, name);
 		lua_gettable(L, tableIndex);
+		
+		if (lua_isnil(L, -1) && (pmi.ArgFlagsAt(i) & PMIFLAG_OPTIONAL) == 0)
+		{
+			// Not an optional flag, so we have to bail.
+			fprintf(stderr, "Missing required argument %s\n", name.String());
+			lua_pop(L, 1);
+			return B_ERROR;
+		}
+		
 		switch (pmi.ArgTypeAt(i))
 		{
 			case PARG_INT8:
@@ -311,7 +322,7 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 			}
 			case PARG_LIST:
 			{
-				debugger("List handling unimplemented for argument passing from Lua. Sorry!");
+				debugger("List handling unsupported for argument passing from Lua. Sorry!");
 				break;
 			}
 			default:
@@ -1587,7 +1598,6 @@ lua_object_get_id(lua_State *L)
 }
 
 
-/*
 static
 int
 lua_object_run_method(lua_State *L)
@@ -1599,7 +1609,7 @@ lua_object_run_method(lua_State *L)
 		return 0;
 	}
 	
-	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !ISPOINTER(L, 3) || !ISPOINTER(L, 4))
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !lua_istable(L, 3))
 	{
 		lua_pushfstring(L, "Bad argument type in object_run_method()");
 		lua_error(L);
@@ -1610,15 +1620,33 @@ lua_object_run_method(lua_State *L)
 	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
 		return 0;
 	
-	BString name = lua_tostring(L, 2);
+	BString methodName = lua_tostring(L, 2);
+	if (methodName.CountChars() < 1)
+		return 0;
+	
+	void *method = pobject_find_method(pobj, methodName.String());
+	if (!method)
+		return 0;
+	
+	PMethodInterface pmi;
+	pmethod_get_interface(method, &pmi);
+	
+	PArgs args;
+	int32 argCount = ReadMethodArgs(L, args.List(), pmi, 3);
+	if (argCount < 0)
+	{
+		fprintf(stderr, "Couldn't run method %s\n", methodName.String());
+		return 0;
+	}
+	
+	PArgs retVals;
+	pobject_run_method(pobj, methodName.String(), args.List(), retVals.List());
+	PushArgList(L, retVals.List());
 	
 	return 1;
 }
-*/
 
 /*
-int					pobject_run_method(void *pobj, const char *name, PArgList *in,
-										PArgList *out);
 void *				pobject_find_method(void *pobj, const char *name);
 void *				pobject_method_at(void *pobj, int index);
 int					pobject_count_methods(void *pobj);

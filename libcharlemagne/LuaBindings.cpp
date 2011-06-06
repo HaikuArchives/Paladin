@@ -339,7 +339,22 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 }
 
 
+int
+lua_run_lua_event(void *pobject, PArgList *in, PArgList *out)
+{
+	//	The Lua event process
+	//	Event is called.
+	//	Event bridge function lua_run_lua_event is called.
+	//		lua_run_lua_event() converts the event name to the Lua event property.
+	//		The Lua event property is a string property containing the code to be
+	//		run at event time.
+	
+	return 0;
+}
+
+
 #pragma mark - PObjectBroker functions
+
 
 static
 int
@@ -350,6 +365,7 @@ lua_objectspace_count_types(lua_State *L)
 }
 
 
+static
 int
 lua_objectspace_type_at(lua_State *L)
 {
@@ -1420,14 +1436,14 @@ lua_data_print_to_stream(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
 	{
-		lua_pushfstring(L, "Wrong number of arguments in data_get_friendly_type()");
+		lua_pushfstring(L, "Wrong number of arguments in data_print_to_steam()");
 		lua_error(L);
 		return 0;
 	}
 	
 	if (!ISPOINTER(L, 1))
 	{
-		lua_pushfstring(L, "Bad argument type in data_get_friendly_type()");
+		lua_pushfstring(L, "Bad argument type in data_print_to_stream()");
 		lua_error(L);
 		return 0;
 	}
@@ -1713,23 +1729,314 @@ lua_object_method_at(lua_State *L)
 	lua_pushlightuserdata(L, method);
 	return 1;
 }
-/*
-int					pobject_count_methods(void *pobj);
 
-bool				pobject_uses_interface(void *pobj, const char *name);
-void				pobject_interface_at(void *pobj, int index,
-										char **out);
-int					pobject_count_interfaces(void *pobj);
-void				pobject_print_to_stream(void *pobj);
 
-void *				pobject_find_event(void *pobj, const char *name);
-void *				pobject_event_at(void *pobj, int index);
-int					pobject_count_events(void *pobj);
-int					pobject_run_event(void *pobj, const char *name, PArgList *in,
-										PArgList *out);
-int					pobject_connect_event(void *pobj, const char *name,
-										MethodFunction func);
-*/
+static
+int
+lua_object_count_methods(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_count_methods()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_count_methods()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	lua_pushinteger(L, pobject_count_methods(pobj));
+	return 1;
+}
+
+
+static
+int
+lua_object_uses_interface(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_uses_interface()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_uses_interface()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	BString interfaceName = lua_tostring(L, 2);
+	if (interfaceName.CountChars() < 1)
+		return 0;
+	
+	lua_pushboolean(L, pobject_uses_interface(pobj, interfaceName.String()));
+	return 1;
+}
+
+
+static
+int
+lua_object_interface_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_interface_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_interface_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	int32 index = lua_tointeger(L, 2);
+	
+	char *interface;
+	pobject_interface_at(pobj, index, &interface);
+	if (!interface)
+		return 0;
+	
+	lua_pushstring(L, interface);
+	free(interface);
+	return 1;
+}
+
+
+static
+int
+lua_object_count_interfaces(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_count_interfaces()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_count_interfaces()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	lua_pushinteger(L, pobject_count_interfaces(pobj));
+	return 1;
+}
+
+
+static
+int
+lua_object_print_to_stream(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_print_to_stream()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_print_to_stream()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobject = (UserData*)lua_touserdata(L, 1);
+	if (pobject && pobject->type == USERDATA_OBJECT_PTR)
+		pobject_print_to_stream(pobject->data);
+	
+	return 0;
+}
+
+
+static
+int
+lua_object_find_event(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_find_event()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_find_event()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	BString eventName = lua_tostring(L, 2);
+	if (eventName.CountChars() < 1)
+		return 0;
+	
+	void *event = pobject_find_event(pobj, eventName.String());
+	if (!event)
+		return 0;
+	
+	lua_pushlightuserdata(L, event);
+	return 1;
+}
+
+
+static
+int
+lua_object_event_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_event_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in object_event_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	int32 index = lua_tointeger(L, 2);
+	
+	void *event = pobject_event_at(pobj, index);
+	if (!event)
+		return 0;
+	
+	lua_pushlightuserdata(L, event);
+	return 1;
+}
+
+
+static
+int
+lua_object_count_events(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_count_events()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in object_count_events()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	lua_pushinteger(L, pobject_count_events(pobj));
+	return 1;
+}
+
+
+static
+int
+lua_object_run_event(lua_State *L)
+{
+	if (lua_gettop(L) != 4)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_run_event()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !lua_istable(L, 3))
+	{
+		lua_pushfstring(L, "Bad argument type in object_run_event()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	BString eventName = lua_tostring(L, 2);
+	if (eventName.CountChars() < 1)
+		return 0;
+	
+	void *event = pobject_find_event(pobj, eventName.String());
+	if (!event)
+		return 0;
+	
+	PMethodInterface pmi;
+	pmethod_get_interface(event, &pmi);
+	
+	PArgs args;
+	int32 argCount = ReadMethodArgs(L, args.List(), pmi, 3);
+	if (argCount < 0)
+	{
+		fprintf(stderr, "Couldn't run event %s\n", eventName.String());
+		return 0;
+	}
+	
+	PArgs retVals;
+	pobject_run_event(pobj, eventName.String(), args.List(), retVals.List());
+	PushArgList(L, retVals.List());
+	
+	return 1;
+}
+
+
+static
+int
+lua_object_connect_event(lua_State *L)
+{
+	//	Connecting a Lua event:
+	//	If necessary, create the necessary Lua event property
+	//	Set the Lua event property to the passed lua code.
+	//	Connect the regular event property to lua_run_lua_event()
+	
+	
+	
+	return 0;
+}
+
+// int pobject_connect_event(void *pobj, const char *name, MethodFunction func);
+
 
 #pragma mark - Module registration
 
@@ -1780,6 +2087,16 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "object_run_method", lua_object_run_method },
 	{ "object_find_method", lua_object_find_method },
 	{ "object_method_at", lua_object_method_at },
+	{ "object_count_methods", lua_object_count_methods },
+	{ "object_uses_interface", lua_object_uses_interface },
+	{ "object_interface_at", lua_object_interface_at },
+	{ "object_count_interfaces", lua_object_count_interfaces },
+	{ "object_print_to_stream", lua_object_print_to_stream },
+	{ "object_find_event", lua_object_find_event },
+	{ "object_event_at", lua_object_event_at },
+	{ "object_count_events", lua_object_count_events },
+	{ "object_run_event", lua_object_run_event },
+	{ "object_connect_event", lua_object_connect_event },
 	
 	{ NULL, NULL}
 };

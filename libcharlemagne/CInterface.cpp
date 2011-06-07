@@ -375,7 +375,7 @@ remove_parg(PArgList *list, PArgListItem *node)
 
 
 void
-set_parg(PArgListItem *node, void *arg, size_t argsize, PArgType type)
+set_parg(PArgListItem *node, const void *arg, size_t argsize, PArgType type)
 {
 	/*
 		Assign a value to an existing PArgListItem. This handles all of the
@@ -1014,9 +1014,9 @@ pvalue_get_type(void *pval, char **out)
 #pragma mark -	property functions
 
 void *
-pproperty_create(void)
+pproperty_create(const char *type)
 {
-	return new PProperty();
+	return gPropertyRoster.MakeProperty(type);
 }
 
 
@@ -1721,10 +1721,10 @@ pobject_count_events(void *pobj)
 
 int
 pobject_connect_event(void *pobj, const char *name,
-						MethodFunction func)
+						MethodFunction func, void *extraData)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
-	return obj ? obj->ConnectEvent(name, func) : B_BAD_DATA;
+	return obj ? obj->ConnectEvent(name, func, extraData) : B_BAD_DATA;
 }
 
 

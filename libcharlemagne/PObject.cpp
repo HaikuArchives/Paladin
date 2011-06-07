@@ -687,20 +687,41 @@ PObject::RunEvent(EventData *data, PArgList &in, PArgList &out)
 		return B_ERROR;
 	
 	if (data->hook)
+	{
+		// This searches for the EventName data from the beginning of
+		// the parglist. We set the EventName argument so that an event
+		// handler can act as a dispatcher for multiple events.
+		PArgListItem *eventName = find_parg(&in, "EventName", NULL);
+		if (eventName)
+			set_parg(eventName, data->name.String(), data->name.Length(),
+					PARG_STRING);
+		else
+			add_parg_string(&in, "EventName", data->name.String());
+		
+		PArgListItem *extraArg = find_parg(&in, "ExtraData", NULL);
+		if (extraArg)
+			set_parg(extraArg, data->extraData, sizeof(data->extraData),
+					PARG_POINTER);
+		else
+			add_parg_pointer(&in, "ExtraData", data->extraData);
+		
 		return data->hook(this, &in, &out);
+	}
 	
 	return B_OK;
 }
 
 
 status_t
-PObject::ConnectEvent(const char *name, MethodFunction func)
+PObject::ConnectEvent(const char *name, MethodFunction func, void *extraData)
 {
 	EventData *data = FindEvent(name);
 	if (!data)
 		return B_NAME_NOT_FOUND;
 	
 	data->hook = func;
+	data->extraData = extraData;
+	
 	return B_OK;
 }
 
@@ -724,11 +745,12 @@ UnflattenObject(BMessage *msg)
 }
 
 
-EventData::EventData(const char *n, const char *d, PMethodInterface *pmi)
+EventData::EventData(const char *n, const char *d, PMethodInterface *pmi, void *ptr)
 {
 	name = n;
 	description = d;
 	hook = NULL;
 	if (pmi)
 		interface = *pmi;
+	extraData = ptr;
 }

@@ -37,6 +37,7 @@ struct UserData
 #define PUSH_TABLE_INT(state,key,value) {lua_pushstring(state,key); \
 						lua_pushinteger(state,value); lua_settable(state, -3);}
 
+
 int
 PushArgList(lua_State *L, PArgList *list)
 {
@@ -348,6 +349,25 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out)
 	//		lua_run_lua_event() converts the event name to the Lua event property.
 	//		The Lua event property is a string property containing the code to be
 	//		run at event time.
+	char *eventName;
+	if (find_parg_string(in, "EventName", &eventName) != B_OK)
+		return 0;
+	
+	BString luaEventName;
+	luaEventName << "Lua" << eventName << "Code";
+	free(eventName);
+	
+	// The ExtraData pointer should contain a pointer to the necessary Lua state.
+	lua_State *L;
+	if (find_parg_pointer(in, "ExtraData", (void**)&L) != B_OK || !L)
+		return 0;
+	
+	PArgListItem *codeItem = find_parg(in, luaEventName.String(), NULL);
+	if (!codeItem)
+		return 0;
+	
+	// Execute the script for the event
+	luaL_dostring(L, (const char *)codeItem->data);
 	
 	return 0;
 }
@@ -434,9 +454,29 @@ static
 int
 lua_property_create(lua_State *L)
 {
-	UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
-	ud->data = pproperty_create();
-	ud->type = USERDATA_PROPERTY;
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in property_create()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isstring(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in property_create()");
+		lua_error(L);
+		return 0;
+	}
+	
+	void *prop = pproperty_create(lua_tostring(L, 1));
+	if (!prop)
+		lua_pushnil(L);
+	else
+	{
+		UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
+		ud->data = prop;
+		ud->type = USERDATA_PROPERTY;
+	}
 	
 	return 1;
 }
@@ -1976,7 +2016,7 @@ static
 int
 lua_object_run_event(lua_State *L)
 {
-	if (lua_gettop(L) != 4)
+	if (lua_gettop(L) != 3)
 	{
 		lua_pushfstring(L, "Wrong number of arguments in object_run_event()");
 		lua_error(L);
@@ -2029,8 +2069,53 @@ lua_object_connect_event(lua_State *L)
 	//	If necessary, create the necessary Lua event property
 	//	Set the Lua event property to the passed lua code.
 	//	Connect the regular event property to lua_run_lua_event()
+	if (lua_gettop(L) != 3)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in object_connect_event()");
+		lua_error(L);
+		return 0;
+	}
 	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !lua_isstring(L, 3))
+	{
+		lua_pushfstring(L, "Bad argument type in object_connect_event()");
+		lua_error(L);
+		return 0;
+	}
 	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	BString eventName = lua_tostring(L, 2);
+	if (eventName.CountChars() < 1)
+		return 0;
+	
+	void *property = pobject_find_event(pobj, eventName.String());
+	if (!property)
+	{
+		lua_pushfstring(L, "Nonexistent property name in object_connect_event()");
+		lua_error(L);
+		return 0;
+	}
+	
+	// Although it is possible to have code which has embedded zeroes in it, it requires
+	// what seems like too much work and C/C++ just doesn't handle it well, so we're
+	// not going to support it.
+	BString luaEventName;
+	luaEventName << "Lua" << eventName << "Code";
+	
+	StringValue luaCode(lua_tostring(L, 3));
+	
+	void *luaProperty = pdata_find_property(pobj, luaEventName.String());
+	if (!luaProperty)
+	{
+		luaProperty = pproperty_create("StringProperty");
+		pproperty_set_name(luaProperty, luaEventName.String());
+		pdata_add_property(pobj, luaProperty, 0, -1);
+	}
+	pproperty_set_value(luaProperty, &luaCode);
+	pobject_connect_event(pobj, eventName.String(), lua_run_lua_event, L);	
 	
 	return 0;
 }

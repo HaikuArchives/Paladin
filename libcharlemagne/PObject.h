@@ -25,13 +25,15 @@ public:
 class EventData
 {
 public:
-	EventData(const char *n, const char *d, PMethodInterface *pmi = NULL);
+	EventData(const char *n, const char *d, PMethodInterface *pmi = NULL,
+				void *ptr = NULL);
 	
 	BString				name,
 						description;
 	
 	PMethodInterface	interface;
 	MethodFunction		hook;
+	void				*extraData;
 };
 
 
@@ -83,7 +85,8 @@ public:
 			EventData *		FindEvent(const char *name);
 			status_t		RunEvent(const char *name, PArgList &in, PArgList &out);
 	virtual	status_t		RunEvent(EventData *data, PArgList &in, PArgList &out);
-			status_t		ConnectEvent(const char *name, MethodFunction func);
+			status_t		ConnectEvent(const char *name, MethodFunction func,
+										void *extraData = NULL);
 			
 	virtual	void			PrintToStream(void);
 	

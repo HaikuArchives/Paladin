@@ -104,7 +104,7 @@ int					add_pargitem(PArgList *list, PArgListItem *item);
 int					add_parg(PArgList *list, const char *name, void *arg, size_t argsize,
 							PArgType type);
 int					remove_parg(PArgList *list, PArgListItem *node);
-void				set_parg(PArgListItem *node, void *arg, size_t argsize,
+void				set_parg(PArgListItem *node, const void *arg, size_t argsize,
 							PArgType type);
 
 int					add_parg_int8(PArgList *list, const char *name, int8_t arg);
@@ -167,7 +167,7 @@ void				pvalue_get_type(void *pval, char **out);
 /* -------------------------------------------------------------------------------------
 	PProperty-related definitions
    ------------------------------------------------------------------------------------- */
-void *				pproperty_create(void);
+void *				pproperty_create(const char *type);
 void				pproperty_destroy(void *prop);
 void *				pproperty_duplicate(void *prop);
 void				pproperty_copy(void *from, void *to);
@@ -283,7 +283,7 @@ int					pobject_count_events(void *pobj);
 int					pobject_run_event(void *pobj, const char *name, PArgList *in,
 										PArgList *out);
 int					pobject_connect_event(void *pobj, const char *name,
-										MethodFunction func);
+										MethodFunction func, void *extraData);
 
 /* -------------------------------------------------------------------------------------
 	PMethod-related definitions

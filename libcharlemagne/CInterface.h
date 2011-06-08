@@ -306,8 +306,7 @@ void				pmethodinterface_set_rval(void *pmi, int index, const char *name,
 											PArgType type, const char *description);
 void				pmethodinterface_add_rval(void *pmi, const char *name,
 											PArgType type, const char *description);
-void				pmethodinterface_remove_rval(void *pmi, int index, const char *name,
-											PArgType type, const char *description);
+void				pmethodinterface_remove_rval(void *pmi, int index);
 void				pmethodinterface_rval_name_at(void *pmi, int index, char **out);
 PArgType			pmethodinterface_rval_type_at(void *pmi, int index);
 void				pmethodinterface_rval_desc_at(void *pmi, int index, char **out);

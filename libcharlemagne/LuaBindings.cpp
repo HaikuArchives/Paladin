@@ -2168,31 +2168,574 @@ lua_pmethodinterface_destroy(lua_State *L)
 }
 
 
-/*
-void				pmethodinterface_set_arg(void *pmi, int index, const char *name,
-											PArgType type, const char *description);
-void				pmethodinterface_add_arg(void *pmi, const char *name,
-											PArgType type, const char *description);
-void				pmethodinterface_remove_arg(void *pmi, int index, const char *name,
-											PArgType type, const char *description);
-void				pmethodinterface_arg_name_at(void *pmi, int index, char **out);
-PArgType			pmethodinterface_arg_type_at(void *pmi, int index);
-void				pmethodinterface_arg_desc_at(void *pmi, int index, char **out);
-int					pmethodinterface_count_args(void *pmi);
-int					pmethodinterface_find_arg(void *pmi, const char *name);
+static
+int
+lua_pmethodinterface_set_arg(lua_State *L)
+{
+	if (lua_gettop(L) < 4 || lua_gettop(L) > 5)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_set_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2) || !lua_isstring(L, 3) ||
+		!lua_isnumber(L, 4) || (lua_gettop(L) == 5 && !lua_tostring(L, 5)))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_set_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	int index = lua_tointeger(L, 2);
+	const char *name = lua_tostring(L, 3);
+	PArgType type = (PArgType)lua_tointeger(L, 4);
+	
+	const char *desc = NULL;
+	if (lua_gettop(L) == 5)
+		desc = lua_tostring(L, 5);
+	
+	pmethodinterface_set_arg(ud->data, index, name, type, desc);
+	
+	return 0;
+}
 
-void				pmethodinterface_set_rval(void *pmi, int index, const char *name,
-											PArgType type, const char *description);
-void				pmethodinterface_add_rval(void *pmi, const char *name,
-											PArgType type, const char *description);
-void				pmethodinterface_remove_rval(void *pmi, int index, const char *name,
-											PArgType type, const char *description);
-void				pmethodinterface_rval_name_at(void *pmi, int index, char **out);
-PArgType			pmethodinterface_rval_type_at(void *pmi, int index);
-void				pmethodinterface_rval_desc_at(void *pmi, int index, char **out);
-int					pmethodinterface_count_rvals(void *pmi);
-int					pmethodinterface_find_rval(void *pmi, const char *name);
-*/
+
+static
+int
+lua_pmethodinterface_add_arg(lua_State *L)
+{
+	if (lua_gettop(L) < 3 || lua_gettop(L) > 4)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_add_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !lua_isnumber(L, 3) ||
+		(lua_gettop(L) == 4 && !lua_tostring(L, 4)))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_add_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	const char *name = lua_tostring(L, 2);
+	PArgType type = (PArgType)lua_tointeger(L, 3);
+	
+	const char *desc = NULL;
+	if (lua_gettop(L) == 4)
+		desc = lua_tostring(L, 4);
+	
+	pmethodinterface_add_arg(ud->data, name, type, desc);
+	
+	return 0;
+}
+
+
+static
+int
+lua_pmethodinterface_remove_arg(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_remove_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_remove_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	int index = lua_tointeger(L, 2);
+	
+	pmethodinterface_remove_arg(ud->data, index);
+	
+	return 0;
+}
+
+
+static
+int
+lua_pmethodinterface_arg_name_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_arg_name_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_arg_name_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	char *out;
+	pmethodinterface_arg_name_at(ud->data, lua_tointeger(L, 2), &out);
+	
+	if (out)
+	{
+		lua_pushstring(L, out);
+		free(out);
+	}
+	else
+		lua_pushnil(L);
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_arg_type_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_arg_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_arg_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	lua_pushinteger(L, (int)pmethodinterface_arg_type_at(ud->data, lua_tointeger(L, 2)));
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_arg_desc_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_arg_desc_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_arg_desc_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	char *out;
+	pmethodinterface_arg_desc_at(ud->data, lua_tointeger(L, 2), &out);
+	
+	if (out)
+	{
+		lua_pushstring(L, out);
+		free(out);
+	}
+	else
+		lua_pushnil(L);
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_count_args(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_count_args()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_count_args()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	lua_pushinteger(L, pmethodinterface_count_args(ud->data));
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_find_arg(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_find_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_find_arg()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	lua_pushinteger(L, pmethodinterface_find_arg(ud->data, lua_tostring(L, 2)));
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_set_rval(lua_State *L)
+{
+	if (lua_gettop(L) < 4 || lua_gettop(L) > 5)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_set_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2) || !lua_isstring(L, 3) ||
+		!lua_isnumber(L, 4) || (lua_gettop(L) == 5 && !lua_tostring(L, 5)))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_set_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	int index = lua_tointeger(L, 2);
+	const char *name = lua_tostring(L, 3);
+	PArgType type = (PArgType)lua_tointeger(L, 4);
+	
+	const char *desc = NULL;
+	if (lua_gettop(L) == 5)
+		desc = lua_tostring(L, 5);
+	
+	pmethodinterface_set_rval(ud->data, index, name, type, desc);
+	
+	return 0;
+}
+
+
+static
+int
+lua_pmethodinterface_add_rval(lua_State *L)
+{
+	if (lua_gettop(L) < 3 || lua_gettop(L) > 4)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_add_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !lua_isnumber(L, 3) ||
+		(lua_gettop(L) == 4 && !lua_tostring(L, 4)))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_add_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	const char *name = lua_tostring(L, 2);
+	PArgType type = (PArgType)lua_tointeger(L, 3);
+	
+	const char *desc = NULL;
+	if (lua_gettop(L) == 4)
+		desc = lua_tostring(L, 4);
+	
+	pmethodinterface_add_rval(ud->data, name, type, desc);
+	
+	return 0;
+}
+
+
+static
+int
+lua_pmethodinterface_remove_rval(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_remove_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_remove_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	int index = lua_tointeger(L, 2);
+	
+	pmethodinterface_remove_rval(ud->data, index);
+	
+	return 0;
+}
+
+
+static
+int
+lua_pmethodinterface_rval_name_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_rval_name_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_rval_name_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	char *out;
+	pmethodinterface_rval_name_at(ud->data, lua_tointeger(L, 2), &out);
+	
+	if (out)
+	{
+		lua_pushstring(L, out);
+		free(out);
+	}
+	else
+		lua_pushnil(L);
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_rval_type_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_rval_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_rval_type_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	lua_pushinteger(L, (int)pmethodinterface_rval_type_at(ud->data, lua_tointeger(L, 2)));
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_rval_desc_at(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_rval_desc_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_rval_desc_at()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	char *out;
+	pmethodinterface_rval_desc_at(ud->data, lua_tointeger(L, 2), &out);
+	
+	if (out)
+	{
+		lua_pushstring(L, out);
+		free(out);
+	}
+	else
+		lua_pushnil(L);
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_count_rvals(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_count_rvals()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_count_rvals()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	lua_pushinteger(L, pmethodinterface_count_rvals(ud->data));
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_find_rval(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_find_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_find_rval()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || (ud->type != USERDATA_INTERFACE && ud->type != USERDATA_INTERFACE_PTR))
+		return 0;
+	
+	lua_pushinteger(L, pmethodinterface_find_rval(ud->data, lua_tostring(L, 2)));
+	
+	return 1;
+}
 
 #pragma mark - PMethodInterface methods
 
@@ -2273,6 +2816,22 @@ static const luaL_Reg charlemagnelib[] = {
 	
 	{ "pmethodinterface_create", lua_pmethodinterface_create },
 	{ "pmethodinterface_destroy", lua_pmethodinterface_destroy },
+	{ "pmethodinterface_set_arg", lua_pmethodinterface_set_arg },
+	{ "pmethodinterface_add_arg", lua_pmethodinterface_add_arg },
+	{ "pmethodinterface_remove_arg", lua_pmethodinterface_remove_arg },
+	{ "pmethodinterface_arg_name_at", lua_pmethodinterface_arg_name_at },
+	{ "pmethodinterface_arg_type_at", lua_pmethodinterface_arg_type_at },
+	{ "pmethodinterface_arg_desc_at", lua_pmethodinterface_arg_desc_at },
+	{ "pmethodinterface_count_args", lua_pmethodinterface_count_args },
+	{ "pmethodinterface_find_arg", lua_pmethodinterface_find_arg },
+	{ "pmethodinterface_set_rval", lua_pmethodinterface_set_rval },
+	{ "pmethodinterface_add_rval", lua_pmethodinterface_add_rval },
+	{ "pmethodinterface_remove_rval", lua_pmethodinterface_remove_rval },
+	{ "pmethodinterface_rval_name_at", lua_pmethodinterface_rval_name_at },
+	{ "pmethodinterface_rval_type_at", lua_pmethodinterface_rval_type_at },
+	{ "pmethodinterface_rval_desc_at", lua_pmethodinterface_rval_desc_at },
+	{ "pmethodinterface_count_rvals", lua_pmethodinterface_count_rvals },
+	{ "pmethodinterface_find_rval", lua_pmethodinterface_find_rval },
 	
 	{ NULL, NULL}
 };

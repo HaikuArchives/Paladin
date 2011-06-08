@@ -20,7 +20,11 @@ enum
 	USERDATA_PROPERTY_PTR,
 	USERDATA_DATA,
 	USERDATA_DATA_PTR,
-	USERDATA_OBJECT_PTR
+	USERDATA_OBJECT_PTR,
+	USERDATA_PMETHOD,
+	USERDATA_PMETHOD_PTR,
+	USERDATA_INTERFACE,
+	USERDATA_INTERFACE_PTR
 };
 
 struct UserData
@@ -2120,7 +2124,91 @@ lua_object_connect_event(lua_State *L)
 	return 0;
 }
 
-// int pobject_connect_event(void *pobj, const char *name, MethodFunction func);
+#pragma mark - PMethodInterface methods
+
+
+static
+int
+lua_pmethodinterface_create(lua_State *L)
+{
+	UserData *ud = (UserData*)lua_newuserdata(L, sizeof(UserData));
+	ud->data = pmethod_create();
+	ud->type = USERDATA_INTERFACE;
+	
+	return 1;
+}
+
+
+static
+int
+lua_pmethodinterface_destroy(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in pmethodinterface_destroy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in pmethodinterface_destroy()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && ud->type == USERDATA_INTERFACE)
+		pdata_destroy(ud->data);
+	
+	return 0;
+}
+
+
+/*
+void				pmethodinterface_set_arg(void *pmi, int index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_add_arg(void *pmi, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_remove_arg(void *pmi, int index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_arg_name_at(void *pmi, int index, char **out);
+PArgType			pmethodinterface_arg_type_at(void *pmi, int index);
+void				pmethodinterface_arg_desc_at(void *pmi, int index, char **out);
+int					pmethodinterface_count_args(void *pmi);
+int					pmethodinterface_find_arg(void *pmi, const char *name);
+
+void				pmethodinterface_set_rval(void *pmi, int index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_add_rval(void *pmi, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_remove_rval(void *pmi, int index, const char *name,
+											PArgType type, const char *description);
+void				pmethodinterface_rval_name_at(void *pmi, int index, char **out);
+PArgType			pmethodinterface_rval_type_at(void *pmi, int index);
+void				pmethodinterface_rval_desc_at(void *pmi, int index, char **out);
+int					pmethodinterface_count_rvals(void *pmi);
+int					pmethodinterface_find_rval(void *pmi, const char *name);
+*/
+
+#pragma mark - PMethodInterface methods
+
+/*
+void *				pmethod_create(void);
+void				pmethod_destroy(void *pmethod);
+void				pmethod_set_name(void *pmethod, const char *name);
+void				pmethod_get_name(void *pmethod, char **out);
+void				pmethod_set_interface(void *pmethod, void *pmi);
+void				pmethod_get_interface(void *pmethod, void *pmi);
+void				pmethod_set_desc(void *pmethod, const char *name);
+void				pmethod_get_desc(void *pmethod, char **out);
+void				pmethod_set_function(void *pmethod, MethodFunction func);
+MethodFunction		pmethod_get_function(void *pmethod);
+int					pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out);
+*/
 
 
 #pragma mark - Module registration
@@ -2182,6 +2270,9 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "object_count_events", lua_object_count_events },
 	{ "object_run_event", lua_object_run_event },
 	{ "object_connect_event", lua_object_connect_event },
+	
+	{ "pmethodinterface_create", lua_pmethodinterface_create },
+	{ "pmethodinterface_destroy", lua_pmethodinterface_destroy },
 	
 	{ NULL, NULL}
 };

@@ -1768,8 +1768,7 @@ pmethodinterface_add_arg(void *pminterface, const char *name, PArgType type,
 
 
 void 
-pmethodinterface_remove_arg(void *pminterface, int index, const char *name,
-											PArgType type, const char *description)
+pmethodinterface_remove_arg(void *pminterface, int index)
 {
 	PMethodInterface *pmi = static_cast<PMethodInterface*>(pminterface);
 	if (pmi)

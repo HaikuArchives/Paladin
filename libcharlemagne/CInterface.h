@@ -295,8 +295,7 @@ void				pmethodinterface_set_arg(void *pmi, int index, const char *name,
 											PArgType type, const char *description);
 void				pmethodinterface_add_arg(void *pmi, const char *name,
 											PArgType type, const char *description);
-void				pmethodinterface_remove_arg(void *pmi, int index, const char *name,
-											PArgType type, const char *description);
+void				pmethodinterface_remove_arg(void *pmi, int index);
 void				pmethodinterface_arg_name_at(void *pmi, int index, char **out);
 PArgType			pmethodinterface_arg_type_at(void *pmi, int index);
 void				pmethodinterface_arg_desc_at(void *pmi, int index, char **out);

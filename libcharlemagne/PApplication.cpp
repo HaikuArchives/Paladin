@@ -313,7 +313,7 @@ PApplication::InitBackend(void)
 
 
 int32_t
-PAppObscureCursor(void *pobject, PArgList *in, PArgList *out)
+PAppObscureCursor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (be_app)
 		be_app->ObscureCursor();
@@ -323,7 +323,7 @@ PAppObscureCursor(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PAppRun(void *pobject, PArgList *in, PArgList *out)
+PAppRun(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	thread_id id = -1;
 	if (be_app)
@@ -340,7 +340,7 @@ PAppRun(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PAppQuit(void *pobject, PArgList *in, PArgList *out)
+PAppQuit(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (be_app)
 		be_app->Quit();
@@ -350,7 +350,7 @@ PAppQuit(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PAppWindowAt(void *pobject, PArgList *in, PArgList *out)
+PAppWindowAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	uint64_t id = 0;
 	if (be_app)

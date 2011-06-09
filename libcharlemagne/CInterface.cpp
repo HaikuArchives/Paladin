@@ -1994,6 +1994,24 @@ pmethod_get_function(void *pmethod)
 }
 
 
+void 
+pmethod_set_code(void *pmethod, const char *name)
+{
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		pm->SetCode(name);
+}
+
+
+void 
+pmethod_get_code(void *pmethod, char **out)
+{
+	PMethod *pm = static_cast<PMethod*>(pmethod);
+	if (pm)
+		*out = strdup(pm->GetCode().String());
+}
+
+
 int 
 pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out,
 			void *extra)

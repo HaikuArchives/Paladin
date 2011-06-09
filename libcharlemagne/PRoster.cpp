@@ -193,7 +193,7 @@ PRoster::InitMethods(void)
 
 
 int32_t
-PRosterActivateApp(void *pobject, PArgList *in, PArgList *out)
+PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("team", PARG_INT32, "Team ID of the app to activate");
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
@@ -203,7 +203,7 @@ PRosterActivateApp(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out)
+PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("path", PARG_STRING, "Path of the document to add to the recent list.");
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the app used to open the document.", PMIFLAG_OPTIONAL);
@@ -213,7 +213,7 @@ PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out)
+PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("path", PARG_STRING, "Path of the folder to add to the recent list.");
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the app used to open the folder.", PMIFLAG_OPTIONAL);
@@ -223,7 +223,7 @@ PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterBroadcast(void *pobject, PArgList *in, PArgList *out)
+PRosterBroadcast(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("list", PARG_LIST, "Argument list containing the message data");
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
@@ -233,7 +233,7 @@ PRosterBroadcast(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterFindApp(void *pobject, PArgList *in, PArgList *out)
+PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
 //	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
@@ -245,7 +245,7 @@ PRosterFindApp(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out)
+PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddReturnValue("list", PARG_LIST, "List containing the app_info information");
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
@@ -255,7 +255,7 @@ PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out)
+PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
 //	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
@@ -267,7 +267,7 @@ PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetAppList(void *pobject, PArgList *in, PArgList *out)
+PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("signature", PARG_STRING, "Optional MIME type of a running app", PMIFLAG_OPTIONAL);
 //	pmi.AddReturnValue("list", PARG_LIST, "List of team_id values");
@@ -277,7 +277,7 @@ PRosterGetAppList(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out)
+PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent apps to retrieve.");
 //	pmi.AddReturnValue("list", PARG_LIST, "List of paths to recently-run applications");
@@ -287,7 +287,7 @@ PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out)
+PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent documents to retrieve.");
 //	pmi.AddArg("types", PARG_LIST, "List of mimetypes desired.", PMIFLAG_OPTIONAL);
@@ -302,7 +302,7 @@ PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out)
+PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent documents to retrieve.");
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the application used to open the "
@@ -314,7 +314,7 @@ PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out)
+PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("team", PARG_INT32, "TeamID of the desired application");
 //	pmi.AddReturnValue("list", PARG_LIST, "List containing the app_info information");
@@ -325,7 +325,7 @@ PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterIsRunning(void *pobject, PArgList *in, PArgList *out)
+PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the possibly running app", PMIFLAG_OPTIONAL);
 //	pmi.AddArg("path", PARG_STRING, "path of the possibly running app", PMIFLAG_OPTIONAL);
@@ -336,7 +336,7 @@ PRosterIsRunning(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterLaunch(void *pobject, PArgList *in, PArgList *out)
+PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("signature", PARG_STRING, "MIME signature of the application to launch");
 //	pmi.AddArg("arglist", PARG_LIST, "List of string arguments (argc)", PMIFLAG_OPTIONAL);
@@ -346,7 +346,7 @@ PRosterLaunch(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PRosterTeamFor(void *pobject, PArgList *in, PArgList *out)
+PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
 //	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);

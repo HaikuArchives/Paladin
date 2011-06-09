@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <String.h>
 
+#include "PApplication.h"
 #include "PArgs.h"
 #include "PMethod.h"
 #include "PValue.h"
@@ -374,6 +375,42 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	return 0;
 }
 
+
+int
+lua_connect_lua_event(void *pobj, const char *eventName, const char *code,
+						lua_State *L)
+{
+	if (!eventName || !code || strlen(eventName) < 1)
+		return 0;
+	
+	void *event = pobject_find_event(pobj, eventName);
+	if (!event)
+	{
+		lua_pushstring(L, "Nonexistent event name in connect_lua_event()");
+		lua_error(L);
+		return 0;
+	}
+	
+	// Although it is possible to have code which has embedded zeroes in it, it requires
+	// what seems like too much work and C/C++ just doesn't handle it well, so we're
+	// not going to support it.
+	BString luaEventName;
+	luaEventName << "Lua" << eventName << "Code";
+	
+	StringValue luaCode(lua_tostring(L, 3));
+	
+	void *luaProperty = pdata_find_property(pobj, luaEventName.String());
+	if (!luaProperty)
+	{
+		luaProperty = pproperty_create("StringProperty");
+		pproperty_set_name(luaProperty, luaEventName.String());
+		pdata_add_property(pobj, luaProperty, 0, -1);
+	}
+	pproperty_set_value(luaProperty, &luaCode);
+	pobject_connect_event(pobj, eventName, lua_run_lua_event, L);	
+	
+	return 0;
+}
 
 #pragma mark - PObjectBroker functions
 
@@ -2101,23 +2138,7 @@ lua_object_connect_event(lua_State *L)
 		return 0;
 	}
 	
-	// Although it is possible to have code which has embedded zeroes in it, it requires
-	// what seems like too much work and C/C++ just doesn't handle it well, so we're
-	// not going to support it.
-	BString luaEventName;
-	luaEventName << "Lua" << eventName << "Code";
-	
-	StringValue luaCode(lua_tostring(L, 3));
-	
-	void *luaProperty = pdata_find_property(pobj, luaEventName.String());
-	if (!luaProperty)
-	{
-		luaProperty = pproperty_create("StringProperty");
-		pproperty_set_name(luaProperty, luaEventName.String());
-		pdata_add_property(pobj, luaProperty, 0, -1);
-	}
-	pproperty_set_value(luaProperty, &luaCode);
-	pobject_connect_event(pobj, eventName.String(), lua_run_lua_event, L);	
+	lua_connect_lua_event(pobj, eventName.String(), lua_tostring(L, 3), L);
 	
 	return 0;
 }
@@ -3082,6 +3103,43 @@ lua_method_run(lua_State *L)
 }
 
 
+static
+int
+lua_run_app_lua(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushstring(L, "Wrong number of arguments in run_app()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushstring(L, "Bad argument type in run_app()");
+		lua_error(L);
+		return 0;
+	}
+	
+	const char *signature = lua_tostring(L, 1);
+	if (!signature)
+	{
+		lua_pushstring(L, "Empty signature error in run_app()");
+		lua_error(L);
+		return 0;
+	}
+		
+	PApplication *app = (PApplication*)MakeObject("PApplication");
+	
+	const char *code = lua_tostring(L, 2);
+	
+	if (code)
+		lua_connect_lua_event(app, "AppSetup", code, L);
+	
+	return (int)app->Run(signature);
+}
+
+
 #pragma mark - Module registration
 
 
@@ -3168,6 +3226,7 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "method_get_interface", lua_method_get_interface },
 	{ "method_run", lua_method_run },
 	
+	{ "run_app", lua_run_app_lua },
 	
 	{ NULL, NULL}
 };

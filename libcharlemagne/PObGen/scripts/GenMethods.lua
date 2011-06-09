@@ -110,7 +110,7 @@ function GenerateMethodDefs(obj, back)
 		local method = obj.methods[i]
 		
 		out = out .. "int32_t " .. obj.name .. method[1] ..
-			"(void *pobject, PArgList *in, PArgList *out);\n"
+			"(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);\n"
 		i = i + 1
 	end
 	
@@ -126,7 +126,7 @@ function GenerateMethod(obj, back, method)
 	
 	-- Start with the top part of the function definition
 	local methodCode = "int32_t\n" .. obj.name .. method[1] ..
-					"(void *pobject, PArgList *in, PArgList *out)\n{\n"
+					"(void *pobject, PArgList *in, PArgList *out, void *extraData)\n{\n"
 	
 	if (method[2] == "embedded") then
 		if (obj.embeddedMethods[method[1]]) then

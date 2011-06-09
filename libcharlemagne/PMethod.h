@@ -121,11 +121,17 @@ public:
 	virtual	void			SetFunction(MethodFunction func);
 			MethodFunction	GetFunction(void) const;
 	
-	virtual	status_t		Run(PObject *object, PArgList &in, PArgList &out);
+	virtual	void			SetCode(const char *string);
+			void			SetCode(const BString &string);
+			BString			GetCode(void) const;
+	
+	virtual	status_t		Run(PObject *object, PArgList &in, PArgList &out,
+								void *extraData = NULL);
 	
 private:
 			BString				fName,
-								fDescription;
+								fDescription,
+								fCode;
 			MethodFunction		fFunction;
 			uint32				fFlags;
 			PMethodInterface	fInterface;

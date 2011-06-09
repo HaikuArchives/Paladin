@@ -193,13 +193,13 @@ PObject::GetID(void) const
 
 
 status_t
-PObject::RunMethod(const char *name, PArgList &in, PArgList &out)
+PObject::RunMethod(const char *name, PArgList &in, PArgList &out, void *extraData)
 {
 	PMethod *method = FindMethod(name);
 	if (!method)
 		return B_NAME_NOT_FOUND;
 	
-	method->Run(this, in, out);
+	method->Run(this, in, out, extraData);
 	return B_OK;
 }
 
@@ -235,13 +235,14 @@ PObject::CountMethods(void) const
 
 
 status_t
-PObject::RunInheritedMethod(const char *name, PArgList &in, PArgList &out)
+PObject::RunInheritedMethod(const char *name, PArgList &in, PArgList &out,
+							void *extraData)
 {
 	PMethod *method = FindInheritedMethod(name);
 	if (!method)
 		return B_NAME_NOT_FOUND;
 	
-	method->Run(this, in, out);
+	method->Run(this, in, out, extraData);
 	return B_OK;
 }
 
@@ -705,7 +706,7 @@ PObject::RunEvent(EventData *data, PArgList &in, PArgList &out)
 		else
 			add_parg_pointer(&in, "ExtraData", data->extraData);
 		
-		return data->hook(this, &in, &out);
+		return data->hook(this, &in, &out, data->extraData);
 	}
 	
 	return B_OK;

@@ -76,7 +76,7 @@ struct p_arg_list
 
 typedef struct p_arg_list PArgList;
 
-typedef int (*MethodFunction)(void *pobject, PArgList *in, PArgList *out);
+typedef int (*MethodFunction)(void *pobject, PArgList *in, PArgList *out, void *ptr);
 
 /* -------------------------------------------------------------------------------------
 	Argument-passing code
@@ -266,7 +266,7 @@ void				pobject_copy(void *from, void *to);
 void				pobject_delete(void *pobj);
 unsigned long		pobject_get_id(void *pobj);
 int					pobject_run_method(void *pobj, const char *name, PArgList *in,
-										PArgList *out);
+										PArgList *out, void *ptr);
 void *				pobject_find_method(void *pobj, const char *name);
 void *				pobject_method_at(void *pobj, int index);
 int					pobject_count_methods(void *pobj);
@@ -281,7 +281,7 @@ void *				pobject_find_event(void *pobj, const char *name);
 void *				pobject_event_at(void *pobj, int index);
 int					pobject_count_events(void *pobj);
 int					pobject_run_event(void *pobj, const char *name, PArgList *in,
-										PArgList *out);
+										PArgList *out, void *ptr);
 int					pobject_connect_event(void *pobj, const char *name,
 										MethodFunction func, void *extraData);
 
@@ -324,7 +324,10 @@ void				pmethod_set_desc(void *pmethod, const char *name);
 void				pmethod_get_desc(void *pmethod, char **out);
 void				pmethod_set_function(void *pmethod, MethodFunction func);
 MethodFunction		pmethod_get_function(void *pmethod);
-int					pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out);
+void				pmethod_set_code(void *pmethod, const char *name);
+void				pmethod_get_code(void *pmethod, char **out);
+int					pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out,
+								void *extraData);
 
 #if defined(__cplusplus)
 	}

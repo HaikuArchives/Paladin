@@ -1618,10 +1618,10 @@ pobject_get_id(void *pobj)
 
 int
 pobject_run_method(void *pobj, const char *name, PArgList *in,
-										PArgList *out)
+					PArgList *out, void *extra)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
-	return obj ? obj->RunMethod(name, *in, *out) : NULL;
+	return obj ? obj->RunMethod(name, *in, *out, extra) : NULL;
 }
 
 
@@ -1696,10 +1696,10 @@ pobject_find_event(void *pobj, const char *name)
 
 int
 pobject_run_event(void *pobj, const char *name, PArgList *in,
-										PArgList *out)
+					PArgList *out, void *extra)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
-	return obj ? obj->RunMethod(name, *in, *out) : NULL;
+	return obj ? obj->RunMethod(name, *in, *out, extra) : NULL;
 }
 
 
@@ -1995,11 +1995,12 @@ pmethod_get_function(void *pmethod)
 
 
 int 
-pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out)
+pmethod_run(void *pmethod, void *pobject, PArgList *in, PArgList *out,
+			void *extra)
 {
 	PMethod *pm = static_cast<PMethod*>(pmethod);
 	PObject *pobj = static_cast<PObject*>(pobject);
-	return pm ? pm->Run(pobj, *in, *out) : B_ERROR;
+	return pm ? pm->Run(pobj, *in, *out, extra) : B_ERROR;
 }
 
 

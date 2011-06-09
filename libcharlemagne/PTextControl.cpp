@@ -10,7 +10,7 @@
 #include "EnumProperty.h"
 #include "PMethod.h"
 
-int32_t PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out);
+int32_t PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 class PTextControlBackend : public AutoTextControl
 {
@@ -293,7 +293,7 @@ PTextControl::InitMethods(void)
 
 
 int32_t
-PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out)
+PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;

@@ -96,10 +96,31 @@ PMethod::GetFunction(void) const
 }
 
 
-status_t
-PMethod::Run(PObject *object, PArgList &in, PArgList &out)
+void
+PMethod::SetCode(const char *string)
 {
-	return fFunction(object, &in, &out);
+	fCode = string;
+}
+
+
+void
+PMethod::SetCode(const BString &string)
+{
+	SetCode(string.String());
+}
+
+
+BString
+PMethod::GetCode(void) const
+{
+	return fCode;
+}
+
+	
+status_t
+PMethod::Run(PObject *object, PArgList &in, PArgList &out, void *extra)
+{
+	return fFunction(object, &in, &out, extra);
 }
 
 

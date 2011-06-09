@@ -10,12 +10,12 @@
 #include "PObjectBroker.h"
 #include "PView.h"
 
-int32_t PBitmapInitialize(void *pobject, PArgList *in, PArgList *out);
-int32_t PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out);
-int32_t PBitmapSetBits(void *pobject, PArgList *in, PArgList *out);
-int32_t PBitmapAddChild(void *pobject, PArgList *in, PArgList *out);
-int32_t PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out);
-int32_t PBitmapCountChildren(void *pobject, PArgList *in, PArgList *out);
+int32_t PBitmapInitialize(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PBitmapSetBits(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PBitmapAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PBitmapCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 class PBitmapBackend
 {
@@ -457,7 +457,7 @@ PBitmapBackend::IsLocked(void) const
 
 
 int32_t
-PBitmapInitialize(void *pobject, PArgList *in, PArgList *out)
+PBitmapInitialize(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -501,7 +501,7 @@ PBitmapInitialize(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out)
+PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -534,7 +534,7 @@ PBitmapInitializeFrom(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PBitmapSetBits(void *pobject, PArgList *in, PArgList *out)
+PBitmapSetBits(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -569,7 +569,7 @@ PBitmapSetBits(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PBitmapAddChild(void *pobject, PArgList *in, PArgList *out)
+PBitmapAddChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -609,7 +609,7 @@ PBitmapAddChild(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out)
+PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -649,7 +649,7 @@ PBitmapRemoveChild(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PBitmapCountChildren(void *pobject, PArgList *in, PArgList *out)
+PBitmapCountChildren(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;

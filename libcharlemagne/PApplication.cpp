@@ -13,10 +13,10 @@
 #include "PWindow.h"
 #include "PWindowPriv.h"
 
-int32_t PAppObscureCursor(void *pobject, PArgList *in, PArgList *out);
-int32_t PAppRun(void *pobject, PArgList *in, PArgList *out);
-int32_t PAppQuit(void *pobject, PArgList *in, PArgList *out);
-int32_t PAppWindowAt(void *pobject, PArgList *in, PArgList *out);
+int32_t PAppObscureCursor(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PAppRun(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PAppQuit(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PAppWindowAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 
 class PAppBackend : public BApplication

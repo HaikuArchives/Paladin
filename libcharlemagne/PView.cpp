@@ -22,9 +22,9 @@ static const uint32 ksFollowBottom = B_FOLLOW_BOTTOM;
 static const uint32 ksFollowTopBottom = B_FOLLOW_TOP_BOTTOM;
 static const uint32 ksFollowVCenter = B_FOLLOW_V_CENTER;
 
-int32_t PViewAddChild(void *pobject, PArgList *in, PArgList *out);
-int32_t PViewRemoveChild(void *pobject, PArgList *in, PArgList *out);
-int32_t PViewChildAt(void *pobject, PArgList *in, PArgList *out);
+int32_t PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PViewRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PViewChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 class PViewBackend : public BView
 {
@@ -959,7 +959,7 @@ PViewBackend::MessageReceived(BMessage *msg)
 
 
 int32_t
-PViewAddChild(void *pobject, PArgList *in, PArgList *out)
+PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -1001,7 +1001,7 @@ PViewAddChild(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PViewRemoveChild(void *pobject, PArgList *in, PArgList *out)
+PViewRemoveChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -1044,7 +1044,7 @@ PViewRemoveChild(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PViewChildAt(void *pobject, PArgList *in, PArgList *out)
+PViewChildAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;

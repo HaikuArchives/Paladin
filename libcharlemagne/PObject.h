@@ -62,12 +62,14 @@ public:
 	
 			uint64			GetID(void) const;
 	
-	virtual	status_t		RunMethod(const char *name, PArgList &in, PArgList &out);
+	virtual	status_t		RunMethod(const char *name, PArgList &in, PArgList &out,
+										void *extraData);
 			PMethod *		FindMethod(const char *name);
 			PMethod *		MethodAt(const int32 &index) const;
 			int32			CountMethods(void) const;
 			
-	virtual	status_t		RunInheritedMethod(const char *name, PArgList &in, PArgList &out);
+	virtual	status_t		RunInheritedMethod(const char *name, PArgList &in, PArgList &out,
+												void *extraData);
 			PMethod *		FindInheritedMethod(const char *name);
 			PMethod *		InheritedMethodAt(const int32 &index) const;
 			int32			CountInheritedMethods(void) const;

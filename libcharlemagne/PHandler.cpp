@@ -94,7 +94,7 @@ PHandler::RunMessageHandler(const int32 &constant, PArgList &args)
 		return B_NAME_NOT_FOUND;
 	
 	PArgList out;
-	return i->second(this, &args, &out);
+	return i->second(this, &args, &out, NULL);
 }
 
 

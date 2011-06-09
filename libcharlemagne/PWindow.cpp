@@ -12,11 +12,11 @@
 #include "PView.h"
 #include "PWindowPriv.h"
 
-int32_t PWindowAddChild(void *pobject, PArgList *in, PArgList *out);
-int32_t PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out);
-int32_t PWindowChildAt(void *pobject, PArgList *in, PArgList *out);
-int32_t PWindowCountChildren(void *pobject, PArgList *in, PArgList *out);
-int32_t PWindowFindView(void *pobject, PArgList *in, PArgList *out);
+int32_t PWindowAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PWindowChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PWindowCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PWindowFindView(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 PWindow::PWindow(void)
 	:	fWindow(NULL)
@@ -633,7 +633,7 @@ PWindowBackend::GetOwner(void)
 
 
 int32_t
-PWindowAddChild(void *pobject, PArgList *in, PArgList *out)
+PWindowAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -669,7 +669,7 @@ PWindowAddChild(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out)
+PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -707,7 +707,7 @@ PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PWindowChildAt(void *pobject, PArgList *in, PArgList *out)
+PWindowChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -745,7 +745,7 @@ PWindowChildAt(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PWindowCountChildren(void *pobject, PArgList *in, PArgList *out)
+PWindowCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -767,7 +767,7 @@ PWindowCountChildren(void *pobject, PArgList *in, PArgList *out)
 
 
 int32_t
-PWindowFindView(void *pobject, PArgList *in, PArgList *out)
+PWindowFindView(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;

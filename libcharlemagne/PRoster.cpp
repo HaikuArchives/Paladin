@@ -1,20 +1,20 @@
 #include "PRoster.h"
 
-int32_t PRosterActivateApp(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterBroadcast(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterFindApp(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetAppList(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterIsRunning(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterLaunch(void *pobject, PArgList *in, PArgList *out);
-int32_t PRosterTeamFor(void *pobject, PArgList *in, PArgList *out);
+int32_t PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterBroadcast(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 PRoster::PRoster(void)
 {

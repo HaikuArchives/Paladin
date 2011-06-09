@@ -3,3 +3,23 @@ Test and fix PTextControl, including floaters not working correctly with them
 Resizing a window doesn't update its values. The Update() method for the editor is called by the PropertyWindow, but it ends up getting the old value for the property instead of the new one. At that point, the value for Frame() doesn't return the right values. Is this a Haiku bug?
 
 Will need to create a window for managing the application/project settings
+
+Possible Feature Notes
+- integrate the compiler for interpreted languages
+- debugging tools
+- help system?
+- snap to 5x5 grid for layout
+- language addons - pick the language for a particular project
+- XML import/export? Glade?
+- Window templates
+- menu editor 
+
+Possible New Controls
+CD player
+MP3 player
+Video player
+calendar
+downloader
+spinner
+toolbar
+- Color picker dialog window

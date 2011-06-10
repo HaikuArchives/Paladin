@@ -173,6 +173,8 @@ PushArgList(lua_State *L, PArgList *list)
 int32
 ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex)
 {
+	// TODO: This needs to be changed to handle variable arguments instead of a table
+	
 	// This function is for reading in all of the necessary data to call a
 	// method owned by a PObject.
 	
@@ -345,72 +347,63 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 }
 
 
+int32
+ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int startingIndex)
+{
+	// TODO: Implement
+	return 0;
+}
+
+
 int
 lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 {
-	//	The Lua event process
-	//	Event is called.
-	//	Event bridge function lua_run_lua_event is called.
-	//		lua_run_lua_event() converts the event name to the Lua event property.
-	//		The Lua event property is a string property containing the code to be
-	//		run at event time.
 	char *eventName;
 	if (find_parg_string(in, "EventName", &eventName) != B_OK)
 		return 0;
 	
-	BString luaEventName;
-	luaEventName << "Lua" << eventName << "Code";
-	free(eventName);
-	
 	// The extraData pointer should contain a pointer to the necessary Lua state.
 	lua_State *L = (lua_State*)extraData;
 	
-	PArgListItem *codeItem = find_parg(in, luaEventName.String(), NULL);
-	if (!codeItem)
+	EventData *event = (EventData*)pobject_find_event(pobject, eventName);
+	if (!event || event->code.CountChars() < 1)
 		return 0;
 	
-	// Execute the script for the event
-	luaL_dostring(L, (const char *)codeItem->data);
+	// From here we need to:
+	// 1) Empty the stack
+	// 2) Find the Lua function to call
+	// 3) Set up the call by pushing all of the arguments to the stack
+	// 4) Call the function
+	// 5) Convert the return values into the out PArgList
+	// 6) Empty the stack
 	
-	return 0;
-}
-
-
-int
-lua_connect_lua_event(void *pobj, const char *eventName, const char *code,
-						lua_State *L)
-{
-	if (!eventName || !code || strlen(eventName) < 1)
-		return 0;
+	lua_pop(L, -1);
 	
-	void *event = pobject_find_event(pobj, eventName);
-	if (!event)
+	// This will push the function setup onto the top of the stack
+	lua_getglobal(L, event->code.String());
+	if (lua_isnil(L, lua_gettop(L)))
 	{
-		lua_pushstring(L, "Nonexistent event name in connect_lua_event()");
+		lua_pop(L, -1);
+		BString error;
+		error << "Couldn't find function '" << event->code << "' in object_run_event";
+		lua_pushstring(L, error.String());
+		lua_error(L);
+		return 0;
+	}
+	PushArgList(L, in);
+	if (lua_pcall(L, count_pargs(in), event->interface.CountReturnValues(), 0) != 0)
+	{
+		lua_pushfstring(L, "Error running event hook %s: %s", event->code.String(), lua_tostring(L, -1));
 		lua_error(L);
 		return 0;
 	}
 	
-	// Although it is possible to have code which has embedded zeroes in it, it requires
-	// what seems like too much work and C/C++ just doesn't handle it well, so we're
-	// not going to support it.
-	BString luaEventName;
-	luaEventName << "Lua" << eventName << "Code";
-	
-	StringValue luaCode(lua_tostring(L, 3));
-	
-	void *luaProperty = pdata_find_property(pobj, luaEventName.String());
-	if (!luaProperty)
-	{
-		luaProperty = pproperty_create("StringProperty");
-		pproperty_set_name(luaProperty, luaEventName.String());
-		pdata_add_property(pobj, luaProperty, 0, -1);
-	}
-	pproperty_set_value(luaProperty, &luaCode);
-	pobject_connect_event(pobj, eventName, lua_run_lua_event, L);	
+	ReadReturnValues(L, out, event->interface, 1);
+	lua_pop(L, -1);
 	
 	return 0;
 }
+
 
 #pragma mark - PObjectBroker functions
 
@@ -2084,6 +2077,10 @@ lua_object_run_event(lua_State *L)
 	PMethodInterface pmi;
 	pmethod_get_interface(event, &pmi);
 	
+	// All of this conversion might seem unnecesary at first, but it is necessary because
+	// we need to make sure that Lua interfaces properly with both standard (C++) hook functions
+	// and with the Lua ones. If this weren't necessary, we could just pass the Lua stack
+	// straight through. :/
 	PArgs args;
 	int32 argCount = ReadMethodArgs(L, args.List(), pmi, 3);
 	if (argCount < 0)
@@ -2091,7 +2088,6 @@ lua_object_run_event(lua_State *L)
 		fprintf(stderr, "Couldn't run event %s\n", eventName.String());
 		return 0;
 	}
-	
 	PArgs retVals;
 	pobject_run_event(pobj, eventName.String(), args.List(), retVals.List(), L);
 	PushArgList(L, retVals.List());
@@ -2104,10 +2100,6 @@ static
 int
 lua_object_connect_event(lua_State *L)
 {
-	//	Connecting a Lua event:
-	//	If necessary, create the necessary Lua event property
-	//	Set the Lua event property to the passed lua code.
-	//	Connect the regular event property to lua_run_lua_event()
 	if (lua_gettop(L) != 3)
 	{
 		lua_pushfstring(L, "Wrong number of arguments in object_connect_event()");
@@ -2130,15 +2122,19 @@ lua_object_connect_event(lua_State *L)
 	if (eventName.CountChars() < 1)
 		return 0;
 	
-	void *property = pobject_find_event(pobj, eventName.String());
-	if (!property)
+	void *event = pobject_find_event(pobj, eventName.String());
+	if (!event)
 	{
-		lua_pushfstring(L, "Nonexistent property name in object_connect_event()");
+		lua_pushfstring(L, "Nonexistent event name in object_connect_event()");
 		lua_error(L);
 		return 0;
 	}
 	
-	lua_connect_lua_event(pobj, eventName.String(), lua_tostring(L, 3), L);
+	// Just like PMethods, EventData instances also have a code attribute which can be used
+	// to either hold a function name or actual code. For Lua, we use function names for
+	// events and methods
+	pobject_connect_event(pobj->data, eventName.String(), lua_run_lua_event, L);
+	event_set_code(event, lua_tostring(L, 3));
 	
 	return 0;
 }
@@ -3015,7 +3011,12 @@ lua_method_set_code(lua_State *L)
 	BString code = lua_tostring(L, 2);
 	if (method && (method->type == USERDATA_METHOD || method->type == USERDATA_METHOD_PTR))
 	{
+		// The code attribute can be used by language bindings to either store the name
+		// of a function to run or actual code. For Lua, we'll hold function names.
 		
+		lua_getfield(L, LUA_GLOBALSINDEX, code.String());
+		if (!lua_isnil(L, lua_gettop(L)))
+			return 0;
 		pmethod_set_code(method->data, code.String());
 	}
 	return 0;
@@ -3134,7 +3135,10 @@ lua_run_app_lua(lua_State *L)
 	const char *code = lua_tostring(L, 2);
 	
 	if (code)
-		lua_connect_lua_event(app, "AppSetup", code, L);
+	{
+		pobject_connect_event(app, "AppSetup", lua_run_lua_event, L);
+		event_set_code(pobject_find_event(app, "AppSetup"), code);
+	}
 	
 	return (int)app->Run(signature);
 }

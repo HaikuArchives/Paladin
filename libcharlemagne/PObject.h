@@ -33,6 +33,7 @@ public:
 	
 	PMethodInterface	interface;
 	MethodFunction		hook;
+	BString				code;
 	void				*extraData;
 };
 

@@ -80,6 +80,13 @@ PArgs::RemoveItem(PArgListItem *item)
 
 
 int32
+PArgs::CountItems(void)
+{
+	return count_pargs(fArgList);
+}
+
+
+int32
 PArgs::AddInt8(const char *name, int8 arg)
 {
 	return add_parg(fArgList, name, (void*)&arg, sizeof(int8_t), PARG_INT8);

@@ -24,6 +24,8 @@ public:
 	int32				AddItem(const char *name, void *arg, size_t argsize,
 								PArgType type);
 	int32				RemoveItem(PArgListItem *item);
+	int32				CountItems(void);
+	
 	
 	int32				AddInt8(const char *name, int8 arg);
 	int32				AddInt16(const char *name, int16 arg);

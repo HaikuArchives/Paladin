@@ -532,6 +532,23 @@ set_parg(PArgListItem *node, const void *arg, size_t argsize, PArgType type)
 
 
 int
+count_pargs(PArgList *list)
+{
+	if (!list)
+		return -1;
+	
+	int itemCount = 0;
+	PArgListItem *item = get_parg_first(list);
+	while (item)
+	{
+		itemCount++;
+		item = get_parg_next(list, item);
+	}
+	return itemCount;
+}
+
+
+int
 add_parg_int8(PArgList *list, const char *name, int8_t arg)
 {
 	return add_parg(list, name, &arg, sizeof(int8_t), PARG_INT8);
@@ -1725,6 +1742,24 @@ pobject_connect_event(void *pobj, const char *name,
 {
 	PObject *obj = static_cast<PObject*>(pobj);
 	return obj ? obj->ConnectEvent(name, func, extraData) : B_BAD_DATA;
+}
+
+
+void
+event_set_code(void *eventptr, const char *code)
+{
+	EventData *event = static_cast<EventData*>(eventptr);
+	if (event)
+		event->code = code;
+}
+
+
+void
+event_get_code(void *eventptr, const char **out)
+{
+	EventData *event = static_cast<EventData*>(eventptr);
+	if (event)
+		*out = event->code.CountChars() ? strdup(event->code.String()) : NULL;
 }
 
 

@@ -106,6 +106,10 @@ int					add_parg(PArgList *list, const char *name, void *arg, size_t argsize,
 int					remove_parg(PArgList *list, PArgListItem *node);
 void				set_parg(PArgListItem *node, const void *arg, size_t argsize,
 							PArgType type);
+					
+					// Expensive call because this is a doubly-linked list. Cache the
+					// value returned when possible.
+int					count_pargs(PArgList *list);
 
 int					add_parg_int8(PArgList *list, const char *name, int8_t arg);
 int					add_parg_int16(PArgList *list, const char *name, int16_t arg);
@@ -284,6 +288,8 @@ int					pobject_run_event(void *pobj, const char *name, PArgList *in,
 										PArgList *out, void *ptr);
 int					pobject_connect_event(void *pobj, const char *name,
 										MethodFunction func, void *extraData);
+void				event_set_code(void *event, const char *code);
+void				event_get_code(void *event, const char **out);
 
 /* -------------------------------------------------------------------------------------
 	PMethod-related definitions

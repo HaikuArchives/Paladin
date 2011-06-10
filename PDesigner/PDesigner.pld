@@ -73,7 +73,6 @@ LIBRARY=/boot/develop/lib/x86/libtranslation.so
 LIBRARY=/boot/develop/lib/x86/libtracker.so
 LIBRARY=/boot/develop/lib/x86/libsupc++.so
 LIBRARY=/boot/develop/lib/x86/libstdc++.so
-LIBRARY=/boot/common/lib/libcharlemagne.so
 RUNARGS=
 CCDEBUG=yes
 CCPROFILE=no

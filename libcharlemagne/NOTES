@@ -1,3 +1,5 @@
+Redo the Lua bindings ReadMethodArgs and ReadReturnValues to handle variable arguments instead of using a table
+
 Implement type-specific bindings for PData in LuaBindings.cpp
 
 Reimplement PMethodInteface's backend using a map instead of a list.

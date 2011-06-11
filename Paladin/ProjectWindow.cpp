@@ -1393,9 +1393,11 @@ ProjectWindow::SetupMenus(void)
 										new BMessage(M_REVERT_SELECTION)));
 	fSourceMenu->AddSeparatorItem();
 	fSourceMenu->AddItem(new BMenuItem(TR("Push Changes to Remote Repository"),
-										new BMessage(M_PUSH_PROJECT)));
+										new BMessage(M_PUSH_PROJECT), B_UP_ARROW,
+										B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 	fSourceMenu->AddItem(new BMenuItem(TR("Pull Changes from Remote Repository"),
-										new BMessage(M_PULL_PROJECT)));
+										new BMessage(M_PULL_PROJECT), B_DOWN_ARROW,
+										B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 	
 	
 	fProjectMenu = new BMenu(TR("Project"));

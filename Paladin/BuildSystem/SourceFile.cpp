@@ -17,6 +17,16 @@ SourceFile::SourceFile(const char *path)
 }
 
 
+SourceFile::SourceFile(const entry_ref &ref)
+	:	fNeedsBuild(BUILD_YES),
+		fType(TYPE_UNKNOWN),
+		fModTime(0)
+{
+	BPath path(&ref);
+	SetPath(path.Path());
+}
+
+
 SourceFile::~SourceFile(void)
 {
 }

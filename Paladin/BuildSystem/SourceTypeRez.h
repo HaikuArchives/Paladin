@@ -23,6 +23,7 @@ class SourceFileRez : public SourceFile
 {
 public:
 						SourceFileRez(const char *path);
+						SourceFileRez(const entry_ref &ref);
 			bool		UsesBuild(void) const;
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 			void		Precompile(BuildInfo &info, const char *options);

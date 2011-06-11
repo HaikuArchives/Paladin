@@ -32,6 +32,14 @@ SourceTypeLib::CreateSourceFileItem(const char *path)
 }
 
 
+SourceFile *
+SourceTypeLib::CreateSourceFile(const char *folder, const char *name, uint32 options)
+{
+	// We don't create libraries out of nothing here. :)
+	return NULL;
+}
+
+
 SourceOptionView *
 SourceTypeLib::CreateOptionView(void)
 {
@@ -48,6 +56,12 @@ SourceTypeLib::GetName(void) const
 
 SourceFileLib::SourceFileLib(const char *path)
 	:	SourceFile(path)
+{
+}
+
+
+SourceFileLib::SourceFileLib(const entry_ref &ref)
+	:	SourceFile(ref)
 {
 }
 

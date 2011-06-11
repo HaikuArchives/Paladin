@@ -38,6 +38,71 @@ SourceTypeC::CreateSourceFileItem(const char *path)
 }
 
 
+SourceFile *
+SourceTypeC::CreateSourceFile(const char *dir, const char *name, uint32 options)
+{
+	if (!dir || !name)
+		return NULL;
+	
+	BString folderstr(dir);
+	if (folderstr.ByteAt(folderstr.CountChars() - 1) != '/')
+		folderstr << "/";
+	
+	DPath folder(folderstr.String()), filename(name);
+	
+	bool is_cpp = false;
+	bool is_header = false;
+	bool create_pair = ((options & SOURCEFILE_PAIR) != 0);
+	
+	BString ext = filename.GetExtension();
+	if ( (ext.ICompare("cpp") == 0) || (ext.ICompare("c") == 0) ||
+		(ext.ICompare("cxx") == 0) || (ext.ICompare("cc") == 0) )
+		is_cpp = true;
+	else if ((ext.ICompare("h") == 0) || (ext.ICompare("hxx") == 0) ||
+			(ext.ICompare("hpp") == 0) || (ext.ICompare("h++") == 0))
+		is_header = true;
+	
+	if (!is_cpp && !is_header)
+		return NULL;
+	
+	entry_ref sourceRef, headerRef;
+	if (create_pair)
+	{
+		// Creating the pair is language dependent and probably should be abstracted
+		// away, but seeing how we're oriented toward C++ development, this can slide
+		BString nameone, nametwo;
+		
+		if (is_cpp)
+		{
+			nameone = filename.GetFileName();
+			nametwo = filename.GetBaseName();
+			nametwo << ".h";
+		}
+		else if (is_header)
+		{
+			nameone = filename.GetBaseName();
+			nameone << ".cpp";
+			nametwo = filename.GetFileName();
+		}
+		
+		if (nameone.CountChars() > 0)
+		{
+			// Source file
+			BString data;
+			data << "#include \"" << nametwo.String() << "\"\n\n";
+			sourceRef = MakeProjectFile(folder.GetFullPath(),nameone.String(),data.String());
+			
+			// Header
+			data = MakeHeaderGuard(nametwo.String());
+			headerRef = MakeProjectFile(folder.GetFullPath(),nametwo.String(),data.String());
+		}
+	}
+	
+	BEntry entry(is_cpp ? &sourceRef : &headerRef);
+	return entry.Exists() ? new SourceFileC(is_cpp ? sourceRef : headerRef) : NULL;
+}
+
+
 SourceOptionView *
 SourceTypeC::CreateOptionView(void)
 {
@@ -47,6 +112,12 @@ SourceTypeC::CreateOptionView(void)
 
 SourceFileC::SourceFileC(const char *path)
 	:	SourceFile(path)
+{
+}
+
+
+SourceFileC::SourceFileC(const entry_ref &ref)
+	:	SourceFile(ref)
 {
 }
 

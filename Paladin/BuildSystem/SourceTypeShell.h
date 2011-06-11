@@ -13,6 +13,8 @@ public:
 			BString		GetExtension(const int32 &index);
 	
 			SourceFile *		CreateSourceFileItem(const char *path);
+			SourceFile *		CreateSourceFile(const char *folder, const char *name,
+												uint32 options = 0);
 			SourceOptionView *	CreateOptionView(void);
 			BString		GetName(void) const;
 
@@ -24,6 +26,7 @@ class SourceFileShell : public SourceFile
 {
 public:
 						SourceFileShell(const char *path);
+						SourceFileShell(const entry_ref &ref);
 			void		PostBuild(BuildInfo &info, const char *options);
 };
 

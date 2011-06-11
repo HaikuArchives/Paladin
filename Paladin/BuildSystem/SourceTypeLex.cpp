@@ -51,6 +51,12 @@ SourceFileLex::SourceFileLex(const char *path)
 }
 
 
+SourceFileLex::SourceFileLex(const entry_ref &ref)
+	:	SourceFile(ref)
+{
+}
+
+
 bool
 SourceFileLex::UsesBuild(void) const
 {

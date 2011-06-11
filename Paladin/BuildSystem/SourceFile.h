@@ -33,6 +33,7 @@ class SourceFile
 {
 public:
 						SourceFile(const char *path);
+						SourceFile(const entry_ref &ref);
 	virtual				~SourceFile(void);
 						
 			void		SetPath(const char *path);

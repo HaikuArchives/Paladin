@@ -7,6 +7,12 @@
 class SourceFile;
 class SourceOptionView;
 
+// Option flags for SourceType::CreateSourceFile
+enum
+{
+	SOURCEFILE_PAIR = 0x00000001	// Create a source file and a partner file, if appropriate
+};
+
 class SourceType
 {
 public:
@@ -16,6 +22,8 @@ public:
 			bool		HasExtension(const char *ext);
 	
 	virtual	SourceFile *		CreateSourceFileItem(const char *path);
+	virtual	SourceFile *		CreateSourceFile(const char *folder, const char *name,
+												uint32 options = 0);
 	virtual	SourceOptionView *	CreateOptionView(void);
 	
 	virtual	BString		GetName(void) const;

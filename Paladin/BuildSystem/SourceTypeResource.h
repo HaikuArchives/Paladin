@@ -12,6 +12,8 @@ public:
 			BString		GetExtension(const int32 &index);
 	
 			SourceFile *		CreateSourceFileItem(const char *path);
+			SourceFile *		CreateSourceFile(const char *folder, const char *name,
+												uint32 options = 0);
 			SourceOptionView *	CreateOptionView(void);
 			BString		GetName(void) const;
 
@@ -23,6 +25,7 @@ class SourceFileResource : public SourceFile
 {
 public:
 						SourceFileResource(const char *path);
+						SourceFileResource(const entry_ref &ref);
 			bool		UsesBuild(void) const;
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 			void		Compile(BuildInfo &info, const char *options);

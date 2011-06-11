@@ -54,6 +54,12 @@ SourceFileRez::SourceFileRez(const char *path)
 }
 
 
+SourceFileRez::SourceFileRez(const entry_ref &ref)
+	:	SourceFile(ref)
+{
+}
+
+
 bool
 SourceFileRez::UsesBuild(void) const
 {

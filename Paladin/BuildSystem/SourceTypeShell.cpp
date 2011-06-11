@@ -4,6 +4,7 @@
 
 #include "BuildInfo.h"
 #include "DebugTools.h"
+#include "Globals.h"
 
 SourceTypeShell::SourceTypeShell(void)
 {
@@ -31,6 +32,38 @@ SourceTypeShell::CreateSourceFileItem(const char *path)
 }
 
 
+SourceFile *
+SourceTypeShell::CreateSourceFile(const char *dir, const char *name, uint32 options)
+{
+	if (!dir || !name)
+		return NULL;
+	
+	BString folderstr(dir);
+	if (folderstr.ByteAt(folderstr.CountChars() - 1) != '/')
+		folderstr << "/";
+	
+	DPath folder(folderstr.String()), filename(name);
+	
+	BString ext = filename.GetExtension();
+	if (ext.ICompare("sh") != 0)
+		return NULL;
+	
+	BString fileData = "#!/bin/sh\n\n";
+	entry_ref outRef = MakeProjectFile(folder, filename.GetFileName(),
+							fileData.String(), "text/x-source-code");
+	BFile file(&outRef, B_READ_WRITE);
+	if (file.InitCheck() == B_OK)
+	{
+		mode_t perms;
+		file.GetPermissions(&perms);
+		file.SetPermissions(perms | S_IXUSR | S_IXGRP);
+	}
+	
+	BEntry entry(&outRef);
+	return entry.Exists() ? new SourceFileShell(outRef) : NULL;
+}
+
+
 SourceOptionView *
 SourceTypeShell::CreateOptionView(void)
 {
@@ -40,6 +73,12 @@ SourceTypeShell::CreateOptionView(void)
 
 SourceFileShell::SourceFileShell(const char *path)
 	:	SourceFile(path)
+{
+}
+
+
+SourceFileShell::SourceFileShell(const entry_ref &ref)
+	:	SourceFile(ref)
 {
 }
 

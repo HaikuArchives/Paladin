@@ -51,6 +51,12 @@ SourceFileYacc::SourceFileYacc(const char *path)
 }
 
 
+SourceFileYacc::SourceFileYacc(const entry_ref &ref)
+	:	SourceFile(ref)
+{
+}
+
+
 bool
 SourceFileYacc::UsesBuild(void) const
 {

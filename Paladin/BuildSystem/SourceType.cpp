@@ -1,5 +1,9 @@
 #include "SourceType.h"
 
+#include <File.h>
+
+#include "SourceFile.h"
+
 SourceType::SourceType(void)
 {
 }
@@ -40,6 +44,18 @@ SourceFile *
 SourceType::CreateSourceFileItem(const char *path)
 {
 	return NULL;
+}
+
+
+SourceFile *
+SourceType::CreateSourceFile(const char *folder, const char *name,
+							uint32 options)
+{
+	DPath path(folder);
+	path << name;
+	BFile file(path.GetFullPath(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+	
+	return new SourceFile(path.GetFullPath());
 }
 
 

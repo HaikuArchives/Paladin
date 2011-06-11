@@ -1,9 +1,12 @@
 #include "SourceTypeResource.h"
 #include <Entry.h>
+#include <File.h>
 #include <stdio.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Node.h>
+#include <NodeInfo.h>
+#include <Resources.h>
 
 #include "BuildInfo.h"
 #include "DebugTools.h"
@@ -41,6 +44,55 @@ SourceTypeResource::CreateSourceFileItem(const char *path)
 }
 
 
+SourceFile *
+SourceTypeResource::CreateSourceFile(const char *dir, const char *name, uint32 options)
+{
+	if (!dir || !name)
+		return NULL;
+	
+	BString folderstr(dir);
+	if (folderstr.ByteAt(folderstr.CountChars() - 1) != '/')
+		folderstr << "/";
+	
+	DPath folder(folderstr.String()), filename(name);
+	
+	bool is_binary = true;
+	
+	BString ext = filename.GetExtension();
+	if (ext.ICompare("rdef") == 0)
+		is_binary = false;
+	else if (ext.ICompare("rsrc") != 0)
+		return NULL;
+	
+	entry_ref outRef;
+	if (is_binary)
+	{
+		DPath path(folder);
+		path << filename.GetFileName();
+		
+		BFile file(path.GetFullPath(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+		if (file.InitCheck() != B_OK)
+			return NULL;
+		
+		BResources res(&file, true);
+		res.Sync();
+		outRef = path.GetRef();
+		
+		BNodeInfo nodeInfo(&file);
+		nodeInfo.SetType("application/x-be-resource");
+	}
+	else
+	{
+		BString rdefdata = MakeRDefTemplate();
+		outRef = MakeProjectFile(folder.GetFullPath(), filename.GetFileName(),
+								rdefdata.String(), "text/x-vnd.Be.ResourceDef");
+	}
+	
+	BEntry entry(&outRef);
+	return entry.Exists() ? new SourceFileResource(outRef) : NULL;
+}
+
+
 SourceOptionView *
 SourceTypeResource::CreateOptionView(void)
 {
@@ -57,6 +109,12 @@ SourceTypeResource::GetName(void) const
 
 SourceFileResource::SourceFileResource(const char *path)
 	:	SourceFile(path)
+{
+}
+
+
+SourceFileResource::SourceFileResource(const entry_ref &ref)
+	:	SourceFile(ref)
 {
 }
 

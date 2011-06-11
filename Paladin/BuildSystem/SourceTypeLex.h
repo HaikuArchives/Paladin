@@ -23,6 +23,7 @@ class SourceFileLex : public SourceFile
 {
 public:
 						SourceFileLex(const char *path);
+						SourceFileLex(const entry_ref &ref);
 			bool		UsesBuild(void) const;
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 			void		Precompile(BuildInfo &info, const char *options);

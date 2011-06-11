@@ -23,6 +23,7 @@ class SourceFileYacc : public SourceFile
 {
 public:
 						SourceFileYacc(const char *path);
+						SourceFileYacc(const entry_ref &ref);
 			bool		UsesBuild(void) const;
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 			void		Precompile(BuildInfo &info, const char *options);

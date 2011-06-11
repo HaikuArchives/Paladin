@@ -448,8 +448,10 @@ ShellHelper::RunInPipe(BString &out, bool redirectStdErr)
 	if (file.InitCheck() != B_OK)
 		return file.InitCheck();
 	
-	char buffer[1024];
-	while (file.Read(buffer, 1024) > 0)
+//	char buffer[1024];
+//	while (file.Read(buffer, 1024) > 0)
+	char buffer[4096];
+	while (file.Read(buffer, 4096) > 0)
 		out << buffer;
 	
 	file.Unset();

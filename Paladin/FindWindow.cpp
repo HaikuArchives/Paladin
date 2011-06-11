@@ -235,8 +235,8 @@ FindWindow::MessageReceived(BMessage *msg)
 		}
 		case M_SHOW_RESULT:
 		{
-			GrepListItem *item = (GrepListItem*)fResultList->ItemAt(
-													fResultList->CurrentSelection());
+			GrepListItem *item = dynamic_cast<GrepListItem*>(fResultList->ItemAt(
+													fResultList->CurrentSelection()));
 			if (item)
 			{
 				LaunchHelper launcher("application/x-vnd.dw-PalEdit");
@@ -425,6 +425,7 @@ FindWindow::FindResults(void)
 	TokenizeToList(out.String(), resultList);
 	
 	Lock();
+	
 	for (int32 i = 0; i < resultList.CountItems(); i++)
 	{
 		// We don't want to hog the window lock, but we also don't want
@@ -458,8 +459,11 @@ FindWindow::FindResults(void)
 		fResultList->AddItem(new GrepListItem(entryPath.GetRef(), atol(lineString.String()),
 											locationString.String()));
 	}
-	if (fResultList->CountItems() > 0)
-		EnableReplace(true);
+	EnableReplace(fResultList->CountItems() > 0);
+	
+	if (fResultList->CountItems() == 0)
+		fResultList->AddItem(new BStringItem("No matches found"));
+	
 	Unlock();
 	
 }

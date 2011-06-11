@@ -26,7 +26,7 @@ SourceTypeLib::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeLib::CreateSourceFile(const char *path)
+SourceTypeLib::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileLib(path) : NULL;
 }

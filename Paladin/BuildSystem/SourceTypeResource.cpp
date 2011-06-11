@@ -35,7 +35,7 @@ SourceTypeResource::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeResource::CreateSourceFile(const char *path)
+SourceTypeResource::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileResource(path) : NULL;
 }

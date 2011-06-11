@@ -1140,7 +1140,7 @@ ProjectWindow::AddFile(const entry_ref &ref, BPoint *pt)
 		return;
 	}
 	
-	SourceFile *file = gFileFactory.CreateSourceFile(path.Path());
+	SourceFile *file = gFileFactory.CreateSourceFileItem(path.Path());
 	SourceFileItem *item = new SourceFileItem(file,1);
 	
 	int32 selection;

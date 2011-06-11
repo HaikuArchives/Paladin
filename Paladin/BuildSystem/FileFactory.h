@@ -10,7 +10,7 @@ public:
 						FileFactory(void);
 						
 		void			LoadTypes(void);
-		SourceFile *	CreateSourceFile(const char *path);
+		SourceFile *	CreateSourceFileItem(const char *path);
 
 private:
 		BObjectList<SourceType>	fList;

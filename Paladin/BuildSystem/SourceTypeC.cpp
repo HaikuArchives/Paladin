@@ -32,7 +32,7 @@ SourceTypeC::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeC::CreateSourceFile(const char *path)
+SourceTypeC::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileC(path) : NULL;
 }
@@ -331,4 +331,3 @@ SourceFileC::RemoveObjects(BuildInfo &info)
 	BEntry entry(GetObjectPath(info).GetFullPath());
 	entry.Remove();
 }
-

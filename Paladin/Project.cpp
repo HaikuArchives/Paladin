@@ -134,7 +134,7 @@ Project::Load(const char *path)
 					value.Prepend("/");
 					value.Prepend(fPath.GetFolder());
 				}
-				srcfile = gFileFactory.CreateSourceFile(value.String());
+				srcfile = gFileFactory.CreateSourceFileItem(value.String());
 				AddFile(srcfile, srcgroup);
 			}
 			else if (entry == "DEPENDENCY")
@@ -1119,7 +1119,7 @@ Project::AddLibrary(const char *path)
 	if (!HasLibrary(libpath.GetFullPath()))
 	{
 		STRACE(1,("%s: Added library %s\n",GetName(),libpath.GetFullPath()));
-		fLibraryList.AddItem(gFileFactory.CreateSourceFile(libpath.GetFullPath()));
+		fLibraryList.AddItem(gFileFactory.CreateSourceFileItem(libpath.GetFullPath()));
 	}
 }
 
@@ -1590,4 +1590,3 @@ DetectPlatform(void)
 	
 	return type;
 };
-

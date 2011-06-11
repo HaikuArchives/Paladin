@@ -32,7 +32,7 @@ SourceTypeYacc::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeYacc::CreateSourceFile(const char *path)
+SourceTypeYacc::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileYacc(path) : NULL;
 }
@@ -217,4 +217,3 @@ SourceFileYacc::RemoveObjects(BuildInfo &info)
 		index++;
 	}
 }
-

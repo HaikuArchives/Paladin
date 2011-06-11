@@ -37,7 +37,7 @@ SourceType::HasExtension(const char *ext)
 
 
 SourceFile *
-SourceType::CreateSourceFile(const char *path)
+SourceType::CreateSourceFileItem(const char *path)
 {
 	return NULL;
 }
@@ -55,4 +55,3 @@ SourceType::GetName(void) const
 {
 	return BString("Unknown");
 }
-

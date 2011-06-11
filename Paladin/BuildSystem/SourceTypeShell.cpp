@@ -25,7 +25,7 @@ SourceTypeShell::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeShell::CreateSourceFile(const char *path)
+SourceTypeShell::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileShell(path) : NULL;
 }
@@ -88,4 +88,3 @@ SourceFileShell::PostBuild(BuildInfo &info, const char *options)
 	
 	ParseIntoLines(errmsg.String(),info.errorList);
 }
-

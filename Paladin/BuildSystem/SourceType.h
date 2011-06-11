@@ -15,7 +15,7 @@ public:
 	virtual	BString		GetExtension(const int32 &index);
 			bool		HasExtension(const char *ext);
 	
-	virtual	SourceFile *		CreateSourceFile(const char *path);
+	virtual	SourceFile *		CreateSourceFileItem(const char *path);
 	virtual	SourceOptionView *	CreateOptionView(void);
 	
 	virtual	BString		GetName(void) const;

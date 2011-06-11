@@ -396,7 +396,7 @@ BeIDE2Paladin(const char *path, BString &outpath)
 	for (int32 i = 0; i < beide.CountFiles(); i++)
 	{
 		ProjectFile file = beide.FileAt(i);
-		SourceFile *srcFile = gFileFactory.CreateSourceFile(file.path.String());
+		SourceFile *srcFile = gFileFactory.CreateSourceFileItem(file.path.String());
 		
 		if (!srcFile)
 			continue;
@@ -644,5 +644,3 @@ GetPartnerRef(entry_ref ref)
 	
 	return entry_ref();
 }
-
-

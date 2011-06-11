@@ -28,7 +28,7 @@ SourceTypeRez::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeRez::CreateSourceFile(const char *path)
+SourceTypeRez::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileRez(path) : NULL;
 }
@@ -239,4 +239,3 @@ SourceFileRez::RemoveObjects(BuildInfo &info)
 	base << ".rsrc";
 	BEntry(base.String()).Remove();
 }
-

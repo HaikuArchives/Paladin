@@ -32,7 +32,7 @@ SourceTypeLex::GetExtension(const int32 &index)
 
 	
 SourceFile *
-SourceTypeLex::CreateSourceFile(const char *path)
+SourceTypeLex::CreateSourceFileItem(const char *path)
 {
 	return (path) ? new SourceFileLex(path) : NULL;
 }
@@ -217,4 +217,3 @@ SourceFileLex::RemoveObjects(BuildInfo &info)
 		index++;
 	}
 }
-

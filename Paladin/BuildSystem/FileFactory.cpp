@@ -35,7 +35,7 @@ FileFactory::LoadTypes(void)
 
 
 SourceFile *
-FileFactory::CreateSourceFile(const char *path)
+FileFactory::CreateSourceFileItem(const char *path)
 {
 	if (!path)
 		return NULL;
@@ -46,7 +46,7 @@ FileFactory::CreateSourceFile(const char *path)
 	{
 		SourceType *item = fList.ItemAt(i);
 		if (item->HasExtension(file.GetExtension()))
-			return item->CreateSourceFile(path);
+			return item->CreateSourceFileItem(path);
 	}
 	
 	// The default source file class doesn't do anything significant
@@ -54,4 +54,3 @@ FileFactory::CreateSourceFile(const char *path)
 	sourcefile->SetBuildFlag(BUILD_NO);
 	return sourcefile;
 }
-

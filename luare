@@ -38,8 +38,8 @@ end
 filePath = arg[argIndex]
 
 if (filePath == nil) then
-	print("Usage:\n\tluasub -i file [newname]")
-	print("\tluasub pattern replacement file [newname] [+line]")
+	print("Usage:\n\t(Interactive mode) luare -i file [newname]")
+	print("\t(Shell mode) luare pattern replacement file [newname] [+line]")
 	return 0
 end
 
@@ -83,7 +83,8 @@ if (matchLine < 0) then
 	file:close()
 	
 	local outFile = io.open(newPath, "w+")
-	outFile:write(string.gsub(fileData, pattern, replacement))
+	local newData = string.gsub(fileData, pattern, replacement);
+	outFile:write(newData)
 	outFile:close()
 else
 	local fileTable = {}

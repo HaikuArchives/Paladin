@@ -51,8 +51,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 	if (!string)
 		return;
 	
-	char *workstr = new char[strlen(string) + 1];
-	strcpy(workstr, string);
+	char *workstr = strdup(string);
 	strtok(workstr, "\n");
 	
 	char *token = strtok(NULL,"\n");
@@ -60,7 +59,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 	
 	if (!token)
 	{
-		delete [] workstr;
+		free(workstr);
 		stringList.AddItem(new BString(string));
 		return;
 	}
@@ -84,7 +83,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 	lasttoken = token;
 	stringList.AddItem(newword);
 		
-	delete [] workstr;
+	free(workstr);
 }
 
 

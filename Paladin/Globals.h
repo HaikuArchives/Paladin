@@ -49,6 +49,7 @@ extern DPath gAppPath;
 extern DPath gBackupPath;
 extern DPath gProjectPath;
 extern DPath gLastProjectPath;
+extern bool gDontManageHeaders;
 extern bool gSingleThreadedBuild;
 extern bool gShowFolderOnOpen;
 extern bool gShowTooltips;

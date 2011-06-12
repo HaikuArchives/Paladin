@@ -25,6 +25,7 @@ DPath gBackupPath;
 DPath gProjectPath;
 DPath gLastProjectPath;
 
+bool gDontManageHeaders = true;
 bool gSingleThreadedBuild = false;
 bool gShowFolderOnOpen = false;
 bool gAutoSyncModules = true;
@@ -60,6 +61,7 @@ InitGlobals(void)
 	
 	gSettings.Load("/boot/home/config/settings/Paladin_settings");
 	
+	gDontManageHeaders = gSettings.GetBool("dontmanageheaders",true);
 	gSingleThreadedBuild = gSettings.GetBool("singlethreaded",false);
 	gShowFolderOnOpen = gSettings.GetBool("showfolderonopen",false);
 	gAutoSyncModules = gSettings.GetBool("autosyncmodules",true);

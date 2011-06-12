@@ -19,6 +19,7 @@ private:
 					*fBackupFolder;
 					
 	BCheckBox		*fShowProjFolder,
+					*fDontAddHeaders,
 					*fSlowBuilds,
 					*fCCache,
 					*fFastDep,

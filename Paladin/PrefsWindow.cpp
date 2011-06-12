@@ -72,14 +72,22 @@ PrefsWindow::PrefsWindow(BRect frame)
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	view->AddChild(fShowProjFolder);
 	
-	fShowProjFolder->GetPreferredSize(&pw,&ph);
-	fShowProjFolder->ResizeTo(r.Width(), ph);
 	if (gShowFolderOnOpen)
 		fShowProjFolder->SetValue(B_CONTROL_ON);
-	SetToolTip(fShowProjFolder,TR("If checked, when a project is opened, "
-								"its parent folder is opened in Tracker"));
+	SetToolTip(fShowProjFolder,TR("When checked, a project's folder is shown in "
+									"Tracker when it is opened."));
+	r.OffsetBy(0, r.Height() + 5);
+	fDontAddHeaders = new BCheckBox(r,"dontaddheaders",
+									TR("Don't Add Headers to Projects"),
+									new BMessage,
+									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	view->AddChild(fDontAddHeaders);
 	
-	r = fShowProjFolder->Frame();
+	if (gDontManageHeaders)
+		fDontAddHeaders->SetValue(B_CONTROL_ON);
+	SetToolTip(fDontAddHeaders,TR("If checked, header files are not automatically "
+								"added to projects."));
+	
 	r.OffsetBy(0,r.Height() + 5.0);
 	
 	BBox *buildBox = new BBox(r, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
@@ -240,6 +248,9 @@ PrefsWindow::QuitRequested(void)
 	
 	gShowFolderOnOpen = (fShowProjFolder->Value() == B_CONTROL_ON);
 	gSettings.SetBool("showfolderonopen",gShowFolderOnOpen);
+	
+	gDontManageHeaders = (fDontAddHeaders->Value() == B_CONTROL_ON);
+	gSettings.SetBool("dontmanageheaders", gDontManageHeaders);
 	
 	gSingleThreadedBuild = (fSlowBuilds->Value() == B_CONTROL_ON);
 	gSettings.SetBool("singlethreaded",gSingleThreadedBuild);

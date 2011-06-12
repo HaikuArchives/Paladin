@@ -1690,6 +1690,9 @@ ProjectWindow::AddNewFile(BString name, bool create_pair)
 		DPath partnerPath(partnerRef);
 		fSourceControl->AddToRepository(projfile.GetFullPath());
 		msg.AddRef("refs",&partnerRef);
+		
+		if (!gDontManageHeaders)
+			AddFile(partnerRef);
 	}
 	
 	be_app->PostMessage(&msg);

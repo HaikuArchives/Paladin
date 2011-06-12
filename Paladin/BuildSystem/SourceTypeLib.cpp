@@ -32,11 +32,11 @@ SourceTypeLib::CreateSourceFileItem(const char *path)
 }
 
 
-SourceFile *
+entry_ref
 SourceTypeLib::CreateSourceFile(const char *folder, const char *name, uint32 options)
 {
 	// We don't create libraries out of nothing here. :)
-	return NULL;
+	return entry_ref();
 }
 
 

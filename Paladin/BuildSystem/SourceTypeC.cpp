@@ -38,11 +38,11 @@ SourceTypeC::CreateSourceFileItem(const char *path)
 }
 
 
-SourceFile *
+entry_ref
 SourceTypeC::CreateSourceFile(const char *dir, const char *name, uint32 options)
 {
 	if (!dir || !name)
-		return NULL;
+		return entry_ref();
 	
 	BString folderstr(dir);
 	if (folderstr.ByteAt(folderstr.CountChars() - 1) != '/')
@@ -63,7 +63,7 @@ SourceTypeC::CreateSourceFile(const char *dir, const char *name, uint32 options)
 		is_header = true;
 	
 	if (!is_cpp && !is_header)
-		return NULL;
+		return entry_ref();
 	
 	entry_ref sourceRef, headerRef;
 	if (create_pair)
@@ -98,8 +98,7 @@ SourceTypeC::CreateSourceFile(const char *dir, const char *name, uint32 options)
 		}
 	}
 	
-	BEntry entry(is_cpp ? &sourceRef : &headerRef);
-	return entry.Exists() ? new SourceFileC(is_cpp ? sourceRef : headerRef) : NULL;
+	return is_cpp ? sourceRef : headerRef;
 }
 
 

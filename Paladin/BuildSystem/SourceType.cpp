@@ -47,7 +47,7 @@ SourceType::CreateSourceFileItem(const char *path)
 }
 
 
-SourceFile *
+entry_ref
 SourceType::CreateSourceFile(const char *folder, const char *name,
 							uint32 options)
 {
@@ -55,7 +55,9 @@ SourceType::CreateSourceFile(const char *folder, const char *name,
 	path << name;
 	BFile file(path.GetFullPath(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
 	
-	return new SourceFile(path.GetFullPath());
+	entry_ref outRef;
+	BEntry(path.GetFullPath()).GetRef(&outRef);
+	return outRef;
 }
 
 

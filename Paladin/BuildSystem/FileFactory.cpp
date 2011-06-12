@@ -7,6 +7,7 @@
 #include "SourceTypeResource.h"
 #include "SourceTypeRez.h"
 #include "SourceTypeShell.h"
+#include "SourceTypeText.h"
 #include "SourceTypeYacc.h"
 
 FileFactory gFileFactory;
@@ -31,6 +32,7 @@ FileFactory::LoadTypes(void)
 	fList.AddItem(new SourceTypeRez);
 	fList.AddItem(new SourceTypeShell);
 	fList.AddItem(new SourceTypeYacc);
+	fList.AddItem(new SourceTypeText);
 }
 
 
@@ -54,3 +56,34 @@ FileFactory::CreateSourceFileItem(const char *path)
 	sourcefile->SetBuildFlag(BUILD_NO);
 	return sourcefile;
 }
+
+
+entry_ref
+FileFactory::CreateSourceFile(const char *folder, const char *name, uint32 options)
+{
+	DPath filename(name);
+	SourceType *type = FindTypeForExtension(filename.GetExtension());
+	if (!type)
+		return entry_ref();
+	
+	return type->CreateSourceFile(folder, name, options);
+}
+
+
+SourceType *
+FileFactory::FindTypeForExtension(const char *ext)
+{
+	for (int32 i = 0; i < fList.CountItems(); i++)
+	{
+		SourceType *type = fList.ItemAt(i);
+		if (!type)
+			continue;
+		
+		if (type->HasExtension(ext))
+			return type;
+	}
+	
+	return NULL;
+}
+
+

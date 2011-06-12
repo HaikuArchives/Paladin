@@ -32,11 +32,11 @@ SourceTypeShell::CreateSourceFileItem(const char *path)
 }
 
 
-SourceFile *
+entry_ref
 SourceTypeShell::CreateSourceFile(const char *dir, const char *name, uint32 options)
 {
 	if (!dir || !name)
-		return NULL;
+		return entry_ref();
 	
 	BString folderstr(dir);
 	if (folderstr.ByteAt(folderstr.CountChars() - 1) != '/')
@@ -46,7 +46,7 @@ SourceTypeShell::CreateSourceFile(const char *dir, const char *name, uint32 opti
 	
 	BString ext = filename.GetExtension();
 	if (ext.ICompare("sh") != 0)
-		return NULL;
+		return entry_ref();
 	
 	BString fileData = "#!/bin/sh\n\n";
 	entry_ref outRef = MakeProjectFile(folder, filename.GetFileName(),
@@ -59,8 +59,7 @@ SourceTypeShell::CreateSourceFile(const char *dir, const char *name, uint32 opti
 		file.SetPermissions(perms | S_IXUSR | S_IXGRP);
 	}
 	
-	BEntry entry(&outRef);
-	return entry.Exists() ? new SourceFileShell(outRef) : NULL;
+	return outRef;
 }
 
 

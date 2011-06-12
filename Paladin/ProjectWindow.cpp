@@ -1666,121 +1666,32 @@ ProjectWindow::DoBuild(int32 postbuild)
 void
 ProjectWindow::AddNewFile(BString name, bool create_pair)
 {
-	entry_ref ref;
 	BMessage msg(M_ADD_FILES);
 	
-	DPath projfolder(fProject->GetPath().GetFolder());
-	DPath projfile(projfolder);
-	projfile.Append(name);
+	DPath projfile(fProject->GetPath().GetFolder());
+	projfile << name;
 	
-	BString ext = projfile.GetExtension();
-	if (ext.CountChars() < 1)
-		ext = "cpp";
-	
-	bool is_cpp = false;
-	bool is_header = false;
-	bool is_resource = false;
-	
-	if ( (ext.ICompare("cpp") == 0) || (ext.ICompare("c") == 0) ||
-		(ext.ICompare("cxx") == 0) || (ext.ICompare("cc") == 0) )
-		is_cpp = true;
-	else if ((ext.ICompare("h") == 0) || (ext.ICompare("hxx") == 0) ||
-			(ext.ICompare("hpp") == 0) || (ext.ICompare("h++") == 0))
-		is_header = true;
-	else if ((ext.ICompare("rsrc") == 0) || (ext.ICompare("rdef") == 0))
-		is_resource = true;
-	
-	if (create_pair && !is_resource)
-	{
-		// Creating the pair is language dependent and probably should be abstracted
-		// away, but seeing how we're oriented toward C++ development, this can slide
-		BString nameone, nametwo;
-		
-		if (is_cpp)
-		{
-			nameone = projfile.GetFileName();
-			nametwo = projfile.GetBaseName();
-			nametwo << ".h";
-		}
-		else if (is_header)
-		{
-			nameone = projfile.GetBaseName();
-			nameone << ".cpp";
-			nametwo = projfile.GetFileName();
-		}
-		else
-		{
-			BString errmsg;
-			errmsg << TR("Paladin didn't recognize the extension for the filename you ")
-				<< TR("requested, so it will create only the file requested and not a file pair.");
-			BAlert *alert = new BAlert("Paladin",errmsg.String(),"OK");
-			alert->Go();
-		}
-		
-		if (nameone.CountChars() > 0)
-		{
-			// Source file
-			BString data;
-			data << "#include \"" << nametwo.String() << "\"\n\n";
-			ref = MakeProjectFile(projfile.GetFolder(),nameone.String(),data.String());
-			AddFile(ref);
-
-			if (fSourceControl)
-			{
-				DPath mainPath(ref);
-				fSourceControl->AddToRepository(mainPath.GetFullPath());
-			}
-			msg.AddRef("refs",&ref);
-			
-			data = MakeHeaderGuard(nametwo.String());
-			
-			// Header
-			ref = MakeProjectFile(projfile.GetFolder(),nametwo.String(),data.String());
-			if (!ref.name)
-				return;
-			
-			// We don't add headers to the project. User can do that if he wants.
-			// We *do* add them to source control however.
-			if (fSourceControl)
-			{
-				DPath partnerPath(ref);
-				fSourceControl->AddToRepository(partnerPath.GetFullPath());
-			}
-			
-			msg.AddRef("refs",&ref);
-			be_app->PostMessage(&msg);
-			return;
-		}
-		
-	}
-	
-	BString mimetype;
-	BString rdefdata;
-	if (is_resource)
-	{
-		if (ext.ICompare("rdef") == 0)
-		{
-			mimetype = "text/x-vnd.Be.ResourceDef";
-			rdefdata = MakeRDefTemplate();
-		}
-		else
-			mimetype = "application/x-be-resource";
-	}
-	ref = MakeProjectFile(projfolder, name.String(), rdefdata.String(), mimetype.String());
-	
-	if (!ref.name)
+	entry_ref ref = gFileFactory.CreateSourceFile(projfile.GetFolder(),
+												projfile.GetFileName(),
+												create_pair ? SOURCEFILE_PAIR : 0);
+	if (!ref.name || strlen(ref.name) == 0)
 		return;
 	
-	if (!is_header)
-		AddFile(ref);
+	AddFile(ref);
 	
 	if (fSourceControl)
-	{
-		DPath filePath(ref);
-		fSourceControl->AddToRepository(filePath.GetFullPath());
-	}
+		fSourceControl->AddToRepository(projfile.GetFullPath());
 	
 	msg.AddRef("refs",&ref);
+	
+	if (create_pair && fSourceControl)
+	{
+		entry_ref partnerRef = GetPartnerRef(ref);
+		DPath partnerPath(partnerRef);
+		fSourceControl->AddToRepository(projfile.GetFullPath());
+		msg.AddRef("refs",&partnerRef);
+	}
+	
 	be_app->PostMessage(&msg);
 }
 

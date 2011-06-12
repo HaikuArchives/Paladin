@@ -12,8 +12,8 @@ public:
 			int32		CountExtensions(void) const;
 			BString		GetExtension(const int32 &index);
 	
-			SourceFile *		CreateSourceFileItem(const char *path);
-			SourceFile *		CreateSourceFile(const char *folder, const char *name,
+			SourceFile *	CreateSourceFileItem(const char *path);
+			entry_ref		CreateSourceFile(const char *folder, const char *name,
 												uint32 options = 0);
 			SourceOptionView *	CreateOptionView(void);
 			BString		GetName(void) const;

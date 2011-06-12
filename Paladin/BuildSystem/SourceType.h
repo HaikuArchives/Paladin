@@ -1,6 +1,7 @@
 #ifndef SOURCETYPE_H
 #define SOURCETYPE_H
 
+#include <Entry.h>
 #include <String.h>
 #include <View.h>
 
@@ -19,10 +20,10 @@ public:
 	virtual				~SourceType(void);
 	virtual	int32		CountExtensions(void) const;
 	virtual	BString		GetExtension(const int32 &index);
-			bool		HasExtension(const char *ext);
+	virtual	bool		HasExtension(const char *ext);
 	
 	virtual	SourceFile *		CreateSourceFileItem(const char *path);
-	virtual	SourceFile *		CreateSourceFile(const char *folder, const char *name,
+	virtual	entry_ref	CreateSourceFile(const char *folder, const char *name,
 												uint32 options = 0);
 	virtual	SourceOptionView *	CreateOptionView(void);
 	

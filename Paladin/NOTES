@@ -1,5 +1,4 @@
 TODO:
-	Test generator code in SourceFile* classes and bolt it into ProjectWindow::AddNewFile
 	Create a lua-based grep so that regular expressions in the find box are compatible with the replacement program (grep's UNIX re vs luare's Lua re)
 	Issue: Printing output for hg push doesn't happen until after the fact. This is mitigated by
 		setting the preoutgoing hook in the [hooks] section of .hgrc to echo something.

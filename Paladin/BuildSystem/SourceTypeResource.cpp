@@ -44,11 +44,11 @@ SourceTypeResource::CreateSourceFileItem(const char *path)
 }
 
 
-SourceFile *
+entry_ref
 SourceTypeResource::CreateSourceFile(const char *dir, const char *name, uint32 options)
 {
 	if (!dir || !name)
-		return NULL;
+		return entry_ref();
 	
 	BString folderstr(dir);
 	if (folderstr.ByteAt(folderstr.CountChars() - 1) != '/')
@@ -62,7 +62,7 @@ SourceTypeResource::CreateSourceFile(const char *dir, const char *name, uint32 o
 	if (ext.ICompare("rdef") == 0)
 		is_binary = false;
 	else if (ext.ICompare("rsrc") != 0)
-		return NULL;
+		return entry_ref();
 	
 	entry_ref outRef;
 	if (is_binary)
@@ -72,7 +72,7 @@ SourceTypeResource::CreateSourceFile(const char *dir, const char *name, uint32 o
 		
 		BFile file(path.GetFullPath(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		if (file.InitCheck() != B_OK)
-			return NULL;
+			return entry_ref();
 		
 		BResources res(&file, true);
 		res.Sync();
@@ -88,8 +88,7 @@ SourceTypeResource::CreateSourceFile(const char *dir, const char *name, uint32 o
 								rdefdata.String(), "text/x-vnd.Be.ResourceDef");
 	}
 	
-	BEntry entry(&outRef);
-	return entry.Exists() ? new SourceFileResource(outRef) : NULL;
+	return outRef;
 }
 
 

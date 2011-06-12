@@ -173,8 +173,6 @@ PushArgList(lua_State *L, PArgList *list)
 int32
 ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex)
 {
-	// TODO: This needs to be changed to handle variable arguments instead of a table
-	
 	// This function is for reading in all of the necessary data to call a
 	// method owned by a PObject.
 	
@@ -348,10 +346,177 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 
 
 int32
-ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int startingIndex)
+ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex)
 {
-	// TODO: Implement
-	return 0;
+	// This function is for reading in all of the data returned from a Lua hook function,
+	// which is expected to be a table
+	
+	if (!list)
+		return B_ERROR;
+	
+	if (pmi.CountArgs() == 0 && pmi.CountReturnValues() == 0)
+		return 0;
+	
+	PArgs args(list);
+	args.MakeEmpty();
+	
+	int32 returnCount = 0;
+	for (int32 i = 0; i < pmi.CountReturnValues(); i++)
+	{
+		BString name = pmi.ReturnNameAt(i);
+		if (name.CountChars() < 1)
+			continue;
+		
+		lua_pushstring(L, name);
+		lua_gettable(L, tableIndex);
+		
+		if (lua_isnil(L, -1) && (pmi.ReturnFlagsAt(i) & PMIFLAG_OPTIONAL) == 0)
+		{
+			// Not an optional flag, so we have to bail.
+			fprintf(stderr, "Missing required argument %s\n", name.String());
+			lua_pop(L, 1);
+			return B_ERROR;
+		}
+		
+		switch (pmi.ReturnTypeAt(i))
+		{
+			case PARG_INT8:
+			{
+				args.AddInt8(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_INT16:
+			{
+				args.AddInt16(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_INT32:
+			{
+				args.AddInt32(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_INT64:
+			{
+				args.AddInt64(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_FLOAT:
+			{
+				args.AddFloat(name.String(), lua_tonumber(L, -1));
+				break;
+			}
+			case PARG_DOUBLE:
+			{
+				args.AddDouble(name.String(), lua_tonumber(L, -1));
+				break;
+			}
+			case PARG_BOOL:
+			{
+				args.AddBool(name.String(), lua_toboolean(L, -1));
+				break;
+			}
+			case PARG_CHAR:
+			{
+				args.AddChar(name.String(), lua_tointeger(L, -1));
+				break;
+			}
+			case PARG_STRING:
+			{
+				args.AddString(name.String(), lua_tostring(L, -1));
+				break;
+			}
+			case PARG_RECT:
+			{
+				BRect r;
+				
+				lua_pushstring(L, "left");
+				lua_gettable(L, -1);
+				r.left = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "top");
+				lua_gettable(L, -1);
+				r.top = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "right");
+				lua_gettable(L, -1);
+				r.right = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "bottom");
+				lua_gettable(L, -1);
+				r.bottom = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				args.AddRect(name.String(), r);
+				break;
+			}
+			case PARG_POINT:
+			{
+				BPoint pt;
+				
+				lua_pushstring(L, "x");
+				lua_gettable(L, -1);
+				pt.x = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "y");
+				lua_gettable(L, -1);
+				pt.y = lua_tonumber(L, -1);
+				lua_pop(L, 1);
+				
+				args.AddPoint(name.String(), pt);
+				break;
+			}
+			case PARG_COLOR:
+			{
+				rgb_color c;
+				
+				lua_pushstring(L, "reg");
+				lua_gettable(L, -1);
+				c.red = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "green");
+				lua_gettable(L, -1);
+				c.green = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "blue");
+				lua_gettable(L, -1);
+				c.blue = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				lua_pushstring(L, "alpha");
+				lua_gettable(L, -1);
+				c.alpha = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+				
+				args.AddColor(name.String(), c);
+				break;
+			}
+			case PARG_POINTER:
+			{
+				args.AddPointer(name.String(), (void*)lua_topointer(L, -1));
+				break;
+			}
+			case PARG_LIST:
+			{
+				debugger("List handling unsupported for argument passing from Lua. Sorry!");
+				break;
+			}
+			default:
+			{
+				printf("Unsupported retyrn type set to method\n");
+				lua_pop(L, 1);
+				break;
+			}			
+		}
+		lua_pop(L, 1);
+		returnCount++;
+	}
+	return returnCount;
 }
 
 

@@ -3309,6 +3309,15 @@ lua_run_app_lua(lua_State *L)
 }
 
 
+static
+int
+lua_debugger(lua_State *L)
+{
+	BString msg = (lua_gettop(L) == 1) ? lua_tostring(L, 1) : "";
+	debugger(msg.String());
+	return 0;
+}
+
 #pragma mark - Module registration
 
 
@@ -3396,6 +3405,7 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "method_run", lua_method_run },
 	
 	{ "run_app", lua_run_app_lua },
+	{ "debugger", lua_debugger },
 	
 	{ NULL, NULL}
 };

@@ -43,6 +43,44 @@ struct UserData
 						lua_pushinteger(state,value); lua_settable(state, -3);}
 
 
+static
+int
+DumpLuaStack(lua_State *L)
+{
+	int top = lua_gettop(L);
+	for (int i = 1; i <= top; i++)
+	{
+		int type = lua_type(L, i);
+		switch (type)
+		{
+			case LUA_TSTRING:
+			{
+				printf("'%s'", lua_tostring(L, i));
+				break;
+			}
+			case LUA_TBOOLEAN:
+			{
+				printf(lua_toboolean(L, i) ? "true" : "false");
+				break;
+			}
+			case LUA_TNUMBER:
+			{
+				printf("%g", lua_tonumber(L, i));
+				break;
+			}
+			default:
+			{
+				printf("%s", lua_typename(L, type));
+				break;
+			}
+		}
+		printf("  ");
+	}
+	printf("\n");
+	return 0;
+}
+
+
 int
 PushArgList(lua_State *L, PArgList *list)
 {
@@ -556,6 +594,9 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 		return 0;
 	}
 	PushArgList(L, in);
+	
+	DumpLuaStack(L);
+	
 	if (lua_pcall(L, count_pargs(in), event->interface.CountReturnValues(), 0) != 0)
 	{
 		lua_pushfstring(L, "Error running event hook %s: %s", event->code.String(), lua_tostring(L, -1));

@@ -1707,7 +1707,7 @@ void *
 pobject_find_event(void *pobj, const char *name)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
-	return obj ? obj->FindMethod(name) : NULL;
+	return obj ? obj->FindEvent(name) : NULL;
 }
 
 

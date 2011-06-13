@@ -618,6 +618,13 @@ FindWindow::SetProject(Project *proj)
 		{
 			SourceFile *file = group->filelist.ItemAt(j);
 			fFileList.AddItem(new BString(file->GetPath().GetFullPath()));
+			
+			entry_ref partnerRef = GetPartnerRef(file->GetPath().GetRef());
+			if (partnerRef.name)
+			{
+				DPath partnerPath(partnerRef);
+				fFileList.AddItem(new BString(partnerPath.GetFullPath()));
+			}
 		}
 	}
 }

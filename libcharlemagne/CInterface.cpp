@@ -886,7 +886,7 @@ find_parg_string(PArgList *list, const char *name, char **out)
 		return B_ERROR;
 	
 	PArgListItem *item = find_parg(list, name, NULL);
-	if (!item || item->type != PARG_INT64)
+	if (!item || item->type != PARG_STRING)
 		return B_NAME_NOT_FOUND;
 	
 	*out = strdup((char*)item->data);

@@ -199,6 +199,7 @@ PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("ActivateApp", PRosterActivateApp, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -209,6 +210,7 @@ PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *pt
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the app used to open the document.", PMIFLAG_OPTIONAL);
 //	AddMethod(new PMethod("AddToRecentDocuments", PRosterAddToRecentDocuments, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -219,6 +221,7 @@ PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddArg("signature", PARG_STRING, "MIME type of the app used to open the folder.", PMIFLAG_OPTIONAL);
 //	AddMethod(new PMethod("AddToRecentDocuments", PRosterAddToRecentFolders, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -229,6 +232,7 @@ PRosterBroadcast(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("Broadcast", PRosterBroadcast, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -241,6 +245,7 @@ PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("FindApp", PRosterFindApp, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -251,6 +256,7 @@ PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("GetActiveAppInfo", PRosterGetActiveAppInfo, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -263,6 +269,7 @@ PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("GetAppInfo", PRosterGetAppInfo, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -273,6 +280,7 @@ PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("list", PARG_LIST, "List of team_id values");
 //	AddMethod(new PMethod("GetAppList", PRosterGetAppList, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -283,6 +291,7 @@ PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("list", PARG_LIST, "List of paths to recently-run applications");
 //	AddMethod(new PMethod("GetRecentApps", PRosterGetRecentApps, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -298,6 +307,7 @@ PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("list", PARG_LIST, "List of paths to recently-used documents");
 //	AddMethod(new PMethod("GetRecentDocuments", PRosterGetRecentDocuments, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -310,6 +320,7 @@ PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("list", PARG_LIST, "List of paths to recently-used folders");
 //	AddMethod(new PMethod("GetRecentFolders", PRosterGetRecentFolders, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -321,6 +332,7 @@ PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("GetRunningAppInfo", PRosterGetRunningAppInfo, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -332,6 +344,7 @@ PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("value", PARG_BOOL, "True if the specified app is running");
 //	AddMethod(new PMethod("IsRunning", PRosterIsRunning, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }
 
 
@@ -342,6 +355,7 @@ PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddArg("arglist", PARG_LIST, "List of string arguments (argc)", PMIFLAG_OPTIONAL);
 //	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
 //	AddMethod(new PMethod("Launch", PRosterLaunch, &pmi));
+	return 0;
 }
 
 
@@ -353,4 +367,5 @@ PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 //	pmi.AddReturnValue("value", PARG_INT32, "team_id of the specified app");
 //	AddMethod(new PMethod("TeamFor", PRosterTeamFor, &pmi));
 //	pmi.MakeEmpty();
+	return 0;
 }

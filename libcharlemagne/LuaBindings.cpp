@@ -49,8 +49,8 @@ void	DumpLuaStack(lua_State *L);
 int		PushArgList(lua_State *L, PArgList *list);
 int32	ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex);
 int32	ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
-int		GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
-int		GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
+//int		GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
+//int		GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
 int		lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
 
 BString
@@ -603,7 +603,7 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 	return returnCount;
 }
 
-
+/*
 int
 GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out)
 {
@@ -614,7 +614,7 @@ int
 GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out)
 {
 }
-
+*/
 
 int
 lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
@@ -623,6 +623,7 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (find_parg_string(in, "EventName", &eventName) != B_OK)
 		return 0;
 	
+
 	// The extraData pointer should contain a pointer to the necessary Lua state.
 	lua_State *L = (lua_State*)extraData;
 	
@@ -638,12 +639,10 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	// 5) Convert the return values into the out PArgList
 	// 6) Empty the stack
 	
-	printf("run_lua_event initial stack: \n");
-	DumpLuaStack(L);
-	
 	lua_pop(L, -1);
 	
 	// This will push the function setup onto the top of the stack
+
 	lua_getglobal(L, event->code.String());
 	if (lua_isnil(L, lua_gettop(L)))
 	{
@@ -654,19 +653,18 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 		lua_error(L);
 		return 0;
 	}
+	
+
 	PushArgList(L, in);
-	printf("run_lua_event event stack:\n");
 	
-	DumpLuaStack(L);
-	
-	if (lua_pcall(L, count_pargs(in), event->interface.CountReturnValues(), 0) != 0)
+	if (lua_pcall(L, 1, event->interface.CountReturnValues(), 0) != 0)
 	{
 		lua_pushfstring(L, "Error running event hook %s: %s", event->code.String(), lua_tostring(L, -1));
 		lua_error(L);
 		return 0;
 	}
 	
-	ReadReturnValues(L, out, event->interface, 1);
+	ReadReturnValues(L, out, event->interface, 2);
 	lua_pop(L, -1);
 	
 	return 0;
@@ -1323,6 +1321,82 @@ lua_data_copy(lua_State *L)
 
 static
 int
+lua_data_set_property(lua_State *L)
+{
+	if (lua_gettop(L) != 3)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_set_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad property name in data_set_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	const char *propName = lua_tostring(L, 2);
+	
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (ud && (ud->type == USERDATA_DATA || ud->type == USERDATA_DATA_PTR ||
+				ud->type == USERDATA_OBJECT_PTR))
+	{
+		void *prop = pdata_find_property(ud->data, propName);
+		if (!prop)
+		{
+			lua_pushfstring(L, "Couldn't find property %s in data_set_property()", propName);
+			lua_error(L);
+			return 0;
+		}
+		
+		int type = lua_type(L, 3);
+		switch (type)
+		{
+			case LUA_TNUMBER:
+			{
+				FloatValue dval;
+				dval = lua_tonumber(L, 3);
+				pproperty_set_value(prop, &dval);
+				break;
+			}
+			case LUA_TSTRING:
+			{
+				StringValue sval;
+				*sval.value = lua_tostring(L, 3);
+				pproperty_set_value(prop, &sval);
+				break;
+			}
+			case LUA_TBOOLEAN:
+			{
+				BoolValue bval;
+				bval = lua_toboolean(L, 3);
+				pproperty_set_value(prop, &bval);
+				break;
+			}
+			case LUA_TTABLE:
+			{
+				// TODO: implement handling for rectangles, points, and colors by
+				// detecting the property type and attempting to read it in from the table
+				break;
+			}
+			default:
+			{
+				
+				lua_pushfstring(L, "Bad property value in data_set_property()");
+				lua_error(L);
+				return 0;
+			}
+		}
+	}
+	
+	return 0;
+}
+
+
+static
+int
 lua_data_count_properties(lua_State *L)
 {
 	if (lua_gettop(L) < 1 || lua_gettop(L) > 2)
@@ -1958,9 +2032,10 @@ static
 int
 lua_object_run_method(lua_State *L)
 {
-	if (lua_gettop(L) != 4)
+	if (lua_gettop(L) != 3)
 	{
-		lua_pushfstring(L, "Wrong number of arguments in object_run_method()");
+		lua_pushfstring(L, "Wrong number of arguments(%d) in object_run_method()\n", lua_gettop(L));
+		DumpLuaStack(L);
 		lua_error(L);
 		return 0;
 	}
@@ -3448,6 +3523,7 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "data_destroy", lua_data_destroy },
 	{ "data_duplicate", lua_data_duplicate },
 	{ "data_copy", lua_data_copy },
+	{ "data_set_property", lua_data_set_property },
 	{ "data_count_properties", lua_data_count_properties },
 	{ "data_property_at", lua_data_property_at },
 	{ "data_find_property", lua_data_find_property },

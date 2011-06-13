@@ -42,42 +42,76 @@ struct UserData
 #define PUSH_TABLE_INT(state,key,value) {lua_pushstring(state,key); \
 						lua_pushinteger(state,value); lua_settable(state, -3);}
 
+//GetTableString(lua_State *L, int tableIndex, 
 
-static
-int
+BString
+LuaTypeToString(lua_State *L, int index, int type)
+{
+	BString out;
+	switch (type)
+	{
+		case LUA_TSTRING:
+		{
+			out << "'" << lua_tostring(L, index) << "'";
+			break;
+		}
+		case LUA_TBOOLEAN:
+		{
+			out << (lua_toboolean(L, index) ? "true" : "false");
+			break;
+		}
+		case LUA_TNUMBER:
+		{
+			out << (float)lua_tonumber(L, index);
+			break;
+		}
+		default:
+		{
+			out << lua_typename(L, type);
+			break;
+		}
+	}
+	return out;
+}
+
+void
+DumpLuaTable(lua_State *L, int tableIndex)
+{
+	lua_pushnil(L);
+	printf("{");
+	while (lua_next(L, tableIndex) != 0)
+	{
+		BString keyString = lua_tostring(L, -2);
+		
+		BString valueString;
+		int type = lua_type(L, -1);
+		if (type == LUA_TTABLE)
+			DumpLuaTable(L, lua_gettop(L));
+		else
+			valueString = LuaTypeToString(L, -1, type);
+		
+		printf("%s=%s,",
+			keyString.String(),
+			valueString.String());
+		lua_pop(L, 1);
+	}
+	printf("}");
+}
+
+
+void
 DumpLuaStack(lua_State *L)
 {
 	int top = lua_gettop(L);
 	for (int i = 1; i <= top; i++)
 	{
 		int type = lua_type(L, i);
-		switch (type)
-		{
-			case LUA_TSTRING:
-			{
-				printf("'%s'", lua_tostring(L, i));
-				break;
-			}
-			case LUA_TBOOLEAN:
-			{
-				printf(lua_toboolean(L, i) ? "true" : "false");
-				break;
-			}
-			case LUA_TNUMBER:
-			{
-				printf("%g", lua_tonumber(L, i));
-				break;
-			}
-			default:
-			{
-				printf("%s", lua_typename(L, type));
-				break;
-			}
-		}
-		printf("  ");
+		if (type == LUA_TTABLE)
+			DumpLuaTable(L, i);
+		else
+			printf("%s  ", LuaTypeToString(L, i, type).String());
 	}
 	printf("\n");
-	return 0;
 }
 
 
@@ -91,6 +125,8 @@ PushArgList(lua_State *L, PArgList *list)
 	if (item)
 		lua_newtable(L);
 	else
+		return 0;
+	if (!item)
 		return 0;
 	
 	while (item)
@@ -580,6 +616,9 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	// 5) Convert the return values into the out PArgList
 	// 6) Empty the stack
 	
+	printf("run_lua_event initial stack: \n");
+	DumpLuaStack(L);
+	
 	lua_pop(L, -1);
 	
 	// This will push the function setup onto the top of the stack
@@ -594,6 +633,7 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 		return 0;
 	}
 	PushArgList(L, in);
+	printf("run_lua_event event stack:\n");
 	
 	DumpLuaStack(L);
 	

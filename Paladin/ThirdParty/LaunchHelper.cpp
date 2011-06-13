@@ -448,11 +448,17 @@ ShellHelper::RunInPipe(BString &out, bool redirectStdErr)
 	if (file.InitCheck() != B_OK)
 		return file.InitCheck();
 	
-//	char buffer[1024];
-//	while (file.Read(buffer, 1024) > 0)
-	char buffer[4096];
-	while (file.Read(buffer, 4096) > 0)
-		out << buffer;
+	off_t size;
+	file.GetSize(&size);
+	
+	char *buffer = out.LockBuffer(size + 1);
+	if (buffer)
+	{
+		file.Read(buffer, size);
+		out.UnlockBuffer();
+	}
+	else
+		fprintf(stderr, "Couldn't create buffer for command ShellHelper::RunInPipe\n");
 	
 	file.Unset();
 	BEntry(tmpfilename.String()).Remove();

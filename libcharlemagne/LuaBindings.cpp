@@ -42,7 +42,16 @@ struct UserData
 #define PUSH_TABLE_INT(state,key,value) {lua_pushstring(state,key); \
 						lua_pushinteger(state,value); lua_settable(state, -3);}
 
-//GetTableString(lua_State *L, int tableIndex, 
+// Support function declarations
+BString	LuaTypeToString(lua_State *L, int index, int type);
+void	DumpLuaTable(lua_State *L, int tableIndex);
+void	DumpLuaStack(lua_State *L);
+int		PushArgList(lua_State *L, PArgList *list);
+int32	ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex);
+int32	ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
+int		GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
+int		GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
+int		lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
 
 BString
 LuaTypeToString(lua_State *L, int index, int type)
@@ -73,6 +82,7 @@ LuaTypeToString(lua_State *L, int index, int type)
 	}
 	return out;
 }
+
 
 void
 DumpLuaTable(lua_State *L, int tableIndex)
@@ -117,7 +127,7 @@ DumpLuaStack(lua_State *L)
 
 int
 PushArgList(lua_State *L, PArgList *list)
-{
+ {
 	if (!list)
 		return 0;
 	
@@ -591,6 +601,18 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 		returnCount++;
 	}
 	return returnCount;
+}
+
+
+int
+GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out)
+{
+}
+
+
+int
+GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out)
+{
 }
 
 

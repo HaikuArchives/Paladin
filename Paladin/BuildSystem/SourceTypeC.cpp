@@ -65,37 +65,33 @@ SourceTypeC::CreateSourceFile(const char *dir, const char *name, uint32 options)
 	if (!is_cpp && !is_header)
 		return entry_ref();
 	
-	entry_ref sourceRef, headerRef;
-	if (create_pair)
+	BString sourceName, headerName;
+	if (is_cpp)
 	{
-		// Creating the pair is language dependent and probably should be abstracted
-		// away, but seeing how we're oriented toward C++ development, this can slide
-		BString nameone, nametwo;
+		sourceName = filename.GetFileName();
+		headerName = filename.GetBaseName();
+		headerName << ".h";
+	}
+	else
+	{
+		sourceName = filename.GetBaseName();
+		sourceName << ".cpp";
+		headerName = filename.GetFileName();
+	}
 		
-		if (is_cpp)
-		{
-			nameone = filename.GetFileName();
-			nametwo = filename.GetBaseName();
-			nametwo << ".h";
-		}
-		else if (is_header)
-		{
-			nameone = filename.GetBaseName();
-			nameone << ".cpp";
-			nametwo = filename.GetFileName();
-		}
-		
-		if (nameone.CountChars() > 0)
-		{
-			// Source file
-			BString data;
-			data << "#include \"" << nametwo.String() << "\"\n\n";
-			sourceRef = MakeProjectFile(folder.GetFullPath(),nameone.String(),data.String());
-			
-			// Header
-			data = MakeHeaderGuard(nametwo.String());
-			headerRef = MakeProjectFile(folder.GetFullPath(),nametwo.String(),data.String());
-		}
+	
+	entry_ref sourceRef, headerRef;
+	BString data;
+	if (is_cpp || create_pair)
+	{
+		data << "#include \"" << headerName << "\"\n\n";
+		sourceRef = MakeProjectFile(folder.GetFullPath(),sourceName.String(),data.String());
+	}
+	
+	if (is_header || create_pair)
+	{
+		data = MakeHeaderGuard(headerName.String());
+		headerRef = MakeProjectFile(folder.GetFullPath(),headerName.String(),data.String());
 	}
 	
 	return is_cpp ? sourceRef : headerRef;

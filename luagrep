@@ -29,3 +29,14 @@
 		-i, --ignore-case	perform a case-insensitive search
 		-r, --recursive		recurse into directories
 ]]
+
+function GrepFile(path, options)
+	-- actually searches the file
+end
+
+
+function PrintResultsNormal(results)
+	-- Takes a table and prints them
+	-- The format is filename:\t<result>
+end
+

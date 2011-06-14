@@ -181,6 +181,8 @@ bool				pproperty_is_read_only(void *prop);
 void				pproperty_set_read_only(void *prop, bool value);
 void				pproperty_set_enabled(void *prop, bool value);
 bool				pproperty_is_enabled(void *prop);
+void				pproperty_set_type(void *prop, const char *type);
+void				pproperty_get_type(void *prop, char **out);
 int					pproperty_set_value(void *prop, void *pvalue);
 int					pproperty_get_value(void *prop, void *pvalue);
 void				pproperty_get_value_as_string(void *prop, char **out);

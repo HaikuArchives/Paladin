@@ -1060,6 +1060,68 @@ lua_property_set_enabled(lua_State *L)
 
 
 int
+lua_property_set_type(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in property_set_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in property_set_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1) || lua_isnil(L, 2))
+		return 0;
+	
+	UserData *prop = (UserData*)lua_touserdata(L, 1);
+	BString type = lua_tostring(L, 2);
+	if (prop && (prop->type == USERDATA_PROPERTY || prop->type == USERDATA_PROPERTY_PTR))
+		pproperty_set_type(prop->data, type.String());
+	return 0;
+}
+
+
+int
+lua_property_get_type(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in property_get_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1))
+	{
+		lua_pushfstring(L, "Bad argument type in property_get_type()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (lua_isnil(L, 1))
+		return 0;
+	
+	UserData *prop = (UserData*)lua_touserdata(L, 1);
+	if (prop && (prop->type == USERDATA_PROPERTY || prop->type == USERDATA_PROPERTY_PTR))
+	{
+		char *outtype;
+		pproperty_get_type(prop->data, &outtype);
+		lua_pushstring(L, outtype);
+		free(outtype);
+		return 1;
+	}
+	
+	return 0;
+}
+
+
+int
 lua_property_get_value(lua_State *L)
 {
 	if (lua_gettop(L) != 1)
@@ -1379,6 +1441,7 @@ lua_data_set_property(lua_State *L)
 			{
 				// TODO: implement handling for rectangles, points, and colors by
 				// detecting the property type and attempting to read it in from the table
+				
 				break;
 			}
 			default:
@@ -3516,6 +3579,8 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "property_set_read_only", lua_property_set_read_only },
 	{ "property_is_enabled", lua_property_is_enabled },
 	{ "property_set_enabled", lua_property_set_enabled },
+	{ "property_get_type", lua_property_get_type },
+	{ "property_set_type", lua_property_set_type },
 	{ "property_get_value", lua_property_get_value },
 	{ "property_set_value", lua_property_set_value },
 	{ "property_get_description", lua_property_get_description },

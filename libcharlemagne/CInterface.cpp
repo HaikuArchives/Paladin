@@ -1121,6 +1121,28 @@ pproperty_is_enabled(void *prop)
 
 
 
+void
+pproperty_set_type(void *prop, const char *type)
+{
+	PProperty *p = static_cast<PProperty*>(prop);
+	if (p)
+		p->SetType(type);
+}
+
+
+void
+pproperty_get_type(void *prop, char **out)
+{
+	PProperty *p = static_cast<PProperty*>(prop);
+	if (p)
+	{
+		BString type(p->GetType());
+		*out = type.CountChars() ? strdup(type.String()) : NULL;
+	}
+}
+
+
+
 int
 pproperty_set_value(void *prop, void *pvalue)
 {

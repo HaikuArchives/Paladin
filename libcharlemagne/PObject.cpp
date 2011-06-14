@@ -83,10 +83,6 @@ PObject::PObject(const PObject &from)
 	
 	PObjectBroker::RegisterObject(this);
 	*this = from;
-	RemoveProperty(FindProperty("ObjectID"));
-	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
-				PROPERTY_READ_ONLY);
-	AddEvent("Destroy", "The object is about to be destroyed.");
 }
 
 
@@ -100,6 +96,24 @@ PObject::operator=(const PObject &from)
 	RemoveProperty(FindProperty("ObjectID"));
 	AddProperty(new IntProperty("ObjectID", GetID(), "Unique identifier of the object"),
 				PROPERTY_READ_ONLY);
+	
+	fInheritedList->MakeEmpty();
+	for (int32 i = 0; i < from.CountInheritedMethods(); i++)
+		AddInheritedMethod(new PMethod(*from.MethodAt(i)));
+	
+	fInterfaceList->MakeEmpty();
+	for (int32 i = 0; i < from.CountInterfaces(); i++)
+		AddInterface(from.InterfaceAt(i));
+	
+	fMethodList->MakeEmpty();
+	for (int32 i = 0; i < from.CountMethods(); i++)
+		AddMethod(new PMethod(*from.MethodAt(i)));
+	
+	fEventList->MakeEmpty();
+	for (int32 i = 0; i < from.CountEvents(); i++)
+		AddEvent(new EventData(*from.EventAt(i)));
+	
+	
 	return *this;
 }
 
@@ -123,13 +137,13 @@ PObject::~PObject(void)
 	PArgs in, out;
 	RunEvent("Destroy", in.ListRef(), out.ListRef());
 	
+	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
+	broker->UnregisterObject(this);
+	
 	delete fPropertyList;
 	delete fInterfaceList;
 	delete fMethodList;
 	delete fEventList;
-	
-	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
-	broker->UnregisterObject(this);
 }
 
 
@@ -350,18 +364,31 @@ PObject::PrintToStream(void)
 	for (int32 i = 0; i < CountInterfaces(); i++)
 		printf("\t%s\n",InterfaceAt(i).String());
 	
-	for (int32 i = 0; i < fPropertyList->CountItems(); i++)
+	printf("Properties:\n");
+	if (CountProperties() == 0)
+		printf("\tNone\n");
+	for (int32 i = 0; i < CountProperties(); i++)
 	{
 		PProperty *p = PropertyAt(i);
-		printf("Property: Name is %s, Type is %s, Value is %s\n",p->GetName().String(),
+		printf("\t%s (%s): %s\n",p->GetName().String(),
 				p->GetType().String(), p->GetValueAsString().String());
 	}
 	
-	printf("Object:\nMethods:\n");
+	printf("Methods:\n");
+	if (CountMethods() == 0)
+		printf("\tNone\n");
 	for (int32 i = 0; i < CountMethods(); i++)
 		printf("\t%s\n",MethodAt(i)->GetName().String());
 	
-	printf("Object:\nEvents:\n");
+	printf("Inherited Methods:\n");
+	if (CountInheritedMethods() == 0)
+		printf("\tNone\n");
+	for (int32 i = 0; i < CountInheritedMethods(); i++)
+		printf("\t%s\n",InheritedMethodAt(i)->GetName().String());
+	
+	printf("Events:\n");
+	if (CountEvents() == 0)
+		printf("\tNone\n");
 	for (int32 i = 0; i < CountEvents(); i++)
 		printf("\t%s\n",EventAt(i)->name.String());
 }
@@ -421,11 +448,7 @@ PObject::ConvertMsgToArgs(BMessage &in, PArgList &out)
 				case B_POINT_TYPE:
 					pargType = PARG_POINT;
 					break;
-/*
-				case B_RGB_32_BIT_TYPE:
-					pargType = PARG_COLOR;
-					break;
-*/				case B_RGB_COLOR_TYPE:
+				case B_RGB_COLOR_TYPE:
 					pargType = PARG_COLOR;
 					break;
 				case B_POINTER_TYPE:
@@ -637,7 +660,16 @@ PObject::AddEvent(const char *name, const char *description,
 	if (FindEvent(name))
 		return B_OK;
 	
-	EventData *data = new EventData(name, description, interface);
+	return AddEvent(new EventData(name, description, interface));
+}
+
+
+status_t
+PObject::AddEvent(EventData *data)
+{
+	if (fEventList->HasItem(data))
+		return B_OK;
+	
 	fEventList->AddItem(data);
 	return B_OK;
 }
@@ -755,3 +787,26 @@ EventData::EventData(const char *n, const char *d, PMethodInterface *pmi, void *
 		interface = *pmi;
 	extraData = ptr;
 }
+
+
+EventData::EventData(const EventData &from)
+{
+	*this = from;
+}
+
+
+EventData &
+EventData::operator=(const EventData &from)
+{
+	name = from.name;
+	description = from.description;
+	interface = from.interface;
+	hook = from.hook;
+	code = from.code;
+	
+	// NOTE: this is *not* copied
+	extraData = from.extraData;
+	
+	return *this;
+}
+

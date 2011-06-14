@@ -1898,6 +1898,8 @@ lua_object_create(lua_State *L)
 	if (!pobj)
 		return 0;
 	
+	pobject_print_to_stream(pobj);
+	
 	UserData *ud = (UserData*)lua_newuserdata(L, 1);
 	ud->data = pobj;
 	ud->type = USERDATA_OBJECT_PTR;

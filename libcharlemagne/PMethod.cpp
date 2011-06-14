@@ -12,6 +12,12 @@ PMethod::PMethod(const char *name, MethodFunction func, PMethodInterface *interf
 }
 
 
+PMethod::PMethod(const PMethod &from)
+{
+	*this = from;
+}
+
+
 PMethod::~PMethod(void)
 {
 }
@@ -21,6 +27,11 @@ PMethod &
 PMethod::operator=(const PMethod &from)
 {
 	fName = from.fName;
+	fDescription = from.fDescription;
+	fCode = from.fCode;
+	fFunction = from.fFunction;
+	fFlags = from.fFlags;
+	fInterface = from.fInterface;
 	
 	return *this;
 }

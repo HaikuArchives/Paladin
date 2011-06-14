@@ -25,8 +25,10 @@ public:
 class EventData
 {
 public:
-	EventData(const char *n, const char *d, PMethodInterface *pmi = NULL,
-				void *ptr = NULL);
+						EventData(const char *n, const char *d, PMethodInterface *pmi = NULL,
+								void *ptr = NULL);
+						EventData(const EventData &from);
+	EventData &			operator=(const EventData &from);
 	
 	BString				name,
 						description;
@@ -106,8 +108,9 @@ protected:
 	
 	virtual	status_t		AddInheritedMethod(PMethod *method);
 	
-	virtual	status_t		AddEvent(const char *name, const char *description,
+			status_t		AddEvent(const char *name, const char *description,
 									PMethodInterface *interface = NULL);
+	virtual	status_t		AddEvent(EventData *data);
 	virtual	status_t		RemoveEvent(const char *name);
 	
 	

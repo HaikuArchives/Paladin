@@ -1,5 +1,7 @@
 Implement type-specific bindings for PData in LuaBindings.cpp
 
+Go back over PObject methods to make sure stuff like Archiving still works after all of the changes that have been made to it
+
 Reimplement PMethodInteface's backend using a map instead of a list.
 
 Finish PRoster class

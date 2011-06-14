@@ -104,6 +104,7 @@ public:
 									MethodFunction func = NULL,
 									PMethodInterface *interface = NULL,
 									const int32 &flags = 0);
+							PMethod(const PMethod &from);
 	virtual					~PMethod(void);
 			PMethod &		operator=(const PMethod &from);
 			

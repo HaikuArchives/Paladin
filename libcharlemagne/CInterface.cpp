@@ -1325,7 +1325,7 @@ pdata_set_value_for_property(void *pdata, const char *name, void *pvalue)
 {
 	PData *pd = static_cast<PData*>(pdata);
 	PValue *val = static_cast<PValue*>(pvalue);
-	return pd ? pd->SetProperty(name, val) : B_BAD_DATA;
+	return (pd && val) ? pd->SetProperty(name, val) : B_BAD_DATA;
 }
 
 

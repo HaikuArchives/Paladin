@@ -49,8 +49,10 @@ void	DumpLuaStack(lua_State *L);
 int		PushArgList(lua_State *L, PArgList *list);
 int32	ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex);
 int32	ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
-//int		GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
-//int		GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
+status_t	GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
+status_t	GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
+status_t	GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out);
+status_t	GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out);
 int		lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
 
 BString
@@ -603,18 +605,62 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 	return returnCount;
 }
 
-/*
-int
+
+status_t
 GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out)
 {
+	lua_pushinteger(L, paramIndex);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isstring(L, -1))
+		return B_ERROR;
+	
+	out = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
 }
 
 
-int
+status_t
 GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out)
 {
+	lua_pushinteger(L, paramIndex);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
+		return B_ERROR;
+	
+	out = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
 }
-*/
+
+
+status_t
+GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out)
+{
+	lua_pushinteger(L, paramIndex);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
+		return B_ERROR;
+	
+	out = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
+}
+
+
+status_t
+GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out)
+{
+	lua_pushinteger(L, paramIndex);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
+		return B_ERROR;
+	
+	out = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
+}
+
 
 int
 lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
@@ -1420,28 +1466,121 @@ lua_data_set_property(lua_State *L)
 			{
 				FloatValue dval;
 				dval = lua_tonumber(L, 3);
-				pproperty_set_value(prop, &dval);
+				pdata_set_value_for_property(ud->data, propName, &dval);
 				break;
 			}
 			case LUA_TSTRING:
 			{
 				StringValue sval;
 				*sval.value = lua_tostring(L, 3);
-				pproperty_set_value(prop, &sval);
+				pdata_set_value_for_property(ud->data, propName, &sval);
 				break;
 			}
 			case LUA_TBOOLEAN:
 			{
 				BoolValue bval;
 				bval = lua_toboolean(L, 3);
-				pproperty_set_value(prop, &bval);
+				pdata_set_value_for_property(ud->data, propName, &bval);
 				break;
 			}
 			case LUA_TTABLE:
 			{
 				// TODO: implement handling for rectangles, points, and colors by
 				// detecting the property type and attempting to read it in from the table
+				char *temp;
+				pproperty_get_type(prop, &temp);
+				BString type(temp);
+				free(temp);
 				
+				if (type.ICompare("RectProperty") == 0)
+				{
+					if (lua_objlen(L, 3) != 4)
+					{
+						printf("RectProperty tables must have 4 values\n");
+						lua_error(L);
+					}
+					
+					RectValue rval;
+					if (GetTableFloat(L, 3, 1, rval.value->left) != B_OK)
+					{
+						printf("Couldn't set left value for property %s\n", propName);
+						lua_error(L);
+					}
+					if (GetTableFloat(L, 3, 2, rval.value->top) != B_OK)
+					{
+						printf("Couldn't set top value for property %s\n", propName);
+						lua_error(L);
+					}
+					if (GetTableFloat(L, 3, 3, rval.value->right) != B_OK)
+					{
+						printf("Couldn't set right value for property %s\n", propName);
+						lua_error(L);
+					}
+					if (GetTableFloat(L, 3, 4, rval.value->bottom) != B_OK)
+					{
+						printf("Couldn't set bottom value for property %s\n", propName);
+						lua_error(L);
+					}
+					pdata_set_value_for_property(ud->data, propName, &rval);
+					
+				}
+				else if (type.ICompare("PointProperty") == 0)
+				{
+					if (lua_objlen(L, 3) != 2)
+					{
+						printf("PointProperty tables must have 2 values\n");
+						lua_error(L);
+					}
+					
+					PointValue pval;
+					if (GetTableFloat(L, 3, 1, pval.value->x) != B_OK)
+					{
+						printf("Couldn't set x value for property %s\n", propName);
+						lua_error(L);
+					}
+					if (GetTableFloat(L, 3, 2, pval.value->y) != B_OK)
+					{
+						printf("Couldn't set y value for property %s\n", propName);
+						lua_error(L);
+					}
+					pdata_set_value_for_property(ud->data, propName, &pval);
+				}
+				else if (type.ICompare("ColorProperty") == 0)
+				{
+					int tableLength = lua_objlen(L, 3);
+					if (tableLength < 3 || tableLength > 4)
+					{
+						printf("ColorProperty tables must have 3 or 4 values\n");
+						lua_error(L);
+					}
+					
+					ColorValue cval;
+					if (GetTableUInteger8(L, 3, 1, cval.value->red) != B_OK)
+					{
+						printf("Couldn't set red value for property %s\n", propName);
+						lua_error(L);
+					}
+					if (GetTableUInteger8(L, 3, 2, cval.value->green) != B_OK)
+					{
+						printf("Couldn't set green value for property %s\n", propName);
+						lua_error(L);
+					}
+					if (GetTableUInteger8(L, 3, 3, cval.value->blue) != B_OK)
+					{
+						printf("Couldn't set blue value for property %s\n", propName);
+						lua_error(L);
+					}
+					
+					if (tableLength == 3 || GetTableUInteger8(L, 3, 4, cval.value->alpha) != B_OK)
+						cval.value->alpha = 255;
+					pdata_set_value_for_property(ud->data, propName, &cval);
+				}
+				else
+				{
+					printf("Unsupported type %s in data_set_property\n", type.String());
+					lua_error(L);
+					return 0;
+				}
 				break;
 			}
 			default:

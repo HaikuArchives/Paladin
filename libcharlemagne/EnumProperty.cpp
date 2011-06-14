@@ -113,6 +113,11 @@ EnumProperty::SetValue(PValue *value)
 		StringValue *s = (StringValue*)value;
 		fValueItem = FindItem(s->value->String());
 	}
+	else if (value->type->ICompare("float") == 0)
+	{
+		FloatValue *f = (FloatValue*)value;
+		fValueItem = FindItem((int64)*f->value);
+	}
 	else
 		return B_BAD_VALUE;
 	
@@ -370,6 +375,11 @@ EnumFlagProperty::SetValue(PValue *value)
 		if (!pair)
 			return B_BAD_VALUE;
 		fValue = *pair->value;
+	}
+	else if (value->type->ICompare("float") == 0)
+	{
+		FloatValue *f = (FloatValue*)value;
+		fValue = (int64)*f->value;
 	}
 	else
 		return B_BAD_VALUE;

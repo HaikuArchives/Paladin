@@ -106,6 +106,12 @@ DumpLuaTable(lua_State *L, int tableIndex)
 			keyString.String(),
 			valueString.String());
 		lua_pop(L, 1);
+		
+		if (lua_isnumber(L, -1))
+		{
+			lua_pop(L, 1);
+			break;
+		}
 	}
 	printf("}");
 }
@@ -280,6 +286,15 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 		
 		lua_pushstring(L, name);
 		lua_gettable(L, tableIndex);
+		
+		if (lua_isnil(L, -1))
+		{
+			// We couldn't find a named argument that matches our needs.
+			// Let's try getting the value by index instead.
+			lua_pop(L, 1);
+			lua_pushnumber(L, i + 1);
+			lua_gettable(L, tableIndex);
+		}
 		
 		if (lua_isnil(L, -1) && (pmi.ArgFlagsAt(i) & PMIFLAG_OPTIONAL) == 0)
 		{
@@ -1485,8 +1500,6 @@ lua_data_set_property(lua_State *L)
 			}
 			case LUA_TTABLE:
 			{
-				// TODO: implement handling for rectangles, points, and colors by
-				// detecting the property type and attempting to read it in from the table
 				char *temp;
 				pproperty_get_type(prop, &temp);
 				BString type(temp);
@@ -2100,8 +2113,6 @@ lua_object_create(lua_State *L)
 	if (!pobj)
 		return 0;
 	
-	pobject_print_to_stream(pobj);
-	
 	UserData *ud = (UserData*)lua_newuserdata(L, 1);
 	ud->data = pobj;
 	ud->type = USERDATA_OBJECT_PTR;
@@ -2251,15 +2262,15 @@ lua_object_run_method(lua_State *L)
 		return 0;
 	}
 	
-	UserData *pobj = (UserData*)lua_touserdata(L, 1);
-	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+	UserData *ud = (UserData*)lua_touserdata(L, 1);
+	if (!ud || ud->type != USERDATA_OBJECT_PTR)
 		return 0;
 	
 	BString methodName = lua_tostring(L, 2);
 	if (methodName.CountChars() < 1)
 		return 0;
 	
-	void *method = pobject_find_method(pobj, methodName.String());
+	void *method = pobject_find_method(ud->data, methodName.String());
 	if (!method)
 		return 0;
 	
@@ -2275,7 +2286,7 @@ lua_object_run_method(lua_State *L)
 	}
 	
 	PArgs retVals;
-	pobject_run_method(pobj, methodName.String(), args.List(), retVals.List(), L);
+	pobject_run_method(ud->data, methodName.String(), args.List(), retVals.List(), L);
 	PushArgList(L, retVals.List());
 	
 	return 1;

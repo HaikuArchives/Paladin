@@ -1500,7 +1500,11 @@ lua_data_set_property(lua_State *L)
 			{
 				FloatValue dval;
 				dval = lua_tonumber(L, 3);
-				pdata_set_value_for_property(ud->data, propName, &dval);
+				status_t status = pdata_set_value_for_property(ud->data, propName, &dval);
+				if (status)
+				{
+					printf("Setvalue returned %ld\n", status);
+				}
 				break;
 			}
 			case LUA_TSTRING:

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <String.h>
+#include <Window.h>
 
 #include "PApplication.h"
 #include "PArgs.h"
@@ -34,6 +35,12 @@ struct UserData
 	int		type;
 };
 
+struct APIConstant
+{
+	const char *name;
+	uint64 value;
+};
+
 #define ISPOINTER(L,I) (lua_isuserdata(L,I) || lua_isnil(L,I))
 #define PUSH_TABLE_FLOAT(state,key,value) {lua_pushstring(state,key); \
 						lua_pushnumber(state,value); lua_settable(state, -3);}
@@ -53,6 +60,7 @@ status_t	GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &o
 status_t	GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
 status_t	GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out);
 status_t	GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out);
+void	SetGlobalConstant(lua_State *L, const char *name, const uint64 &value);
 int		lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
 
 BString
@@ -674,6 +682,17 @@ GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out)
 	out = lua_tonumber(L, -1);
 	lua_pop(L, 1);
 	return B_OK;
+}
+
+
+void
+SetGlobalConstant(lua_State *L, const char *name, const uint64 &value)
+{
+	if (name)
+	{
+		lua_pushinteger(L, value);
+		lua_setglobal(L, name);
+	}
 }
 
 
@@ -3803,9 +3822,33 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "run_app", lua_run_app_lua },
 	{ "debugger", lua_debugger },
 	
-	{ NULL, NULL}
+	{ NULL, 0 }
 };
 
+
+static const APIConstant sAPIConstants[] = {
+	{ "BNotMovable", B_NOT_MOVABLE },
+	{ "BNotClosable", B_NOT_CLOSABLE },
+	{ "BNotZoomable", B_NOT_ZOOMABLE },
+	{ "BNotMinimizable", B_NOT_MINIMIZABLE },
+	{ "BNotResizable", B_NOT_RESIZABLE },
+	{ "BNotHResizable", B_NOT_H_RESIZABLE },
+	{ "BNotVResizable", B_NOT_V_RESIZABLE },
+	{ "BAvoidFront", B_AVOID_FRONT },
+	{ "BAvoidFocus", B_AVOID_FOCUS },
+	{ "BWillAcceptFirstClick", B_WILL_ACCEPT_FIRST_CLICK },
+	{ "BOutlineResize", B_OUTLINE_RESIZE },
+	{ "BNoWorkspaceActivation", B_NO_WORKSPACE_ACTIVATION },
+	{ "BNotAnchoredOnActivate", B_NOT_ANCHORED_ON_ACTIVATE },
+	{ "BAsynchronousControls", B_ASYNCHRONOUS_CONTROLS },
+	{ "BQuitOnWindowClose", B_QUIT_ON_WINDOW_CLOSE },
+	{ "BSamePositionInAllWorkspaces", B_SAME_POSITION_IN_ALL_WORKSPACES },
+	{ "BUpdateSizeLimits", B_AUTO_UPDATE_SIZE_LIMITS },
+	{ "BCloseOnEscape", B_CLOSE_ON_ESCAPE },
+	{ "BNoServerSideWindowModifiers", B_NO_SERVER_SIDE_WINDOW_MODIFIERS },
+	
+	{ NULL, NULL }
+};
 
 int
 luaopen_charlemagne(lua_State *L)
@@ -3813,6 +3856,14 @@ luaopen_charlemagne(lua_State *L)
 	pobjectspace_init();
 	
 	luaL_register(L, "charlemagne", charlemagnelib);
+	
+	int32 i = 0;
+	while (sAPIConstants[i].name)
+	{
+		SetGlobalConstant(L, sAPIConstants[i].name, sAPIConstants[i].value);
+		i++;
+	}
+	
 	return 1;
 }
 

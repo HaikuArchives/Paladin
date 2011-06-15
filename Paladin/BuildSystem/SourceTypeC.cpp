@@ -84,7 +84,9 @@ SourceTypeC::CreateSourceFile(const char *dir, const char *name, uint32 options)
 	BString data;
 	if (is_cpp || create_pair)
 	{
-		data << "#include \"" << headerName << "\"\n\n";
+		if (create_pair)
+			data << "#include \"" << headerName << "\"\n\n";
+		
 		sourceRef = MakeProjectFile(folder.GetFullPath(),sourceName.String(),data.String());
 	}
 	

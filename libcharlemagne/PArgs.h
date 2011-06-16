@@ -1,6 +1,7 @@
 #ifndef PARGS_H
 #define PARGS_H
 
+#include <Entry.h>
 #include <Rect.h>
 #include <InterfaceDefs.h>
 #include <String.h>
@@ -45,6 +46,7 @@ public:
 	int32				AddPointer(const char *name, void *arg);
 	int32				AddList(const char *name, const PArgList *list);
 	int32				AddList(const char *name, const PArgs &list);
+	int32				AddRef(const char *name, const entry_ref &ref);
 	
 	PArgListItem *		FindItem(const char *name, int32 index = 0);
 	int32				FindInt8(const char *name, int8 *out);
@@ -65,6 +67,7 @@ public:
 	int32				FindPointer(const char *name, void **arg);
 	int32				FindList(const char *name, PArgList **list);
 	int32				FindList(const char *name, PArgs &list, bool copy = false);
+	int32				FindRef(const char *name, entry_ref &ref);
 	
 	PArgListItem *		ItemAt(int32 index);
 	

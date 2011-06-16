@@ -232,6 +232,20 @@ PArgs::AddList(const char *name, const PArgs &list)
 }
 
 
+int32
+PArgs::AddRef(const char *name, const entry_ref &ref)
+{
+	if (!name)
+		return B_ERROR;
+	
+	PArgs refList;
+	refList.AddInt32("device", ref.device);
+	refList.AddInt64("directory", ref.directory);
+	refList.AddString("name", ref.name);
+	return AddList(name, refList);
+}
+
+
 PArgListItem *
 PArgs::FindItem(const char *name, int32 index)
 {
@@ -466,6 +480,35 @@ PArgs::FindList(const char *name, PArgs &list, bool copy)
 		return status;
 	
 	SetTo(ptr, copy);
+	return B_OK;
+}
+
+
+int32
+PArgs::FindRef(const char *name, entry_ref &ref)
+{
+	if (!name)
+		return B_ERROR;
+	
+	PArgs refList;
+	status_t status = FindList(name, refList);
+	if (status != B_OK)
+		return status;
+	
+	status = refList.FindInt32("device", &ref.device);
+	if (status != B_OK)
+		return status;
+	
+	status = refList.FindInt64("directory", &ref.directory);
+	if (status != B_OK)
+		return status;
+	
+	BString refName;
+	status = refList.FindString("name", &refName);
+	if (status != B_OK)
+		return status;
+	ref.set_name(refName.String());
+	
 	return B_OK;
 }
 

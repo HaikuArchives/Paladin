@@ -159,6 +159,7 @@ int					find_parg_rect(PArgList *list, const char *name, float *left,
 int					find_parg_color(PArgList *list, const char *name, unsigned char *red,
 									unsigned char *green, unsigned char *blue, unsigned char *alpha);
 int					find_parg_pointer(PArgList *list, const char *name, void **ptr);
+int					find_parg_list(PArgList *list, const char *name, PArgList **out);
 
 /* -------------------------------------------------------------------------------------
 	PValue-related definitions

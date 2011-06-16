@@ -17,6 +17,7 @@ public:
 	
 	PArgs &				operator=(const PArgs &from);
 	void				SetTo(const PArgs &from);
+	void				SetTo(PArgList *from, bool own = false);
 	
 	void				MakeEmpty(void);
 	
@@ -62,6 +63,8 @@ public:
 								uint8 *blue, uint8 *alpha = NULL);
 	int32				FindColor(const char *name, rgb_color *color);
 	int32				FindPointer(const char *name, void **arg);
+	int32				FindList(const char *name, PArgList **list);
+	int32				FindList(const char *name, PArgs &list, bool copy = false);
 	
 	PArgListItem *		ItemAt(int32 index);
 	

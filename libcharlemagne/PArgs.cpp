@@ -51,6 +51,38 @@ PArgs::SetTo(const PArgs &from)
 
 
 void
+PArgs::SetTo(PArgList *from, bool own)
+{
+	// If own is true, we copy the entire list, but it is false,
+	// we just copy the pointer to the list
+	if (fFreeList)
+		empty_parglist(fArgList);
+	else if (own)
+	{
+		// If we don't already own the list but we're going to,
+		// then we will need to allocate a new list to hold the
+		// new list items
+		fArgList = create_parglist();
+	}
+	
+	if (!from)
+		return;
+	
+	if (own)
+	{
+		copy_parglist(from, fArgList);
+		fFreeList = true;
+	}
+	else
+	{
+		destroy_parglist(fArgList);
+		fArgList = from;
+		fFreeList = false;
+	}
+}
+
+
+void
 PArgs::MakeEmpty(void)
 {
 	empty_parglist(fArgList);
@@ -406,6 +438,34 @@ PArgs::FindPointer(const char *name, void **out)
 		return B_NAME_NOT_FOUND;
 	
 	*out = item->data;
+	return B_OK;
+}
+
+
+int32
+PArgs::FindList(const char *name, PArgList **list)
+{
+	if (!name)
+		return B_ERROR;
+	
+	find_parg_list(fArgList, name, list);
+	
+	return (*list == NULL) ? B_NAME_NOT_FOUND : B_OK;
+}
+
+
+int32
+PArgs::FindList(const char *name, PArgs &list, bool copy)
+{
+	if (!name)
+		return B_ERROR;
+	
+	PArgList *ptr;
+	status_t status = find_parg_list(fArgList, name, &ptr);
+	if (status != B_OK)
+		return status;
+	
+	SetTo(ptr, copy);
 	return B_OK;
 }
 

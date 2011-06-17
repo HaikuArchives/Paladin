@@ -1,4 +1,6 @@
 #include "PRoster.h"
+#include <malloc.h>
+#include <string.h>
 
 int32_t PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 int32_t PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
@@ -186,6 +188,7 @@ PRoster::InitMethods(void)
 	pmi.AddArg("signature", PARG_STRING, "MIME signature of the application to launch");
 	pmi.AddArg("arglist", PARG_LIST, "List of string arguments (argc)", PMIFLAG_OPTIONAL);
 	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddReturnValue("team", PARG_INT32, "Team ID of the launched process");
 	AddMethod(new PMethod("Launch", PRosterLaunch, &pmi));
 }
 
@@ -355,6 +358,7 @@ PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	outArgs.MakeEmpty();
 	outArgs.AddList("entry_ref", refList);
 	outArgs.AddInt32("status", status);
+	
 	return B_OK;
 }
 
@@ -528,14 +532,66 @@ PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr)
 int32_t
 PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
-//	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent documents to retrieve.");
-//	pmi.AddArg("types", PARG_LIST, "List of mimetypes desired.", PMIFLAG_OPTIONAL);
-//	pmi.AddArg("signature", PARG_STRING, "MIME type of the application used to open the "
-//										"specified documents.",	PMIFLAG_OPTIONAL);
-//	pmi.AddReturnValue("refs", PARG_LIST, "List of paths to recently-used documents");
-//	AddMethod(new PMethod("GetRecentDocuments", PRosterGetRecentDocuments, &pmi));
-//	pmi.MakeEmpty();
-	return 0;
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PRoster *roster = static_cast<PRoster*>(pobject);
+	if (!roster)
+		return B_BAD_TYPE;
+	
+	PArgs args(in);
+	
+	int32 max;
+	if (args.FindInt32("maxcount", &max) != B_OK)
+		return B_ERROR;
+	
+	BString signature;
+	if (args.FindString("signature", &signature) != B_OK)
+		signature = "";
+	
+	PArgs typeList;
+	int32 typeIndex = 0;
+	char **types = NULL;
+	if (args.FindList("types", typeList) == B_OK)
+	{
+		int32 typeCount = typeList.CountItems();
+		types = (char **)malloc(sizeof(char*) * typeCount);
+		
+		PArgListItem *item = typeList.GetFirstItem();
+		while (item && typeIndex < typeCount)
+		{
+			if (item->type == PARG_STRING)
+			{
+				types[typeIndex] = (char*)item->data;
+				typeIndex++;
+			}
+			
+			item = typeList.GetNextItem(item);
+		}
+	}
+	
+	BMessage refmsg;
+	be_roster->GetRecentDocuments(&refmsg, max, (const char **)types, typeIndex + 1,
+								signature.String());
+	
+	free(types);
+	
+	PArgs outRefList;
+	int32 i = 0;
+	entry_ref appRef;
+	while (refmsg.FindRef("refs", i, &appRef) == B_OK)
+	{
+		BString indexString;
+		indexString << i;
+		outRefList.AddRef(indexString.String(), appRef);
+		i++;
+	}
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddList("paths", outRefList);
+	
+	return B_OK;
 }
 
 
@@ -584,45 +640,174 @@ PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 int32_t
 PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
-//	pmi.AddArg("team", PARG_INT32, "TeamID of the desired application");
-//	pmi.AddReturnValue("app_info", PARG_LIST, "List containing the app_info information");
-//	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
-//	AddMethod(new PMethod("GetRunningAppInfo", PRosterGetRunningAppInfo, &pmi));
-//	pmi.MakeEmpty();
-	return 0;
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PRoster *roster = static_cast<PRoster*>(pobject);
+	if (!roster)
+		return B_BAD_TYPE;
+	
+	PArgs args(in);
+	
+	int32 team;
+	if (args.FindInt32("team", &team) != B_OK)
+		return B_ERROR;
+	
+	app_info info;
+	status_t status = be_roster->GetRunningAppInfo(team, &info);
+	
+	PArgs infoList;
+	infoList.AddInt32("thread", info.thread);
+	infoList.AddInt32("team", info.team);
+	infoList.AddInt32("port", info.port);
+	infoList.AddInt32("flags", info.flags);
+	infoList.AddRef("entry_ref", info.ref);
+	infoList.AddString("signature", info.signature);
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddList("app_info", infoList);
+	outArgs.AddInt32("status", status);
+	
+	return B_OK;
 }
 
 
 int32_t
 PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
-//	pmi.AddArg("signature", PARG_STRING, "MIME type of the possibly running app", PMIFLAG_OPTIONAL);
-//	pmi.AddArg("path", PARG_STRING, "path of the possibly running app", PMIFLAG_OPTIONAL);
-//	pmi.AddReturnValue("value", PARG_BOOL, "True if the specified app is running");
-//	AddMethod(new PMethod("IsRunning", PRosterIsRunning, &pmi));
-//	pmi.MakeEmpty();
-	return 0;
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PRoster *roster = static_cast<PRoster*>(pobject);
+	if (!roster)
+		return B_BAD_TYPE;
+	
+	PArgs args(in);
+	
+	BString path;
+	if (args.FindString("path", &path) != B_OK)
+		path = "";
+	
+	BString signature;
+	if (args.FindString("signature", &signature) != B_OK)
+		signature = "";
+	
+	bool isRunning;
+	if (path.CountChars() > 1)
+	{
+		entry_ref pathRef;
+		BEntry entry(path.String());
+		entry.GetRef(&pathRef);
+		
+		isRunning = be_roster->IsRunning(&pathRef);
+	}
+	else if(signature.CountChars() < 1)
+	{
+		isRunning = be_roster->IsRunning(signature.String());
+	}
+	else
+		return B_ERROR;
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddBool("value", isRunning);
+	
+	return B_OK;
 }
 
 
 int32_t
 PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
-//	pmi.AddArg("signature", PARG_STRING, "MIME signature of the application to launch");
-//	pmi.AddArg("arglist", PARG_LIST, "List of string arguments (argc)", PMIFLAG_OPTIONAL);
-//	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
-//	AddMethod(new PMethod("Launch", PRosterLaunch, &pmi));
-	return 0;
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PRoster *roster = static_cast<PRoster*>(pobject);
+	if (!roster)
+		return B_BAD_TYPE;
+	
+	PArgs args(in);
+	
+	BString signature;
+	if (args.FindString("signature", &signature) != B_OK)
+		signature = "";
+	
+	PArgs argList;
+	int32 argIndex = 0;
+	char **launchArgs = NULL;
+	if (args.FindList("arglist", argList) == B_OK)
+	{
+		int32 typeCount = argList.CountItems();
+		launchArgs = (char **)malloc(sizeof(char*) * typeCount);
+		
+		PArgListItem *item = argList.GetFirstItem();
+		while (item && argIndex < typeCount)
+		{
+			if (item->type == PARG_STRING)
+			{
+				launchArgs[argIndex] = (char*)item->data;
+				argIndex++;
+			}
+			
+			item = argList.GetNextItem(item);
+		}
+	}
+	
+	team_id team;
+	status_t status = be_roster->Launch(signature.String(), argIndex + 1,
+										launchArgs, &team);
+	
+	free(launchArgs);
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddInt32("team", team);
+	outArgs.AddInt32("status", status);
+	
+	return B_OK;
 }
 
 
 int32_t
 PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 {
-//	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
-//	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
-//	pmi.AddReturnValue("value", PARG_INT32, "team_id of the specified app");
-//	AddMethod(new PMethod("TeamFor", PRosterTeamFor, &pmi));
-//	pmi.MakeEmpty();
-	return 0;
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PRoster *roster = static_cast<PRoster*>(pobject);
+	if (!roster)
+		return B_BAD_TYPE;
+	
+	PArgs args(in);
+	
+	BString path;
+	if (args.FindString("path", &path) != B_OK)
+		path = "";
+	
+	BString signature;
+	if (args.FindString("signature", &signature) != B_OK)
+		signature = "";
+	
+	team_id team;
+	if (path.CountChars() > 1)
+	{
+		entry_ref pathRef;
+		BEntry entry(path.String());
+		entry.GetRef(&pathRef);
+		
+		team = be_roster->TeamFor(&pathRef);
+	}
+	else if(signature.CountChars() < 1)
+	{
+		team = be_roster->TeamFor(signature.String());
+	}
+	else
+		return B_ERROR;
+	
+	PArgs outArgs(out);
+	outArgs.MakeEmpty();
+	outArgs.AddInt32("value", team);
+	
+	return B_OK;
 }

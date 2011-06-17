@@ -1,3 +1,29 @@
+--[[
+	C++ methods to (somehow) implement:
+		AddItem
+		AddStringItem
+		RemoveItem
+		ItemAt
+		IndexOf
+		InvalidateItem
+		IsItemSelected
+	
+	Methods to implement:
+		[Set|Get]SelectionMessage
+		[Set|Get]InvocationMessage
+		ScrollToSelection
+		ScrollTo
+		InitiateDrag
+		MakeEmpty
+		IsEmpty
+	
+	Additional Events:
+		SelectionChanged
+	
+	Additional Properties:
+		Selection (set, get)
+]]
+
 Module = MakeModule("PListView")
 Module.headerName = "PListView.h"
 Module.codeFileName = "PListView.cpp"

@@ -6,14 +6,69 @@
 #include "PApplication.h"
 #include "PArgs.h"
 #include "PMethod.h"
+#include "PProperty.h"
 #include "PValue.h"
+#include "lua.hpp"
+
+void
+SetIntField(lua_State *L, const char *key, int value)
+{
+	lua_pushinteger(L, value);
+	lua_setfield(L, -2, key);
+}
+
+
+void
+SetStringField(lua_State *L, const char *key, const char *value)
+{
+	lua_pushstring(L, value);
+	lua_setfield(L, -2, key);
+}
+
+
+void
+SetFloatField(lua_State *L, const char *key, float value)
+{
+	lua_pushnumber(L, value);
+	lua_setfield(L, -2, key);
+}
+
+
+void
+PushColor(lua_State *L, const rgb_color &value)
+{
+	lua_newtable(L);
+	SetIntField(L, "red", value.red);
+	SetIntField(L, "green", value.green);
+	SetIntField(L, "blue", value.blue);
+	SetIntField(L, "alpha", value.alpha);
+}
+
+
+void
+PushRect(lua_State *L, const BRect &value)
+{
+	lua_newtable(L);
+	SetFloatField(L, "left", value.left);
+	SetFloatField(L, "top", value.top);
+	SetFloatField(L, "right", value.right);
+	SetFloatField(L, "bottom", value.bottom);
+}
+
+
+void
+PushPoint(lua_State *L, const BPoint &value)
+{
+	lua_newtable(L);
+	SetFloatField(L, "x", value.x);
+	SetFloatField(L, "y", value.y);
+}
+
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-#include "lua.h"
-#include "lauxlib.h"
 #include "CInterface.h"
 
 enum
@@ -62,6 +117,7 @@ status_t	GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out)
 status_t	GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out);
 void	SetGlobalConstant(lua_State *L, const char *name, const uint64 &value);
 int		lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
+
 
 BString
 LuaTypeToString(lua_State *L, int index, int type)
@@ -1480,7 +1536,6 @@ lua_data_set_property(lua_State *L)
 	}
 	
 	const char *propName = lua_tostring(L, 2);
-	
 	UserData *ud = (UserData*)lua_touserdata(L, 1);
 	if (ud && (ud->type == USERDATA_DATA || ud->type == USERDATA_DATA_PTR ||
 				ud->type == USERDATA_OBJECT_PTR))
@@ -1527,9 +1582,9 @@ lua_data_set_property(lua_State *L)
 				pproperty_get_type(prop, &temp);
 				BString type(temp);
 				free(temp);
-				
 				if (type.ICompare("RectProperty") == 0)
 				{
+
 					if (lua_objlen(L, 3) != 4)
 					{
 						printf("RectProperty tables must have 4 values\n");
@@ -1629,6 +1684,88 @@ lua_data_set_property(lua_State *L)
 		}
 	}
 	
+	return 0;
+}
+
+
+static
+int
+lua_data_get_property(lua_State *L)
+{
+	if (lua_gettop(L) != 2)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in data_get_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2))
+	{
+		lua_pushfstring(L, "Bad argument type in data_get_property()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pdata = (UserData*)lua_touserdata(L, 1);
+	if (pdata && (pdata->type == USERDATA_DATA || pdata->type == USERDATA_DATA_PTR ||
+					pdata->type == USERDATA_OBJECT_PTR))
+	{
+		const char *propName = lua_tostring(L, 2);
+		
+		PProperty *prop = (PProperty*)pdata_find_property(pdata->data, propName);
+		if (!prop)
+		{
+			lua_pushfstring(L, "Property %s not found in data_get_property()", propName);
+			lua_error(L);
+			return 0;
+		}
+		
+		BString type(prop->GetType());
+		if (type.ICompare("IntProperty") == 0 || type.ICompare("FloatProperty") == 0)
+		{
+			FloatValue fv;
+			prop->GetValue(&fv);
+			lua_pushnumber(L, *fv.value);
+		}
+		else if (type.ICompare("StringProperty") == 0)
+		{
+			StringValue sv;
+			prop->GetValue(&sv);
+			lua_pushstring(L, sv.value->String());
+		}
+		else if (type.ICompare("BoolProperty") == 0)
+		{
+			BoolValue bv;
+			prop->GetValue(&bv);
+			lua_pushboolean(L, *bv.value);
+		}
+		else if (type.ICompare("RectProperty") == 0)
+		{
+			RectValue rv;
+			prop->GetValue(&rv);
+			PushRect(L, *rv.value);
+		}
+		else if (type.ICompare("PointProperty") == 0)
+		{
+			PointValue pv;
+			prop->GetValue(&pv);
+			PushPoint(L, *pv.value);
+		}
+		else if (type.ICompare("ColorProperty") == 0)
+		{
+			ColorValue cv;
+			prop->GetValue(&cv);
+			PushColor(L, *cv.value);
+		}
+		else if (type.ICompare("ListValue") == 0)
+		{
+			//ListValue lv;
+			//prop->GetValue(&lv);
+			printf("Getting a list not yet supported. Sorry!\n");
+			return 0;
+		}
+		return 1;
+	}
 	return 0;
 }
 
@@ -2272,7 +2409,7 @@ lua_object_run_method(lua_State *L)
 {
 	if (lua_gettop(L) != 3)
 	{
-		lua_pushfstring(L, "Wrong number of arguments(%d) in object_run_method()\n", lua_gettop(L));
+		lua_pushfstring(L, "Two arguments required in object_run_method()\n", lua_gettop(L));
 		DumpLuaStack(L);
 		lua_error(L);
 		return 0;
@@ -2280,7 +2417,10 @@ lua_object_run_method(lua_State *L)
 	
 	if (!ISPOINTER(L, 1) || !lua_isstring(L, 2) || !lua_istable(L, 3))
 	{
-		lua_pushfstring(L, "Bad argument type in object_run_method()");
+		if (!lua_istable(L, 3))
+			lua_pushstring(L, "Last argument in object_run_method must be a table");
+		else
+			lua_pushfstring(L, "Bad argument type in object_run_method()");
 		lua_error(L);
 		return 0;
 	}
@@ -3734,6 +3874,34 @@ lua_debugger(lua_State *L)
 	return 0;
 }
 
+static
+int
+lua_ui_color(lua_State *L)
+{
+	if (lua_gettop(L) != 1)
+	{
+		lua_pushstring(L, "Argument missing in UIColor()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!lua_isnumber(L, 1))
+	{
+		lua_pushstring(L, "Argument is not a number in UIColor()");
+		lua_error(L);
+		return 0;
+	}
+	
+	int32 value = lua_tonumber(L, 1);
+
+	rgb_color c = ui_color((color_which)value);
+	PushColor(L, c);
+	
+	DumpLuaStack(L);
+	return 1;
+}
+
+
 #pragma mark - Module registration
 
 
@@ -3764,6 +3932,7 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "data_duplicate", lua_data_duplicate },
 	{ "data_copy", lua_data_copy },
 	{ "data_set_property", lua_data_set_property },
+	{ "data_get_property", lua_data_get_property },
 	{ "data_count_properties", lua_data_count_properties },
 	{ "data_property_at", lua_data_property_at },
 	{ "data_find_property", lua_data_find_property },
@@ -3825,12 +3994,14 @@ static const luaL_Reg charlemagnelib[] = {
 	
 	{ "run_app", lua_run_app_lua },
 	{ "debugger", lua_debugger },
+	{ "UIColor", lua_ui_color },
 	
 	{ NULL, 0 }
 };
 
 
 static const APIConstant sAPIConstants[] = {
+	// BWindow flags
 	{ "BNotMovable", B_NOT_MOVABLE },
 	{ "BNotClosable", B_NOT_CLOSABLE },
 	{ "BNotZoomable", B_NOT_ZOOMABLE },
@@ -3850,6 +4021,29 @@ static const APIConstant sAPIConstants[] = {
 	{ "BUpdateSizeLimits", B_AUTO_UPDATE_SIZE_LIMITS },
 	{ "BCloseOnEscape", B_CLOSE_ON_ESCAPE },
 	{ "BNoServerSideWindowModifiers", B_NO_SERVER_SIDE_WINDOW_MODIFIERS },
+	
+	// ui_color constants
+	{ "BPanelBackgroundColor", B_PANEL_BACKGROUND_COLOR },
+	{ "BPanelTextColor", B_PANEL_TEXT_COLOR },
+	{ "BDocumentBackgroundColor", B_DOCUMENT_BACKGROUND_COLOR },
+	{ "BDocumentTextColor", B_DOCUMENT_TEXT_COLOR },
+	{ "BControlBackgroundColor", B_CONTROL_BACKGROUND_COLOR },
+	{ "BControlTextColor", B_CONTROL_TEXT_COLOR },
+	{ "BControlBorderColor", B_CONTROL_BORDER_COLOR },
+	{ "BControlHighlightColor", B_CONTROL_HIGHLIGHT_COLOR },
+	{ "BNavigationBaseColor", B_NAVIGATION_BASE_COLOR },
+	{ "BNavigationPulseColor", B_NAVIGATION_PULSE_COLOR },
+	{ "BShineColor", B_SHINE_COLOR },
+	{ "BShadowColor", B_SHADOW_COLOR },
+	{ "BMenuBackgroundColor", B_MENU_BACKGROUND_COLOR },
+	{ "BMenuSelectedBackgroundColor", B_MENU_SELECTED_BACKGROUND_COLOR },
+	{ "BMenuItemTextColor", B_MENU_ITEM_TEXT_COLOR },
+	{ "BMenuSelectedItemTextColor", B_MENU_SELECTED_ITEM_TEXT_COLOR },
+	{ "BMenuSelectedBorderColor", B_MENU_SELECTED_BORDER_COLOR },
+	{ "BMenuTooltipBackgroundColor", B_TOOL_TIP_BACKGROUND_COLOR },
+	{ "BMenuTooltipTextColor", B_TOOL_TIP_TEXT_COLOR },
+	{ "BSuccessColor", B_SUCCESS_COLOR },
+	{ "BFailureColor", B_FAILURE_COLOR },
 	
 	{ NULL, NULL }
 };

@@ -20,6 +20,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+--require("charlemagne")
+
 function PColor(r, g, b, a)
 	local alpha = a
 	if (not alpha) then
@@ -52,6 +54,11 @@ function MakeObject(name)
 	obj.SetProperty =
 		function (propname, value)
 			charlemagne.data_set_property(obj.handle, propname, value)
+		end
+	
+	obj.GetProperty =
+		function (propname)
+			return charlemagne.data_get_property(obj.handle, propname)
 		end
 	
 	obj.CountProperties = 

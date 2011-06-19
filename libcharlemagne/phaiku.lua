@@ -28,17 +28,17 @@ function PColor(r, g, b, a)
 		alpha = 255
 	end
 	
-	return { r, g, b, alpha }
+	return { ["red"]=r, ["green"]=g, ["blue"]=b, ["alpha"]=alpha }
 end
 
 
 function PRect(l, t, r, b)
-	return { l, t, r, b }
+	return { ["left"]=l, ["top"]=t, ["right"]=r, ["bottom"]=b }
 end
 
 
 function PPoint(x, y)
-	return { x, y }
+	return { ["x"]=x, ["y"]=y }
 end
 
 

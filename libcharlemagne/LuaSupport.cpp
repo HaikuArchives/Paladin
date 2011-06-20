@@ -645,6 +645,32 @@ GetTableSize(lua_State *L, int tableIndex)
 }
 
 
+int
+CountTableData(lua_State *L, int tableIndex)
+{
+	// Expensive call, but it's the only way to get the size of a table which uses
+	// non-integers for keys
+	
+	int tableCount = lua_objlen(L, tableIndex);
+	if (tableCount != 0)
+		return tableCount;
+	
+	// Push the first key to get
+	lua_pushnil(L);
+	while (lua_next(L, tableIndex))
+	{
+		int type = lua_type(L, -1);
+		if (type != LUA_TFUNCTION && type != LUA_TTHREAD)
+			tableCount++;
+		
+		// pop off the value, but leave the key for the next call to lua_next()
+		lua_pop(L, 1);
+	}
+	
+	return tableCount;
+}
+
+
 status_t
 GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out)
 {

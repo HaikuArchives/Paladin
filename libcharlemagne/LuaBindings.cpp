@@ -876,10 +876,11 @@ lua_data_set_property(lua_State *L)
 				free(temp);
 				if (type.ICompare("RectProperty") == 0)
 				{
-					
-					if (GetTableSize(L, 3) != 4)
+					int tableSize = CountTableData(L, 3);
+					if (tableSize != 4)
 					{
-						printf("RectProperty tables must have 4 values\n");
+						printf("data_set_property(%s): RectProperty tables must have 4 values, not %d\n",
+								propName, tableSize);
 						lua_error(L);
 					}					
 					RectValue rval;
@@ -908,7 +909,7 @@ lua_data_set_property(lua_State *L)
 				}
 				else if (type.ICompare("PointProperty") == 0)
 				{
-					if (GetTableSize(L, 3) != 2)
+					if (CountTableData(L, 3) != 2)
 					{
 						printf("PointProperty tables must have 2 values\n");
 						lua_error(L);
@@ -929,7 +930,7 @@ lua_data_set_property(lua_State *L)
 				}
 				else if (type.ICompare("ColorProperty") == 0)
 				{
-					int tableLength = GetTableSize(L, 3);
+					int tableLength = CountTableData(L, 3);
 					if (tableLength < 3 || tableLength > 4)
 					{
 						printf("ColorProperty tables must have 3 or 4 values\n");

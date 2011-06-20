@@ -28,17 +28,92 @@ function PColor(r, g, b, a)
 		alpha = 255
 	end
 	
-	return { ["red"]=r, ["green"]=g, ["blue"]=b, ["alpha"]=alpha }
+	local out = { ["red"]=r, ["green"]=g, ["blue"]=b, ["alpha"]=alpha }
+	
+	out.Set = function(self, r, g, b, a)
+			self.red = r
+			self.green = g
+			self.blue = b
+			self.alpha = (a or 255)
+		end
+	
+	return out
 end
 
 
 function PRect(l, t, r, b)
-	return { ["left"]=l, ["top"]=t, ["right"]=r, ["bottom"]=b }
+	local out = { ["left"]=l, ["top"]=t, ["right"]=r, ["bottom"]=b }
+	
+	out.OffsetTo = function(self, x, y)
+			self.right = x + (self.right - self.left)
+			self.bottom = y + (self.bottom - self.top)
+			self.left = x
+			self.top = y
+		end
+	
+	out.OffsetToCopy = function(self, x, y)
+			local out = self
+			out.OffsetTo(x,y)
+			return out
+		end
+	
+	out.OffsetToPoint = function(self, pt)
+			self.right = pt.x + (self.right - self.left)
+			self.bottom = pt.y + (self.bottom - self.top)
+			self.left = pt.x
+			self.top = pt.y
+		end
+	
+	out.OffsetBy = function(self, x, y)
+			self.left = self.left + x
+			self.right = self.right + x
+			self.top = self.top + y
+			self.bottom = self.bottom + y
+		end
+	
+	out.OffsetByCopy = function(self, x, y)
+			local out = self
+			out.OffsetBy(x,y)
+			return out
+		end
+	
+	out.OffsetByPoint = function(self, x, y)
+			self.left = self.left + pt.x
+			self.right = self.right + pt.x
+			self.top = self.top + pt.y
+			self.bottom = self.bottom + pt.y
+		end
+	
+	out.Set = function(self, l, t, r, b)
+			self.left = l
+			self.top = t
+			self.right = r
+			self.bottom = b
+		end
+	
+	return out
 end
 
 
 function PPoint(x, y)
-	return { ["x"]=x, ["y"]=y }
+	local out = { ["x"]=x, ["y"]=y }
+	
+	out.OffsetBy = function(self, x, y)
+			self.x = self.x + x
+			self.y = self.y + y
+		end
+	
+	out.OffsetByPoint = function(self, x, y)
+			self.x = self.x + pt.x
+			self.y = self.y + pt.y
+		end
+	
+	out.Set = function(self, x, y)
+			self.x = x
+			self.y = y
+		end
+	
+	return out
 end
 
 

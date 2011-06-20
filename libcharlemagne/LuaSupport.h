@@ -26,6 +26,7 @@ int32		ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 
 int32		ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
 
 int			GetTableSize(lua_State *L, int tableIndex);
+int			CountTableData(lua_State *L, int tableIndex);
 
 status_t	GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
 status_t	GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);

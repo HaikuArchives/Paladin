@@ -883,22 +883,22 @@ lua_data_set_property(lua_State *L)
 						lua_error(L);
 					}					
 					RectValue rval;
-					if (GetTableFloat(L, 3, 1, rval.value->left) != B_OK)
+					if (GetTableFloatByKey(L, 3, "left", rval.value->left) != B_OK)
 					{
 						printf("Couldn't set left value for property %s\n", propName);
 						lua_error(L);
 					}
-					if (GetTableFloat(L, 3, 2, rval.value->top) != B_OK)
+					if (GetTableFloatByKey(L, 3, "top", rval.value->top) != B_OK)
 					{
 						printf("Couldn't set top value for property %s\n", propName);
 						lua_error(L);
 					}
-					if (GetTableFloat(L, 3, 3, rval.value->right) != B_OK)
+					if (GetTableFloatByKey(L, 3, "right", rval.value->right) != B_OK)
 					{
 						printf("Couldn't set right value for property %s\n", propName);
 						lua_error(L);
 					}
-					if (GetTableFloat(L, 3, 4, rval.value->bottom) != B_OK)
+					if (GetTableFloatByKey(L, 3, "bottom", rval.value->bottom) != B_OK)
 					{
 						printf("Couldn't set bottom value for property %s\n", propName);
 						lua_error(L);
@@ -915,12 +915,12 @@ lua_data_set_property(lua_State *L)
 					}
 					
 					PointValue pval;
-					if (GetTableFloat(L, 3, 1, pval.value->x) != B_OK)
+					if (GetTableFloatByKey(L, 3, "x", pval.value->x) != B_OK)
 					{
 						printf("Couldn't set x value for property %s\n", propName);
 						lua_error(L);
 					}
-					if (GetTableFloat(L, 3, 2, pval.value->y) != B_OK)
+					if (GetTableFloatByKey(L, 3, "y", pval.value->y) != B_OK)
 					{
 						printf("Couldn't set y value for property %s\n", propName);
 						lua_error(L);
@@ -937,23 +937,24 @@ lua_data_set_property(lua_State *L)
 					}
 					
 					ColorValue cval;
-					if (GetTableUInteger8(L, 3, 1, cval.value->red) != B_OK)
+					if (GetTableUInt8ByKey(L, 3, "red", cval.value->red) != B_OK)
 					{
 						printf("Couldn't set red value for property %s\n", propName);
 						lua_error(L);
 					}
-					if (GetTableUInteger8(L, 3, 2, cval.value->green) != B_OK)
+					if (GetTableUInt8ByKey(L, 3, "green", cval.value->green) != B_OK)
 					{
 						printf("Couldn't set green value for property %s\n", propName);
 						lua_error(L);
 					}
-					if (GetTableUInteger8(L, 3, 3, cval.value->blue) != B_OK)
+					if (GetTableUInt8ByKey(L, 3, "blue", cval.value->blue) != B_OK)
 					{
 						printf("Couldn't set blue value for property %s\n", propName);
 						lua_error(L);
 					}
 					
-					if (tableLength == 3 || GetTableUInteger8(L, 3, 4, cval.value->alpha) != B_OK)
+					if (tableLength == 3 ||
+						GetTableUInt8ByKey(L, 3, "alpha", cval.value->alpha) != B_OK)
 						cval.value->alpha = 255;
 					pdata_set_value_for_property(ud->data, propName, &cval);
 				}

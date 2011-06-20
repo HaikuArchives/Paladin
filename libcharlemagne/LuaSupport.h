@@ -18,28 +18,34 @@
 #define PUSH_TABLE_INT(state,key,value) {lua_pushstring(state,key); \
 						lua_pushinteger(state,value); lua_settable(state, -3);}
 
-extern "C" {
-	BString		LuaTypeToString(lua_State *L, int index, int type);
-	void		DumpLuaTable(lua_State *L, int tableIndex);
-	void		DumpLuaStack(lua_State *L);
-	int			PushArgList(lua_State *L, PArgList *list);
-	int32		ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex);
-	int32		ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
-	int			GetTableSize(lua_State *L, int tableIndex);
-	status_t	GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
-	status_t	GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
-	status_t	GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out);
-	status_t	GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out);
-	void		SetGlobalConstant(lua_State *L, const char *name, const uint64 &value);
-}
+BString		LuaTypeToString(lua_State *L, int index, int type);
+void		DumpLuaTable(lua_State *L, int tableIndex);
+void		DumpLuaStack(lua_State *L);
+int			PushArgList(lua_State *L, PArgList *list);
+int32		ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex);
+int32		ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
 
-void	SetFloatField(lua_State *L, const char *key, float value);
-void	SetIntField(lua_State *L, const char *key, int value);
-void	SetStringField(lua_State *L, const char *key, const char *value);
+int			GetTableSize(lua_State *L, int tableIndex);
 
-void	PushColor(lua_State *L, const rgb_color &value);
-void	PushPoint(lua_State *L, const BPoint &value);
-void	PushRect(lua_State *L, const BRect &value);
+status_t	GetTableString(lua_State *L, int tableIndex, int paramIndex, BString &out);
+status_t	GetTableInteger(lua_State *L, int tableIndex, int paramIndex, int32 &out);
+status_t	GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out);
+status_t	GetTableUInt8(lua_State *L, int tableIndex, int paramIndex, uint8 &out);
+
+status_t	GetTableStringByKey(lua_State *L, int tableIndex, const char *key, BString &out);
+status_t	GetTableIntegerByKey(lua_State *L, int tableIndex, const char *key, int32 &out);
+status_t	GetTableFloatByKey(lua_State *L, int tableIndex, const char *key, float &out);
+status_t	GetTableUInt8ByKey(lua_State *L, int tableIndex, const char *key, uint8 &out);
+
+void		SetGlobalConstant(lua_State *L, const char *name, const uint64 &value);
+
+void		SetFloatField(lua_State *L, const char *key, float value);
+void		SetIntField(lua_State *L, const char *key, int value);
+void		SetStringField(lua_State *L, const char *key, const char *value);
+
+void		PushColor(lua_State *L, const rgb_color &value);
+void		PushPoint(lua_State *L, const BPoint &value);
+void		PushRect(lua_State *L, const BRect &value);
 
 
 

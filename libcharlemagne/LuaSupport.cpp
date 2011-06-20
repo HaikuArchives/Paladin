@@ -55,8 +55,6 @@ PushRect(lua_State *L, const BRect &value)
 }
 
 
-extern "C" {
-
 BString
 LuaTypeToString(lua_State *L, int index, int type)
 {
@@ -643,9 +641,6 @@ GetTableSize(lua_State *L, int tableIndex)
 		lua_pop(L, 1);
 	}
 	
-	// Leave the stack in the state that we got it.
-	lua_pop(L, 1);
-	
 	return tableCount;
 }
 
@@ -693,9 +688,65 @@ GetTableFloat(lua_State *L, int tableIndex, int paramIndex, float &out)
 
 
 status_t
-GetTableUInteger8(lua_State *L, int tableIndex, int paramIndex, uint8 &out)
+GetTableUInt8(lua_State *L, int tableIndex, int paramIndex, uint8 &out)
 {
 	lua_pushinteger(L, paramIndex);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
+		return B_ERROR;
+	
+	out = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
+}
+
+
+status_t
+GetTableStringByKey(lua_State *L, int tableIndex, const char *key, BString &out)
+{
+	lua_pushstring(L, key);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isstring(L, -1))
+		return B_ERROR;
+	
+	out = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
+}
+
+
+status_t
+GetTableIntegerByKey(lua_State *L, int tableIndex, const char *key, int32 &out)
+{
+	lua_pushstring(L, key);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
+		return B_ERROR;
+	
+	out = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
+}
+
+
+status_t
+GetTableFloatByKey(lua_State *L, int tableIndex, const char *key, float &out)
+{
+	lua_pushstring(L, key);
+	lua_gettable(L, tableIndex);
+	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
+		return B_ERROR;
+	
+	out = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return B_OK;
+}
+
+
+status_t
+GetTableUInt8ByKey(lua_State *L, int tableIndex, const char *key, uint8 &out)
+{
+	lua_pushstring(L, key);
 	lua_gettable(L, tableIndex);
 	if (lua_isnil(L, -1) || !lua_isnumber(L, -1))
 		return B_ERROR;
@@ -715,5 +766,3 @@ SetGlobalConstant(lua_State *L, const char *name, const uint64 &value)
 		lua_setglobal(L, name);
 	}
 }
-
-} // end extern "C"

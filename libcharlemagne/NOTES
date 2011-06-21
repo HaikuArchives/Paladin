@@ -1,5 +1,3 @@
-Fix Push(Rect|Point|Color) to call the Lua-based constructors so that returned values also have all of the methods that they should.
-
 Go back over PObject methods to make sure stuff like Archiving still works after all of the changes that have been made to it
 
 Reimplement PMethodInteface's backend using a map instead of a list.

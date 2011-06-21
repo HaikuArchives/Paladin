@@ -136,6 +136,11 @@ function MakeObject(name)
 			return charlemagne.data_get_property(obj.handle, propname)
 		end
 	
+	obj.PropertyAt =
+		function (index)
+			return charlemagne.data_property_at(obj.handle, index)
+		end
+	
 	obj.CountProperties = 
 		function ()
 			return charlemagne.data_count_properties(obj.handle)
@@ -158,11 +163,18 @@ function MakeObject(name)
 	
 	obj.HasInterface =
 		function (interfaceName)
-			charlemagne.object_get_interface(obj.handle, interfaceName)
+			return charlemagne.object_get_interface(obj.handle, interfaceName)
+		end
+	
+	obj.PrintToStream =
+		function()
+			charlemagne.data_print_to_stream(obj.handle)
 		end
 	
 	-- Set up convenience properties
 	obj.id = charlemagne.object_get_id(obj.handle)
+	obj.type = charlemagne.object_get_type(obj.handle)
+	obj.friendlytype = charlemagne.object_get_friendly_type(obj.handle)
 	
 	return obj
 end

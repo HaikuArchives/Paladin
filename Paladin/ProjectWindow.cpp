@@ -1693,6 +1693,7 @@ ProjectWindow::AddNewFile(BString name, bool create_pair)
 		
 		if (!gDontManageHeaders)
 			AddFile(partnerRef);
+		fSourceControl->AddToRepository(partnerPath.GetFullPath());
 	}
 	
 	be_app->PostMessage(&msg);

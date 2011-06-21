@@ -91,49 +91,33 @@ private:
 end
 
 
-function GenerateHeader(obj, back)
-	local getSetCode = [[
+
+local headerGetSetCode = [[
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 ]]
 	
-	local tailCode = [[
+local headerTailCode = [[
 };
 
 #endif
 ]]
-	
+
+
+function GenerateViewHeader(obj, back)
 	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, obj, back)
 	
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(obj.name) .. "_H")
-	
-	if (not obj.usesView) then
-		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. back.name .. ";\n" ..
-																			"class " .. back.parent .. ";")
-	else
-		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "")
-	end
+	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "")
 	
 	if (obj.properties and table.getn(obj.properties) > 0) then
-		classDef = classDef .. getSetCode .. "\n"
+		classDef = classDef .. headerGetSetCode .. "\n"
 	end
 	
-	if (obj.getBackend and (not obj.usesView)) then
-		if (not back.parent) then
-			print("PBackend.parent may not be empty if GetBackend() is to be used. Aborting.")
-			return nil
-		end
-		classDef = classDef .. "\t\t\t" .. back.parent .. " *\tGetBackend(void) const;\n"
-	end
-	
+	-- All PView-based controls are expected to use a GetBackend().
+	classDef = classDef .. "\t\t\t" .. back.parent .. " *\tGetBackend(void) const;\n"
 	classDef = classDef .. "\n" .. GenerateProtectedSection(obj, back) .. GeneratePrivateSection(obj, back)
-	
-	
-	if (obj.usesBackend and (not obj.usesView)) then
-		classDef = classDef .. "\t\t\t" .. back.name .. " *fBackend;\n"
-	end
-	
-	classDef = classDef .. tailCode .. "\n"
+	classDef = classDef .. headerTailCode .. "\n"
 	
 	local header = io.open(Module.headerName, "w+")
 	if (not header) then
@@ -146,4 +130,53 @@ function GenerateHeader(obj, back)
 	header:close()
 	
 	return 0
+end
+
+
+function GenerateNonViewHeader(obj, back)
+	
+	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, obj, back)
+	
+	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(obj.name) .. "_H")
+	
+	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
+									back.name .. ";\n" .. "class " .. back.parent .. ";")
+	
+	if (obj.properties and table.getn(obj.properties) > 0) then
+		classDef = classDef .. headerGetSetCode .. "\n"
+	end
+	
+	if (obj.getBackend and (not back.parent)) then
+		error("PBackend.parent may not be empty if GetBackend() is to be used. Aborting.")
+		return nil
+	end
+	classDef = classDef .. "\t\t\t" .. back.parent .. " *\tGetBackend(void) const;\n"
+	classDef = classDef .. "\n" .. GenerateProtectedSection(obj, back) .. GeneratePrivateSection(obj, back)
+	
+	if (obj.usesBackend) then
+		classDef = classDef .. "\t\t\t" .. back.name .. " *fBackend;\n"
+	end
+	
+	classDef = classDef .. headerTailCode .. "\n"
+	
+	local header = io.open(Module.headerName, "w+")
+	if (not header) then
+		print("Couldn't open write header for module " .. Module.name)
+		return nil
+	end
+	
+	header:write(classDef)
+	
+	header:close()
+	
+	return 0
+end
+
+
+function GenerateHeader(obj, back)
+	if (obj.usesView) then
+		return GenerateViewHeader(obj, back)
+	else
+		return GenerateNonViewHeader(obj, back)
+	end
 end

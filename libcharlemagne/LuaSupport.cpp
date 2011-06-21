@@ -27,31 +27,34 @@ SetStringField(lua_State *L, const char *key, const char *value)
 void
 PushColor(lua_State *L, const rgb_color &value)
 {
-	lua_newtable(L);
-	SetIntField(L, "red", value.red);
-	SetIntField(L, "green", value.green);
-	SetIntField(L, "blue", value.blue);
-	SetIntField(L, "alpha", value.alpha);
+	lua_getfield(L, LUA_GLOBALSINDEX, "PColor");
+	lua_pushinteger(L, value.red);
+	lua_pushinteger(L, value.green);
+	lua_pushinteger(L, value.blue);
+	lua_pushinteger(L, value.alpha);
+	lua_call(L, 4, 1);
 }
 
 
 void
 PushPoint(lua_State *L, const BPoint &value)
 {
-	lua_newtable(L);
-	SetFloatField(L, "x", value.x);
-	SetFloatField(L, "y", value.y);
+	lua_getfield(L, LUA_GLOBALSINDEX, "PPoint");
+	lua_pushnumber(L, value.x);
+	lua_pushnumber(L, value.y);
+	lua_call(L, 2, 1);
 }
 
 
 void
 PushRect(lua_State *L, const BRect &value)
 {
-	lua_newtable(L);
-	SetFloatField(L, "left", value.left);
-	SetFloatField(L, "top", value.top);
-	SetFloatField(L, "right", value.right);
-	SetFloatField(L, "bottom", value.bottom);
+	lua_getfield(L, LUA_GLOBALSINDEX, "PRect");
+	lua_pushnumber(L, value.left);
+	lua_pushnumber(L, value.top);
+	lua_pushnumber(L, value.right);
+	lua_pushnumber(L, value.bottom);
+	lua_call(L, 4, 1);
 }
 
 

@@ -98,3 +98,7 @@ BeginEmbeddedCode
 EndEmbeddedCode
 
 
+[backend]
+Parent=public AutoTextControl
+Init=BRect(0, 0, 1, 1), "", "", "",new BMessage()
+UsesPViewHooks=true

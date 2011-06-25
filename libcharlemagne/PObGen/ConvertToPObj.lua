@@ -199,6 +199,17 @@ function DumpMethods(obj)
 	print(out)
 end
 
+function DumpBackend(backend)
+	print("[backend]")
+	print("Parent=" .. backend.access .. " " .. backend.parent)
+	print("Init=" .. backend.init)
+	if (backend.eventHooks) then
+		print("UsesPViewHooks=true")
+	else
+		print("UsesPViewHooks=false")
+	end
+end
+
 -- Do the conversion here
 LoadUtilities = assert(loadfile("scripts/GenUtilities.lua"))
 LoadGenHeader = assert(loadfile("scripts/GenHeader.lua"))
@@ -215,5 +226,6 @@ DumpModule(Module)
 DumpObject(PObject)
 DumpProperties(PObject)
 DumpMethods(PObject)
+DumpBackend(PBackend)
 
 return 0

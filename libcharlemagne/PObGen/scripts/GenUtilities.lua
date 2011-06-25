@@ -167,20 +167,20 @@ PObject *
 ]]
 
 
-function ApplyObjectPlaceholders(str, def)
-	if (not def) then
+function ApplyObjectPlaceholders(str, obj, back)
+	if (not obj) then
 		return str
 	end
 	
 	local out = str
 	
-	if (def.object.UsesView) then
+	if (obj.usesView) then
 		
 		local msgCode = [[BMessage viewmsg;
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
 		fView = (BView*)]]
 		
-		msgCode = msgCode .. def.backend.name .. "::Instantiate(&viewmsg);\n"
+		msgCode = msgCode .. back.name .. "::Instantiate(&viewmsg);\n"
 		
 		out = string.gsub(out, "%%%(USESVIEW_CONSTRUCTOR%)", msgCode)
 	else
@@ -318,6 +318,87 @@ end
 
 ------------------------------------------------------------------------------
 -- PObject Generation functions
+
+function MakeModule(modName)
+	local mod = {}
+	mod.name = modName
+	mod.headerName = ""
+	mod.codeFileName = ""
+	mod.parentHeaderName = ""
+	mod.includes = {}
+
+	return mod
+end
+
+
+function MakePObject(objName, objDesc)
+	local obj = {}
+	
+	-- Init data
+	obj.name = objName
+	obj.description = objDesc
+	obj.usesView = false
+	obj.friendlyName = objName
+	obj.parentClass = "PObject"
+	obj.parentAccess = "public"
+	obj.usesBackend = true
+	obj.initBackend = ""
+	obj.getBackend = true
+	obj.properties = {}
+	obj.embeddedProperties = {}
+	obj.methods = {}
+	obj.embeddedMethods = {}
+	obj.variables = {}
+	obj.functions = {}
+	
+	-- Init PObject methods. These are more for convenience
+	-- and clarity than anything
+	obj.CountProperties = function(self)
+		return table.maxn(self.properties)
+		end
+	
+	obj.CountMethods = function(self)
+		return table.maxn(self.methods)
+		end
+	
+	obj.SetVariable = function(self, access, type, name)
+		if ((not access) or (not type) or (not name)) then
+			return nil
+		end
+		
+		self.variables[name] = {}
+		self.variables[name].access = access
+		self.variables[name].type = type
+		end
+	
+	obj.CountVariables = function(self)
+		return table.maxn(self.variables)
+		end
+	
+	obj.SetFunction = function(self, access, type, name, code)
+		self.functions[name] = {}
+		self.functions[name].access = access
+		self.functions[name].type = type
+		self.functions[name].code = code
+		end
+	
+	obj.CountFunctions = function(self)
+		return table.maxn(self.functions)
+		end
+	
+	obj.SetEmbeddedProperty = function(self, name, getcode, setcode)
+		if (not name) then
+			return nil
+		end
+		
+		self.embeddedProperties[name] = {}
+		self.embeddedProperties[name].getCode = getcode
+		self.embeddedProperties[name].setCode = setcode
+		end
+	
+	return obj
+end
+
 
 function MakePBackend(backName)
 	local back = {}

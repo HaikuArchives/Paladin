@@ -1,5 +1,8 @@
 -- Script to generate the header for a PObGen module
 
+LoadParser = assert(loadfile("scripts/PObjParser.lua"))
+LoadParser()
+
 LoadUtilities = assert(loadfile("scripts/GenUtilities.lua"))
 LoadUtilities()
 
@@ -388,9 +391,10 @@ if (not GenerateHeader(PObject, PBackend)) then
 	return -1
 end
 
-
+--[[
 print("Generating " .. Module.codeFileName)
 if (not GenerateCodeFile(PObject, PBackend)) then
 	return -1
 end
 
+]]

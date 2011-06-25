@@ -1,0 +1,39 @@
+[global]
+Module=PClipboard
+Header=PClipboard.h
+CodeFileName=PClipboard.cpp
+ParentHeaderName="PHandler.h"
+
+[includes]
+<Application.h>
+<Clipboard.h>
+<Window.h>
+
+[object]
+Name=PClipboard
+FriendlyName=Clipboard
+Description=A representation of the clipboard
+UsesView=false
+ParentClass=public PHandler
+
+[properties]
+Property bool(false) Locked
+	GetValue:IsLocked(void)
+	SetValue:Lock(embedded)
+BeginEmbeddedCode
+		prop->GetValue(&boolval);
+		if (*boolval.value)
+			fBackend->Lock();
+		else
+			fBackend->Unlock();
+EndEmbeddedCode
+
+Property string(0) Name
+	GetValue:Name(void)
+
+Property int(0) LocalCount
+	GetValue:LocalCount(void)
+
+Property int(0) SystemCount
+	GetValue:SystemCount(void)
+

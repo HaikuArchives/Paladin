@@ -47,8 +47,8 @@ PObject.properties =
 		"The list's selection mode", "B_SINGLE_SELECTION_LIST",
 		{ pair("Single", "B_SINGLE_SELECTION_LIST"),
 			pair("Multiple", "B_MULTIPLE_SELECTION_LIST") } },
-	{ "PreferredHeight", "float",  { "GetPreferredSize", "embedded" }, { }, "" },
-	{ "PreferredWidth", "float",  { "GetPreferredSize", "embedded" }, { }, "" }
+	{ "PreferredHeight", "float",  { "GetPreferredSize", "embedded" }, { }, "", "0" },
+	{ "PreferredWidth", "float",  { "GetPreferredSize", "embedded" }, { }, "", "0" }
 }
 
 PObject:SetEmbeddedProperty("PreferredHeight",

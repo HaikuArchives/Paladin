@@ -1,0 +1,19 @@
+[global]
+Module=PCheckBox
+Header=PCheckBox.h
+CodeFileName=PCheckBox.cpp
+ParentHeaderName="PControl.h"
+
+[includes]
+<Application.h>
+<CheckBox.h>
+<stdio.h>
+<Window.h>
+
+[object]
+Name=PCheckBox
+FriendlyName=CheckBox
+Description=A check box
+UsesView=true
+ParentClass=public PControl
+

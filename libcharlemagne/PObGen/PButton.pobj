@@ -1,0 +1,18 @@
+[global]
+Module=PButton
+Header=PButton.h
+CodeFileName=PButton.cpp
+ParentHeaderName="PControl.h"
+
+[includes]
+<Application.h>
+<Button.h>
+<stdio.h>
+
+[object]
+Name=PButton
+FriendlyName=Button
+Description=A button
+UsesView=true
+ParentClass=public PControl
+

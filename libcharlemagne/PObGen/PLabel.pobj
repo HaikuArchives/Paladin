@@ -1,0 +1,31 @@
+[global]
+Module=PLabel
+Header=PLabel.h
+CodeFileName=PLabel.cpp
+ParentHeaderName="PView.h"
+
+[includes]
+<Application.h>
+<StringView.h>
+<stdio.h>
+<Window.h>
+
+[object]
+Name=PLabel
+FriendlyName=Label
+Description=A text label
+UsesView=true
+ParentClass=public PView
+
+[properties]
+Property string(NULL) Text : The label's text
+	GetValue:Text(void)
+	SetValue:SetText(string)
+
+Property enum(B_ALIGN_LEFT) Alignment
+	GetValue:Alignment(void)
+	SetValue:SetAlignment(int->alignment)
+	Enum:Left,B_ALIGN_LEFT
+	Enum:Center,B_ALIGN_CENTER
+	Enum:Right,B_ALIGN_RIGHT
+

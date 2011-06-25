@@ -1,0 +1,63 @@
+[global]
+Module=PListView
+Header=PListView.h
+CodeFileName=PListView.cpp
+ParentHeaderName="PView.h"
+
+[includes]
+<Application.h>
+<ListView.h>
+<stdio.h>
+<Window.h>
+
+[object]
+Name=PListView
+FriendlyName=List
+Description=A list
+UsesView=true
+ParentClass=public PView
+
+[properties]
+Property int(0) ItemCount : The number of items in the list. Read-only.
+	GetValue:CountItems(void)
+
+Property enum(B_SINGLE_SELECTION_LIST) SelectionType : The list's selection mode
+	GetValue:ListType(void)
+	SetValue:SetListType(int->list_view_type)
+	Enum:Single,B_SINGLE_SELECTION_LIST
+	Enum:Multiple,B_MULTIPLE_SELECTION_LIST
+
+Property float(0) PreferredHeight
+	GetValue:GetPreferredSize(embedded)
+BeginEmbeddedCode
+		if (backend->CountItems() == 0)
+			((FloatProperty*)prop)->SetValue(30);
+		else
+		{
+			float pw, ph;
+			backend->GetPreferredSize(&pw, &ph);
+			if (pw < 10)
+				pw = 100;
+			if (ph < 10)
+				ph = 30;
+			((FloatProperty*)prop)->SetValue(ph);
+		}
+EndEmbeddedCode
+
+Property float(0) PreferredWidth
+	GetValue:GetPreferredSize(embedded)
+BeginEmbeddedCode
+		if (backend->CountItems() == 0)
+			((FloatProperty*)prop)->SetValue(100);
+		else
+		{
+			float pw, ph;
+			backend->GetPreferredSize(&pw, &ph);
+			if (pw < 10)
+				pw = 100;
+			if (ph < 10)
+				ph = 30;
+			((FloatProperty*)prop)->SetValue(pw);
+		}
+EndEmbeddedCode
+

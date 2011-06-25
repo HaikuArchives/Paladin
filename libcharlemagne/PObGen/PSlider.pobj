@@ -1,0 +1,134 @@
+[global]
+Module=PSlider
+Header=PSlider.h
+CodeFileName=PSlider.cpp
+ParentHeaderName="PControl.h"
+
+[includes]
+<Application.h>
+<Slider.h>
+<Window.h>
+<stdio.h>
+
+[object]
+Name=PSlider
+FriendlyName=Slider
+Description=A slider
+UsesView=true
+ParentClass=public PControl
+
+[properties]
+Property color(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT)) BarColor : The bar's color
+	GetValue:BarColor(void)
+	SetValue:SetBarColor(color)
+
+Property float(6.0) BarThickness
+	GetValue:BarThickness(void)
+	SetValue:SetBarThickness(float)
+
+Property int(0) HashMarkCount
+	GetValue:HashMarkCount(void)
+	SetValue:SetHashMarkCount(int)
+
+Property int((int32)B_HASH_MARKS_NONE) HashMarkLocation
+	GetValue:HashMarks(void)
+	SetValue:SetHashMarks(int->hash_mark_location)
+
+Property string(NULL) MinLimitLabel
+	GetValue:MinLimitLabel(embedded)
+BeginEmbeddedCode
+	((StringProperty*)prop)->SetValue(backend->MinLimitLabel());
+EndEmbeddedCode
+	SetValue:SetMinLimitLabel(embedded)
+BeginEmbeddedCode
+		prop->GetValue(&stringval);
+		backend->SetLimitLabels(*stringval.value, backend->MaxLimitLabel());
+EndEmbeddedCode
+
+Property string(NULL) MaxLimitLabel
+	GetValue:MaxLimitLabel(embedded)
+BeginEmbeddedCode
+	((StringProperty*)prop)->SetValue(backend->MaxLimitLabel());
+EndEmbeddedCode
+	SetValue:SetMaxLimitLabel(embedded)
+BeginEmbeddedCode
+		prop->GetValue(&stringval);
+		backend->SetLimitLabels(backend->MinLimitLabel(), *stringval.value);
+EndEmbeddedCode
+
+Property float(0.0) Position
+	GetValue:Position(void)
+	SetValue:SetPosition(float)
+
+Property enum(B_BLOCK_THUMB) ThumbStyle
+	GetValue:Style(void)
+	SetValue:SetStyle(int->thumb_style)
+	Enum:Block,B_BLOCK_THUMB
+	Enum:Triangle,B_TRIANGLE_THUMB
+
+Property enum(B_HORIZONTAL) Orientation
+	GetValue:Orientation(void)
+	SetValue:SetOrientation(int->orientation)
+	Enum:Horizontal,B_HORIZONTAL
+	Enum:Vertical,B_VERTICAL
+
+Property color(rgb_color()) FillColor : The fill color, if it is being used
+	GetValue:FillColor(embedded)
+BeginEmbeddedCode
+		rgb_color fill;
+		backend->FillColor(&fill);
+		((ColorProperty*)prop)->SetValue(fill);
+EndEmbeddedCode
+	SetValue:UseFillColor(embedded)
+BeginEmbeddedCode
+		rgb_color c;
+		bool usingColor = backend->FillColor(&c);
+		 
+		prop->GetValue(&colorval);
+		backend->UseFillColor(usingColor, &c);
+EndEmbeddedCode
+
+Property float(0.0) MinLimit
+	GetValue:GetLimits(embedded)
+BeginEmbeddedCode
+		int32 min, max;
+		backend->GetLimits(&min, &max);
+		((IntProperty*)prop)->SetValue(min);
+EndEmbeddedCode
+	SetValue:SetLimits(embedded)
+BeginEmbeddedCode
+		int32 min, max;
+		backend->GetLimits(&min, &max);
+		
+		prop->GetValue(&intval);
+		backend->SetLimits(*intval.value, max);
+EndEmbeddedCode
+
+Property float(100.0) MaxLimit
+	GetValue:GetLimits(embedded)
+BeginEmbeddedCode
+		int32 min, max;
+		backend->GetLimits(&min, &max);
+		((IntProperty*)prop)->SetValue(max);
+EndEmbeddedCode
+	SetValue:SetLimits(embedded)
+BeginEmbeddedCode
+		int32 min, max;
+		backend->GetLimits(&min, &max);
+		
+		prop->GetValue(&intval);
+		backend->SetLimits(*intval.value, max);
+EndEmbeddedCode
+
+Property bool(false) UsingFillColor
+	GetValue:UsingFillColor(embedded)
+BeginEmbeddedCode
+		rgb_color dummy;
+		((BoolProperty*)prop)->SetValue(backend->FillColor(&dummy));
+EndEmbeddedCode
+	SetValue:UseFillColor(embedded)
+BeginEmbeddedCode
+		prop->GetValue(&boolval);
+		backend->UseFillColor(*boolval.value);
+EndEmbeddedCode
+

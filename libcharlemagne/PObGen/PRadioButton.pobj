@@ -1,0 +1,19 @@
+[global]
+Module=PRadioButton
+Header=PRadioButton.h
+CodeFileName=PRadioButton.cpp
+ParentHeaderName="PControl.h"
+
+[includes]
+<Application.h>
+<RadioButton.h>
+<stdio.h>
+<Window.h>
+
+[object]
+Name=PRadioButton
+FriendlyName=RadioButton
+Description=A radio button
+UsesView=true
+ParentClass=public PControl
+

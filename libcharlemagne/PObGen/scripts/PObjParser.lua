@@ -188,14 +188,30 @@ function ParsePropertySection(sectionData)
 			end
 		
 		elseif (sectionData[i]:match('%s-[pP]roperty%s+')) then
-			local returnType, defaultValue, methodDesc = nil
-			returnType, defaultValue, propName, methodDesc =
-				sectionData[i]:match('%s-[pP]roperty%s+([^%)]+)%(%s-([^%)]+)%)%s+(%w+)%s-:%s-(.*)')
+			local returnType, defaultValue, propDesc = nil
+			returnType, defaultValue, propName=
+				sectionData[i]:match('%s-[pP]roperty%s+([^%)]+)%(%s-([^%)]+)%)%s+(%w+)')
+			propDesc = sectionData[i]:match(':%s-(.*)')
+			
+			local missingVar = nil
+			if (not returnType) then
+				missingVar = "return type"
+			elseif (not defaultValue) then
+				missingVar = "default value"
+			elseif (not propName) then
+				missingVar = "property name"
+			end
+			
+			if (missingVar) then
+				print("Couldn't find " .. missingVar .. " in properties line " ..
+					i .. ". Aborting.")
+				return nil
+			end
 			
 			outTable[propName] = {}
 			outTable[propName].returnType = returnType
 			outTable[propName].defaultValue = defaultValue
-			outTable[propName].methodDesc = methodDesc
+			outTable[propName].propDesc = propDesc
 			
 			if (returnType == "enum") then
 				outTable[propName].enums = {}
@@ -238,21 +254,23 @@ function ParsePropertySection(sectionData)
 				sectionData[i]:match('%s-[sS]et[vV]alue%s-:%s-([%w_]+)%(([%w_]+)')
 			local outCast = sectionData[i]:match('%(.-%->([%w_]+)')
 			
-			if ((not getName) and (not outType)) then
-				-- This may be a property with embedded code
-				getName = sectionData[i]:match('%s-[sS]et[vV]alue%s-:%s-([bB]egin[eE]mbedded[cC]ode)')
-				if (getName) then
-					readEmbeddedCode = true
-					embeddedCode = ""
-					embeddedName = "setValue"
-					embeddedNameCode = "setValueCode"
-				end
+			if ((not setName) and (not outType)) then
+				print("Badly formed SetValue line in properties line " .. i ..
+					". Aborting")
+				return nil
 			end
 			
 			outTable[propName].setValue = {}
 			outTable[propName].setValue.name = setName
 			outTable[propName].setValue.outType = outType
 			outTable[propName].setValue.castAs = outCast
+			if (string.lower(outType) == "embedded") then
+				readEmbeddedCode = true
+				embeddedCode = ""
+				embeddedName = "setValue"
+				embeddedNameCode = "setValueCode"
+			end
+			
 		elseif (sectionData[i]:match('%s-[eE]num%s-')) then
 			if (not propName) then
 				print("Enum line " .. i .. " does not follow a Property line. Aborting.")
@@ -417,7 +435,13 @@ end
 
 
 function ParsePObjFile(path)
-	local fileData = ReadIDL(arg[1])
+	local fileData = ReadIDL(path)
+	
+	if (not fileData) then
+		print("Couldn't open file '" .. path .. "'.")
+		return nil
+	end
+	
 	local sectionTable = ParseIntoSections(fileData)
 	fileData = nil
 	

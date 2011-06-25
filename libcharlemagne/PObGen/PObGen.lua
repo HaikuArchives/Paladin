@@ -378,7 +378,7 @@ end
 -- Main section of script
 fileName = arg[1]
 if (not fileName) then
-	print("Usage: PNewGen.lua <filename>")
+	print("Usage: PObGen.lua <filename>")
 	return 0;
 end
 

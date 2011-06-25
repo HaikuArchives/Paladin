@@ -201,6 +201,7 @@ end
 
 function DumpBackend(backend)
 	print("[backend]")
+	print("Name=" .. backend.name )
 	print("Parent=" .. backend.access .. " " .. backend.parent)
 	print("Init=" .. backend.init)
 	if (backend.eventHooks) then

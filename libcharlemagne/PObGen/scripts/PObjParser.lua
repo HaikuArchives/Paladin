@@ -124,6 +124,10 @@ function ParsePairSection(sectionData, sectionName)
 				return nil
 			end
 		else
+			if (v == "false") then
+				v = nil
+			end
+			
 			outTable[k] = v
 		end
 	end

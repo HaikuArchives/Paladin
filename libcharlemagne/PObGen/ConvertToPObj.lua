@@ -201,14 +201,10 @@ end
 
 function DumpBackend(backend)
 	print("[backend]")
-	print("Name=" .. backend.name )
+	print("Type=Subclass")
+	print("Class=" .. backend.name )
 	print("Parent=" .. backend.access .. " " .. backend.parent)
-	print("Init=" .. backend.init)
-	if (backend.eventHooks) then
-		print("UsesPViewHooks=true")
-	else
-		print("UsesPViewHooks=false")
-	end
+	print("InitCode=" .. backend.init)
 end
 
 -- Do the conversion here

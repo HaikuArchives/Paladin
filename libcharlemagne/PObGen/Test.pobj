@@ -84,6 +84,17 @@ BeginEmbeddedCode
 EndEmbeddedCode
 
 [backend]
+Type=Subclass
+Class=PTextView
 ParentClass=public BTextView
 InitCode=BRect(0,0,99,99), "textview", BRect(5,5,94,94), B_FOLLOW_LEFT | B_FOLLOW_TOP
-UsePViewEvents=true
+
+# Entry:
+# Type=[unique|single|subclass]
+# Class: Class of the backend
+# UniqueVar: unique type only. name of the unique variable to serve as the backend
+# ParentClass: subclass type only. Name of parent class of the backend
+# InitCode: subclass, single. Code to put into backend/parent constructor
+# Name: deprecated
+# UsePViewEvents: deprecated.
+

@@ -2,7 +2,7 @@
 Module=PClipboard
 Header=PClipboard.h
 CodeFileName=PClipboard.cpp
-ParentHeaderName="PHandler.h"
+ParentHeaderName="PObject.h"
 
 [includes]
 <Application.h>
@@ -14,7 +14,7 @@ Name=PClipboard
 FriendlyName=Clipboard
 Description=A representation of the clipboard
 UsesView=false
-ParentClass=public PHandler
+ParentClass=public PObject
 
 [properties]
 Property bool(false) Locked
@@ -37,3 +37,7 @@ Property int(0) LocalCount
 Property int(0) SystemCount
 	GetValue:SystemCount(void)
 
+[backend]
+Type=unique
+Class=BClipboard
+UniqueVar=be_clipboard

@@ -1,13 +1,13 @@
 -- Script to generate the header for a PObGen module
 
-if (not ApplyObjectPlaceholders) then
-	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
-	LoadUtilities()
-end
-
 if (not ParsePObjFile) then
 	LoadParser = assert(loadfile("PObjParser.lua"))
 	LoadParser()
+end
+
+if (not ApplyObjectPlaceholders) then
+	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
+	LoadUtilities()
 end
 
 ----------------------------------------------------------------------
@@ -56,6 +56,10 @@ private:
 			void			InitMethods(void);
 ]]
 	
+	if (def.backend.Type == "single" or def.backend.Type == "unique") then
+		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend\n"
+	end
+	
 	return out .. "\n"
 end
 
@@ -76,18 +80,20 @@ local headerTailCode = [[
 function GenerateViewHeader(def)
 	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, def)
 	
-	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(def.object.Name) .. "_H")
+	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)",
+									string.upper(def.object.Name) .. "_H")
 	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)\n\n", "")
 	
 	if (def.object.properties and table.getn(def.object.properties) > 0) then
 		classDef = classDef .. headerGetSetCode .. "\n"
 	end
 	
-	local parentName = def.backend.Parent:match("%s([%w_]+)")
+	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
 	
 	-- All PView-based controls are expected to use a GetBackend().
 	classDef = classDef .. "\t\t\t" .. parentName .. " *\tGetBackend(void) const;\n"
-	classDef = classDef .. "\n" .. GenerateProtectedSection(obj, back) .. GeneratePrivateSection(obj, back)
+	classDef = classDef .. "\n" .. GenerateProtectedSection(def) ..
+				GeneratePrivateSection(def)
 	classDef = classDef .. headerTailCode .. "\n"
 	
 	local header = io.open(def.global.Header, "w+")
@@ -104,37 +110,52 @@ function GenerateViewHeader(def)
 end
 
 
-function GenerateNonViewHeader(obj, back)
-	error("generation for non-PView objects needs updated!!")
-	return 0
+function GenerateNonViewHeader(def)
+	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, def)
 	
-	local classDef = ApplyObjectPlaceholders(PObjectHeaderCode, obj, back)
+	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", 
+									string.upper(def.object.Name) .. "_H")
 	
-	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", string.upper(def.object.Name) .. "_H")
-	
-	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
-									def.backend.Name .. ";\n" .. "class " .. def.backend.Parent .. ";")
+	local backType = def.backend.Type:lower()
+	if (backType == "subclass") then
+		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
+										def.backend.Class .. ";\n" .. "class " ..
+										def.backend.ParentClass .. ";")
+	else
+		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
+										def.backend.Class .. ";\n")
+	end
 	
 	if (def.object.properties and table.getn(def.object.properties) > 0) then
 		classDef = classDef .. headerGetSetCode .. "\n"
 	end
 	
-	if (def.object.getBackend and (not def.backend.Parent)) then
+	if (def.object.getBackend and
+			(backType == "subclass" and (not def.backend.ParentClass))) then
 		error("PBackend.Parent may not be empty if GetBackend() is to be used. Aborting.")
 		return nil
 	end
-	classDef = classDef .. "\t\t\t" .. def.backend.Parent .. " *\tGetBackend(void) const;\n"
-	classDef = classDef .. "\n" .. GenerateProtectedSection(def) .. GeneratePrivateSection(obj, back)
+	
+	if (backType == "subclass") then
+		classDef = classDef .. "\t\t\t" .. def.backend.ParentClass ..
+					" *\tGetBackend(void) const;\n"
+	else
+		classDef = classDef .. "\t\t\t" .. def.backend.Class ..
+					" *\tGetBackend(void) const;\n"
+	end
+	
+	classDef = classDef .. "\n" .. GenerateProtectedSection(def) ..
+				GeneratePrivateSection(def)
 	
 	if (def.object.usesBackend) then
-		classDef = classDef .. "\t\t\t" .. def.backend.Name .. " *fBackend;\n"
+		classDef = classDef .. "\t\t\t" .. def.backend.Class .. " *fBackend;\n"
 	end
 	
 	classDef = classDef .. headerTailCode .. "\n"
 	
-	local header = io.open(def.global.headerName, "w+")
+	local header = io.open(def.global.Header, "w+")
 	if (not header) then
-		print("Couldn't open write header for module " .. def.global.Name)
+		print("Couldn't open write header for module " .. def.global.Class)
 		return nil
 	end
 	

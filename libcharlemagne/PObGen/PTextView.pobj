@@ -49,7 +49,6 @@ Property bool(false) HideTyping : Hides typing, such as for a password box
 
 Property int(0) LineCount : The current line count.
 	GetValue:CountLines(void)
-	SetValue:()
 
 Property int(0) MaxBytes : The maximum number of bytes the text view will accept.
 	GetValue:MaxBytes(void)
@@ -77,7 +76,6 @@ Property string(NULL) Text : The contents of the text view.
 
 Property int(0) TextLength : The number of bytes occupied by the text view's contents, excluding the NULL terminator
 	GetValue:TextLength(void)
-	SetValue:()
 
 Property rect(BRect(0, 0, 1, 1)) TextRect : The size and location of the area used to display text
 	GetValue:TextRect(void)

@@ -228,12 +228,12 @@ function ParsePropertySection(sectionData)
 			end
 			
 			local getName, inType = 
-				sectionData[i]:match('%s-[gG]et[vV]alue%s-:%s-([%w_]+)%(([%w_]+)')
-			local inCast = sectionData[i]:match('%(.-%->([%w_]+)')
+				sectionData[i]:match('%s-[gG]et[vV]alue%s-:%s-([%w_]+)%(([%w_%*%&]+)')
+			local inCast = sectionData[i]:match('%(.-%->([%w_%*%&]+)')
 			
 			if ((not getName) and (not inType)) then
 				print("Badly formed GetValue line in properties line " .. i ..
-					". Aborting")
+					" near definition for property " .. propName .. ". Aborting")
 				return nil
 			end
 			
@@ -260,7 +260,7 @@ function ParsePropertySection(sectionData)
 			
 			if ((not setName) and (not outType)) then
 				print("Badly formed SetValue line in properties line " .. i ..
-					". Aborting")
+					" near definition for property " .. propName .. ". Aborting")
 				return nil
 			end
 			

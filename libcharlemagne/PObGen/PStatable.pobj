@@ -1,0 +1,36 @@
+[global]
+Module=PStatable
+Header=PStatable.h
+CodeFileName=PStatable.cpp
+ParentHeaderName="PObject.h"
+
+[includes]
+<Statable.h>
+
+[object]
+Name=PStatable
+FriendlyName=Statable
+Description=A filesystem entry, such as a file or directory.
+UsesView=false
+ParentClass=public PObject
+UsesBackend=true
+
+[properties]
+Property int(0) AccessTime : Get the entry's last-accessed time
+	GetValue:GetAccessTime(&time_t)
+
+Property int(0) CreationTime : Get the entry's creation time
+	GetValue:GetCreationTime(&time_t)
+
+Property int(0) Group : Set or get the entry's group
+	GetValue:GetGroup(&gid_t)
+	SetValue:SetGroup(int->gid_t)in)
+
+Property int(0) Owner : Set or get the entry's owner
+	GetValue:GetOwner(&uid_t)
+	SetValue:SetOwner(int->uid_t)in)
+
+[backend]
+Type=Single
+Class=BStatable
+# Use the default(empty) constructor

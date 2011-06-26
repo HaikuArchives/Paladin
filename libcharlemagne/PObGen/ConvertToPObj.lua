@@ -71,7 +71,7 @@ function DumpProperties(obj)
 		out = out .. "\n"
 		
 		local getValue = prop[3]
-		if (getValue[1]) then
+		if (getValue[1] and getValue[1]:len() > 0) then
 			out = out .. "\tGetValue:" .. getValue[1] .. "("
 			if (string.sub(getValue[2],1,1) == "(") then
 				out = out .. "int->" .. string.sub(getValue[2],2,-2)
@@ -87,7 +87,7 @@ function DumpProperties(obj)
 		end
 		
 		local setValue = prop[4]
-		if (setValue[1]) then
+		if (setValue[1] and setValue[1]:len() > 0) then
 			out = out .. "\tSetValue:" .. setValue[1] .. "("
 			if (string.sub(setValue[2],1,1) == "(") then
 				out = out .. "int->" .. string.sub(setValue[2],2,-2)

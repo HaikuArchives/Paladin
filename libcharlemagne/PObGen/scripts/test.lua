@@ -6,7 +6,7 @@ if (not ParsePObjFile) then
 end
 
 if (not ApplyObjectPlaceholders) then
-	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
+	LoadUtilities = assert(loadfile("NewGenHeader.lua"))
 	LoadUtilities()
 end
 
@@ -56,7 +56,8 @@ private:
 			void			InitMethods(void);
 ]]
 	
-	if (def.backend.Type == "single" or def.backend.Type == "unique") then
+	local backType = def.backend.Type:lower()
+	if (backType == "single" or backType == "unique") then
 		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend\n"
 	end
 	
@@ -146,10 +147,6 @@ function GenerateNonViewHeader(def)
 	
 	classDef = classDef .. "\n" .. GenerateProtectedSection(def) ..
 				GeneratePrivateSection(def)
-	
-	if (def.object.usesBackend) then
-		classDef = classDef .. "\t\t\t" .. def.backend.Class .. " *fBackend;\n"
-	end
 	
 	classDef = classDef .. headerTailCode .. "\n"
 	

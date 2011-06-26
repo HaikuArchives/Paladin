@@ -51,7 +51,8 @@ private:
 			void			InitMethods(void);
 ]]
 	
-	if (def.backend.Type == "single" or def.backend.Type == "unique") then
+	local backType = def.backend.Type:lower()
+	if (backType == "single" or backType == "unique") then
 		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend\n"
 	end
 	
@@ -83,7 +84,7 @@ function GenerateViewHeader(def)
 		classDef = classDef .. headerGetSetCode .. "\n"
 	end
 	
-	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
+	local parentName = def.backend.Parent:match("%s([%w_]+)")
 	
 	-- All PView-based controls are expected to use a GetBackend().
 	classDef = classDef .. "\t\t\t" .. parentName .. " *\tGetBackend(void) const;\n"
@@ -141,10 +142,6 @@ function GenerateNonViewHeader(def)
 	
 	classDef = classDef .. "\n" .. GenerateProtectedSection(def) ..
 				GeneratePrivateSection(def)
-	
-	if (def.object.usesBackend) then
-		classDef = classDef .. "\t\t\t" .. def.backend.Class .. " *fBackend;\n"
-	end
 	
 	classDef = classDef .. headerTailCode .. "\n"
 	

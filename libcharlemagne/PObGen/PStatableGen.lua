@@ -4,7 +4,7 @@ Module = MakeModule("PStatable")
 Module.headerName = "PStatable.h"
 Module.codeFileName = "PStatable.cpp"
 
-Module.parentHeaderName = [["Statable.h"]]
+Module.parentHeaderName = [["PObject.h"]]
 
 Module.includes = { "<Statable.h>" }
 

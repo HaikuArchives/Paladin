@@ -89,7 +89,7 @@ function GenerateViewHeader(def)
 		classDef = classDef .. headerGetSetCode .. "\n"
 	end
 	
-	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
+	local parentName = def.backend.Parent:match("%s([%w_]+)")
 	
 	-- All PView-based controls are expected to use a GetBackend().
 	classDef = classDef .. "\t\t\t" .. parentName .. " *\tGetBackend(void) const;\n"

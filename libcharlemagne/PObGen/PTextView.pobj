@@ -77,7 +77,7 @@ Property string(NULL) Text : The contents of the text view.
 Property int(0) TextLength : The number of bytes occupied by the text view's contents, excluding the NULL terminator
 	GetValue:TextLength(void)
 
-Property rect(BRect(0, 0, 1, 1)) TextRect : The size and location of the area used to display text
+Property rect(rect) TextRect : The size and location of the area used to display text
 	GetValue:TextRect(void)
 	SetValue:SetTextRect(rect)
 

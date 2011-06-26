@@ -179,7 +179,7 @@ function ApplyObjectPlaceholders(str, def)
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
 		fView = (BView*)]]
 		
-		msgCode = msgCode .. def.backend.Name .. "::Instantiate(&viewmsg);\n"
+		msgCode = msgCode .. def.backend.Class .. "::Instantiate(&viewmsg);\n"
 		
 		out = string.gsub(out, "%%%(USESVIEW_CONSTRUCTOR%)", msgCode)
 	else

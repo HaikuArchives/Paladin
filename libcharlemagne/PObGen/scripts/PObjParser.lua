@@ -208,7 +208,7 @@ function ParsePropertySection(sectionData)
 			
 			if (missingVar) then
 				print("Couldn't find " .. missingVar .. " in properties line " ..
-					i .. ". Aborting.")
+					i .. "('" .. sectionData[i] .. "'). Aborting.")
 				return nil
 			end
 			

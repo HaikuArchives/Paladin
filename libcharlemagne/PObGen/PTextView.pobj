@@ -430,5 +430,5 @@ EndEmbeddedCode
 [backend]
 Type=Subclass
 Class=PTextViewBackend
-Parent=public BTextView
+ParentClass=public BTextView
 InitCode=BRect(0,0,99,99), "textview", BRect(5,5,94,94), B_FOLLOW_LEFT | B_FOLLOW_TOP

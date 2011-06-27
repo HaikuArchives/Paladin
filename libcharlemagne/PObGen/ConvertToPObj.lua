@@ -203,7 +203,7 @@ function DumpBackend(backend)
 	print("[backend]")
 	print("Type=Subclass")
 	print("Class=" .. backend.name )
-	print("Parent=" .. backend.access .. " " .. backend.parent)
+	print("ParentClass=" .. backend.access .. " " .. backend.parent)
 	print("InitCode=" .. backend.init)
 end
 

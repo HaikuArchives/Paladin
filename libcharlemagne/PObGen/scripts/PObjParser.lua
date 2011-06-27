@@ -1,23 +1,6 @@
-function DumpTable(t, level)
-	if (not level) then
-		level = 0
-	end
-	
-	for k, v in pairs(t) do
-		if (k and v and type(v) == "table") then
-			io.write(string.rep("\t",level))
-			print("Table[" .. k .. "]")
-			DumpTable(v, level + 1)
-		else
-			io.write(string.rep("\t",level))
-			if (type(v) == "boolean") then
-				if (v) then v = "true" else v = "false" end
-			elseif (type(v) == "function") then
-				v = "function"
-			end
-			print(k .. " = " .. v)
-		end
-	end
+if (not DumpTable) then
+	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
+	LoadUtilities()
 end
 
 local SectionTable =
@@ -28,6 +11,7 @@ local SectionTable =
 	["[properties]"] = {},
 	["[methods]"] = {},
 	["[backend]"] = {},
+	["[events]"] = {},
 }
 
 local GlobalKeywordTable =
@@ -100,7 +84,9 @@ function ParseIntoSections(lineData)
 		if (SectionTable[lineData[i]]) then
 			sectionName = lineData[i]
 		else
-			table.insert(sectionTable[sectionName], lineData[i])
+			if (sectionTable[sectionName]) then
+				table.insert(sectionTable[sectionName], lineData[i])
+			end
 		end
 	end
 	
@@ -424,6 +410,97 @@ function ParseMethodSection(sectionData)
 end
 
 
+function ParseEventSection(sectionData)
+	local outTable = {}
+	
+	local eventName = nil
+	local readEmbeddedCode = false
+	local embeddedCode = ""
+	
+	for i = 1, #sectionData do
+		
+		if (readEmbeddedCode) then
+			local endEmbedded = sectionData[i]:match('%s-[eE]nd[eE]mbedded[cC]ode%s-')
+			if (endEmbedded) then
+				readEmbeddedCode = false
+				outTable[eventName].code = embeddedCode
+			else
+				embeddedCode = embeddedCode .. sectionData[i] .. "\n"
+			end
+		elseif (sectionData[i]:sub(1,1) == "#") then
+			-- It's a commented line. Do nothing.
+			
+		elseif (sectionData[i]:match('%s-[Ee]vent[Hh]ook%s+')) then
+			eventName = sectionData[i]:match('%s-[Ee]ventHook%s+([%w_]+)')
+			
+			outTable[eventName] = {}
+			outTable[eventName].params = {}
+			outTable[eventName].returnval = ""
+			outTable[eventName].type = "generated"
+			
+		elseif (sectionData[i]:match('%s-[Ee]mbedded[Hh]ook%s+')) then
+			local eventDef = nil
+			eventName, eventDef = 
+				sectionData[i]:match('%s-[Ee]mbedded[Hh]ook%s+([%w_]+)%s-:%s-(.*)')
+			
+			outTable[eventName] = {}
+			outTable[eventName].type = "embedded"
+			outTable[eventName].definition = eventDef
+			
+		elseif (sectionData[i]:match('%s-[pP]aram%s+')) then
+			
+			if (not eventName) then
+				print("Param line " .. i .. " does not follow a Event line. Aborting.")
+				return nil
+			end
+			
+			local paramType, paramName =
+				sectionData[i]:match('%s-[pP]aram%s+([%w_]+)%s+([%w_]+)')
+			
+			local inCast = sectionData[i]:match('%(([&%*%w_]+)%)')
+			
+			local paramData = {}
+			paramData.paramType = paramType
+			paramData.paramName = paramName
+			paramData.inCast = inCast
+			
+			table.insert(outTable[eventName].params, paramData)
+			
+		elseif (sectionData[i]:match('%s-[rR]eturn%s+')) then
+			
+			if (not eventName) then
+				print("Return line " .. i .. " does not follow a Event line. Aborting.")
+				return nil
+			end
+			
+			local returnType =
+				sectionData[i]:match('%s-[rR]eturn%s+([%w_]+)')
+			
+			outTable[eventName].returnval = returnType
+		
+		elseif (sectionData[i]:match('%s-([bB]egin[eE]mbedded[cC]ode)')) then
+			readEmbeddedCode = true
+			embeddedCode = ""
+		else
+			-- something might be wrong in the [global] section. Check
+			-- for a blank line before complaining
+			if (sectionData[i]:match('[^%s]+')) then
+				local outmsg = "Unrecognized code in line " .. i ..
+					" of the Event section"
+				if (eventName) then
+					outmsg = outmsg .. " in declaration of event " .. eventName
+				end
+				outmsg = outmsg .. ". Aborting.\nError: '" .. sectionData[i] .. "'"
+				print(outmsg)
+				return nil
+			end
+		end
+	end
+	
+	return outTable
+end
+
+
 function ParseSections(sectionData)
 	local outTable = {}
 	
@@ -433,6 +510,7 @@ function ParseSections(sectionData)
 	outTable.properties = ParsePropertySection(sectionData["[properties]"])
 	outTable.methods = ParseMethodSection(sectionData["[methods]"])
 	outTable.backend = ParsePairSection(sectionData["[backend]"], "backend")
+	outTable.events = ParseEventSection(sectionData["[events]"])
 	
 	return outTable
 end

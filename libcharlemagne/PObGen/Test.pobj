@@ -96,5 +96,26 @@ InitCode=BRect(0,0,99,99), "textview", BRect(5,5,94,94), B_FOLLOW_LEFT | B_FOLLO
 # ParentClass: subclass type only. Name of parent class of the backend
 # InitCode: subclass, single. Code to put into backend/parent constructor
 # Name: deprecated
-# UsePViewEvents: deprecated.
+# UsePViewEvents: deprecated. Code will check for subclass type and object.UsesView
 
+[events]
+EventHook Name
+	Param inType paramName(useType)
+	Return returnType
+EmbeddedHook KeyDown : void	KeyDown(const char *bytes, int32 count);
+BeginEmbeddedCode
+void
+%(BACKENDNAME)::KeyDown(const char *bytes, int32 count)
+{
+	PArgs in, out;
+	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddInt32("count", count);
+	EventData *data = fOwner->FindEvent("KeyDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+	else
+		%(BACKEND_PARENT_NAME)::KeyDown(bytes, count);
+}
+
+
+EndEmbeddedCode

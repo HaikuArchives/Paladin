@@ -232,28 +232,37 @@ end
 ------------------------------------------------------------------------------
 -- Utility function definitions
 
--- pair() and triplet() are syntactic sugar for the definition files
-function pair(k, v)
-	return { ["key"] = k, ["value"] = v }
+function DumpTable(t, level)
+	if (not level) then
+		level = 0
+	end
+	
+	for k, v in pairs(t) do
+		if (k and v and type(v) == "table") then
+			io.write(string.rep("\t",level))
+			print("Table[" .. k .. "]")
+			DumpTable(v, level + 1)
+		else
+			io.write(string.rep("\t",level))
+			if (type(v) == "boolean") then
+				if (v) then v = "true" else v = "false" end
+			elseif (type(v) == "function") then
+				v = "function"
+			end
+			print(k .. " = " .. v)
+		end
+	end
 end
 
 
-function triplet(k, v, d, f)
-	return { ["key"]=k, ["value"]=v, ["description"]=d, ["flags"]=f }
-end
-
-
-function param(name, type, callType, callIndex, desc, flags)
-	local t = {}
-	
-	t.name = name
-	t.type = type
-	t.callIndex = callIndex
-	t.callType = callType
-	t.description = desc
-	t.flags = flags
-	
-	return t
+function GetTableSize(t)
+	local size = 0
+	for k, v in pairs(t) do
+		if (k) then
+			size = size + 1
+		end
+	end
+	return size
 end
 
 

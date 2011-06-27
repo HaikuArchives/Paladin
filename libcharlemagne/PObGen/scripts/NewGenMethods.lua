@@ -1,7 +1,7 @@
 -- Script to generate the header for a PObGen module
 
-if (not GenerateHeader) then
-	LoadUtilities = assert(loadfile("scripts/GenUtilities.lua"))
+if (not DumpTable) then
+	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
 	LoadUtilities()
 end
 
@@ -21,7 +21,7 @@ void
 	local out = ApplyObjectPlaceholders(PObjectInitMethodsCode, obj, back)
 	out = ApplyBackendPlaceholders(out, obj, back)
 	
-	if ((not obj.methods) or table.getn(obj.methods) == 0) then
+	if (GetTableSize == 0) then
 		out = out .. "}\n\n\n"
 		return out
 	end
@@ -101,7 +101,7 @@ end
 function GenerateMethodDefs(def)
 	local out = ""
 	
-	if ((not def.methods)) then
+	if ((not def.methods) or GetTableSize(def.methods) == 0) then
 		return out
 	end
 		
@@ -310,7 +310,7 @@ function GenerateMethod(obj, back, method)
 end
 
 
-function GenerateMethods(obj, back)
+function GenerateMethods(def)
 	local out = ""
 	
 	if ((not obj.methods) or table.getn(obj.methods) == 0) then

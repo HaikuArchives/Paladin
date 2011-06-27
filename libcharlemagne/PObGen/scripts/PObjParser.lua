@@ -457,12 +457,12 @@ function ParseEventSection(sectionData)
 			local paramType, paramName =
 				sectionData[i]:match('%s-[pP]aram%s+([%w_]+)%s+([%w_]+)')
 			
-			local inCast = sectionData[i]:match('%(([&%*%w_]+)%)')
+			local castType = sectionData[i]:match('%(([&%*%w_]+)%)')
 			
 			local paramData = {}
 			paramData.paramType = paramType
 			paramData.paramName = paramName
-			paramData.inCast = inCast
+			paramData.castType = castType
 			
 			table.insert(outTable[eventName].params, paramData)
 			
@@ -511,6 +511,11 @@ function ParseSections(sectionData)
 	outTable.methods = ParseMethodSection(sectionData["[methods]"])
 	outTable.backend = ParsePairSection(sectionData["[backend]"], "backend")
 	outTable.events = ParseEventSection(sectionData["[events]"])
+	
+	if (outTable.backend.Type and outTable.backend.Type:lower() == "subclass" and
+			outTable.object.UsesView) then
+		outTable = AddViewHooks(outTable)
+	end
 	
 	return outTable
 end

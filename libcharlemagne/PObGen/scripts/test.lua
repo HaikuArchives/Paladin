@@ -41,8 +41,8 @@ void
 ]]
 	local pobjCode = ApplyObjectPlaceholders(PObjectMainCode, def)
 	
-	local parent = def.object.ParentClass:match("%s-([%w_]+)")
-	if (parent == "PView") then
+	local parent = def.object.ParentClass:match("%s+([%w_]+)")
+	if (parent:lower() == "pview") then
 		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW)", "true")
 		pobjCode = ApplyCustomPlaceholder(pobjCode, "%(USESVIEW_BYPASSVIEW2)", ", true")
 	else
@@ -58,20 +58,25 @@ void
 --	local getCode = GenerateGetProperty(def)
 --	local setCode = GenerateSetProperty(def)
 	
---	local getBackendCode = ""
---	if (def.object.GetBackend and (not def.object.UsesView)) then
---		getBackendCode = [[
---%(BACKEND_PARENT_NAME) *
---%(POBJECTNAME)::GetBackend(void) const
---{
---	return fBackend;
---}
---[[
+	local getBackendCode = ""
+	if (def.object.GetBackend or def.object.UsesView) then
+		getBackendCode = [[
+%(BACKEND_PARENT_NAME) *
+%(POBJECTNAME)::GetBackend(void) const
+{
+	return fBackend;
+}
+
+
+]]
 		getBackendCode = ApplyObjectPlaceholders(getBackendCode, def)
 		getBackendCode = ApplyBackendPlaceholders(getBackendCode, def)
 	end
-
 	
+	pobjCode = pobjCode .. getBackendCode
+	
+	
+--[[
 	local initPropCode = GenerateInitProperties(def)
 	local initMethodsCode = GenerateInitMethods(def)
 	local methodsCode = GenerateMethods(def)
@@ -138,7 +143,7 @@ function GenerateCodeFile(def)
 	
 	fileData = includeString .. methodDefs .. backendDef .. pobjectCode .. backendCode
 ]]
-	fileData = includeString ..methodDefs .. backendDef
+	fileData = includeString ..methodDefs .. backendDef .. pobjectCode
 	
 	local codeFile = io.open(def.global.CodeFileName, "w+")
 	if (not codeFile) then

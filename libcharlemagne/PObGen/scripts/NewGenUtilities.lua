@@ -163,19 +163,17 @@ PObject *
 {
 	return new %(POBJECTNAME)(*this);
 }
+
+
 ]]
 
-
 function ApplyObjectPlaceholders(str, def)
-	if (not def) then
-		return str
-	end
-	
 	local out = str
 	
 	if (def.object.UsesView) then
 		
-		local msgCode = [[BMessage viewmsg;
+		local msgCode = [[
+	BMessage viewmsg;
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
 		fView = (BView*)]]
 		
@@ -187,7 +185,9 @@ function ApplyObjectPlaceholders(str, def)
 	end
 	
 	out = string.gsub(out, "%%%(POBJECTNAME%)", def.object.Name)
-	out = string.gsub(out, "%%%(POBJECT_PARENT_NAME%)", def.object.ParentClass)
+	
+	local parent = def.object.ParentClass:match("%s([%w_]+)")
+	out = string.gsub(out, "%%%(POBJECT_PARENT_NAME%)", parent)
 	out = string.gsub(out, "%%%(POBJECT_PARENT_HEADER%)", def.global.ParentHeaderName)
 	out = string.gsub(out, "%%%(POBJECT_FRIENDLY_NAME%)", def.object.FriendlyName)
 	
@@ -195,26 +195,23 @@ function ApplyObjectPlaceholders(str, def)
 end
 
 
-function ApplyBackendPlaceholders(str, obj, back)
-	if (not back) then
-		return str
+function ApplyBackendPlaceholders(str, def)
+	local out = string.gsub(str, "%%%(BACKENDNAME%)", def.backend.Class)
+	
+	local parentPattern = ""
+	if (def.backend.ParentClass) then
+		parentPattern = def.backend.ParentClass:match("%s+([%w_]+)")
 	end
 	
-	local out = string.gsub(str, "%%%(BACKENDNAME%)", def.backend.Name)
-	
-	local parentPattern = def.backend.name
-	if (def.backend.parent) then
-		parentPattern = def.backend.parent
-	end
 	out = string.gsub(out, "%%%(BACKEND_PARENT_NAME%)", parentPattern)
 	
-	local fViewName = ""
+	local backendName = ""
 	if (def.object.UsesView) then
-		fViewName = "fView"
+		backendName = "fView"
 	else
-		fViewName = "fBackend"
+		backendName = "fBackend"
 	end
-	out = string.gsub(out, "%%%(BACKEND_FVIEW_NAME%)", fViewName)
+	out = string.gsub(out, "%%%(BACKEND_FVIEW_NAME%)", backendName)
 	
 	return out
 end

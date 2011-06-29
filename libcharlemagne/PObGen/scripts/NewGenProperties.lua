@@ -88,18 +88,26 @@ function GenerateGetProperty(def)
 		
 			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n'
 			
-			propCode = propCode ..	"\t\t((" .. 
-					TypeToPropertyClass(prop.returnType) ..
-						"*)prop)->SetValue("
-			
-			if (prop.getValue.castAs) then
-				propCode = propCode .. "(" .. prop.castAs .. ")"
-			elseif (prop.getValue.inType ~= "void") then
-				print("prop type is " .. (prop.getValue.inType or "nil"))
+			if (prop.getValue.inType:lower() == "embedded") then
+				if (not prop.getValueCode) then
+					print("Embedded GetProperty code for property " .. propName ..
+							" is missing. Skipping")
+				else
+					propCode = propCode .. "\t{\n" .. prop.getValueCode .. "\t}\n"
+				end
+			else
+				propCode = propCode ..	"\t\t((" .. 
+						TypeToPropertyClass(prop.type) ..
+							"*)prop)->SetValue("
+				
+				if (prop.getValue.castAs) then
+					propCode = propCode .. "(" .. prop.castAs .. ")"
+				elseif (prop.getValue.inType ~= "void") then
+					print("prop type is " .. (prop.getValue.inType or "nil"))
+				end
+				
+				propCode = propCode .. "backend->" .. propName .. "());\n"
 			end
-			
-			propCode = propCode .. "backend->" .. propName .. "());\n"
-
 		
 			out = out .. propCode
 			propertiesWritten = propertiesWritten + 1
@@ -118,7 +126,8 @@ function GenerateGetProperty(def)
 		out = out .. "\t\tif (backend->Window())\n\t\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
-	out = out .. "\t\treturn " .. def.object.ParentClass ..
+	local parent = def.object.ParentClass:match("%s+([%w_]+)")
+	out = out .. "\t\treturn " .. parent ..
 				"::GetProperty(name, value, index);\n\t}\n\n"
 	
 	if (def.object.UsesView) then
@@ -145,44 +154,43 @@ function GenerateSetProperty(def)
 	
 	local i = 1
 	local propertiesWritten = 0
-	while (def.object.properties[i]) do
-		local prop = def.object.properties[i]
+	for propName, prop in pairs(def.properties) do
 		
-		if (prop[4][1] and prop[4][1]:len() > 0) then
+		if (prop["setValue"]) then
 			local propCode = "\t"
 			if (i > 1) then
 				propCode = "\telse "
 			end
 			
-			local valName = TypeToPropertyClass(prop[2])
-			if (prop[2] == "enum") then
+			local valName = TypeToPropertyClass(prop.type)
+			if (prop.type:lower() == "enum") then
 				valName = "IntProperty"
 			end
 			valName = valName.sub(valName:lower(), 1, valName:len() - 8) .. "val"
-			propCode = propCode .. 'if (str.ICompare("' .. prop[1] .. '") == 0)\n' ..
+			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n' ..
 						"\t{\n"
 			
-			if (prop[4][2] == "embedded") then
-				if (def.object.embeddedProperties[prop[1]] == nil or
-						def.object.embeddedProperties[prop[1]].setCode == nil) then
-					print("Embedded SetProperty code for property " .. prop[1] ..
-							" is missing. Skipping.")
+			if (prop.setValue.outType:lower() == "embedded") then
+				if (not prop.setValueCode) then
+					print("Embedded SetProperty code for property " .. propName ..
+							" is missing. Skipping")
 					-- Gotta at least close the code section so while the code is missing,
 					-- at least compilation isn't broken
 					propCode = propCode .. "\t}\n"
 				else
-					propCode = propCode .. def.object.embeddedProperties[prop[1]].setCode .. "\t}\n"
+					propCode = propCode .. def.object.setValueCode .. "\t}\n"
 				end
 			else
 				propCode = propCode .. "\t\tprop->GetValue(&" .. valName .. ");\n" ..
-							"\t\tbackend->" .. prop[4][1] .. "("
+							"\t\tbackend->" .. propName .. "("
 			
-				if (prop[2] == "enum") then
-					if (prop[4][2]:len() > 0 and prop[4][2] ~= "void") then
-						propCode = propCode .. prop[4][2]
+				if (prop.type:lower() == "enum") then
+					if (prop.setValue.outType:len() > 0 and 
+							prop.setValue.outType ~= "void") then
+						propCode = propCode .. prop.setValue.outType
 					end
-				elseif (prop[4][2]:sub(1,1) == "(") then
-					propCode = propCode .. prop[4][2]
+				elseif (prop.setValue.castAs) then
+					propCode = propCode .. "(" .. prop.setValue.castAs .. ")"
 				end
 				propCode = propCode .. "*" .. valName .. ".value);\n" .. "\t}\n"
 			end
@@ -206,7 +214,8 @@ function GenerateSetProperty(def)
 		out = out .. "\t\tif (backend->Window())\n\t\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
-	out = out .. "\t\treturn " .. def.object.ParentClass ..
+	local parent = def.object.ParentClass:match("%s+([%w_]+)")
+	out = out .. "\t\treturn " .. parent ..
 				"::SetProperty(name, value, index);\n\t}\n\n"
 	
 	if (def.object.UsesView) then

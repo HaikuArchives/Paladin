@@ -296,6 +296,11 @@ end
 
 
 function TypeToPropertyClass(str)
+	if (not str) then
+		print("nil property type")
+		return nil
+	end
+	
 	if (str == "int") then
 		return "IntProperty"
 	elseif (str == "bool") then

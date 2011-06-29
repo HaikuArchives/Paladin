@@ -62,7 +62,7 @@ void
 
 
 	local getCode = GenerateGetProperty(def)
---	local setCode = GenerateSetProperty(def)
+	local setCode = GenerateSetProperty(def)
 	
 	local getBackendCode = ""
 	if (def.object.GetBackend or def.object.UsesView) then
@@ -79,9 +79,6 @@ void
 		getBackendCode = ApplyBackendPlaceholders(getBackendCode, def)
 	end
 	
-	pobjCode = pobjCode .. getCode .. getBackendCode
-	
-	
 --[[
 	local initPropCode = GenerateInitProperties(def)
 	local initMethodsCode = GenerateInitMethods(def)
@@ -90,9 +87,10 @@ void
 		(not initMethodsCode) or (not methodsCode)) then
 		return nil
 	end
-	
+]]	
 	pobjCode = pobjCode .. getCode .. setCode .. getBackendCode
 
+--[[
 	if (def.object.InitBackend) then
 		if (string.len(def.object.InitBackend) > 0) then
 			pobjCode = pobjCode .. "void\n" .. def.object.Name .. "::InitBackend(void)\n{\n" .. 

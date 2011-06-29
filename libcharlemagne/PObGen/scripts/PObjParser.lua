@@ -178,13 +178,13 @@ function ParsePropertySection(sectionData)
 			end
 		
 		elseif (sectionData[i]:match('%s-[pP]roperty%s+')) then
-			local returnType, defaultValue, propDesc = nil
-			returnType, defaultValue, propName=
+			local propType, defaultValue, propDesc = nil
+			propType, defaultValue, propName=
 				sectionData[i]:match('%s-[pP]roperty%s+([^%)]+)%(%s-([^%)]+)%)%s+(%w+)')
 			propDesc = sectionData[i]:match(':%s-(.*)')
 			
 			local missingVar = nil
-			if (not returnType) then
+			if (not propType) then
 				missingVar = "return type"
 			elseif (not defaultValue) then
 				missingVar = "default value"
@@ -199,11 +199,11 @@ function ParsePropertySection(sectionData)
 			end
 			
 			outTable[propName] = {}
-			outTable[propName].returnType = returnType
+			outTable[propName].type = propType
 			outTable[propName].defaultValue = defaultValue
 			outTable[propName].propDesc = propDesc
 			
-			if (returnType == "enum") then
+			if (propType == "enum") then
 				outTable[propName].enums = {}
 			end
 			

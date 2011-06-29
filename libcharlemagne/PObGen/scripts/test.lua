@@ -25,6 +25,12 @@ if (not AddViewHooks) then
 	LoadBackend()
 end
 
+if (not GenerateGetProperty) then
+	LoadProperties = assert(loadfile("NewGenProperties.lua"))
+	LoadProperties()
+end
+
+
 function GeneratePObject(def)
 
 	local initBackendTemplate = [[
@@ -55,7 +61,7 @@ void
 	end
 
 
---	local getCode = GenerateGetProperty(def)
+	local getCode = GenerateGetProperty(def)
 --	local setCode = GenerateSetProperty(def)
 	
 	local getBackendCode = ""
@@ -73,7 +79,7 @@ void
 		getBackendCode = ApplyBackendPlaceholders(getBackendCode, def)
 	end
 	
-	pobjCode = pobjCode .. getBackendCode
+	pobjCode = pobjCode .. getCode .. getBackendCode
 	
 	
 --[[

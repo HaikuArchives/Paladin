@@ -233,51 +233,50 @@ function GenerateInitProperties(def)
 	
 	out = out .. '\tSetStringProperty("Description", "' .. def.object.Description .. '");\n\n'
 	
-	if ((not def.object.properties) or GetTableSize(def.object.properties) == 0) then
+	if ((not def.properties) or GetTableSize(def.properties) == 0) then
 		out = out .. "}\n\n\n"
 		return out
 	end
 	
 	local i = 1
 	local enumWritten = false
-	while (def.object.properties[i]) do
-		local prop = def.object.properties[i]
+	for propName, prop in pairs(def.properties) do
 		
-		if (prop[6]) then
+		if (prop.defaultValue) then
 			local propCode = ""
 			
-			if (prop[2] == "enum") then
+			if (prop.type == "enum") then
 				-- We handle the initialization of enumerated properties differently
 				-- because they involve more work. More work to do more work. Meh. :/
-				if (prop[7]) then
+				if (prop.enums and GetTableSize(prop.enums) > 0) then
 					if (not enumWritten) then
 						enumWritten = true
 						propCode = propCode .. "\n\tEnumProperty *prop = NULL;\n\n"
 					end
 					
 					propCode = propCode .. "\tprop = new EnumProperty();\n"
-					propCode = propCode .. '\tprop->SetName("' .. prop[1] .. '");\n' ..
-								"\tprop->SetValue((int32)" .. prop[6] .. ");\n"
-					if (prop[5]:len() > 0) then
-						propCode = propCode .. '\tprop->SetDescription("' .. prop[5] .. '");\n'
+					propCode = propCode .. '\tprop->SetName("' .. propName .. '");\n' ..
+								"\tprop->SetValue((int32)" .. prop.defaultValue .. ");\n"
+					if (prop.description:len() > 0) then
+						propCode = propCode .. '\tprop->SetDescription("' ..
+									prop.description .. '");\n'
 					end
 					
-					local enumCount = table.getn(prop[7])
-					for j = 1, enumCount do
-						propCode = propCode .. '\tprop->AddValuePair("' .. prop[7][j].key ..
-									'", ' .. prop[7][j].value .. ");\n"
+					for i,enum in ipairs(prop.enums) do
+						propCode = propCode .. '\tprop->AddValuePair("' .. enum[1] ..
+									'", ' .. enum[2] .. ");\n"
 					end
 					propCode = propCode .. "\tAddProperty(prop);\n\n"
 				else
-					print("Property " .. prop[1] .. " is missing enumerated values definition. Skipping.")
+					print("Property " .. propName .. " is missing enumerated values definition. Skipping.")
 				end
 			else
-				local propType = TypeToPropertyClass(prop[2])
+				local propType = TypeToPropertyClass(prop.type)
 				propCode = "\tAddProperty(new " .. propType .. '("' ..
-								prop[1] .. '", ' .. prop[6]
+								propName .. '", ' .. prop.defaultValue
 			
-				if (prop[5] and prop[5]:len() > 0) then
-					propCode = propCode .. ', "' .. prop[5] .. '"));\n'
+				if (prop.description and prop.description:len() > 0) then
+					propCode = propCode .. ', "' .. prop.description .. '"));\n'
 				else
 					propCode = propCode .. "));\n"
 				end
@@ -285,8 +284,6 @@ function GenerateInitProperties(def)
 			
 			out = out .. propCode
 		end
-		
-		i = i + 1
 	end
 	out = out .. "}\n\n\n"
 	

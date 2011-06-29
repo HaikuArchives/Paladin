@@ -201,7 +201,7 @@ function ParsePropertySection(sectionData)
 			outTable[propName] = {}
 			outTable[propName].type = propType
 			outTable[propName].defaultValue = defaultValue
-			outTable[propName].propDesc = propDesc
+			outTable[propName].description = propDesc
 			
 			if (propType == "enum") then
 				outTable[propName].enums = {}

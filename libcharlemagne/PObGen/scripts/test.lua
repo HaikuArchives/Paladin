@@ -79,8 +79,8 @@ void
 		getBackendCode = ApplyBackendPlaceholders(getBackendCode, def)
 	end
 	
---[[
 	local initPropCode = GenerateInitProperties(def)
+--[[
 	local initMethodsCode = GenerateInitMethods(def)
 	local methodsCode = GenerateMethods(def)
 	if ((not getCode) or (not setCode) or (not initPropCode) or
@@ -106,6 +106,8 @@ void
 	
 	pobjCode = pobjCode .. initPropCode .. initMethodsCode .. methodsCode
 ]]	
+	pobjCode = pobjCode .. initPropCode
+	
 	return pobjCode
 end
 

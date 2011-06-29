@@ -352,10 +352,13 @@ function ParseMethodSection(sectionData)
 			
 			local inCast = sectionData[i]:match('%(([&%*%w_]+)%)')
 			
+			local paramDesc = sectionData[i]:match(":%s-(.+)")
+			
 			local paramData = {}
-			paramData.paramType = paramType
-			paramData.paramName = paramName
-			paramData.inCast = inCast
+			paramData.type = paramType
+			paramData.name = paramName
+			paramData.castAs = inCast
+			paramData.description = paramDesc
 			
 			table.insert(outTable[methodName].params, paramData)
 			
@@ -371,10 +374,13 @@ function ParseMethodSection(sectionData)
 			
 			local outCast = sectionData[i]:match('%(([&%*%w_]+)%)')
 			
+			local retDesc = sectionData[i]:match(":%s-(.+)")
+			
 			local returnData = {}
-			returnData.returnType = returnType
-			returnData.paramName = paramName
-			returnData.outCast = outCast
+			returnData.type = returnType
+			returnData.name = paramName
+			returnData.castAs = outCast
+			returnData.description = retDesc
 			
 			table.insert(outTable[methodName].returnvals, returnData)
 		

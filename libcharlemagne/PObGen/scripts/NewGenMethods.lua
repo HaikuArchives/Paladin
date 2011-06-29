@@ -8,7 +8,7 @@ end
 
 ----------------------------------------------------------------------
 -- 
-function GenerateInitMethods(obj, back)
+function GenerateInitMethods(def)
 	local PObjectInitMethodsCode =
 [[
 void
@@ -18,8 +18,8 @@ void
 	
 ]]
 
-	local out = ApplyObjectPlaceholders(PObjectInitMethodsCode, obj, back)
-	out = ApplyBackendPlaceholders(out, obj, back)
+	local out = ApplyObjectPlaceholders(PObjectInitMethodsCode, def)
+	out = ApplyBackendPlaceholders(out, def)
 	
 	if (GetTableSize == 0) then
 		out = out .. "}\n\n\n"
@@ -27,15 +27,14 @@ void
 	end
 	
 	local i = 1
-	while (obj.methods[i]) do
-		local method = obj.methods[i]
+	for methodName, method in pairs(def.methods) do
 		
-		for j = 1, table.getn(method[3]) do
-			local entry = method[3][j]
+		for j = 1, #method.params do
+			local entry = method.params[j]
 			local methodCode = ""
 			
 			if (not entry.type) then
-				print("Bad type in entry " .. method[1] .. " in GenerateInitMethods")
+				print("Nil type in entry " .. methodName .. " in GenerateInitMethods")
 				return ""
 			end
 			
@@ -64,8 +63,8 @@ void
 			out = out .. methodCode .. ");\n"
 		end
 		
-		for j = 1, table.getn(method[4]) do
-			local entry = method[4][j]
+		for j = 1, #method.returnvals do
+			local entry = method.returnvals[j]
 			local methodCode = ""
 			local pargType = PTypeToConstant(entry.type)
 			
@@ -85,12 +84,10 @@ void
 			out = out .. methodCode .. ");\n"
 		end
 		
-		local methodFunc = obj.name .. method[1]
+		local methodFunc = def.object.Name .. methodName
 		out = out .. '\tAddMethod(new PMethod("' ..
-				method[1] .. '", ' .. methodFunc ..
+				methodName .. '", ' .. methodFunc ..
 				', &pmi));\n\tpmi.MakeEmpty();\n\n'
-		
-		i = i + 1
 	end
 	
 	out = out .. "}\n\n\n"
@@ -117,17 +114,17 @@ function GenerateMethodDefs(def)
 end
 
 
-function GenerateMethod(obj, back, method)
+function GenerateMethod(def, method)
 	
 	local out = ""
 	
 	-- Start with the top part of the function definition
-	local methodCode = "int32_t\n" .. obj.name .. method[1] ..
+	local methodCode = "int32_t\n" .. def.object.Name .. method[1] ..
 					"(void *pobject, PArgList *in, PArgList *out, void *extraData)\n{\n"
 	
 	if (method[2] == "embedded") then
-		if (obj.embeddedMethods[method[1]]) then
-			methodCode = methodCode .. obj.embeddedMethods[method[1]] .. "}\n\n\n"
+		if (def.object.embeddedMethods[method[1]]) then
+			methodCode = methodCode .. def.object.embeddedMethods[method[1]] .. "}\n\n\n"
 			return methodCode
 		else
 			print("Method " .. method[1] .. " is embedded but missing definition. ")
@@ -140,7 +137,7 @@ function GenerateMethod(obj, back, method)
 	-- If the object inherits from PView, we need to cast it to the backend
 	-- class' real class to call the method. Objects which do not inherit from
 	-- PView are expected to provide a private member named "backend".
-	if (obj.usesView) then
+	if (def.object.UsesView) then
 		methodCode = methodCode .. [[
 	PView *parent = static_cast<PView*>(pobject);
 	if (!parent)
@@ -149,9 +146,9 @@ function GenerateMethod(obj, back, method)
 	BTextView *backend = (BTextView*)parent->GetView();
 ]]
 	else
-		local parentName = back.parent
+		local parentName = def.backend.ParentClass:match("%s+([%w_]+)")
 		if (not parentName) then
-			parentName = back.name
+			parentName = def.backend.Class
 		end
 		
 --		methodCode = methodCode .. "\t" .. parentName .. " *backend = fBackend;\n"
@@ -162,8 +159,8 @@ function GenerateMethod(obj, back, method)
 	
 	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)parent->GetBackend();
 ]]
-		tempCode = ApplyObjectPlaceholders(tempCode, obj, back)
-		methodCode = methodCode .. ApplyBackendPlaceholders(tempCode, obj, back)
+		tempCode = ApplyObjectPlaceholders(tempCode, def)
+		methodCode = methodCode .. ApplyBackendPlaceholders(tempCode, def)
 	end
 	
 	-- Declare the argument wrappers which we'll use to get input to the 
@@ -203,7 +200,7 @@ function GenerateMethod(obj, back, method)
 	end
 	
 	-- If this is a view-based object, lock the parent window
-	if (obj.usesView) then
+	if (def.object.UsesView) then
 		methodCode = methodCode .. "\tif (backend->Window())\n" ..
 					"\t\tbackend->Window()->Lock();\n\n"
 	end
@@ -291,7 +288,7 @@ function GenerateMethod(obj, back, method)
 	methodCode = methodCode .. callLine .. "\n\n"
 
 	-- If this is a view-based object, we need to unlock the parent window now
-	if (obj.usesView) then
+	if (def.object.UsesView) then
 		methodCode = methodCode .. "\tif (backend->Window())\n" ..
 					"\t\tbackend->Window()->Unlock();\n\n"
 	end
@@ -313,14 +310,14 @@ end
 function GenerateMethods(def)
 	local out = ""
 	
-	if ((not obj.methods) or table.getn(obj.methods) == 0) then
+	if ((not def.methods) or table.getn(def.methods) == 0) then
 		return out
 	end
 		
 	local i = 1
-	for i = 1, table.getn(obj.methods) do
-		local method = obj.methods[i]
-		local methodCode = GenerateMethod(obj, back, method)
+	for i = 1, table.getn(def.methods) do
+		local method = def.methods[i]
+		local methodCode = GenerateMethod(def, method)
 		
 		if (methodCode) then
 			out = out .. methodCode

@@ -46,8 +46,8 @@ EndEmbeddedCode
 [methods]
 Method CanEndLine
 	CallName CanEndLine
-	Param int32 offset(&int32) : Offset to test for line ending.
-	Return bool value : True if the character can be the last one on a line.
+	Param int32 offset(&int32), 1 : Offset to test for line ending.
+	Return bool value, -1 : True if the character can be the last one on a line.
 
 Method Cut
 BeginEmbeddedCode
@@ -82,6 +82,12 @@ BeginEmbeddedCode
 	
 	return B_OK;
 EndEmbeddedCode
+
+Method FindWord
+	CallName FindWord
+	Param int32 offset(int32), 1 : Starting point for searching for a word.
+	Return int32 start(&int32), 2 : Starting offset of the next word.
+	Return int32 end(&int32), 3 : Ending offset of the next word
 
 [backend]
 Type=Subclass

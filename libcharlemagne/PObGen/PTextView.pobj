@@ -77,7 +77,7 @@ Property string(NULL) Text : The contents of the text view.
 Property int(0) TextLength : The number of bytes occupied by the text view's contents, excluding the NULL terminator
 	GetValue:TextLength(void)
 
-Property rect(rect) TextRect : The size and location of the area used to display text
+Property rect(BRect(0, 0, 1, 1)) TextRect : The size and location of the area used to display text
 	GetValue:TextRect(void)
 	SetValue:SetTextRect(rect)
 
@@ -125,13 +125,13 @@ EndEmbeddedCode
 
 Method ByteAt
 	CallName ByteAt
-	Param int32 offset(int32) : Offset of the byte to get.
-	Return char value(char) : 1-byte character at the specified offset.
+	Param int32 offset(int32), 1 : Offset of the byte to get.
+	Return char value(char), -1 : 1-byte character at the specified offset.
 
 Method CanEndLine
 	CallName ByteAt
-	Param int32 offset(int32) : Offset to test for line ending
-	Return bool value(bool) : True if the character can be the last one on a line.
+	Param int32 offset(int32), 1 : Offset to test for line ending
+	Return bool value(bool), -1 : True if the character can be the last one on a line.
 
 Method Copy
 	Param int64 clipid(The id of a clipboard object)
@@ -205,8 +205,8 @@ EndEmbeddedCode
 
 Method Delete
 	CallName Delete
-	Param int32 start(int32) : Starting offset of the range to delete.
-	Param int32 end(int32) : Ending offset of the range to delete.
+	Param int32 start(int32), 1 : Starting offset of the range to delete.
+	Param int32 end(int32), 2 : Ending offset of the range to delete.
 
 Method DisallowChars
 	Param string chars(The set of characters to disallow)
@@ -243,25 +243,25 @@ EndEmbeddedCode
 
 Method FindWord
 	CallName FindWord
-	Param int32 offset(int32) : Starting point for searching for a word
-	Return int32 start(&int32) : Starting offset of the next word
-	Return int32 end(&int32) : Ending offset of the next word
+	Param int32 offset(int32), 1 : Starting point for searching for a word
+	Return int32 start(&int32), 2 : Starting offset of the next word
+	Return int32 end(&int32), 3 : Ending offset of the next word
 
 Method GetInsets
 	CallName GetInsets
-	Return float left(&float) : Left inset
-	Return float top(&float) : Top inset
-	Return float right(&float) : Right inset
-	Return float bottom(&float) : Bottom inset
+	Return float left(&float), 1 : Left inset
+	Return float top(&float), 2 : Top inset
+	Return float right(&float), 3 : Right inset
+	Return float bottom(&float), 4 : Bottom inset
 
 Method GetSelection
 	CallName GetSelection
-	Return int32 start(&int32) : Starting offset of the selection
-	Return int32 end(&int32) : Ending offset of the selection
+	Return int32 start(&int32), 1 : Starting offset of the selection
+	Return int32 end(&int32), 2 : Ending offset of the selection
 
 Method GetText
-	Param int32 start(int32) : Starting offset of the text
-	Param int32 end(int32) : Ending offset of the text
+	Param int32 start(int32), 1 : Starting offset of the text
+	Param int32 end(int32), 2 : Ending offset of the text
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -299,23 +299,23 @@ EndEmbeddedCode
 
 Method Highlight
 	CallName Highlight
-	Param int32 start(int32) : Starting offset of the text to highlight
-	Param int32 end(int32) : Ending offset of the text to highlight
+	Param int32 start(int32), 1 : Starting offset of the text to highlight
+	Param int32 end(int32), 2 : Ending offset of the text to highlight
 
 Method Insert
 	CallName Insert
-	Param string text(string) : The text to insert
-	OptParam int32 length(int32) : How much of the string to insert
+	Param string text(string), 1 : The text to insert
+	OptParam int32 length(int32), 2 : How much of the string to insert
 
 Method LineAtOffset
 	CallName LineAt
-	Param int32 offset(int32) : Offset to find the line for
-	Return int32 line(int32) : Line for the specified offset
+	Param int32 offset(int32), 1 : Offset to find the line for
+	Return int32 line(int32), -1 : Line for the specified offset
 
 Method LineAtPoint
 	CallName LineAt
-	Param point point(point) : Point to find the line for
-	Return int32 pointline(int32) : Line for the specified point.
+	Param point point(point), 1 : Point to find the line for
+	Return int32 pointline(int32), -1 : Line for the specified point.
 
 Method Paste
 	Param int64 clipid(Object ID of a PClipboard object)
@@ -354,42 +354,42 @@ EndEmbeddedCode
 
 Method PointAt
 	CallName PointAt
-	Param int32 offset(int32) : Offset to get the point for
-	Return point point(point) : Point for the offset specified
-	Return float height(&float) : Height of the line at the specified offset
+	Param int32 offset(int32), 1 : Offset to get the point for
+	Return point point(point), -1 : Point for the offset specified
+	Return float height(&float), 2 : Height of the line at the specified offset
 
 Method ScrollToOffset
 	CallName ScrollToOffset
-	Param int32 offset(int32) : Offset to scroll to
+	Param int32 offset(int32), 1 : Offset to scroll to
 
 Method ScrollToSelection
 	CallName ScrollToSelection
 
 Method Select
 	CallName Select
-	Param int32 start(int32) : Starting offset of the next word
-	Param int32 end(int32) : Ending offset of the next word
+	Param int32 start(int32), 1 : Starting offset of the next word
+	Param int32 end(int32), 2 : Ending offset of the next word
 
 Method SelectAll
 	CallName SelectAll
 
 Method SetInsets
 	CallName SetInsets
-	Param float left(float) : Left inset
-	Param float top(float) : Top inset
-	Param float right(float) : Right inset
-	Param float bottom(float) : Bottom inset
+	Param float left(float), 1 : Left inset
+	Param float top(float), 2 : Top inset
+	Param float right(float), 3 : Right inset
+	Param float bottom(float), 4 : Bottom inset
 
 Method SetText
 	CallName SetText
-	Param string text(string) : Text to set the Text View to
-	Param int32 length(string) : Length of the text to insert
+	Param string text(string), 1 : Text to set the Text View to
+	Param int32 length(string), 2 : Length of the text to insert
 
 Method TextHeight
 	CallName TextHeight
-	Param int32 start(int32) : Starting offset of the text to highlight
-	Param int32 end(int32) : Ending offset of the text to highlight
-	Return float height(float) : Total height of the lines specified by the given offsets
+	Param int32 start(int32), 1 : Starting offset of the text to highlight
+	Param int32 end(int32), 2 : Ending offset of the text to highlight
+	Return float height(float), -1 : Total height of the lines specified by the given offsets
 
 Method Undo
 	Param int64 clipid(Object ID of a PClipboard object)

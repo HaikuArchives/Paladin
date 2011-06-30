@@ -318,6 +318,7 @@ function ParseMethodSection(sectionData)
 	local methodName = nil
 	local readEmbeddedCode = false
 	local embeddedCode = ""
+	local methodNameLine = nil
 	
 	for i = 1, #sectionData do
 		
@@ -334,6 +335,7 @@ function ParseMethodSection(sectionData)
 			
 		elseif (sectionData[i]:match('%s-[mM]ethod%s+')) then
 			methodName = sectionData[i]:match('%s-[mM]ethod%s+([%w_]+)')
+			methodNameLine = i
 			
 			outTable[methodName] = {}
 			outTable[methodName].params = {}
@@ -348,7 +350,18 @@ function ParseMethodSection(sectionData)
 			end
 			
 			local paramType, paramName =
-				sectionData[i]:match('%s-[pP]aram%s+([%w_]+)%s+([%w_]+)')
+				sectionData[i]:match('%s-[pP]aram%s+([%w_]+)%s+([%w_%&]+)')
+			local paramIndex = tonumber(sectionData[i]:match(",%s-([%-%d]+)"))
+			
+			if ((not paramType) or (not paramName) or (not paramIndex)) then
+				print(methodName .. " line " .. (i - methodNameLine) ..
+						" has a syntax error.")
+				print("Format: Param type name(castAsType), callIndex : description")
+			end
+			
+			if (paramIndex < 0) then
+				paramIndex = -1
+			end
 			
 			local inCast = sectionData[i]:match('%(([&%*%w_]+)%)')
 			
@@ -358,6 +371,7 @@ function ParseMethodSection(sectionData)
 			paramData.type = paramType
 			paramData.name = paramName
 			paramData.castAs = inCast
+			paramData.callIndex = paramIndex
 			paramData.description = paramDesc
 			
 			table.insert(outTable[methodName].params, paramData)
@@ -371,6 +385,11 @@ function ParseMethodSection(sectionData)
 			
 			local returnType, paramName, outType =
 				sectionData[i]:match('%s-[rR]eturn%s+([%w_]+)%s+([%w_]+)')
+			local paramIndex = tonumber(sectionData[i]:match(",%s-([%-%d]+)"))
+			
+			if (paramIndex < 0) then
+				paramIndex = -1
+			end
 			
 			local outCast = sectionData[i]:match('%(([&%*%w_]+)%)')
 			
@@ -380,6 +399,7 @@ function ParseMethodSection(sectionData)
 			returnData.type = returnType
 			returnData.name = paramName
 			returnData.castAs = outCast
+			returnData.callIndex = paramIndex
 			returnData.description = retDesc
 			
 			table.insert(outTable[methodName].returnvals, returnData)

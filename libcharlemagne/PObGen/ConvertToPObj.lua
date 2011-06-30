@@ -150,6 +150,10 @@ function DumpMethods(obj)
 			
 			out = out .. ")"
 			
+			if (param.callIndex) then
+				out = out .. ", " .. param.callIndex
+			end
+			
 			if (param.description) then
 				out = out .. " : " .. param.description .. "\n"
 			else
@@ -172,6 +176,10 @@ function DumpMethods(obj)
 			end
 			
 			out = out .. ")"
+			
+			if (retval.callIndex) then
+				out = out .. ", " .. retval.callIndex
+			end
 			
 			if (retval.description) then
 				out = out .. " : " .. retval.description .. "\n"

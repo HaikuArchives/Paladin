@@ -88,13 +88,8 @@ function GenerateGetProperty(def)
 		
 			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n'
 			
-			if (prop.getValue.inType:lower() == "embedded") then
-				if (not prop.getValueCode) then
-					print("Embedded GetProperty code for property " .. propName ..
-							" is missing. Skipping")
-				else
-					propCode = propCode .. "\t{\n" .. prop.getValueCode .. "\t}\n"
-				end
+			if (prop.getValue.getValueCode) then
+				propCode = propCode .. "\t{\n" .. prop.getValueCode .. "\t}\n"
 			else
 				propCode = propCode ..	"\t\t((" .. 
 						TypeToPropertyClass(prop.type) ..
@@ -102,8 +97,9 @@ function GenerateGetProperty(def)
 				
 				if (prop.getValue.castAs) then
 					propCode = propCode .. "(" .. prop.castAs .. ")"
-				elseif (prop.getValue.inType ~= "void") then
-					print("prop type is " .. (prop.getValue.inType or "nil"))
+				elseif (prop.getValue.type ~= "void") then
+					print("Type for property " .. propName .. " is " ..
+							(prop.getValue.type or "nil"))
 				end
 				
 				propCode = propCode .. "backend->" .. propName .. "());\n"
@@ -170,7 +166,7 @@ function GenerateSetProperty(def)
 			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n' ..
 						"\t{\n"
 			
-			if (prop.setValue.outType:lower() == "embedded") then
+			if (prop.setValue.type:lower() == "embedded") then
 				if (not prop.setValueCode) then
 					print("Embedded SetProperty code for property " .. propName ..
 							" is missing. Skipping")
@@ -185,9 +181,9 @@ function GenerateSetProperty(def)
 							"\t\tbackend->" .. propName .. "("
 			
 				if (prop.type:lower() == "enum") then
-					if (prop.setValue.outType:len() > 0 and 
-							prop.setValue.outType ~= "void") then
-						propCode = propCode .. prop.setValue.outType
+					if (prop.setValue.type:len() > 0 and 
+							prop.setValue.type ~= "void") then
+						propCode = propCode .. prop.setValue.type
 					end
 				elseif (prop.setValue.castAs) then
 					propCode = propCode .. "(" .. prop.setValue.castAs .. ")"

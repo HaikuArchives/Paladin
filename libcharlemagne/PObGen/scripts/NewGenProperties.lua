@@ -75,7 +75,8 @@ function GenerateGetProperty(def)
 	if (def.object.UsesView) then
 		out = out .. "\n\tif (backend->Window())\n\t\tbackend->Window()->Lock();\n\n"
 	end
-
+	
+	
 	local i = 1
 	local propertiesWritten = 0
 	for propName, prop in pairs(def.properties) do
@@ -88,8 +89,16 @@ function GenerateGetProperty(def)
 		
 			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n'
 			
-			if (prop.getValue.getValueCode) then
-				propCode = propCode .. "\t{\n" .. prop.getValueCode .. "\t}\n"
+			if (prop.getValue.type:lower() == "embedded") then
+				if (not prop.getValue.code) then
+					print("Embedded GetProperty code for property " .. propName ..
+							" is missing. Skipping")
+					-- Gotta at least close the code section so while the code is missing,
+					-- at least compilation isn't broken
+					propCode = propCode .. "\t}\n"
+				else
+					propCode = propCode .. prop.getValue.code .. "\t}\n"
+				end
 			else
 				propCode = propCode ..	"\t\t((" .. 
 						TypeToPropertyClass(prop.type) ..
@@ -98,7 +107,7 @@ function GenerateGetProperty(def)
 				if (prop.getValue.castAs) then
 					propCode = propCode .. "(" .. prop.castAs .. ")"
 				elseif (prop.getValue.type ~= "void") then
-					print("Type for property " .. propName .. " is " ..
+					print("GetValue type for property " .. propName .. " is " ..
 							(prop.getValue.type or "nil"))
 				end
 				
@@ -167,14 +176,14 @@ function GenerateSetProperty(def)
 						"\t{\n"
 			
 			if (prop.setValue.type:lower() == "embedded") then
-				if (not prop.setValueCode) then
+				if (not prop.setValue.code) then
 					print("Embedded SetProperty code for property " .. propName ..
 							" is missing. Skipping")
 					-- Gotta at least close the code section so while the code is missing,
 					-- at least compilation isn't broken
 					propCode = propCode .. "\t}\n"
 				else
-					propCode = propCode .. def.object.setValueCode .. "\t}\n"
+					propCode = propCode .. prop.setValue.code .. "\t}\n"
 				end
 			else
 				propCode = propCode .. "\t\tprop->GetValue(&" .. valName .. ");\n" ..

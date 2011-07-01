@@ -8,6 +8,8 @@ Add Set/GetMode methods to PScreen
 
 Test and fix PTextControl problems
 
+Make the autogeneration code write return value code for event hooks
+
 Implement a header for the constants for the HAIKU API, such as resizing modes, BView flags, etc.
 
 Objects to Implement:

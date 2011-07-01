@@ -91,7 +91,7 @@ Property bool(true) UseWordWrap : Whether or not the text view wraps text to fit
 
 [methods]
 Method AllowChars
-	Param string chars(The set of characters to allow)
+	Param string chars(string), 1 : The set of characters to allow
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -134,7 +134,7 @@ Method CanEndLine
 	Return bool value(bool), -1 : True if the character can be the last one on a line.
 
 Method Copy
-	Param int64 clipid(The id of a clipboard object)
+	Param int64 clipid(int64), 1 : The id of a clipboard object
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -169,7 +169,7 @@ BeginEmbeddedCode
 EndEmbeddedCode
 
 Method Cut
-	Param int64 clipid(The id of a clipboard object)
+	Param int64 clipid(int64), 1 : The id of a clipboard object
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -209,7 +209,7 @@ Method Delete
 	Param int32 end(int32), 2 : Ending offset of the range to delete.
 
 Method DisallowChars
-	Param string chars(The set of characters to disallow)
+	Param string chars(string), 1 : The set of characters to disallow
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -318,7 +318,7 @@ Method LineAtPoint
 	Return int32 pointline(int32), -1 : Line for the specified point.
 
 Method Paste
-	Param int64 clipid(Object ID of a PClipboard object)
+	Param int64 clipid(int64), 1 : Object ID of a PClipboard object
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -392,7 +392,7 @@ Method TextHeight
 	Return float height(float), -1 : Total height of the lines specified by the given offsets
 
 Method Undo
-	Param int64 clipid(Object ID of a PClipboard object)
+	Param int64 clipid(int64), 1 : Object ID of a PClipboard object
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;

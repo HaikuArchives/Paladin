@@ -9,12 +9,12 @@ end
 function ViewHookParameter(type, name, cast)
 	return {	["paramName"] = name,
 				["paramType"] = type,
-				["inCast"] = cast,
+				["castType"] = cast,
 			}
 end
 
 function ViewHook(returntype)
-	return {	["type"] = "event",
+	return {	["type"] = "generated",
 				["params"] = {},
 				["returnType"] = returntype,
 				AddParam = function(self, p)
@@ -127,7 +127,7 @@ function GenerateBackendDef(def)
 	for hookName, hookDef in pairs(def.events) do
 		
 		if (hookName and hookDef) then
-			if (hookDef.type == "event") then
+			if (hookDef.type == "generated") then
 				local defString = "\t" .. hookDef.returnType .. "\t" ..
 								hookName .. "("
 				for j = 1, #hookDef.params do
@@ -174,43 +174,42 @@ end
 
 
 function GenerateBackendCode(def)
-	if (not back) then
+	if (not def) then
 		return ""
 	end
-
+	
 	local code = def.backend.Class .. "::" .. def.backend.Class .. "(PObject *owner)\n" ..
-		"\t:\t" .. def.backend.ParentClass .. "(" ..def.backend.Init .. "),\n\t\tfOwner(owner)\n{\n}\n\n\n"
+		"\t:\t" .. def.backend.ParentClass .. "(" ..def.backend.InitCode ..
+		"),\n\t\tfOwner(owner)\n{\n}\n\n\n"
 	
 	-- Now that the constructor is done, write all of the hooks for events
-	local i = 1
-	for i = 1, table.getn(def.events) do
-		local hookDef = def.events[i]
+	for hookName, hookDef in pairs(def.events) do
 		
-		if (hookDef[1] and hookDef[2]) then
-			local defString = hookDef[1] .. "\n" .. def.backend.Class .. "::" .. hookDef[2] .. "("
+		if (hookDef.type == "generated" and hookDef.returnType and hookName) then
+			local defString = hookDef.returnType .. "\n" ..
+							def.backend.Class .. "::" .. hookName .. "("
 			
 			local j = 1
 			local paramCount = 0
 			
-			local inArgs = hookDef[3]
-			local outArgs = hookDef[4]
+			local inArgs = hookDef.params
 			
 			-- Generate the declaration part and the opening brace
 			while (inArgs[j]) do
-				if (inArgs[j] ~= "void") then
+				if (inArgs[j].paramType ~= "void") then
 					if (j > 1) then
 						defString = defString .. ", "
 					end
 					
 					local castStart = nil
 					local castEnd = nil
-					castStart, castEnd = inArgs[j].key:find("%(.-%)")
+					castStart, castEnd = inArgs[j].paramType:find("%(.-%)")
 					
 					local paramType = nil
 					if (castEnd) then
-						paramType = inArgs[j].key:sub(castEnd + 1)
+						paramType = inArgs[j].paramType:sub(castEnd + 1)
 					else
-						paramType = inArgs[j].key
+						paramType = inArgs[j].paramType
 					end
 					defString = defString .. paramType .. " " ..
 								"param" .. tostring(j)
@@ -229,22 +228,22 @@ function GenerateBackendCode(def)
 			
 			for j = 1, paramCount do
 				local pargCall = ""
-				local pargType = BeToPType(inArgs[j].key)
+				local pargType = BeToPType(inArgs[j].paramType)
 				if (pargType == "string") then
 					pargCall = "\tin.AddString("
 				elseif (pargType == "int") then
 					-- We have more than one call, so separate out the values
-					if (inArgs[j].key == "int32" or
-							inArgs[j].key == "uint32") then
+					if (inArgs[j].paramType == "int32" or
+							inArgs[j].paramType == "uint32") then
 						pargCall = "\tin.AddInt32("
-					elseif (inArgs[j].key == "int64" or
-							inArgs[j].key == "uint64") then
+					elseif (inArgs[j].paramType == "int64" or
+							inArgs[j].paramType == "uint64") then
 						pargCall = "\tin.AddInt64("
-					elseif (inArgs[j].key == "int8" or
-							inArgs[j].key == "uint8") then
+					elseif (inArgs[j].paramType == "int8" or
+							inArgs[j].paramType == "uint8") then
 						pargCall = "\tin.AddInt8("
-					elseif (inArgs[j].key == "int16" or
-							inArgs[j].key == "uint16") then
+					elseif (inArgs[j].paramType == "int16" or
+							inArgs[j].paramType == "uint16") then
 						pargCall = "\tin.AddInt16("
 					end
 				elseif (pargType == "bool") then
@@ -264,11 +263,11 @@ function GenerateBackendCode(def)
 				end
 				
 				if (pargCall == "") then
-					print("No matching type for parameter with type " .. inArgs[j].key .. ". Aborting")
+					print("No matching type for parameter with type " .. inArgs[j].paramType .. ". Aborting")
 					return nil
 				end
 				
-				pargCall = pargCall .. '"' .. inArgs[j].value .. '", '
+				pargCall = pargCall .. '"' .. inArgs[j].paramName .. '", '
 				if (pargType == "pointer") then
 					pargCall = pargCall .. "(void*) "
 				end
@@ -277,12 +276,12 @@ function GenerateBackendCode(def)
 				code = code .. pargCall
 			end
 			
-			code = code .. '\tEventData *data = fOwner->FindEvent("' .. hookDef[2] .. '");\n' ..
+			code = code .. '\tEventData *data = fOwner->FindEvent("' .. hookName .. '");\n' ..
 			[[
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		]] .. def.backend.ParentClass .. "::" .. hookDef[2]
+		]] .. def.backend.ParentClass .. "::" .. hookName
 			
 			-- TODO: Implement code for return values
 			
@@ -297,7 +296,7 @@ function GenerateBackendCode(def)
 						parentCall = parentCall .. ", "
 					end
 					
-					local castType = inArgs[j].key:match("(%(.-%))")
+					local castType = inArgs[j].paramType:match("(%(.-%))")
 					if (castType) then
 						parentCall = parentCall .. castType .. " "
 					end
@@ -308,19 +307,16 @@ function GenerateBackendCode(def)
 			end
 			
 			code = code .. "}\n\n\n"
-		end
-		i = i + 1
-	end
-	
-	i = 1
-	while (def.backend.EmbeddedHooks[i]) do
-		if (def.backend.EmbeddedHooks[i].code == nil) then
-			print("Embedded hook " .. i .. " is missing its implementation. Aborting")
-			return nil
-		else
-			code = code .. ApplyBackendPlaceholders(def.backend.EmbeddedHooks[i].code, def)
-		end
-		i = i + 1
+		elseif (hookDef.type == "embedded") then
+			if ((not hookDef.code) or hookDef.code:len() < 1) then
+				print("Embedded hook " .. hookName .. " is missing its implementation. Aborting.")
+				return nil
+			else
+				code = code .. ApplyBackendPlaceholders(hookDef.code, def)
+			end
+			
+		end -- end if returnType and hookName
+		
 	end
 	
 	return code

@@ -132,21 +132,19 @@ function GenerateCodeFile(def)
 	local methodDefs = GenerateMethodDefs(def)
 	local pobjectCode = GeneratePObject(def)
 	
-	local backendDef = ""
-	local backendCode = ""
+	local backendDef = nil
+	local backendCode = nil
 	
 	if (GetTableSize(def.backend) > 0) then
 		backendDef = GenerateBackendDef(def)
---		backendCode = GenerateBackendCode(def)
+		backendCode = GenerateBackendCode(def)
 	end
---[[	
+	
 	if ((not backendDef) or (not pobjectCode) or (not backendCode)) then
 		return nil
 	end
 	
 	fileData = includeString .. methodDefs .. backendDef .. pobjectCode .. backendCode
-]]
-	fileData = includeString ..methodDefs .. backendDef .. pobjectCode
 	
 	local codeFile = io.open(def.global.CodeFileName, "w+")
 	if (not codeFile) then

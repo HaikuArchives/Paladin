@@ -1,15 +1,15 @@
 #!/bin/sh
-lua PObGen.lua PBoxGen.lua
-lua PObGen.lua PButtonGen.lua
-lua PObGen.lua PCheckBoxGen.lua
-lua PObGen.lua PClipboardGen.lua
-lua PObGen.lua PColorControlGen.lua
-lua PObGen.lua PLabelGen.lua
-lua PObGen.lua PListViewGen.lua
-lua PObGen.lua PRadioButtonGen.lua
-lua PObGen.lua PSliderGen.lua
-lua PObGen.lua PTextControlGen.lua
-lua PObGen.lua PTextViewGen.lua
+lua PObGen.lua PBox.pobj
+lua PObGen.lua PButton.pobj
+lua PObGen.lua PCheckBox.pobj
+lua PObGen.lua PClipboard.pobj
+lua PObGen.lua PColorControl.pobj
+lua PObGen.lua PLabel.pobj
+lua PObGen.lua PListView.pobj
+lua PObGen.lua PRadioButton.pobj
+lua PObGen.lua PSlider.pobj
+lua PObGen.lua PTextControl.pobj
+lua PObGen.lua PTextView.pobj
 
 mv -f *.cpp ..
 mv -f *.h ..

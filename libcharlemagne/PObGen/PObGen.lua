@@ -1,32 +1,32 @@
 -- Script to generate the header for a PObGen module
 
 if (not DumpTable) then
-	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
+	LoadUtilities = assert(loadfile("scripts/GenUtilities.lua"))
 	LoadUtilities()
 end
 
 if (not ParsePObjFile) then
-	LoadParser = assert(loadfile("PObjParser.lua"))
+	LoadParser = assert(loadfile("scripts/PObjParser.lua"))
 	LoadParser()
 end
 
 if (not GenHeader) then
-	LoadHeader = assert(loadfile("NewGenHeader.lua"))
+	LoadHeader = assert(loadfile("scripts/GenHeader.lua"))
 	LoadHeader()
 end
 
 if (not GenerateMethods) then
-	LoadMethods = assert(loadfile("NewGenMethods.lua"))
+	LoadMethods = assert(loadfile("scripts/GenMethods.lua"))
 	LoadMethods()
 end
 
 if (not AddViewHooks) then
-	LoadBackend = assert(loadfile("NewGenBackend.lua"))
+	LoadBackend = assert(loadfile("scripts/GenBackend.lua"))
 	LoadBackend()
 end
 
 if (not GenerateGetProperty) then
-	LoadProperties = assert(loadfile("NewGenProperties.lua"))
+	LoadProperties = assert(loadfile("scripts/GenProperties.lua"))
 	LoadProperties()
 end
 

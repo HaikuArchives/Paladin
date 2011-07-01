@@ -208,11 +208,16 @@ function DumpMethods(obj)
 end
 
 function DumpBackend(backend)
+
 	print("[backend]")
 	print("Type=Subclass")
 	print("Class=" .. backend.name )
-	print("ParentClass=" .. backend.access .. " " .. backend.parent)
-	print("InitCode=" .. backend.init)
+	if (backend.access and backend.parent) then
+		print("ParentClass=" .. backend.access .. " " .. backend.parent)
+	end
+	if (backend.init) then
+		print("InitCode=" .. backend.init)
+	end
 end
 
 -- Do the conversion here

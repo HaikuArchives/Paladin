@@ -17,3 +17,8 @@ Description=A radio button
 UsesView=true
 ParentClass=public PControl
 
+[backend]
+Type=Subclass
+Class=PRadioButtonBackend
+ParentClass=public BRadioButton
+InitCode=BRect(0, 0, 1, 1), "", "", new BMessage

@@ -61,3 +61,8 @@ BeginEmbeddedCode
 		}
 EndEmbeddedCode
 
+[backend]
+Type=Subclass
+Class=PListViewBackend
+ParentClass=public BListView
+InitCode=BRect(0,0,1,1),"", B_SINGLE_SELECTION_LIST

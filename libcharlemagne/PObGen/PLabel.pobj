@@ -29,3 +29,8 @@ Property enum(B_ALIGN_LEFT) Alignment
 	Enum:Center,B_ALIGN_CENTER
 	Enum:Right,B_ALIGN_RIGHT
 
+[backend]
+Type=Subclass
+Class=PLabelBackend
+ParentClass=public BStringView
+InitCode=BRect(0,0,1,1),"", ""

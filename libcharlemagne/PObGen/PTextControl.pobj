@@ -99,7 +99,7 @@ EndEmbeddedCode
 
 
 [backend]
-Name=PTextControlBackend
-Parent=public AutoTextControl
-Init=BRect(0, 0, 1, 1), "", "", "",new BMessage()
-UsesPViewHooks=true
+Type=Subclass
+Class=PTextControlBackend
+ParentClass=public AutoTextControl
+InitCode=BRect(0, 0, 1, 1), "", "", "",new BMessage()

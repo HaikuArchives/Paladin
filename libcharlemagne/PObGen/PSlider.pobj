@@ -132,3 +132,8 @@ BeginEmbeddedCode
 		backend->UseFillColor(*boolval.value);
 EndEmbeddedCode
 
+[backend]
+Type=Subclass
+Class=PSliderBackend
+ParentClass=public BSlider
+InitCode=BRect(0, 0, 1, 1), "", "", new BMessage, 0.0, 100.0

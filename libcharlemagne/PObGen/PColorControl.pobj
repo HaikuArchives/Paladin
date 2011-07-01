@@ -35,3 +35,8 @@ Property color(0,0,0) ValueAsColor
 	GetValue:ValueAsColor(void)
 	SetValue:SetValue(color)
 
+[backend]
+Type=Subclass
+Class=PColorControlBackend
+ParentClass=public BColorControl
+InitCode=BPoint(0,0), B_CELLS_16x16, 10.0, "ColorControl"

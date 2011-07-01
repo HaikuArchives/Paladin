@@ -25,3 +25,8 @@ Property enum(B_FANCY_BORDER) BorderStyle : The style of the box's border
 	Enum:Fancy,B_FANCY_BORDER
 	Enum:None,B_NO_BORDER
 
+[backend]
+Type=Subclass
+Class=PBoxBackend
+ParentClass=public BBox
+InitCode=BRect(0, 0, 1, 1)

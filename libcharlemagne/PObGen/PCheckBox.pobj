@@ -17,3 +17,8 @@ Description=A check box
 UsesView=true
 ParentClass=public PControl
 
+[backend]
+Type=Subclass
+Class=PCheckBoxBackend
+ParentClass=public BCheckBox
+InitCode=BRect(0, 0, 1, 1), "", "", new BMessage

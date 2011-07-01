@@ -466,7 +466,7 @@ function ParseEventSection(sectionData)
 			
 			outTable[eventName] = {}
 			outTable[eventName].params = {}
-			outTable[eventName].returnval = ""
+			outTable[eventName].returnType = ""
 			outTable[eventName].type = "generated"
 			
 		elseif (sectionData[i]:match('%s-[Ee]mbedded[Hh]ook%s+')) then
@@ -489,7 +489,7 @@ function ParseEventSection(sectionData)
 				sectionData[i]:match('%s-[pP]aram%s+([%w_]+)%s+([%w_]+)')
 			
 			local castType = sectionData[i]:match('%(([&%*%w_]+)%)')
-			
+
 			local paramData = {}
 			paramData.paramType = paramType
 			paramData.paramName = paramName
@@ -507,7 +507,7 @@ function ParseEventSection(sectionData)
 			local returnType =
 				sectionData[i]:match('%s-[rR]eturn%s+([%w_]+)')
 			
-			outTable[eventName].returnval = returnType
+			outTable[eventName].returnType = returnType
 		
 		elseif (sectionData[i]:match('%s-([bB]egin[eE]mbedded[cC]ode)')) then
 			readEmbeddedCode = true

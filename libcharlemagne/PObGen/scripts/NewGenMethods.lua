@@ -26,8 +26,15 @@ void
 		return out
 	end
 	
-	local i = 1
-	for methodName, method in pairs(def.methods) do
+	local sortedNames = {}
+	for methodName in next, def.methods do
+		table.insert(sortedNames, methodName)
+	end
+	table.sort(sortedNames)
+	
+	for i = 1, #sortedNames do
+		local methodName = sortedNames[i]
+		local method = def.methods[methodName]
 		
 		for j = 1, #method.params do
 			local entry = method.params[j]
@@ -114,22 +121,17 @@ function GenerateMethodDefs(def)
 end
 
 
-function GenerateMethod(def, method)
+function GenerateMethod(def, methodName, method)
 	
 	local out = ""
 	
 	-- Start with the top part of the function definition
-	local methodCode = "int32_t\n" .. def.object.Name .. method[1] ..
+	local methodCode = "int32_t\n" .. def.object.Name .. methodName ..
 					"(void *pobject, PArgList *in, PArgList *out, void *extraData)\n{\n"
 	
-	if (method[2] == "embedded") then
-		if (def.object.embeddedMethods[method[1]]) then
-			methodCode = methodCode .. def.object.embeddedMethods[method[1]] .. "}\n\n\n"
-			return methodCode
-		else
-			print("Method " .. method[1] .. " is embedded but missing definition. ")
-			return ""
-		end
+	if (method.embeddedCode and method.embeddedCode:len() > 0) then
+		methodCode = methodCode .. method.embeddedCode .. "}\n\n\n"
+		return methodCode
 	else
 		methodCode = methodCode .. "\tif (!pobject || !in || !out)\n\t\treturn B_ERROR;\n\n"
 	end
@@ -171,12 +173,12 @@ function GenerateMethod(def, method)
 	-- For each input argument, declare a variable of the proper type and
 	-- attempt to get it from the input arguments. We will return B_ERROR if
 	-- it is not an optional argument and it is not found
-	for j = 1, table.getn(method[3]) do
-		local entry = method[3][j]
+	for j = 1, #method.params do
+		local entry = method.params[j]
 		
 		-- Declare the variable to hold the value for each parameter
 		if (not entry.name) then
-			print("Missing name for entry " .. method[1] .. " in GenerateMethods")
+			print("Missing name for entry " .. methodName .. " in GenerateMethods")
 			return ""
 		end
 		
@@ -206,8 +208,8 @@ function GenerateMethod(def, method)
 	end
 	
 	-- Declare the variables for any output values
-	for j = 1, table.getn(method[4]) do
-		local entry = method[4][j]
+	for j = 1, #method.returnvals do
+		local entry = method.returnvals[j]
 		local beType = PTypeToBe(entry.type)
 		methodCode = methodCode .. "\t" .. beType .. " outValue" .. j .. ";\n"
 	end
@@ -217,23 +219,26 @@ function GenerateMethod(def, method)
 	-- calls may require an out value to be passed by address, casting may
 	-- be necessary, and all sorts of other weirdness. First we will just create
 	-- a table containing the return value (if any) and the parameters, in order.
+	
 	local argTable = {}
 	local returnArg = nil
-	for j = 1, table.getn(method[3]) do
-		local index = method[3][j].callIndex
+	for j = 1, #method.params do
+		local index = method.params[j].callIndex
 		if (index and index > 0) then
-			argTable[index] = method[3][j]
+			argTable[index] = method.params[j]
 			argTable[index].varName = argTable[index].name
+			argTable[index].argType = "param"
 		end
 	end
-	for j = 1, table.getn(method[4]) do
-		local index = method[4][j].callIndex
+	for j = 1, #method.returnvals do
+		local index = method.returnvals[j].callIndex
 		if (index) then
 			if (index > 0) then
-				argTable[index] = method[4][j]
+				argTable[index] = method.returnvals[j]
 				argTable[index].varName = "outValue" .. j
-			elseif (index == -1)then
-				returnArg = method[4][j]
+				argTable[index].argType = "returnval"
+			elseif (index == -1) then
+				returnArg = method.returnvals[j]
 				returnArg.varName = "outValue" .. j
 			end
 		end
@@ -246,17 +251,17 @@ function GenerateMethod(def, method)
 		callLine = callLine .. returnArg.varName .. " = "
 	end
 	
-	callLine = callLine .. "backend->" .. method[2] .. "("
-	for j = 1, table.getn(argTable) do
+	callLine = callLine .. "backend->" .. method.callName .. "("
+	for j = 1, #argTable do
 		local param = ""
 		
 		local getAddress = false
 		local doCast = false
-		local prefix = argTable[j].callType:sub(1,1)
+		local prefix = argTable[j].castAs:sub(1,1)
 		if (prefix == "&") then
 			-- Asked to pass the address of the parameter
 			getAddress = true
-			prefix = argTable[j].callType:sub(2,2)
+			prefix = argTable[j].castAs:sub(2,2)
 		end
 		
 		if (prefix == "(") then
@@ -265,15 +270,15 @@ function GenerateMethod(def, method)
 		end
 		
 		if (doCast and getAddress) then
-			param = param .. "(" .. argTable[j].callType:sub(2) .. "&"
+			param = param .. "(" .. argTable[j].castAs:sub(2) .. "&"
 		elseif(doCast) then
-			param = param .. argTable[j].callType
+			param = param .. argTable[j].castAs
 		elseif(getAddress) then
 			param = param .. "&"
 		end
 		param = param .. argTable[j].varName
 		
-		if (argTable[j].type == "string" and argTable[j].callType == "string") then
+		if (argTable[j].type == "string" and argTable[j].castAs == "string") then
 			param = param .. ".String()"
 		end
 		
@@ -293,14 +298,19 @@ function GenerateMethod(def, method)
 					"\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
-	local outEntry = method[4][1]
-	if (outEntry) then
-		local outType = outEntry.type:sub(1,1):upper() .. outEntry.type:sub(2)
-		methodCode = methodCode .. "\toutArgs.MakeEmpty();\n" ..
-					"\toutArgs.Add" .. outType .. '("' .. outEntry.name ..
-					'", ' .. outEntry.varName .. ");\n\n"
+	if (#method.returnvals > 0) then
+		methodCode = methodCode .. "\toutArgs.MakeEmpty();\n"
+		
+		for j = 1, #argTable do
+			if (argTable[j].argType and argTable[j].argType == "returnval") then
+				local outEntry = argTable[j]
+				local outType = outEntry.type:sub(1,1):upper() .. outEntry.type:sub(2)
+				methodCode = methodCode .. "\toutArgs.Add" .. outType .. '("' ..
+							outEntry.name ..'", ' .. outEntry.varName .. ");\n"
+			end
+		end
+		methodCode = methodCode .. "\n"
 	end
-	
 	out = out .. methodCode .. "\treturn B_OK;\n}\n\n\n"
 	
 	return out
@@ -310,21 +320,27 @@ end
 function GenerateMethods(def)
 	local out = ""
 	
-	if ((not def.methods) or table.getn(def.methods) == 0) then
+	if ((not def.methods) or GetTableSize(def.methods) == 0) then
 		return out
 	end
 		
-	local i = 1
-	for i = 1, table.getn(def.methods) do
-		local method = def.methods[i]
-		local methodCode = GenerateMethod(def, method)
+	local sortedNames = {}
+	for methodName in next, def.methods do
+		table.insert(sortedNames, methodName)
+	end
+	table.sort(sortedNames)
+	
+	for i = 1, #sortedNames do
+		local methodName = sortedNames[i]
+		local method = def.methods[methodName]
+		
+		local methodCode = GenerateMethod(def, methodName, method)
 		
 		if (methodCode) then
 			out = out .. methodCode
 		else
 			return nil
 		end
-		i = i + 1
 	end
 	
 	return out

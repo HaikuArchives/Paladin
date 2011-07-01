@@ -85,16 +85,16 @@ PObject.methods =
 	
 	-- These need to be embedded because of the object lookup
 	{ "Copy", "embedded",
-		{ param("clipid", "int64", "The id of a clipboard object") }, {} },
+		{ param("clipid", "int64", 1, "The id of a clipboard object") }, {} },
 	{ "Cut", "embedded",
-		{ param("clipid", "int64", "The id of a clipboard object") }, {} },
+		{ param("clipid", "int64", 1, "The id of a clipboard object") }, {} },
 	{ "Delete", "Delete",
 		{ param("start", "int32", "int32", 1, "Starting offset of the range to delete."),
 		  param("end", "int32", "int32", 2, "Ending offset of the range to delete.") },
 		{ } },
 	-- This is an embedded method because it doesn't exactly map to the backend's method
 	{ "DisallowChars", "embedded",
-		{ param("chars", "string", "The set of characters to disallow") }, { } },
+		{ param("chars", "string", 1, "The set of characters to disallow") }, { } },
 	{ "FindWord", "FindWord",
 		{ param("offset", "int32", "int32", 1, "Starting point for searching for a word") },
 		{ param("start", "int32", "&int32", 2, "Starting offset of the next word"),
@@ -132,7 +132,7 @@ PObject.methods =
 	
 	-- This is also embedded because of the object lookup
 	{ "Paste", "embedded",
-		{ param("clipid", "int64", "Object ID of a PClipboard object") }, {} },
+		{ param("clipid", "int64", 1, "Object ID of a PClipboard object") }, {} },
 	{ "PointAt", "PointAt",
 		{ param("offset", "int32", "int32", 1, "Offset to get the point for") },
 		{ param("point", "point", "point", -1, "Point for the offset specified"),
@@ -161,7 +161,7 @@ PObject.methods =
 		  param("end", "int32", "int32", 2, "Ending offset of the text to highlight") },
 		{ param("height", "float", "float", -1, "Total height of the lines specified by the given offsets") } },
 	{ "Undo", "embedded",
-		{ param("clipid", "int64", "Object ID of a PClipboard object") }, {} }
+		{ param("clipid", "int64", 1, "Object ID of a PClipboard object") }, {} }
 }
 
 PObject.embeddedMethods = {}

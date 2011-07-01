@@ -171,16 +171,21 @@ function ParsePropertySection(sectionData)
 			local endEmbedded = sectionData[i]:match('%s-[eE]nd[eE]mbedded[cC]ode%s-')
 			if (endEmbedded) then
 				readEmbeddedCode = false
-				outTable[propName][embeddedName] = "embedded"
-				outTable[propName][embeddedNameCode] = embeddedCode
+				outTable[propName][embeddedName].type = "embedded"
+				outTable[propName][embeddedName].code = embeddedCode
 			else
 				embeddedCode = embeddedCode .. sectionData[i] .. "\n"
 			end
 		
 		elseif (sectionData[i]:match('%s-[pP]roperty%s+')) then
 			local propType, defaultValue, propDesc = nil
-			propType, defaultValue, propName=
-				sectionData[i]:match('%s-[pP]roperty%s+([^%)]+)%(%s-([^%)]+)%)%s+(%w+)')
+			propType = sectionData[i]:match('%s-[pP]roperty%s+([%w_]+)')
+			defaultValue, propName = sectionData[i]:match('(%b())%s+([%w_]+)')
+			
+			if (defaultValue) then
+				defaultValue = defaultValue:sub(2, defaultValue:len() - 1)
+			end
+
 			propDesc = sectionData[i]:match(':%s-(.*)')
 			
 			local missingVar = nil
@@ -225,7 +230,7 @@ function ParsePropertySection(sectionData)
 			
 			outTable[propName].getValue = {}
 			outTable[propName].getValue.name = getName
-			outTable[propName].getValue.inType = inType
+			outTable[propName].getValue.type = inType
 			outTable[propName].getValue.castAs = inCast
 			if (string.lower(inType) == "embedded") then
 				readEmbeddedCode = true
@@ -252,7 +257,7 @@ function ParsePropertySection(sectionData)
 			
 			outTable[propName].setValue = {}
 			outTable[propName].setValue.name = setName
-			outTable[propName].setValue.outType = outType
+			outTable[propName].setValue.type = outType
 			outTable[propName].setValue.castAs = outCast
 			if (string.lower(outType) == "embedded") then
 				readEmbeddedCode = true

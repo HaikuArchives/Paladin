@@ -274,7 +274,9 @@ function ParsePropertySection(sectionData)
 			
 			local enumName, enumValue = sectionData[i]:match('%s-[eE]num%s-:%s-(%b"")%s-,([%w_]+)')
 			
-			if (not enumName) then
+			if (enumName) then
+				enumName = enumName.sub(2, enumName:len() - 2)
+			else
 				enumName, enumValue = sectionData[i]:match('%s-[eE]num%s-:%s-([%w_]+)%s-,([%w_]+)')
 			end
 			

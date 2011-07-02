@@ -78,13 +78,15 @@ function GenerateViewHeader(def)
 	
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)",
 									string.upper(def.object.Name) .. "_H")
-	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)\n\n", "")
-	
-	if (def.object.properties and table.getn(def.object.properties) > 0) then
-		classDef = classDef .. headerGetSetCode .. "\n"
-	end
 	
 	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
+	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
+									def.backend.Class .. ";\n" .. "class " ..
+									parentName .. ";")
+	
+	if (def.properties and GetTableSize(def.properties) > 0) then
+		classDef = classDef .. headerGetSetCode .. "\n"
+	end
 	
 	-- All PView-based controls are expected to use a GetBackend().
 	classDef = classDef .. "\t\t\t" .. parentName .. " *\tGetBackend(void) const;\n"

@@ -65,7 +65,7 @@ void
 	local setCode = GenerateSetProperty(def)
 	
 	local getBackendCode = ""
-	if (def.object.GetBackend or def.object.UsesView) then
+	if (def.object.GetBackend and (not def.object.UsesView)) then
 		getBackendCode = [[
 %(BACKEND_PARENT_NAME) *
 %(POBJECTNAME)::GetBackend(void) const

@@ -111,7 +111,7 @@ function GenerateGetProperty(def)
 							(prop.getValue.type or "nil"))
 				end
 				
-				propCode = propCode .. "backend->" .. propName .. "());\n"
+				propCode = propCode .. "backend->" .. prop.getValue.name .. "());\n"
 			end
 		
 			out = out .. propCode
@@ -187,12 +187,16 @@ function GenerateSetProperty(def)
 				end
 			else
 				propCode = propCode .. "\t\tprop->GetValue(&" .. valName .. ");\n" ..
-							"\t\tbackend->" .. propName .. "("
+							"\t\tbackend->" .. prop.setValue.name .. "("
 			
 				if (prop.type:lower() == "enum") then
 					if (prop.setValue.type:len() > 0 and 
 							prop.setValue.type ~= "void") then
-						propCode = propCode .. prop.setValue.type
+						if (prop.setValue.castAs) then
+							propCode = propCode .. "(" .. prop.setValue.castAs .. ")"
+						else
+							propCode = propCode .. "(" .. prop.setValue.type .. ")"
+						end
 					end
 				elseif (prop.setValue.castAs) then
 					propCode = propCode .. "(" .. prop.setValue.castAs .. ")"

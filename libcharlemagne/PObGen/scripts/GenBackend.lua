@@ -26,8 +26,8 @@ end
 PViewHooks = {}
 PViewHooks["AttachedToWindow"] = ViewHook("void")
 PViewHooks["AttachedToWindow"]:AddParam(ViewHookParameter("void"))
-PViewHooks["DetachedToWindow"] = ViewHook("void")
-PViewHooks["DetachedToWindow"]:AddParam(ViewHookParameter("void"))
+PViewHooks["DetachedFromWindow"] = ViewHook("void")
+PViewHooks["DetachedFromWindow"]:AddParam(ViewHookParameter("void"))
 PViewHooks["AllAttached"] = ViewHook("void")
 PViewHooks["AllAttached"]:AddParam(ViewHookParameter("void"))
 PViewHooks["AllDetached"] = ViewHook("void")
@@ -133,7 +133,7 @@ function GenerateBackendDef(def)
 				for j = 1, #hookDef.params do
 					local param = hookDef.params[j]
 					
-					if (param.type == "void") then
+					if (param.paramType == "void") then
 						defString = defString .. "void"
 						break
 					else
@@ -178,8 +178,9 @@ function GenerateBackendCode(def)
 		return ""
 	end
 	
+	local parent = def.backend.ParentClass:match("%s+([%w_]+)")
 	local code = def.backend.Class .. "::" .. def.backend.Class .. "(PObject *owner)\n" ..
-		"\t:\t" .. def.backend.ParentClass .. "(" ..def.backend.InitCode ..
+		"\t:\t" .. parent .. "(" ..def.backend.InitCode ..
 		"),\n\t\tfOwner(owner)\n{\n}\n\n\n"
 	
 	-- Now that the constructor is done, write all of the hooks for events
@@ -281,9 +282,7 @@ function GenerateBackendCode(def)
 	if (data->hook)
 		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
 	else
-		]] .. def.backend.ParentClass .. "::" .. hookName
-			
-			-- TODO: Implement code for return values
+		]] .. parent .. "::" .. hookName
 			
 			-- Calling the parent version if no event function defined
 			if (paramCount == 0) then

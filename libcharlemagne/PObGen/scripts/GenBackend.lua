@@ -174,7 +174,7 @@ end
 
 
 function GenerateBackendCode(def)
-	if (not def) then
+	if (not def or def.backend.Type:lower() ~= "subclass") then
 		return ""
 	end
 	

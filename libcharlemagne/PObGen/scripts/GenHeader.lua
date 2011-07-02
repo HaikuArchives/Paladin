@@ -53,7 +53,7 @@ private:
 	
 	local backType = def.backend.Type:lower()
 	if (backType == "single" or backType == "unique") then
-		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend\n"
+		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend;\n"
 	end
 	
 	return out .. "\n"
@@ -124,7 +124,7 @@ function GenerateNonViewHeader(def)
 										def.backend.Class .. ";\n")
 	end
 	
-	if (def.object.properties and table.getn(def.object.properties) > 0) then
+	if (def.properties and GetTableSize(def.properties) > 0) then
 		classDef = classDef .. headerGetSetCode .. "\n"
 	end
 	

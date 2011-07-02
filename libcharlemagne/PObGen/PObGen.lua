@@ -33,18 +33,6 @@ end
 
 function GeneratePObject(def)
 
-	local initBackendTemplate = [[
-void
-%(POBJECTNAME)::InitBackend(void)
-{
-	if (!%(BACKEND_FVIEW_NAME))
-		%(BACKEND_FVIEW_NAME) = new %(BACKENDNAME)(this);
-	StringValue sv("%(POBJECT_DESCRIPTION)");
-	SetProperty("Description", &sv);
-}
-
-
-]]
 	local pobjCode = ApplyObjectPlaceholders(PObjectMainCode, def)
 	
 	local parent = def.object.ParentClass:match("%s+([%w_]+)")
@@ -88,21 +76,66 @@ void
 	end
 	
 	pobjCode = pobjCode .. getCode .. setCode .. getBackendCode
+	
+	-- Generate the InitBackend code
+	
+	local initBackend = nil
+	if (def.backend.Type:lower() == "subclass") then
+	
+		initBackend = [[
+void
+%(POBJECTNAME)::InitBackend(void)
+{
+	if (!%(BACKEND_FVIEW_NAME))
+		%(BACKEND_FVIEW_NAME) = new %(BACKENDNAME)(this);
+	StringValue sv("%(POBJECT_DESCRIPTION)");
+	SetProperty("Description", &sv);
+}
 
---[[
-	if (def.object.InitBackend) then
-		if (string.len(def.object.InitBackend) > 0) then
-			pobjCode = pobjCode .. "void\n" .. def.object.Name .. "::InitBackend(void)\n{\n" .. 
-						def.object.InitBackend .. "}\n\n\n"
-		else
-			initBackendTemplate = ApplyObjectPlaceholders(initBackendTemplate, def);
-			initBackendTemplate = ApplyBackendPlaceholders(initBackendTemplate, def);
-			initBackendTemplate = ApplyCustomPlaceholder(initBackendTemplate,
-														"%(POBJECT_DESCRIPTION)", def.object.Description);
-			pobjCode = pobjCode .. initBackendTemplate
-		end
+
+]]
+
+	elseif (def.backend.Type:lower() == "unique") then
+	
+		initBackend = [[
+void
+%(POBJECTNAME)::InitBackend(void)
+{
+	if (!%(BACKEND_FVIEW_NAME))
+		%(BACKEND_FVIEW_NAME) = %(UNIQUEVAR);
+	StringValue sv("%(POBJECT_DESCRIPTION)");
+	SetProperty("Description", &sv);
+}
+
+
+]]
+	
+	initBackend = ApplyCustomPlaceholder(initBackend,
+									"%(UNIQUEVAR)", def.backend.UniqueVar);
+	
+	elseif (def.backend.Type:lower() == "single") then
+
+		initBackend = [[
+void
+%(POBJECTNAME)::InitBackend(void)
+{
+	if (!%(BACKEND_FVIEW_NAME))
+		%(BACKEND_FVIEW_NAME) = new %(BACKENDNAME)(%(BACKENDINIT));
+	StringValue sv("%(POBJECT_DESCRIPTION)");
+	SetProperty("Description", &sv);
+}
+
+
+]]
+		initBackend = ApplyCustomPlaceholder(initBackend,
+										"%(BACKENDINIT)", def.backend.InitCode);
 	end
-]]	
+
+	initBackend = ApplyObjectPlaceholders(initBackend, def);
+	initBackend = ApplyBackendPlaceholders(initBackend, def);
+	initBackend = ApplyCustomPlaceholder(initBackend,
+									"%(POBJECT_DESCRIPTION)", def.object.Description);
+	
 	pobjCode = pobjCode .. initPropCode .. initMethodsCode .. methodsCode
 	
 	return pobjCode

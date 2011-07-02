@@ -73,6 +73,7 @@ PTypeConstantTable.char = "PARG_CHAR"
 	BACKEND_CLASS_DECL = the declaration of the backend's class
 	BACKEND_FVIEW_NAME = the name of the backend variable. fView if
 						the object inherits PView, fBackend if not.
+	BACKEND_DELETE = the code for deleting the backend. Only for single backend type.
 	
 	HEADER_GUARD = name of the constant used for the header guard
 	
@@ -138,6 +139,7 @@ PObjectMainCode = [[
 
 %(POBJECTNAME)::~%(POBJECTNAME)(void)
 {
+	%(BACKEND_DELETE)
 }
 
 
@@ -191,6 +193,12 @@ function ApplyObjectPlaceholders(str, def)
 	out = string.gsub(out, "%%%(POBJECT_PARENT_HEADER%)", def.global.ParentHeaderName)
 	out = string.gsub(out, "%%%(POBJECT_FRIENDLY_NAME%)", def.object.FriendlyName)
 	
+	local deleteBackend = ""
+	if (def.backend.Type:lower() == "single") then
+		deleteBackend = "\tdelete fBackend;\n"
+	end
+	out = string.gsub(out, "%%%(BACKEND_DELETE%)", deleteBackend)
+	
 	return out
 end
 
@@ -199,8 +207,10 @@ function ApplyBackendPlaceholders(str, def)
 	local out = string.gsub(str, "%%%(BACKENDNAME%)", def.backend.Class)
 	
 	local parentPattern = ""
-	if (def.backend.ParentClass) then
+	if (def.backend.Type == "subclass" and def.backend.ParentClass) then
 		parentPattern = def.backend.ParentClass:match("%s+([%w_]+)")
+	else
+		parentPattern = def.backend.Class
 	end
 	
 	out = string.gsub(out, "%%%(BACKEND_PARENT_NAME%)", parentPattern)

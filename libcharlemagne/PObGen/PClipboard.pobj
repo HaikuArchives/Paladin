@@ -23,9 +23,9 @@ Property bool(false) Locked
 BeginEmbeddedCode
 		prop->GetValue(&boolval);
 		if (*boolval.value)
-			fBackend->Lock();
+			backend->Lock();
 		else
-			fBackend->Unlock();
+			backend->Unlock();
 EndEmbeddedCode
 
 Property string(0) Name

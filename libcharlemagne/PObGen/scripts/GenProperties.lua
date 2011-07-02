@@ -97,7 +97,7 @@ function GenerateGetProperty(def)
 					-- at least compilation isn't broken
 					propCode = propCode .. "\t}\n"
 				else
-					propCode = propCode .. prop.getValue.code .. "\t}\n"
+					propCode = propCode .. "\t{\n" .. prop.getValue.code .. "\t}\n"
 				end
 			else
 				propCode = propCode ..	"\t\t((" .. 
@@ -172,8 +172,7 @@ function GenerateSetProperty(def)
 				valName = "IntProperty"
 			end
 			valName = valName.sub(valName:lower(), 1, valName:len() - 8) .. "val"
-			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n' ..
-						"\t{\n"
+			propCode = propCode .. 'if (str.ICompare("' .. propName .. '") == 0)\n'
 			
 			if (prop.setValue.type:lower() == "embedded") then
 				if (not prop.setValue.code) then
@@ -183,10 +182,10 @@ function GenerateSetProperty(def)
 					-- at least compilation isn't broken
 					propCode = propCode .. "\t}\n"
 				else
-					propCode = propCode .. prop.setValue.code .. "\t}\n"
+					 propCode = propCode .. "\t{\n" .. prop.setValue.code .. "\t}\n"
 				end
 			else
-				propCode = propCode .. "\t\tprop->GetValue(&" .. valName .. ");\n" ..
+				propCode = propCode .. "\t{\n\t\tprop->GetValue(&" .. valName .. ");\n" ..
 							"\t\tbackend->" .. prop.setValue.name .. "("
 			
 				if (prop.type:lower() == "enum") then
@@ -266,7 +265,7 @@ function GenerateInitProperties(def)
 					propCode = propCode .. "\tprop = new EnumProperty();\n"
 					propCode = propCode .. '\tprop->SetName("' .. propName .. '");\n' ..
 								"\tprop->SetValue((int32)" .. prop.defaultValue .. ");\n"
-					if (prop.description:len() > 0) then
+					if (prop.description and prop.description:len() > 0) then
 						propCode = propCode .. '\tprop->SetDescription("' ..
 									prop.description .. '");\n'
 					end

@@ -15,7 +15,7 @@ PObjectHeaderCode = [[
 
 %(BACKEND_CLASS_DECL)
 
-class %(POBJECTNAME) : %(POBJECT_PARENT_NAME)
+class %(POBJECTNAME) : %(POBJECT_PARENT_INHERIT)
 {
 public:
 							%(POBJECTNAME)(void);

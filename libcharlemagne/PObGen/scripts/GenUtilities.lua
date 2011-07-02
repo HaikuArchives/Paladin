@@ -64,6 +64,7 @@ PTypeConstantTable.char = "PARG_CHAR"
 					in the Lua-based template files
 
 	POBJECT_PARENT_NAME = name of the PObject's parent class
+	POBJECT_PARENT_INHERIT = name and inheritance of the PObject's parent class
 	POBJECT_FRIENDLY_NAME = "friendly" name for the control, such as "Slider"
 							which is not necessarily the name of the class
 	POBJECT_PARENT_HEADER = the header of the pobject's parent class
@@ -139,8 +140,7 @@ PObjectMainCode = [[
 
 %(POBJECTNAME)::~%(POBJECTNAME)(void)
 {
-	%(BACKEND_DELETE)
-}
+%(BACKEND_DELETE)}
 
 
 BArchivable *
@@ -189,6 +189,7 @@ function ApplyObjectPlaceholders(str, def)
 	out = string.gsub(out, "%%%(POBJECTNAME%)", def.object.Name)
 	
 	local parent = def.object.ParentClass:match("%s([%w_]+)")
+	out = string.gsub(out, "%%%(POBJECT_PARENT_INHERIT%)", def.object.ParentClass)
 	out = string.gsub(out, "%%%(POBJECT_PARENT_NAME%)", parent)
 	out = string.gsub(out, "%%%(POBJECT_PARENT_HEADER%)", def.global.ParentHeaderName)
 	out = string.gsub(out, "%%%(POBJECT_FRIENDLY_NAME%)", def.object.FriendlyName)

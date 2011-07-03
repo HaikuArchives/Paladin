@@ -148,8 +148,13 @@ function GenerateMethod(def, methodName, method)
 	BTextView *backend = (BTextView*)parent->GetView();
 ]]
 	else
-		local parentName = def.backend.ParentClass:match("%s+([%w_]+)")
-		if (not parentName) then
+		local parentName = nil
+		if (def.backend.ParentClass) then
+			parentName = def.backend.ParentClass:match("%s+([%w_]+)")
+			if (not parentName) then
+				parentName = def.backend.Class
+			end
+		else
 			parentName = def.backend.Class
 		end
 		

@@ -30,6 +30,10 @@ Property bool(false) HideTyping : Hides typing, such as for a password box.
 	GetValue:IsTypingHidden(void)
 	SetValue:HideTyping(bool)
 
+Property int(0) Size : File size
+	GetValue:GetSize(&off_t)
+	SetValue:SetSize(int)
+
 Property enum(B_ALIGN_RIGHT) Alignment : THe current alignment mode of the text view's contents.
 #	GetValue:Alignment(void)
 	GetValue:Alignment(embedded)

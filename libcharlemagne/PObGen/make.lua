@@ -7,6 +7,7 @@ gFileList =
 	"PCheckBox",
 	"PClipboard",
 	"PColorControl",
+	"PEntry",
 	"PLabel",
 	"PListView",
 	"PRadioButton",

@@ -1,0 +1,109 @@
+[global]
+Module=PEntry
+Header=PEntry.h
+CodeFileName=PEntry.cpp
+ParentHeaderName="PObject.h"
+
+[includes]
+<Directory.h>
+<Entry.h>
+<Path.h>
+
+[object]
+Name=PEntry
+FriendlyName=Entry
+Description=A filesystem entry, such as a file or directory.
+UsesView=false
+ParentClass=public PObject
+UsesBackend=true
+
+[properties]
+Property int(0) AccessTime : Get the entry's last-accessed time
+	GetValue:GetAccessTime(&time_t)
+
+Property int(0) CreationTime : Get the entry's creation time
+	GetValue:GetCreationTime(&time_t)
+
+Property int(0) Group : Set or get the entry's group
+	GetValue:GetGroup(&gid_t)
+	SetValue:SetGroup(int->gid_t)
+
+Property int(0) Owner : Set or get the entry's owner
+	GetValue:GetOwner(&uid_t)
+	SetValue:SetOwner(int->uid_t)
+
+Property string("") Path : Location of the entry on the filesystem
+	GetValue:GetPath(embedded)
+BeginEmbeddedCode
+		BPath path;
+		backend->GetPath(&path);
+		((StringProperty*)prop)->SetValue(path.Path());
+EndEmbeddedCode
+	SetValue:SetTo(string)
+
+Property bool(false) Exists : True if the entry actually exists in the filesystem
+	GetValue:Exists(void)
+
+Property int(0) ErrorStatus : Returns the error status of the entry
+	GetValue:InitCheck(void)
+
+[methods]
+Method MoveTo
+	Param string path(string), 1 : The new path to receive the entry
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PEntry *parent = static_cast<PEntry*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BEntry *backend = (BEntry*)parent->GetBackend();
+	
+	PArgs args(in), outArgs(out);
+	BString string;
+	if (args.FindString("path", &string) != B_OK)
+		return B_ERROR;
+	
+	BDirectory dir(string.String());
+	status_t status = backend->MoveTo(&dir);
+	
+	outArgs.MakeEmpty();
+	outArgs.AddInt32("status", status);
+	
+	return B_OK;
+EndEmbeddedCode
+	Return int32 error(int32), -1 : Success or error state of the call
+
+Method Remove
+
+Method Rename
+	Param string newname(string), 1 : The new name of the entry
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PEntry *parent = static_cast<PEntry*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BEntry *backend = (BEntry*)parent->GetBackend();
+	
+	PArgs args(in), outArgs(out);
+	BString string;
+	if (args.FindString("newname", &string) != B_OK)
+		return B_ERROR;
+	
+	status_t status = backend->Rename(string.String());
+	
+	outArgs.MakeEmpty();
+	outArgs.AddInt32("status", status);
+	
+	return B_OK;
+EndEmbeddedCode
+	Return int32 error(int32), -1 : Success or error state of the call
+
+[backend]
+Type=Single
+Class=BEntry
+# Use the default(empty) constructor, so no InitCode

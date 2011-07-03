@@ -127,8 +127,14 @@ void
 
 
 ]]
-		initBackend = ApplyCustomPlaceholder(initBackend,
-										"%(BACKENDINIT)", def.backend.InitCode);
+		-- We need this because the InitCode field isn't required, although
+		-- it is almost always used.
+		local init = ""
+		if (def.backend.InitCode) then
+			init = def.backend.InitCode
+		end
+		
+		initBackend = ApplyCustomPlaceholder(initBackend, "%(BACKENDINIT)", init);
 	end
 
 	initBackend = ApplyObjectPlaceholders(initBackend, def);

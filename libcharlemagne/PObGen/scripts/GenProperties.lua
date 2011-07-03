@@ -76,6 +76,15 @@ function GenerateGetProperty(def)
 		out = out .. "\n\tif (backend->Window())\n\t\tbackend->Window()->Lock();\n\n"
 	end
 	
+	for propName, prop in pairs(def.properties) do
+		if (prop.getValue and prop.getValue.type) then
+			local type = prop.getValue.type:lower()
+			if (type:sub(1,1) == "&") then
+				out = out .. "\t" .. prop.getValue.type:sub(2) .. " out" ..
+					propName .. "Value;\n"
+			end
+		end
+	end
 	
 	local i = 1
 	local propertiesWritten = 0
@@ -100,18 +109,30 @@ function GenerateGetProperty(def)
 					propCode = propCode .. "\t{\n" .. prop.getValue.code .. "\t}\n"
 				end
 			else
-				propCode = propCode ..	"\t\t((" .. 
-						TypeToPropertyClass(prop.type) ..
-							"*)prop)->SetValue("
-				
-				if (prop.getValue.castAs) then
-					propCode = propCode .. "(" .. prop.castAs .. ")"
-				elseif (prop.getValue.type ~= "void") then
-					print("GetValue type for property " .. propName .. " is " ..
-							(prop.getValue.type or "nil"))
+				if (prop.getValue.type:sub(1,1) == "&") then
+					local paramName = "out".. propName .. "Value"
+					propCode = propCode .. "\t{\n\t\tbackend->" ..
+								prop.getValue.name .. "(&" .. paramName .. ");\n"
+					
+					propCode = propCode ..	"\t\t((" .. 
+							TypeToPropertyClass(prop.type) ..
+								"*)prop)->SetValue(" .. paramName ..
+								");\n\t}\n"
+				else
+					propCode = propCode ..	"\t\t((" .. 
+							TypeToPropertyClass(prop.type) ..
+								"*)prop)->SetValue("
+					
+					if (prop.getValue.castAs) then
+						propCode = propCode .. "(" .. prop.getValue.castAs .. ")"
+					elseif (prop.getValue.type ~= "void") then
+						print("GetValue type for property " .. propName .. " is " ..
+								(prop.getValue.type or "nil"))
+					end
+					
+					propCode = propCode .. "backend->" .. prop.getValue.name ..
+								"());\n"
 				end
-				
-				propCode = propCode .. "backend->" .. prop.getValue.name .. "());\n"
 			end
 		
 			out = out .. propCode

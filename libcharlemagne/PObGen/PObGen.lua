@@ -136,7 +136,8 @@ void
 	initBackend = ApplyCustomPlaceholder(initBackend,
 									"%(POBJECT_DESCRIPTION)", def.object.Description);
 	
-	pobjCode = pobjCode .. initPropCode .. initMethodsCode .. methodsCode
+	pobjCode = pobjCode .. initPropCode .. initBackend .. initMethodsCode ..
+				methodsCode
 	
 	return pobjCode
 end

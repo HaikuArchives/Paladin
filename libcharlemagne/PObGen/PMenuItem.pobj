@@ -1,0 +1,61 @@
+## INCOMPLETE
+##
+[global]
+Module=PMenuItem
+Header=PMenuItem.h
+CodeFileName=PMenuItem.cpp
+ParentHeaderName="PObject.h"
+
+[includes]
+<MenuItem.h>
+
+[object]
+Name=PMenuItem
+FriendlyName=MenuItem
+Description=An item in a menu
+UsesView=false
+ParentClass=public PObject
+
+[properties]
+Property int(0) Message : The message constant for the menu item
+	GetValue:Command(int)
+	SetValue:SetMessage(embedded)
+BeginEmbeddedCode
+		prop->GetValue(&intval);
+		backend->SetMessage(new BMessage(*intval.value));
+EndEmbeddedCode
+
+Property int(0) Target : The ID of the target for the item's message
+
+Property string("") Label : The text of the menu item.
+	GetValue:Label(void)
+	SetValue:SetLabel(string)
+
+Property bool(true) Enabled : The "enabled" state for the item.
+	GetValue:IsEnabled(void)
+	SetValue:SetEnabled(bool)
+
+Property bool(false) Marked : True if the item is checked
+	GetValue:IsMarked(void)
+	SetValue:SetMarked(bool)
+
+Property char(0) Trigger : The letter trigger used when the item is open.
+	GetValue:Trigger(void)
+	SetValue:SetTrigger(char)
+
+Property rect(BRect(0,0,0,0)) Frame : The frame of the menu item
+	GetValue:Frame(void)
+
+[methods]
+Method SetShortcut
+	Param char shortcut(char), 1 : character to define as the item's shortcut
+	Param int32 modifiers(int32), 2 : constants for modifier keys, like the Control key.
+
+Method GetShortcut
+	Return char shortcut(char), -1 : the item's shortcut character
+	Return char modifiers(&int32), 1 : the item's shortcut modifier keys
+
+[backend]
+Type=Single
+Class=BMenuItem
+InitCode="", new BMessage(), 0, 0

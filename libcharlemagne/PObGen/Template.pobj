@@ -2,7 +2,11 @@
 Module=Name of object's module
 Header=Name of object's header file
 CodeFileName=Name of object's source file
-ParentHeaderName=Name of object's parent's header with "" or <>
+
+# ParentHeaderName should be the name of the header for the parent
+# class of the *object*, not the backend. Many times this line will be
+# PObject.h or something similar.
+ParentHeaderName=
 
 [includes]
 

@@ -193,15 +193,14 @@ function GenerateMethod(def, methodName, method)
 		-- If a required argument, add a check to make sure that it
 		-- was found and return B_ERROR if it wasn't
 		local capType = entry.type:sub(1,1):upper() .. entry.type:sub(2)
-		if ((not entry.flags) or
-			(entry.flags:find("PMIFLAG_OPTIONAL", 1, plain) == nil)) then
-			
+		if (entry.defaultValue) then
+			entryCode = entryCode .. "\t" .. entry.name .. " = " ..
+						entry.defaultValue .. ";\n\tinArgs.Find" .. capType ..
+						'("' .. entry.name .. '", &' .. entry.name .. ');\n\n'
+		else
 			entryCode = entryCode .. "\tif (inArgs.Find" .. capType ..
 						'("' .. entry.name .. '", &' .. entry.name ..
 						') != B_OK)\n\t\treturn B_ERROR;\n\n'
-		else
-			entryCode = entryCode .. "\tinArgs.Find" .. capType ..
-						'("' .. entry.name .. '", &' .. entry.name .. ');\n\n'
 		end
 		methodCode = methodCode .. entryCode
 	end

@@ -40,6 +40,9 @@ UsesBackend=true
 #
 # Read-only properties just leave out the SetValue entry
 #
+# Properties which don't call any backend methods can leave out both
+# lines entirely.
+#
 # Possible property types are int, string, bool, float, char,
 # rect, point, color, enum, and pointer.
 #
@@ -75,6 +78,14 @@ UsesBackend=true
 # Each method entry consists of a series of lines describing its input
 # and output values. The CallName line is to denote the name of the
 # backend method to call when it is not the same as the name in the Method line.
+#
+# A parameter may be optional if it is given a default value. This is done by
+# placing the default value in brackets after the cast type like this:
+#
+#	Param int32 start(int32)[0], 1 : Starting offset of the text to highlight
+#
+# The start parameter in this case defaults to zero.
+#
 #
 # The call index is used to describe where in the backend method call the
 # parameter should be placed. A value of -1 can be used in a Return line

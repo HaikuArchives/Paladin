@@ -359,6 +359,10 @@ function ParseMethodSection(sectionData)
 			local paramType, paramName =
 				sectionData[i]:match('%s-[pP]aram%s+([%w_]+)%s+([%w_%&]+)')
 			local paramIndex = tonumber(sectionData[i]:match(",%s-([%-%d]+)"))
+			local defaultValue = sectionData[i]:match("%)%s-(%b[])")
+			if (defaultValue) then
+				defaultValue = defaultValue:sub(2, defaultValue:len() - 1)
+			end
 			
 			if ((not paramType) or (not paramName) or (not paramIndex)) then
 				print(methodName .. " line " .. (i - methodNameLine) ..
@@ -380,6 +384,7 @@ function ParseMethodSection(sectionData)
 			paramData.castAs = inCast
 			paramData.callIndex = paramIndex
 			paramData.description = paramDesc
+			paramData.defaultValue = defaultValue
 			
 			table.insert(outTable[methodName].params, paramData)
 			

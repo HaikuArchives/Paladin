@@ -49,7 +49,7 @@ Property rect(BRect(0,0,0,0)) Frame : The frame of the menu item
 [methods]
 Method SetShortcut
 	Param char shortcut(char), 1 : character to define as the item's shortcut
-	Param int32 modifiers(int32), 2 : constants for modifier keys, like the Control key.
+	Param int32 modifiers(int32)[0], 2 : constants for modifier keys, like the Control key.
 
 Method GetShortcut
 	Return char shortcut(char), -1 : the item's shortcut character

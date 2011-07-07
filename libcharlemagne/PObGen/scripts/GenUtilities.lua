@@ -326,6 +326,8 @@ function TypeToPropertyClass(str)
 		return "ColorProperty"
 	elseif (str == "float") then
 		return "FloatProperty"
+	elseif (str == "char") then
+		return "CharProperty"
 	elseif (str == "enum") then
 		return "EnumProperty"
 	else

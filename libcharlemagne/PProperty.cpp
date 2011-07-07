@@ -366,6 +366,124 @@ StringProperty::GetValueAsString(void) const
 }
 
 
+CharProperty::CharProperty(void)
+{
+	fCharValue = new CharValue();
+	
+	SetType("CharProperty");
+}
+
+
+CharProperty::CharProperty(const char *name, const char &value, const char *desc)
+{
+	fCharValue = new CharValue();
+	
+	SetType("CharProperty");
+	SetName(name);
+	SetValue(value);
+	SetDescription(desc);
+}
+
+
+CharProperty::CharProperty(PValue *value)
+{
+	fCharValue = new CharValue();
+	
+	SetType("CharProperty");
+	SetValue(value);
+}
+
+
+CharProperty::CharProperty(BMessage *msg)
+	:	PProperty(msg)
+{
+	fCharValue = new CharValue();
+	
+	int8 c;
+	if (msg->FindInt8("value",&c) == B_OK)
+		*fCharValue = c;
+}
+
+	
+CharProperty::~CharProperty(void)
+{
+	delete fCharValue;
+}
+
+
+PProperty *
+CharProperty::Create(void)
+{
+	return new CharProperty();
+}
+
+
+PProperty *
+CharProperty::Duplicate(void)
+{
+	return new CharProperty(*this);
+}
+
+
+BArchivable *
+CharProperty::Instantiate(BMessage *data)
+{
+	if (validate_instantiation(data, "CharProperty"))
+		return new CharProperty(data);
+
+	return NULL;
+}
+
+
+status_t
+CharProperty::Archive(BMessage *data, bool deep) const
+{
+	status_t status = PProperty::Archive(data,deep);
+	if (status != B_OK)
+		return status;
+	
+	status = data->AddInt8("value",*fCharValue->value);
+	return status;
+}
+
+		
+status_t
+CharProperty::SetValue(PValue *value)
+{
+	if (IsReadOnly())
+		return B_READ_ONLY;
+	
+	return fCharValue->SetValue(value);
+}
+
+
+status_t
+CharProperty::SetValue(char c)
+{
+	if (IsReadOnly())
+		return B_READ_ONLY;
+	
+	*fCharValue = c;
+	return B_OK;
+}
+
+
+status_t
+CharProperty::GetValue(PValue *pval)
+{
+	return fCharValue->GetValue(pval);
+}
+
+
+BString
+CharProperty::GetValueAsString(void) const
+{
+	BString string;
+	string << *fCharValue->value;
+	return string;
+}
+
+
 BoolProperty::BoolProperty(void)
 {
 	fBoolValue = new BoolValue();

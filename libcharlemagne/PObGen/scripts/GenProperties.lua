@@ -41,6 +41,7 @@ status_t
 	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)%(BACKEND_FVIEW_NAME);
 	
 	BoolValue boolval;
+	CharValue charval;
 	ColorValue colorval;
 	FloatValue floatval;
 	IntValue intval;
@@ -125,9 +126,9 @@ function GenerateGetProperty(def)
 					
 					if (prop.getValue.castAs) then
 						propCode = propCode .. "(" .. prop.getValue.castAs .. ")"
-					elseif (prop.getValue.type ~= "void") then
-						print("GetValue type for property " .. propName .. " is " ..
-								(prop.getValue.type or "nil"))
+--					elseif (prop.getValue.type ~= "void") then
+--						print("GetValue type for property " .. propName .. " is " ..
+--								(prop.getValue.type or "nil"))
 					end
 					
 					propCode = propCode .. "backend->" .. prop.getValue.name ..

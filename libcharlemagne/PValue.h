@@ -141,6 +141,34 @@ public:
 				int64		*value;
 };
 
+class CharValue : public PValue
+{
+public:
+							CharValue(void);
+							CharValue(const CharValue &from);
+							CharValue(char from);
+							~CharValue(void);
+		
+		virtual bool		AcceptsType(char *type);
+		virtual bool		ReturnsType(char *type);
+		virtual	bool		Name(void) const { return "CharValue"; }
+		
+		virtual	status_t	SetValue(PValue *value);
+		virtual	status_t	GetValue(PValue *value);
+		
+		virtual	PValue *	Duplicate(void) const;
+		
+		inline	CharValue &	operator=(const CharValue &from) { *value = *from.value; return *this; }
+		inline	CharValue &	operator=(const char &from) { *value = from; return *this; }
+		
+		inline	bool 		operator==(const CharValue &from) { return *value == *from.value; }
+		inline	bool 		operator==(const char &from) { return *value == from; }
+		inline	bool 		operator!=(const CharValue &from) { return *value != *from.value; }
+		inline	bool 		operator!=(const char &from) { return *value != from; }
+		
+				char		*value;
+};
+
 class FloatValue : public PValue
 {
 public:

@@ -413,6 +413,141 @@ IntValue::Duplicate(void) const
 }
 
 
+CharValue::CharValue(void)
+{
+	value = new char(0LL);
+	*type = "char";
+}
+
+
+CharValue::CharValue(const CharValue &from)
+{
+	value = new char(*from.value);
+	*type = "char";
+}
+
+
+CharValue::CharValue(char from)
+{
+	value = new char(from);
+	*type = "char";
+}
+
+
+CharValue::~CharValue(void)
+{
+	delete value;
+}
+
+
+bool
+CharValue::AcceptsType(char *type)
+{
+	if (strcasecmp(type, "char") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
+		return true;
+	return false;
+}
+
+
+bool
+CharValue::ReturnsType(char *type)
+{
+	if (strcasecmp(type, "char") == 0 ||
+		strcasecmp(type, "bool") == 0 ||
+		strcasecmp(type, "int") == 0 ||
+		strcasecmp(type, "float") == 0 ||
+		strcasecmp(type, "string") == 0)
+		return true;
+	return false;
+}
+
+		
+status_t
+CharValue::SetValue(PValue *pval)
+{
+	if (!pval)
+		return B_ERROR;
+	
+	if (pval->type->ICompare("char") == 0)
+	{
+		CharValue *i = (CharValue*)pval;
+		*value = *i->value;
+	}
+	else if (pval->type->ICompare("int") == 0)
+	{
+		IntValue *i = (IntValue*)pval;
+		*value = *i->value;
+	}
+	else if (pval->type->ICompare("float") == 0)
+	{
+		FloatValue *f = (FloatValue*)pval;
+		*value = char(*f->value);
+	}
+	else if (pval->type->ICompare("string") == 0)
+	{
+		StringValue *s = (StringValue*)pval;
+		BString *v = s->value;
+		if (v->CountChars() == 0)
+			*value = '\0';
+		else
+			*value = v->ByteAt(0);
+	}
+	else
+		return B_BAD_VALUE;
+	
+	return B_OK;
+}
+
+
+status_t
+CharValue::GetValue(PValue *pval)
+{
+	if (!pval)
+		return B_ERROR;
+	
+	if (pval->type->ICompare("char") == 0)
+	{
+		CharValue *i = (CharValue*)pval;
+		*i->value = *value;
+	}
+	else if (pval->type->ICompare("bool") == 0)
+	{
+		BoolValue *b = (BoolValue*)pval;
+		*b->value = (*value == 0) ? false : true;
+	}
+	else if (pval->type->ICompare("int") == 0)
+	{
+		IntValue *i = (IntValue*)pval;
+		*i->value = *value;
+	}
+	else if (pval->type->ICompare("float") == 0)
+	{
+		FloatValue *f = (FloatValue*)pval;
+		*f->value = *value;
+	}
+	else if (pval->type->ICompare("string") == 0)
+	{
+		StringValue *s = (StringValue*)pval;
+		*s->value = "";
+		*s->value << *value;
+	}
+	else
+		return B_BAD_VALUE;
+	
+	return B_OK;
+}
+
+
+PValue *
+CharValue::Duplicate(void) const
+{
+	return new CharValue(*this);
+}
+
+
 FloatValue::FloatValue(void)
 {
 	value = new float();

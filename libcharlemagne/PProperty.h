@@ -84,6 +84,32 @@ private:
 };
 
 
+class CharProperty : public PProperty
+{
+public:
+							CharProperty(void);
+							CharProperty(PValue *value);
+							CharProperty(const char *name, const char &value,
+										const char *desc = NULL);
+							CharProperty(BMessage *msg);
+	virtual					~CharProperty(void);
+	
+	static	PProperty *		Create(void);
+	virtual	PProperty *		Duplicate(void);
+	
+	static	BArchivable *	Instantiate(BMessage *data);
+	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
+		
+	virtual	status_t		SetValue(PValue *value);
+			status_t		SetValue(char value);
+	virtual	status_t		GetValue(PValue *value);
+	virtual	BString			GetValueAsString(void) const;
+	
+private:
+	CharValue				*fCharValue;
+};
+
+
 class BoolProperty : public PProperty
 {
 public:

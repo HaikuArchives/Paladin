@@ -31,7 +31,7 @@ Property string("") Label : The text of the menu item.
 	GetValue:Label(void)
 	SetValue:SetLabel(string)
 
-Property bool(true) Enabled : The "enabled" state for the item.
+Property bool(true) Enabled : The 'enabled' state for the item.
 	GetValue:IsEnabled(void)
 	SetValue:SetEnabled(bool)
 
@@ -52,8 +52,9 @@ Method SetShortcut
 	Param int32 modifiers(int32)[0], 2 : constants for modifier keys, like the Control key.
 
 Method GetShortcut
+	CallName Shortcut
 	Return char shortcut(char), -1 : the item's shortcut character
-	Return char modifiers(&int32), 1 : the item's shortcut modifier keys
+	Return uint32 modifiers(&uint32), 1 : the item's shortcut modifier keys
 
 [backend]
 Type=Single

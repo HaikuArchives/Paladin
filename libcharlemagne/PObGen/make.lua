@@ -10,6 +10,7 @@ gFileList =
 	"PEntry",
 	"PLabel",
 	"PListView",
+	"PMenuItem",
 	"PRadioButton",
 	"PSlider",
 	"PTextControl",

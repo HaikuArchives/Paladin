@@ -84,6 +84,19 @@ function PRect(l, t, r, b)
 			self.bottom = self.bottom + pt.y
 		end
 	
+	out.InsetBy = function(self, x, y)
+			self.left = self.left + x
+			self.right = self.right - x
+			self.top = self.top + y
+			self.bottom = self.bottom - y
+		end
+	
+	out.InsetByCopy = function(self, x, y)
+			local out = self
+			out.InsetBy(x,y)
+			return out
+		end
+	
 	out.Set = function(self, l, t, r, b)
 			self.left = l
 			self.top = t
@@ -173,8 +186,8 @@ function MakeObject(name)
 	
 	-- Set up convenience properties
 	obj.id = charlemagne.object_get_id(obj.handle)
-	obj.type = charlemagne.object_get_type(obj.handle)
-	obj.friendlytype = charlemagne.object_get_friendly_type(obj.handle)
+	obj.type = charlemagne.data_get_type(obj.handle)
+	obj.friendlytype = charlemagne.data_get_friendly_type(obj.handle)
 	
 	return obj
 end

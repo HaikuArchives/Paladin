@@ -163,6 +163,7 @@ PEntry::SetProperty(const char *name, PValue *value, const int32 &index)
 	BEntry *backend = (BEntry*)fBackend;
 	
 	BoolValue boolval;
+	CharValue charval;
 	ColorValue colorval;
 	FloatValue floatval;
 	IntValue intval;
@@ -195,6 +196,13 @@ PEntry::SetProperty(const char *name, PValue *value, const int32 &index)
 	}
 
 	return prop->GetValue(value);
+}
+
+
+BEntry *
+PEntry::GetBackend(void) const
+{
+	return fBackend;
 }
 
 

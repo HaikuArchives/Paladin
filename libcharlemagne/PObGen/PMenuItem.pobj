@@ -15,6 +15,7 @@ FriendlyName=MenuItem
 Description=An item in a menu
 UsesView=false
 ParentClass=public PObject
+GetBackend=true
 
 [properties]
 Property int(0) Message : The message constant for the menu item

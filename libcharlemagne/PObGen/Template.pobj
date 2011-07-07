@@ -16,7 +16,7 @@ FriendlyName=object's friendly name
 Description=object's description
 UsesView=false
 ParentClass=public PObject
-UsesBackend=true
+GetBackend=true
 
 # Property list
 # The format for a property entry is as follows:

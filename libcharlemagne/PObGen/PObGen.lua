@@ -133,7 +133,6 @@ void
 		if (def.backend.InitCode) then
 			init = def.backend.InitCode
 		end
-		
 		initBackend = ApplyCustomPlaceholder(initBackend, "%(BACKENDINIT)", init);
 	end
 

@@ -15,7 +15,7 @@ FriendlyName=Entry
 Description=A filesystem entry, such as a file or directory.
 UsesView=false
 ParentClass=public PObject
-UsesBackend=true
+GetBackend=true
 
 [properties]
 Property int(0) AccessTime : Get the entry's last-accessed time

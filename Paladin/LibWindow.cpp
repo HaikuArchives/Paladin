@@ -142,7 +142,17 @@ LibraryWindow::ScanFolder(BPoint location, const char *path, float *maxwidth)
 	while (dir.GetNextRef(&ref) == B_OK)
 	{
 		BString str(ref.name);
-		if (str.FindLast(".so") < 0 && str.FindLast(".a") < 0)
+		
+		int32 soPos = str.FindLast(".so");
+		int32 aPos = str.FindLast(".a");
+		
+		if (soPos < 0 && aPos < 0)
+			continue;
+		
+		if (soPos >= 0 && soPos < str.CountChars() - 3)
+			continue;
+		
+		if (aPos >= 0 && aPos < str.CountChars() - 2)
 			continue;
 		
 		Lock();	

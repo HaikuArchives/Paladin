@@ -193,6 +193,10 @@ function GenerateMethod(def, methodName, method)
 		-- If a required argument, add a check to make sure that it
 		-- was found and return B_ERROR if it wasn't
 		local capType = entry.type:sub(1,1):upper() .. entry.type:sub(2)
+		if (capType:sub(1,1) == "U") then
+			capType = entry.type:sub(2,1):upper() .. entry.type:sub(3)
+		end
+		
 		if (entry.defaultValue) then
 			entryCode = entryCode .. "\t" .. entry.name .. " = " ..
 						entry.defaultValue .. ";\n\tinArgs.Find" .. capType ..
@@ -309,6 +313,9 @@ function GenerateMethod(def, methodName, method)
 			if (argTable[j].argType and argTable[j].argType == "returnval") then
 				local outEntry = argTable[j]
 				local outType = outEntry.type:sub(1,1):upper() .. outEntry.type:sub(2)
+				if (outType:sub(1,1) == "U") then
+					outType = outType:sub(2,2):upper() .. outType:sub(3)
+				end
 				methodCode = methodCode .. "\toutArgs.Add" .. outType .. '("' ..
 							outEntry.name ..'", ' .. outEntry.varName .. ");\n"
 			end

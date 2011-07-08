@@ -3,6 +3,7 @@ function NewProject(targetName, type)
 	out.sources = {}
 	out.includes = {}
 	out.libraries = {}
+	out.buildopts = {}
 	
 	out.SetType = function(self, t)
 			if (type(self) ~= "table") then
@@ -30,12 +31,32 @@ function NewProject(targetName, type)
 			return self.type
 		end
 	
+	out.SetName(self, name)
+			if (type(self) ~= "table") then
+				error("Non-table passed to Project::SetName")
+			end
+			
+			self.name = name
+		end
+	
+	out.GetName = function(self)
+			if (type(self) ~= "table") then
+				error("Non-table passed to Project::GetName")
+			end
+			
+			return self.name
+		end
+	
 	out.SetTarget(self, name)
 			if (type(self) ~= "table") then
 				error("Non-table passed to Project::SetTarget")
 			end
 			
-			self.name = name
+			if (self.targetname == self.name) then
+				self.name = name
+			end
+			
+			self.targetname = name
 		end
 	
 	out.GetTarget = function(self)
@@ -43,7 +64,7 @@ function NewProject(targetName, type)
 				error("Non-table passed to Project::GetTarget")
 			end
 			
-			return self.name
+			return self.targetname
 		end
 	
 	out.AddIncludes = function(self, includes)
@@ -169,16 +190,71 @@ function NewProject(targetName, type)
 				error("Project not passed to Project::AsPaladinProject")
 			end
 			
+			local out = {}
+			table.insert(out, "TARGETNAME=" .. self.targetname)
 			
+			local AddSourceGroups = function(groupName, group)
+					table.insert(out, "GROUP=" .. groupName)
+					table.insert(out, "EXPANDGROUP=no\n")
+					for i = 1, #group do
+						table.insert(out, "SOURCEFILE=" .. group[i])
+					end
+				end
+			
+			self:ForEachSourceGroup(AddSourceGroups)
+			table.insert(out, "SYSTEMINCLUDE=/boot/develop/headers/be")
+			table.insert(out, "SYSTEMINCLUDE=/boot/develop/headers/cpp")
+			table.insert(out, "SYSTEMINCLUDE=/boot/develop/headers/posix")
+			table.insert(out, "SYSTEMINCLUDE=/boot/home/config/include")
+			
+			for i = 1, #self.libraries do
+				table.insert(out, "LIBRARY=" .. self.libraries[i])
+			end
+			
+			if (self.buildopts.ccdebug) then
+				table.insert(out, "CCDEBUG=yes")
+			end
+			
+			if (self.buildopts.ccprofile) then
+				table.insert(out, "CCPROFILE=yes");
+			end
+			
+			if (self.buildopts.opsize) then
+				table.insert(out, "CCOPSIZE=yes");
+			end
+			
+			if (self.buildopts.oplevel) then
+				table.insert(out, "CCOPLEVEL=" .. self.buildopts.oplevel);
+			else
+				table.insert(out, "CCOPLEVEL=3");
+			end
+			
+			if (self.type) then
+				local typeNum = tonumber(self.type)
+				if (typeNum > 3 or typeNum < 0) then
+					typeNum = 0
+				end
+				
+				table.insert(out, "CCTARGETTYPE=" .. typeNum)
+			else
+				self.type = 0
+				table.insert(out, "CCTARGETTYPE=0")
+			end
+			
+			if (self.buildopts.ccextra) then
+				table.insert(out, "CCEXTRA=" .. self.buildopts.ccextra)
+			end
+			
+			if (self.buildopts.ldextra) then
+				table.insert(out, "LDEXTRA=" .. self.buildopts.ldextra)
+			end
+			
+			return table.concat(out, "\n")
 		end
 	
 	out:SetTarget(targetName)
 	out:SetType(type)
-	out:AddIncludes{ "/boot/develop/headers/be",
-					 "/boot/develop/headers/cpp",
-					 "/boot/develop/headers/posix",
-					 "/boot/home/config/include" }
-	out:AddLibraries{ "root", "be" }
+	out:AddLibraries{ "libroot.so", "libbe.so" }
 	
 	return out
 end

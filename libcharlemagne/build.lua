@@ -46,9 +46,18 @@ gLibSources = {
 	"storage/PNode.cpp",
 }
 
-project = NewProject("chartest", "app")
-project:AddSources("Libcharlemagne", gLibSources)
-project:AddSources("Test Sources",
+libcharlemagne = NewProject("libcharlemagne.so", "sharedlib")
+libcharlemagne:AddSources("Source Files", gLibSources)
+libcharlemagne:Build("libcharlemagne.pld")
+
+chartest = NewProject("chartest", "app")
+chartest:AddSources("Libcharlemagne", gLibSources)
+chartest:AddSources("Test Sources",
 					{ "chartest.cpp", "LuaBindings.cpp", "LuaSupport.cpp" })
-project:AddLibraries{"liblua.so", "libstdc++.r4.so"}
-project:Build("chartested.pld") 
+chartest:AddLibraries{"liblua.so", "libstdc++.r4.so"}
+chartest:Build("chartested.pld") 
+
+luacharlemagne = NewProject("luacharlemagne.so", "sharedlib")
+luacharlemagne:AddSources("Source Files", gLibSources)
+luacharlemagne:AddSources("Lua Sources", { "LuaBindings.cpp", "LuaSupport.cpp" })
+luacharlemagne:Build("libcharlemagne_lua.pld")

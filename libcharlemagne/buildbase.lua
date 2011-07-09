@@ -243,6 +243,7 @@ function NewProject(targetName, projType)
 			
 			local out = {}
 			table.insert(out, "TARGETNAME=" .. self.targetname)
+			table.insert(out, "SCM=none")
 			
 			local AddSourceGroups = function(groupName, group)
 					table.insert(out, "GROUP=" .. groupName)
@@ -343,13 +344,20 @@ function NewProject(targetName, projType)
 			local out = phandle:read("*a")
 			phandle:close()
 			
-			print(out)
+			io.stdout:write(out)
 			
 			local phandle = io.popen("echo $?", "r")
 			local out = phandle:read("*l")
 			phandle:close()
 			
-			return tonumber(out)
+			out = tonumber(out)
+			if (out == 0) then
+				print("Successfully built target " .. self.targetname)
+			else
+				print("Failure building target " .. self.targetname)
+			end
+			
+			return out
 		end
 	
 	return out

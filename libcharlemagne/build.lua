@@ -51,4 +51,4 @@ project:AddSources("Libcharlemagne", gLibSources)
 project:AddSources("Test Sources",
 					{ "chartest.cpp", "LuaBindings.cpp", "LuaSupport.cpp" })
 project:AddLibraries("liblua.so")
-print(project:Build("chartested.pld"))
+project:Build("chartested.pld") 

@@ -243,7 +243,7 @@ function NewProject(targetName, projType)
 			
 			local out = {}
 			table.insert(out, "TARGETNAME=" .. self.targetname)
-			table.insert(out, "SCM=none")
+			table.insert(out, "SCM=none\nPLATFORM=Haiku")
 			
 			local AddSourceGroups = function(groupName, group)
 					table.insert(out, "GROUP=" .. groupName)
@@ -339,6 +339,7 @@ function NewProject(targetName, projType)
 			end
 			
 			PBuild.EnsurePaladinApp()
+			print("Building target " .. self.targetname)
 			local command = "Paladin -b '" .. self.path .. "'"
 			local phandle = io.popen(command, "r")
 			local out = phandle:read("*a")
@@ -350,14 +351,7 @@ function NewProject(targetName, projType)
 			local out = phandle:read("*l")
 			phandle:close()
 			
-			out = tonumber(out)
-			if (out == 0) then
-				print("Successfully built target " .. self.targetname)
-			else
-				print("Failure building target " .. self.targetname)
-			end
-			
-			return out
+			return tonumber(out)
 		end
 	
 	return out

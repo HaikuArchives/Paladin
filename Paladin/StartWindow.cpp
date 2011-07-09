@@ -12,6 +12,7 @@
 
 #include "BitmapButton.h"
 #include "ClickableStringView.h"
+#include "EscapeCancelFilter.h"
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
@@ -63,6 +64,8 @@ StartWindow::StartWindow(void)
 	AddShortcut('O',B_COMMAND_KEY, new BMessage(M_SHOW_OPEN_PROJECT));
 	AddShortcut('N',B_COMMAND_KEY, new BMessage(M_NEW_PROJECT));
 	AddShortcut('I',B_COMMAND_KEY, new BMessage(M_SHOW_IMPORT));
+	
+	AddCommonFilter(new EscapeCancelFilter());
 	
 	MakeCenteredOnShow(true);
 	

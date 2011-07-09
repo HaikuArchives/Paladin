@@ -314,6 +314,8 @@ Project::Save(const char *path)
 	for (int32 i = 0; i < fLibraryList.CountItems(); i++)
 	{
 		SourceFile *file = (SourceFile*)fLibraryList.ItemAt(i);
+		if (!file)
+			continue;
 		
 		BString strpath(file->GetPath().GetFullPath());
 		if (gPlatform == PLATFORM_ZETA)
@@ -777,6 +779,9 @@ Project::Link(void)
 		for (int32 i = 0; i < CountLibraries(); i++)
 		{
 			SourceFile *file = LibraryAt(i);
+			if (!file)
+				continue;
+			
 			BString filenamebase;
 			filenamebase = file->GetPath().GetBaseName();
 			if (filenamebase.FindFirst("lib") == 0)
@@ -1108,11 +1113,18 @@ Project::AddLibrary(const char *path)
 		libpath = FindLibrary(libpath.GetFileName());
 		if (libpath.IsEmpty())
 		{
-			BString err;
-			err << path << " seems to be missing. Do you want to remove it from the project?";
-			int32 result = ShowAlert("Paladin",err.String(),"Remove","Keep");
-			if (result == 0)
-				return;
+			if (gBuildMode)
+			{
+				printf("%s seems to be missing\n", path);
+			}
+			else
+			{
+				BString err;
+				err << path << " seems to be missing. Do you want to remove it from the project?";
+				int32 result = ShowAlert(err.String(),"Remove","Keep");
+				if (result == 0)
+					return;
+			}
 		}
 	}
 	
@@ -1465,7 +1477,8 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		ShowAlert("",alertmsg.String(),"OK");
+		if (!gBuildMode)
+			ShowAlert(alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1476,7 +1489,8 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		ShowAlert("",alertmsg.String(),"OK");
+		if (!gBuildMode)
+			ShowAlert(alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1488,7 +1502,8 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		ShowAlert("",alertmsg.String(),"OK");
+		if (!gBuildMode)
+			ShowAlert(alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1499,7 +1514,8 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		ShowAlert("",alertmsg.String(),"OK");
+		if (!gBuildMode)
+			ShowAlert(alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;

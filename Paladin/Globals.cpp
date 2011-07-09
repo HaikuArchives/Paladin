@@ -551,7 +551,7 @@ ShowAlert(const char *message, const char *button1, const char *button2,
 	
 	if (gBuildMode)
 	{
-		printf("%s", message);
+		printf("%s\n", message);
 		result = -1;
 	}
 	else

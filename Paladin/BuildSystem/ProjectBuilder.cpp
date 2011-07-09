@@ -123,7 +123,7 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 			{
 				STRACE(1,("%s does not need to be built\n",file->GetPath().GetFullPath()));
 			}
-			if (!saveproj && dep.Compare(file->GetDependencies()) != 0)
+			if (!gBuildMode && !saveproj && dep.Compare(file->GetDependencies()) != 0)
 				saveproj = true;
 		}
 	}

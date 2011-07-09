@@ -1,5 +1,46 @@
 PBuildLoaded = true
 
+PBuild = {}
+PBuild.FindPaladinApp = function()
+		local phandle = io.popen("query -f -v /boot '(name==Paladin)&&(BEOS:APP_SIG=application/x-vnd.dw-Paladin)'", "r")
+		local out = nil
+		if (phandle) then
+			out = phandle:read("*l")
+		end
+		phandle:close()
+		
+		return out
+	end
+
+
+PBuild.TestPaladinApp = function()
+		local success = nil
+		local returnVal = os.execute("Paladin -h > /dev/null")
+		if (returnVal == 0) then
+			success = true
+		end
+		
+		return success
+	end
+
+PBuild.EnsurePaladinApp = function()
+		if (not PBuild.TestPaladinApp()) then
+			local appPath = PBuild.FindPaladinApp()
+			if ((not appPath) or (appPath:len() < 1)) then
+				print("Can't find Paladin. Is it installed?")
+				os.exit(1)
+			end
+			
+			local success = os.execute("ln -sf '" .. appPath .. "~/config/bin/")
+			if (success ~= 0) then
+				print("Couldn't create a link to " .. appPath .. " in /boot/home/config/bin/ ." ..
+						"You'll need to do this yourself to use PBuild. Sorry.")
+				os.exit(1)
+			end
+		end
+		return true
+	end
+
 function NewProject(targetName, projType)
 	local out = {}
 	out.sources = {}
@@ -262,9 +303,54 @@ function NewProject(targetName, projType)
 			return table.concat(out, "\n")
 		end
 	
+	out.Write = function(self, path)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::WriteProjectFile")
+			end
+			
+			local file = io.open(path, "w")
+			
+			if (not file) then
+				return nil
+			end
+			
+			file:write(self:AsPaladinProject())
+			file:close()
+			
+			self.path = path
+			
+			return true
+		end
+	
 	out:SetTarget(targetName)
 	out:SetType(projType)
 	out:AddLibraries{ "libroot.so", "libbe.so" }
+	
+	out.Build = function(self, path)
+			if ((not self.path) or (self.path:len() < 1)) then
+				if (path) then
+					self:Write(path)
+				else
+					print("The path for the project file has not been set. Either call Build() " ..
+						"with a path or Write() before calling Build()")
+					os.exit(1)
+				end
+			end
+			
+			PBuild.EnsurePaladinApp()
+			local command = "Paladin -b '" .. self.path .. "'"
+			local phandle = io.popen(command, "r")
+			local out = phandle:read("*a")
+			phandle:close()
+			
+			print(out)
+			
+			local phandle = io.popen("echo $?", "r")
+			local out = phandle:read("*l")
+			phandle:close()
+			
+			return tonumber(out)
+		end
 	
 	return out
 end

@@ -1,4 +1,6 @@
-function NewProject(targetName, type)
+PBuildLoaded = true
+
+function NewProject(targetName, projType)
 	local out = {}
 	out.sources = {}
 	out.includes = {}
@@ -10,7 +12,7 @@ function NewProject(targetName, type)
 				error("Non-table passed to Project::SetType")
 			end
 			
-			if (t == "app") then
+			if (t == "app" or t == "application") then
 				self.type = 0
 			elseif (t == "sharedlib") then
 				self.type = 1
@@ -31,7 +33,7 @@ function NewProject(targetName, type)
 			return self.type
 		end
 	
-	out.SetName(self, name)
+	out.SetName = function(self, name)
 			if (type(self) ~= "table") then
 				error("Non-table passed to Project::SetName")
 			end
@@ -47,7 +49,7 @@ function NewProject(targetName, type)
 			return self.name
 		end
 	
-	out.SetTarget(self, name)
+	out.SetTarget = function(self, name)
 			if (type(self) ~= "table") then
 				error("Non-table passed to Project::SetTarget")
 			end
@@ -109,8 +111,16 @@ function NewProject(targetName, type)
 			
 			local stype = type(sources)
 			if (stype == "string") then
+				if (not self.sources[groupName]) then
+					self.sources[groupName] = {}
+				end
+				
 				table.insert(self.sources[groupName], sources)
 			elseif (stype == "table") then
+				if (not self.sources[groupName]) then
+					self.sources[groupName] = {}
+				end
+				
 				for i = 1, #sources do
 					table.insert(self.sources[groupName], sources[i])
 				end
@@ -167,7 +177,7 @@ function NewProject(targetName, type)
 			local libtype = type(libs)
 			if (libtype == "string") then
 				table.insert(self.libraries, libs)
-			elseif (itype == "table") then
+			elseif (libtype == "table") then
 				for i = 1, #libs do
 					table.insert(self.libraries, libs[i])
 				end
@@ -195,7 +205,7 @@ function NewProject(targetName, type)
 			
 			local AddSourceGroups = function(groupName, group)
 					table.insert(out, "GROUP=" .. groupName)
-					table.insert(out, "EXPANDGROUP=no\n")
+					table.insert(out, "EXPANDGROUP=no")
 					for i = 1, #group do
 						table.insert(out, "SOURCEFILE=" .. group[i])
 					end
@@ -253,7 +263,7 @@ function NewProject(targetName, type)
 		end
 	
 	out:SetTarget(targetName)
-	out:SetType(type)
+	out:SetType(projType)
 	out:AddLibraries{ "libroot.so", "libbe.so" }
 	
 	return out

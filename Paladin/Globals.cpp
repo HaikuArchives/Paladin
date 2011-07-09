@@ -1,6 +1,5 @@
 #include "Globals.h"
 
-#include <Alert.h>
 #include <Application.h>
 #include <ctype.h>
 #include <File.h>
@@ -25,6 +24,7 @@ DPath gBackupPath;
 DPath gProjectPath;
 DPath gLastProjectPath;
 
+bool gBuildMode = false;
 bool gDontManageHeaders = true;
 bool gSingleThreadedBuild = false;
 bool gShowFolderOnOpen = false;
@@ -81,7 +81,6 @@ InitGlobals(void)
 	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4 || gPlatform == PLATFORM_ZETA) &&
 		system("ccache > /dev/null 2>&1") == 1)
 	{
-		printf("ccache enabled\n");
 		gCCacheAvailable = true;
 	}
 		
@@ -545,11 +544,23 @@ IsBeIDEProject(const entry_ref &ref)
 
 
 int32
-AlertError(const char *message, const char *button1, const char *button2,
-			const char *button3)
+ShowAlert(const char *message, const char *button1, const char *button2,
+			const char *button3, alert_type type)
 {
-	BAlert *alert = new BAlert("Paladin", message, button1, button2, button3);
-	return alert->Go();
+	int32 result;
+	
+	if (gBuildMode)
+	{
+		printf("%s", message);
+		result = -1;
+	}
+	else
+	{
+		BAlert *alert = new BAlert("Paladin", message, button1, button2, button3,
+									B_WIDTH_AS_USUAL, type);
+		result = alert->Go();
+	}
+	return result;
 }
 
 

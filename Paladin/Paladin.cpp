@@ -16,6 +16,7 @@
 #include "AboutWindow.h"
 #include "DebugTools.h"
 #include "DPath.h"
+#include "ErrorParser.h"
 #include "FileUtils.h"
 #include "Globals.h"
 #include "MsgDefs.h"
@@ -99,7 +100,6 @@ PrintUsage(void)
 
 App::App(void)
 	:	BApplication(APP_SIGNATURE),
-		fBuildMode(false),
 		fBuildCleanMode(false),
 		fBuilder(NULL)
 {
@@ -157,12 +157,12 @@ App::ArgvReceived(int32 argc,char **argv)
 		{
 			case 'b':
 			{
-				fBuildMode = true;
+				gBuildMode = true;
 				break;
 			}
 			case 'r':
 			{
-				fBuildMode = true;
+				gBuildMode = true;
 				fBuildCleanMode = true;
 				break;
 			}
@@ -255,14 +255,14 @@ App::ArgvReceived(int32 argc,char **argv)
 		refcount++;
 		optind++;
 		
-		if (refcount == 1 && fBuildMode)
+		if (refcount == 1 && gBuildMode)
 			break;
 	}
 	
 	if (refcount > 0)
 		RefsReceived(&refmsg);
 	else
-		if (fBuildMode)
+		if (gBuildMode)
 			Quit();
 }
 
@@ -277,7 +277,7 @@ App::RefsReceived(BMessage *msg)
 		bool isPaladin = Project::IsProject(ref);
 		bool isBeIDE = IsBeIDEProject(ref);
 		
-		if (fBuildMode && isPaladin)
+		if (gBuildMode && isPaladin)
 			BuildProject(ref);
 		else
 		if (isPaladin || isBeIDE)
@@ -300,7 +300,7 @@ App::QuitRequested(void)
 void
 App::ReadyToRun(void)
 {
-	if (CountRegisteredWindows() < 1 && !fBuildMode)
+	if (CountRegisteredWindows() < 1 && !gBuildMode)
 	{
 		StartWindow *win = new StartWindow();
 		win->Show();
@@ -439,6 +439,8 @@ App::MessageReceived(BMessage *msg)
 			SourceFile *file;
 			if (msg->FindPointer("sourcefile",(void**)&file) == B_OK)
 				printf(TR("Building %s\n"),file->GetPath().GetFileName());
+			else
+				printf("NULL pointer in M_BUILDING_FILE\n");
 			break;
 		}
 		case M_LINKING_PROJECT:
@@ -456,6 +458,12 @@ App::MessageReceived(BMessage *msg)
 			BString errstr;
 			if (msg->FindString("errstr",&errstr) == B_OK)
 				printf("%s\n",errstr.String());
+			else
+			{
+				ErrorList errors;
+				errors.Unflatten(*msg);
+				printf("Build failure\n%s", errors.AsString().String());
+			}
 			sReturnCode = -1;
 			PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -727,7 +735,7 @@ App::LoadProject(const entry_ref &givenRef)
 	}
 	
 	// This will be true only if the project file lacks an entry.
-	if (proj->SourceControl() == SCM_INIT && !fBuildMode &&
+	if (proj->SourceControl() == SCM_INIT && !gBuildMode &&
 		!proj->IsReadOnly())
 	{
 		// No given in the project. Attempt to detect one and if there isn't

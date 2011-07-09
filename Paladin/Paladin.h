@@ -35,7 +35,6 @@ private:
 	void	UpdateRecentItems(const entry_ref &ref);
 	void	PostToProjectWindow(BMessage *msg, entry_ref *file);
 	
-	bool			fBuildMode;
 	bool			fBuildCleanMode;
 	ProjectBuilder	*fBuilder;
 	BFilePanel		*fOpenPanel;

@@ -1110,8 +1110,8 @@ Project::AddLibrary(const char *path)
 		{
 			BString err;
 			err << path << " seems to be missing. Do you want to remove it from the project?";
-			BAlert *alert = new BAlert("Paladin",err.String(),"Remove","Keep");
-			if (alert->Go() == 0)
+			int32 result = ShowAlert("Paladin",err.String(),"Remove","Keep");
+			if (result == 0)
 				return;
 		}
 	}
@@ -1459,15 +1459,13 @@ Project::FindLibrary(const char *libname)
 		<< sPlatformArray[fPlatform] << ". ";
 	
 	BPath tempPath;
-	BAlert *alert;
 	
 	find_directory(B_USER_LIB_DIRECTORY,&tempPath);
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		alert = new BAlert("",alertmsg.String(),"OK");
-		alert->Go();
+		ShowAlert("",alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1478,8 +1476,7 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		alert = new BAlert("",alertmsg.String(),"OK");
-		alert->Go();
+		ShowAlert("",alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1491,8 +1488,7 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		alert = new BAlert("",alertmsg.String(),"OK");
-		alert->Go();
+		ShowAlert("",alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1503,8 +1499,7 @@ Project::FindLibrary(const char *libname)
 	if (BEntry(tempPath.Path()).Exists())
 	{
 		alertmsg << "Replacing it with " << tempPath.Path();
-		alert = new BAlert("",alertmsg.String(),"OK");
-		alert->Go();
+		ShowAlert("",alertmsg.String(),"OK");
 		
 		outpath = tempPath.Path();
 		return outpath;

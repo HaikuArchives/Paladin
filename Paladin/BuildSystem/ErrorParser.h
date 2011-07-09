@@ -49,7 +49,9 @@ public:
 			
 			void			Flatten(BMessage &msg);
 			void			Unflatten(BMessage &msg);
-	
+			
+			BString			AsString(void);
+			
 	BObjectList<error_msg>	msglist;
 
 private:

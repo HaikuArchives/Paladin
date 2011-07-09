@@ -438,7 +438,7 @@ ProjectWindow::MessageReceived(BMessage *msg)
 				status = fSourceControl->Pull(NULL);
 				
 				if (!status)
-					AlertError("Unable to pull from the remote repository. If it "
+					ShowAlert("Unable to pull from the remote repository. If it "
 							"uses a secure connection, please set up the appropriate "
 							"SSH keys on the remote server.", "OK");
 			}

@@ -1,6 +1,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <Alert.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Message.h>
@@ -34,8 +35,9 @@ status_t	RunPipedCommand(const char *command, BString &out,
 							bool redirectStdErr);
 status_t	BeIDE2Paladin(const char *path, BString &outpath);
 bool		IsBeIDEProject(const entry_ref &ref);
-int32		AlertError(const char *message, const char *button1,
-						const char *button2 = NULL, const char *button3 = NULL);
+int32		ShowAlert(const char *message, const char *button1,
+						const char *button2 = NULL, const char *button3 = NULL,
+						alert_type type = B_INFO_ALERT);
 DPath		GetSystemPath(directory_which which);
 entry_ref	GetPartnerRef(entry_ref ref);
 
@@ -49,6 +51,7 @@ extern DPath gAppPath;
 extern DPath gBackupPath;
 extern DPath gProjectPath;
 extern DPath gLastProjectPath;
+extern bool	gBuildMode;
 extern bool gDontManageHeaders;
 extern bool gSingleThreadedBuild;
 extern bool gShowFolderOnOpen;

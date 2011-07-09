@@ -215,15 +215,6 @@ ErrorList::Flatten(BMessage &msg)
 	}
 }
 
-/*
-BMessage
-ErrorList::Flatten(void)
-{
-	BMessage msg;
-	Flatten(msg);
-	return msg;
-}
-*/
 
 void
 ErrorList::Unflatten(BMessage &msg)
@@ -266,6 +257,20 @@ ErrorList::Unflatten(BMessage &msg)
 		}
 		msglist.AddItem(error);
 	}
+}
+
+
+BString
+ErrorList::AsString(void)
+{
+	BString out;
+	for (int32 i = 0; i < msglist.CountItems(); i++)
+	{
+		error_msg *item = msglist.ItemAt(i);
+		out << item->rawdata << "\n";
+	}
+	
+	return out;
 }
 
 

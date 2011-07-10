@@ -120,6 +120,12 @@ function ParseVariablesSection(sectionData)
 				table.insert(outTable, { ["type"] = t,
 										["name"] = n,
 										["value"] = v } )
+			elseif (sectionData[i]:len() == 0) then
+				-- Do nothing
+			else
+				print("Invalid line " .. i .. " in variables section:\n" ..
+					sectionData[i])
+				os.exit(1)
 			end
 		end
 	end

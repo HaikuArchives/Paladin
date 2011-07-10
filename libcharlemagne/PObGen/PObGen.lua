@@ -162,10 +162,6 @@ function GenerateCodeFile(def)
 		
 	-- Start with the includes
 	local includeString = '#include "' .. def.global.Header .. '"\n\n'
-	i = 1
-	for i = 1, #def.includes do
-		includeString = includeString .. "#include " .. def.includes[i] .. "\n"
-	end
 	
 	-- These includes are used by a *lot* of PObjects
 	includeString = includeString .. '\n#include "PArgs.h"\n#include "EnumProperty.h"\n' ..

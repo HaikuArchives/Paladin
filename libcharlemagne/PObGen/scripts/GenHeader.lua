@@ -12,6 +12,7 @@ PObjectHeaderCode = [[
 #define %(HEADER_GUARD)
 
 #include %(POBJECT_PARENT_HEADER)
+%(INCLUDE_LIST)
 
 %(BACKEND_CLASS_DECL)
 
@@ -89,6 +90,12 @@ function GenerateViewHeader(def)
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)",
 									string.upper(def.object.Name) .. "_H")
 	
+	local includeString = ""
+	for i = 1, #def.includes do
+		includeString = includeString .. "#include " .. def.includes[i] .. "\n"
+	end
+	classDef = ApplyCustomPlaceholder(classDef, "%(INCLUDE_LIST)", includeString)
+	
 	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
 	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
 									def.backend.Class .. ";\n" .. "class " ..
@@ -123,6 +130,12 @@ function GenerateNonViewHeader(def)
 	
 	classDef = ApplyCustomPlaceholder(classDef, "%(HEADER_GUARD)", 
 									string.upper(def.object.Name) .. "_H")
+	
+	local includeString = ""
+	for i = 1, #def.includes do
+		includeString = includeString .. "#include " .. def.includes[i] .. "\n"
+	end
+	classDef = ApplyCustomPlaceholder(classDef, "%(INCLUDE_LIST)", includeString)
 	
 	local backType = def.backend.Type:lower()
 	if (backType == "subclass") then

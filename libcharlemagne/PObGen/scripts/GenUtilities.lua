@@ -94,6 +94,7 @@ PTypeConstantTable.char = "PARG_CHAR"
 PObjectMainCode = [[
 %(POBJECTNAME)::%(POBJECTNAME)(void)
 	:	%(POBJECT_PARENT_NAME)(%(USESVIEW_BYPASSVIEW))
+%(VARINIT)
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -107,6 +108,7 @@ PObjectMainCode = [[
 
 %(POBJECTNAME)::%(POBJECTNAME)(BMessage *msg)
 	:	%(POBJECT_PARENT_NAME)(msg%(USESVIEW_BYPASSVIEW2))
+%(VARINIT)
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -120,6 +122,7 @@ PObjectMainCode = [[
 
 %(POBJECTNAME)::%(POBJECTNAME)(const char *name)
 	:	%(POBJECT_PARENT_NAME)(name%(USESVIEW_BYPASSVIEW2))
+%(VARINIT)
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -132,6 +135,7 @@ PObjectMainCode = [[
 
 %(POBJECTNAME)::%(POBJECTNAME)(const %(POBJECTNAME) &from)
 	:	%(POBJECT_PARENT_NAME)(from%(USESVIEW_BYPASSVIEW2))
+%(VARINIT)
 {
 	fType = "%(POBJECTNAME)";
 	fFriendlyType = "%(POBJECT_FRIENDLY_NAME)";
@@ -197,6 +201,13 @@ function ApplyObjectPlaceholders(str, def)
 	out = string.gsub(out, "%%%(POBJECT_PARENT_NAME%)", parent)
 	out = string.gsub(out, "%%%(POBJECT_PARENT_HEADER%)", def.global.ParentHeaderName)
 	out = string.gsub(out, "%%%(POBJECT_FRIENDLY_NAME%)", def.object.FriendlyName)
+
+	local varDef = ""
+	for i = 1, #def.variables do
+		local var = def.variables[i]
+		varDef = varDef .. "\t\t, " .. var.name .. "(" .. var.value .. ")\n"
+	end
+	out = string.gsub(out, "%%%(VARINIT%)", varDef)
 	
 	local deleteBackend = ""
 	if (def.backend.Type:lower() == "single") then

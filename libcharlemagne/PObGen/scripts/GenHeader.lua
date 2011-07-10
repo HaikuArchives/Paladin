@@ -56,6 +56,16 @@ private:
 		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend;\n"
 	end
 	
+	
+	if (GetTableSize(def.variables) > 0) then
+		out = out .. "\n"
+	end
+	
+	for i = 1, #def.variables do
+		local var = def.variables[i]
+		out = out .. "\t\t\t" .. var.type .. "\t\t\t" .. var.name .. "\n"
+	end
+	
 	return out .. "\n"
 end
 

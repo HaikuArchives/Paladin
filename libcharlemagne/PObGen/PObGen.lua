@@ -134,6 +134,9 @@ void
 			init = def.backend.InitCode
 		end
 		initBackend = ApplyCustomPlaceholder(initBackend, "%(BACKENDINIT)", init);
+	else
+		print("Invalid backend subclass type '" .. def.backend.Type .. "'. Aborting.")
+		os.exit(1)
 	end
 
 	initBackend = ApplyObjectPlaceholders(initBackend, def);

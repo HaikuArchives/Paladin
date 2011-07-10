@@ -26,9 +26,9 @@ UsesView=true
 ParentClass=public PView
 
 [variables]
-int32 fIntVar
-bool fBoolVar
-float fFloatVar
+int32 fIntVar(1)
+bool fBoolVar(false)
+float fFloatVar(3.14)
 
 [properties]
 Property bool(false) HideTyping : Hides typing, such as for a password box.

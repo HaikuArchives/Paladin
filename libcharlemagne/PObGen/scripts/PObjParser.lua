@@ -12,48 +12,8 @@ local SectionTable =
 	["[methods]"] = {},
 	["[backend]"] = {},
 	["[events]"] = {},
+	["[variables]"] = {},
 }
-
-local GlobalKeywordTable =
-{
-	["module"] = 1,
-	["header"] = 1,
-	["codefilename"] = 1,
-	["parentheadername"] = 1,
-}
-
-local ObjectKeywordTable =
-{
-	["name"] = 1,
-	["friendlyname"] = 1,
-	["description"] = 1,
-	["usesview"] = 1,
-	["parentclass"] = 1,
-}
-
-local PropertyKeywordTable =
-{
-	["property"] = 1,
-	["getvalue"] = 1,
-	["setvalue"] = 1,
-	["enum"] = 1,
-	["beginembeddedcode"] = 1,
-	["endembeddedcode"] = 1,
-}
-
-local MethodKeywordTable =
-{
-	["param"] = 1,
-	["return"] = 1,
-}
-
-local BackendKeywordTable =
-{
-	["parentclass"] = 1,
-	["initcode"] = 1,
-	["usepviewevents"] = 1,
-}
-
 
 function ReadIDL(path)
 	local file = io.open(path)
@@ -98,23 +58,25 @@ function ParsePairSection(sectionData, sectionName)
 	local outTable = {}
 	
 	for i = 1, #sectionData do
-		local k, v = sectionData[i]:match('%s-(%w+)%s-=%s-(.+)')
-		
-		-- something might be wrong in the [global] section. Check
-		-- for a blank line or a comment before complaining
-		if (not k) then
-			if (sectionData[i]:match('[^%s]+') and sectionData[i]:sub(1,1) ~= "#") then
-				print("Unrecognized code in line " .. i ..
-					" of the " .. sectionName ..
-					" section. Aborting.\nError: '" .. sectionData[i] .. "'")
-				return nil
-			end
-		else
-			if (v == "false") then
-				v = nil
-			end
+		if (sectionData[i]:sub(1,1) ~= '#') then
+			local k, v = sectionData[i]:match('%s-(%w+)%s-=%s-(.+)')
 			
-			outTable[k] = v
+			-- something might be wrong in the [global] section. Check
+			-- for a blank line or a comment before complaining
+			if (not k) then
+				if (sectionData[i]:match('[^%s]+') and sectionData[i]:sub(1,1) ~= "#") then
+					print("Unrecognized code in line " .. i ..
+						" of the " .. sectionName ..
+						" section. Aborting.\nError: '" .. sectionData[i] .. "'")
+					return nil
+				end
+			else
+				if (v == "false") then
+					v = nil
+				end
+				
+				outTable[k] = v
+			end
 		end
 	end
 	
@@ -123,8 +85,7 @@ end
 
 
 function ParseIncludeSection(sectionData)
-	-- This function doesn't do much except strip out blank lines
-	-- and do error checking
+	-- This function just strips out blank lines and does some error checking
 	local outTable = {}
 	
 	for i = 1, #sectionData do
@@ -141,6 +102,25 @@ function ParseIncludeSection(sectionData)
 			end
 		else
 			table.insert(outTable, k)
+		end
+	end
+	
+	return outTable
+end
+
+
+function ParseVariablesSection(sectionData)
+	local outTable = {}
+	
+	for i = 1, #sectionData do
+		if (sectionData[i]:sub(1,1) ~= '#') then
+			local t, n, v = sectionData[i]:match('%s-([%w_]+)%s+([%w_]+)(%b())')
+			if (t and n and v) then
+				v = v:sub(2, v:len() - 1)
+				table.insert(outTable, { ["type"] = t,
+										["name"] = n,
+										["value"] = v } )
+			end
 		end
 	end
 	
@@ -545,6 +525,7 @@ function ParseSections(sectionData)
 	outTable.global = ParsePairSection(sectionData["[global]"], "global")
 	outTable.includes = ParseIncludeSection(sectionData["[includes]"])
 	outTable.object = ParsePairSection(sectionData["[object]"], "object")
+	outTable.variables = ParseVariablesSection(sectionData["[variables]"])
 	outTable.properties = ParsePropertySection(sectionData["[properties]"])
 	outTable.methods = ParseMethodSection(sectionData["[methods]"])
 	outTable.backend = ParsePairSection(sectionData["[backend]"], "backend")

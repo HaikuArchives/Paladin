@@ -114,9 +114,9 @@ InitCode=BRect(0,0,99,99), "textview", BRect(5,5,94,94), B_FOLLOW_LEFT | B_FOLLO
 # UsePViewEvents: deprecated. Code will check for subclass type and object.UsesView
 
 [events]
-EventHook Name
-	Param inType paramName(useType)
-	Return returnType
+# EventHook Name
+#	Param inType paramName(useType)
+#	Return returnType
 EmbeddedHook KeyDown : void	KeyDown(const char *bytes, int32 count);
 BeginEmbeddedCode
 void

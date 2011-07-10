@@ -21,11 +21,12 @@ gFileList =
 
 for i = 1, #gFileList do
 	print("Building " .. gFileList[i])
-	local cmd = "lua PObGen/PObGen.lua " .. gFileList[i] .. ".pobj"
+	local basename = gFileList[i]:match("/([%w_%.]+)")
+	local folder = gFileList[i]:match("([%w_%.]+)/")
+	local cmd = "lua PObGen.lua " .. basename .. ".pobj"
 	if (os.execute(cmd) and arg[1] ~= "nomove") then
-		local basename = gFileList[i]:match("/([%w_%.]+)")
-		cmd = string.format("mv defs/%s.cpp .. && mv defs/%s.h ..", basename,
-							basename)
+		cmd = string.format("mv %s.cpp ../%s/ && mv %s.h ../%s/", basename,
+							folder, basename, folder)
 		print("Moving " .. basename)
 		os.execute(cmd)
 	end

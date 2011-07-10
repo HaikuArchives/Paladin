@@ -200,7 +200,7 @@ end
 ----------------------------------
 -- main execution
 if (not arg[1]) then
-	print("Usage: test.lua <file>")
+	print("Usage: PObGen.lua <file>")
 	return 0
 end
 

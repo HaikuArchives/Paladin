@@ -1,0 +1,60 @@
+[global]
+Module=PFile
+Header=PFile.h
+CodeFileName=PFile.cpp
+ParentHeaderName="PNode.h"
+
+[includes]
+<Directory.h>
+<File.h>
+<Path.h>
+
+[object]
+Name=PFile
+FriendlyName=File
+Description=An object representing the data in a file
+UsesView=false
+ParentClass=public PNode
+GetBackend=true
+
+[properties]
+Property bool(true) IsReadable : True if the file is readable
+	GetValue:IsReadable(void)
+
+Property bool(true) IsWritable : True if the file is writable
+	GetValue:IsWritable(void)
+
+Property int(0) Position : The current location within the file
+	GetValue:Position(void)
+
+Property int(0) Size : The size of the file
+	GetValue:GetSize(&off_t)
+	SetValue:SetSize(int)
+
+[methods]
+Method Read
+	Param pointer buffer(pointer), 1 : A buffer to hold the data
+	Param int32 size(int32), 2 : The size of the buffer
+	Return int32 bytesread(int32), -1 : The number of bytes actually read
+
+Method ReadAt
+	Param int32 offset(int32), 1 : Offset in the file to start reading from
+	Param pointer buffer(pointer), 2 : A buffer to hold the data
+	Param int32 size(int32), 3 : The size of the buffer
+	Return int32 bytesread(int32), -1 : The number of bytes actually read
+
+Method Write
+	Param pointer buffer(pointer), 1 : A buffer holding the data to write
+	Param int32 size(int32), 2 : The size of the buffer
+	Return int32 bytesread(int32), -1 : The number of bytes actually written
+
+Method WriteAt
+	Param int32 offset(int32), 1 : Offset in the file to start reading from
+	Param pointer buffer(pointer), 2 : A buffer holding the data to write
+	Param int32 size(int32), 3 : The size of the buffer
+	Return int32 bytesread(int32), -1 : The number of bytes actually written
+
+[backend]
+Type=Single
+Class=BFile
+# Use the default(empty) constructor, so no InitCode

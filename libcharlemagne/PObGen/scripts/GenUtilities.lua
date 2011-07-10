@@ -21,6 +21,7 @@ BePTypeTable.BPoint = "point"
 BePTypeTable.BRect = "rect"
 BePTypeTable.float = "float"
 BePTypeTable.double = "double"
+BePTypeTable["void *"] = "pointer"
 
 PTypeBeTable = {}
 PTypeBeTable.bool = "bool"
@@ -58,6 +59,7 @@ PTypeConstantTable.rect = "PARG_RECT"
 PTypeConstantTable.float = "PARG_FLOAT"
 PTypeConstantTable.double = "PARG_DOUBLE"
 PTypeConstantTable.char = "PARG_CHAR"
+PTypeConstantTable.pointer = "PARG_POINTER"
 
 ------------------------------------------------------------------------------
 -- Code Templates and associated methods

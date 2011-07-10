@@ -43,6 +43,7 @@ gLibSources = {
 	"interface/PWindow.cpp",
 	
 	"storage/PEntry.cpp",
+	"storage/PFile.cpp",
 	"storage/PNode.cpp",
 }
 

@@ -79,6 +79,7 @@ Method Remove
 
 Method Rename
 	Param string newname(string), 1 : The new name of the entry
+	Return int32 error(int32), -1 : Success or error state of the call
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -101,7 +102,6 @@ BeginEmbeddedCode
 	
 	return B_OK;
 EndEmbeddedCode
-	Return int32 error(int32), -1 : Success or error state of the call
 
 [backend]
 Type=Single

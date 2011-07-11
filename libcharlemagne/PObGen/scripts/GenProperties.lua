@@ -232,8 +232,9 @@ function GenerateSetProperty(def)
 		i = i + 1
 	end
 	
+	local parent = def.object.ParentClass:match("%s+([%w_]+)")
 	if (propertiesWritten == 0) then
-		out = out .. "\treturn " .. def.object.ParentClass ..
+		out = out .. "\treturn " .. parent ..
 				"::SetProperty(name, value, index);\n}\n\n\n"
 		return out
 	end
@@ -244,7 +245,6 @@ function GenerateSetProperty(def)
 		out = out .. "\t\tif (backend->Window())\n\t\t\tbackend->Window()->Unlock();\n\n"
 	end
 	
-	local parent = def.object.ParentClass:match("%s+([%w_]+)")
 	out = out .. "\t\treturn " .. parent ..
 				"::SetProperty(name, value, index);\n\t}\n\n"
 	

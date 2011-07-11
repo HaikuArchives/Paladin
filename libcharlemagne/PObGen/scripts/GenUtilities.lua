@@ -60,6 +60,7 @@ PTypeConstantTable.float = "PARG_FLOAT"
 PTypeConstantTable.double = "PARG_DOUBLE"
 PTypeConstantTable.char = "PARG_CHAR"
 PTypeConstantTable.pointer = "PARG_POINTER"
+PTypeConstantTable.list = "PARG_LIST"
 
 ------------------------------------------------------------------------------
 -- Code Templates and associated methods

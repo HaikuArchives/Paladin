@@ -1,6 +1,23 @@
 if (not DumpTable) then
-	LoadUtilities = assert(loadfile("NewGenUtilities.lua"))
+	LoadUtilities = assert(loadfile("GenUtilities.lua"))
 	LoadUtilities()
+end
+
+function ParseError(string, line, section, sectionData, extra)
+	if ((not string) or (not line) or (not section)) then
+		error("Bad ParseError call")
+	end
+	print("Error in section " .. section .. " line " .. line)
+	print(string)
+	if (sectionData) then
+		print("Line: " .. sectionData)
+	end
+	
+	if (extra) then
+		print(extra)
+	end
+	
+	os.exit(1)
 end
 
 local SectionTable =
@@ -65,10 +82,7 @@ function ParsePairSection(sectionData, sectionName)
 			-- for a blank line or a comment before complaining
 			if (not k) then
 				if (sectionData[i]:match('[^%s]+') and sectionData[i]:sub(1,1) ~= "#") then
-					print("Unrecognized code in line " .. i ..
-						" of the " .. sectionName ..
-						" section. Aborting.\nError: '" .. sectionData[i] .. "'")
-					return nil
+					ParseError("Unrecognized code", i, sectionName, sectionData[i])
 				end
 			else
 				if (v == "false") then
@@ -95,10 +109,7 @@ function ParseIncludeSection(sectionData)
 		-- for a blank line or a comment before complaining
 		if (not k) then
 			if (sectionData[i]:match('[^%s]+') and sectionData[i]:sub(1,1) ~= "#") then
-				print("Unrecognized code in line " .. i ..
-					" of the includes section. Aborting.\nError: '" ..
-					sectionData[i] .. "'")
-				return nil
+				ParseError("Unrecognized code", i, "[includes]", sectionData[i])
 			end
 		else
 			table.insert(outTable, k)
@@ -123,9 +134,7 @@ function ParseVariablesSection(sectionData)
 			elseif (sectionData[i]:len() == 0) then
 				-- Do nothing
 			else
-				print("Invalid line " .. i .. " in variables section:\n" ..
-					sectionData[i])
-				os.exit(1)
+				ParseError("Invalid line", i, "[variables]", sectionData[i])
 			end
 		end
 	end
@@ -148,9 +157,8 @@ function ParsePropertySection(sectionData)
 		
 		elseif (sectionData[i]:match("%s-[bB]egin[eE]mbedded[cC]ode")) then
 			if (not readEmbeddedCode) then
-				print("BeginEmbeddedCode follows a non-embedded Get/SetValue in line " ..
-					i .. ". Aborting.")
-				return nil
+				ParseError("BeginEmbeddedCode follows a non-embedded Get/SetValue",
+							i, "[methods]", sectionData[i])
 			end
 		
 		elseif (readEmbeddedCode) then
@@ -184,9 +192,8 @@ function ParsePropertySection(sectionData)
 			end
 			
 			if (missingVar) then
-				print("Couldn't find " .. missingVar .. " in properties line " ..
-					i .. "('" .. sectionData[i] .. "'). Aborting.")
-				return nil
+				ParseError("Couldn't find " .. missingVar, i,
+							"[properties]", sectionData[i])
 			end
 			
 			outTable[propName] = {}
@@ -200,8 +207,8 @@ function ParsePropertySection(sectionData)
 			
 		elseif (sectionData[i]:match('%s-[gG]et[vV]alue%s-')) then
 			if (not propName) then
-				print("GetValue line " .. i .. " does not follow a Property line. Aborting.")
-				return nil
+				ParseError("GetValue line does not follow a Property line.",
+							i, "[properties]", sectionData[i])
 			end
 			
 			local getName, inType = 
@@ -209,9 +216,8 @@ function ParsePropertySection(sectionData)
 			local inCast = sectionData[i]:match('%(.-%->([%w_%*%&]+)')
 			
 			if ((not getName) and (not inType)) then
-				print("Badly formed GetValue line in properties line " .. i ..
-					" near definition for property " .. propName .. ". Aborting")
-				return nil
+				ParseError("Badly formed GetValue line near definition for property " ..
+							propName, i, "[properties]", sectionData[i])
 			end
 			
 			outTable[propName].getValue = {}
@@ -236,9 +242,8 @@ function ParsePropertySection(sectionData)
 			local outCast = sectionData[i]:match('%(.-%->([%w_]+)')
 			
 			if ((not setName) and (not outType)) then
-				print("Badly formed SetValue line in properties line " .. i ..
-					" near definition for property " .. propName .. ". Aborting")
-				return nil
+				ParseError("Badly formed SetValue line near definition for property " ..
+							propName, i, "[properties]", sectionData[i])
 			end
 			
 			outTable[propName].setValue = {}
@@ -254,8 +259,8 @@ function ParsePropertySection(sectionData)
 			
 		elseif (sectionData[i]:match('%s-[eE]num%s-')) then
 			if (not propName) then
-				print("Enum line " .. i .. " does not follow a Property line. Aborting.")
-				return nil
+				ParseError("Enum line does not follow a Property line",
+							i, "[properties]", sectionData[i])
 			end
 			
 			local enumName, enumValue = sectionData[i]:match('%s-[eE]num%s-:%s-(%b"")%s-,([%w_]+)')
@@ -274,15 +279,12 @@ function ParsePropertySection(sectionData)
 					errName = "value"
 				end
 				
-				print("Missing enum " .. errName .. " in line " .. i .. " of the Properties section for property " ..
-					propName ..	". Aborting")
-				return nil
+				ParseError("Missing enum " .. errName,	i, "[properties]", sectionData[i])
 			end
 			
 			if (not outTable[propName].enums) then
-				print("Enumerated value definition in Properties line " .. i .. "for non-enumerated property" ..
-						propName .. ". Aborting")
-				return nil
+				ParseError("Enumerated value definition for non-enumerated property",
+							i, "[properties]", sectionData[i])
 			end
 			
 			
@@ -292,10 +294,7 @@ function ParsePropertySection(sectionData)
 			-- something might be wrong in the [global] section. Check
 			-- for a blank line before complaining
 			if (sectionData[i]:match('[^%s]+')) then
-				print("Unrecognized code in line " .. i ..
-					" of the Property section. Aborting.\nError: '" ..
-					sectionData[i] .. "'")
-				return nil
+				ParseError("Unrecognized code", i, "[properties]", sectionData[i])
 			end
 		end
 		
@@ -338,8 +337,8 @@ function ParseMethodSection(sectionData)
 		elseif (sectionData[i]:match('%s-[pP]aram%s+')) then
 			
 			if (not methodName) then
-				print("Param line " .. i .. " does not follow a Method line. Aborting.")
-				return nil
+				ParseError("Param line does not follow a Method line",
+							i, "[methods]", sectionData[i])
 			end
 			
 			local paramType, paramName =
@@ -351,9 +350,9 @@ function ParseMethodSection(sectionData)
 			end
 			
 			if ((not paramType) or (not paramName) or (not paramIndex)) then
-				print(methodName .. " line " .. (i - methodNameLine) ..
-						" has a syntax error.")
-				print("Format: Param type name(castAsType), callIndex : description")
+				ParseError("Param line has a syntax error",
+							i, "[methods]", sectionData[i],
+							"Format: Param type name(castAsType), callIndex : description")
 			end
 			
 			if (paramIndex < 0) then
@@ -361,6 +360,11 @@ function ParseMethodSection(sectionData)
 			end
 			
 			local inCast = sectionData[i]:match('%(([&%*%w_]+)%)')
+			if (not inCast) then
+				ParseError("Missing parameter cast type in method " .. methodName,
+							i, "[methods]",	sectionData[i],
+							"Format: Param type name(castAsType), callIndex : description")
+			end
 			
 			local paramDesc = sectionData[i]:match(":%s-(.+)")
 			
@@ -377,8 +381,8 @@ function ParseMethodSection(sectionData)
 		elseif (sectionData[i]:match('%s-[rR]eturn%s+')) then
 			
 			if (not methodName) then
-				print("Return line " .. i .. " does not follow a Method line. Aborting.")
-				return nil
+				ParseError("Return line does not follow a Method line",
+							i, "[methods]", sectionData[i])
 			end
 			
 			local returnType, paramName, outType =
@@ -405,8 +409,8 @@ function ParseMethodSection(sectionData)
 		elseif (sectionData[i]:match('%s-[cC]all[nN]ame%s-([%w_]+)')) then
 			
 			if (not methodName) then
-				print("CallName line " .. i .. " does not follow a Method line. Aborting.")
-				return nil
+				ParseError("CallName line does not follow a Method line",
+							i, "[methods]", sectionData[i])
 			end
 			
 			outTable[methodName].callName = sectionData[i]:match('%s-[cC]all[nN]ame%s-([%w_]+)')
@@ -415,17 +419,14 @@ function ParseMethodSection(sectionData)
 			readEmbeddedCode = true
 			embeddedCode = ""
 		else
-			-- something might be wrong in the [global] section. Check
+			-- something might be wrong in the [method] section. Check
 			-- for a blank line before complaining
 			if (sectionData[i]:match('[^%s]+')) then
-				local outmsg = "Unrecognized code in line " .. i ..
-					" of the Method section"
+				local outmsg = "Unrecognized code"
 				if (methodName) then
-					outmsg = outmsg .. " in declaration of method " .. methodName
+					outmsg = outmsg .. " for method " .. methodName
 				end
-				outmsg = outmsg .. ". Aborting.\nError: '" .. sectionData[i] .. "'"
-				print(outmsg)
-				return nil
+				ParseError(outmsg, i, "[methods]", sectionData[i])
 			end
 		end
 	end
@@ -474,8 +475,8 @@ function ParseEventSection(sectionData)
 		elseif (sectionData[i]:match('%s-[pP]aram%s+')) then
 			
 			if (not eventName) then
-				print("Param line " .. i .. " does not follow a Event line. Aborting.")
-				return nil
+				ParseError("Param line does not follow an Event line",
+							i, "[events]", sectionData[i])
 			end
 			
 			local paramType, paramName =
@@ -493,8 +494,8 @@ function ParseEventSection(sectionData)
 		elseif (sectionData[i]:match('%s-[rR]eturn%s+')) then
 			
 			if (not eventName) then
-				print("Return line " .. i .. " does not follow a Event line. Aborting.")
-				return nil
+				ParseError("Return line does not follow an Event line",
+							i, "[events]", sectionData[i])
 			end
 			
 			local returnType =
@@ -506,17 +507,14 @@ function ParseEventSection(sectionData)
 			readEmbeddedCode = true
 			embeddedCode = ""
 		else
-			-- something might be wrong in the [global] section. Check
+			-- something might be wrong in the [events] section. Check
 			-- for a blank line before complaining
 			if (sectionData[i]:match('[^%s]+')) then
-				local outmsg = "Unrecognized code in line " .. i ..
-					" of the Event section"
+				local outmsg = "Unrecognized code"
 				if (eventName) then
-					outmsg = outmsg .. " in declaration of event " .. eventName
+					outmsg = outmsg .. " for event " .. eventName
 				end
-				outmsg = outmsg .. ". Aborting.\nError: '" .. sectionData[i] .. "'"
-				print(outmsg)
-				return nil
+				ParseError(outmsg, i, "[events]", sectionData[i])
 			end
 		end
 	end

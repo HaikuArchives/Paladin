@@ -140,13 +140,15 @@ function GenerateMethod(def, methodName, method)
 	-- class' real class to call the method. Objects which do not inherit from
 	-- PView are expected to provide a private member named "backend".
 	if (def.object.UsesView) then
-		methodCode = methodCode .. [[
+		local tempCode = [[
 	PView *parent = static_cast<PView*>(pobject);
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	BTextView *backend = (BTextView*)parent->GetView();
+	%(BACKEND_PARENT_NAME) *backend = (%(BACKEND_PARENT_NAME)*)parent->GetView();
 ]]
+		tempCode = ApplyObjectPlaceholders(tempCode, def)
+		methodCode = methodCode .. ApplyBackendPlaceholders(tempCode, def)
 	else
 		local parentName = nil
 		if (def.backend.ParentClass) then

@@ -12,6 +12,7 @@ TODO:
 	Track down hardcoded path locations and replace them
 
 Features to implement / consider:
+	In-app help system
 	Bazaar support?
 	CVS import support
 	Possibly implement a command-line-only build tool with more options or expand the current

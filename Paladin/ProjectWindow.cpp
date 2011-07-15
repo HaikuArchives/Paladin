@@ -932,10 +932,11 @@ ProjectWindow::MessageReceived(BMessage *msg)
 				errmsg << TR("in and will need to be rebuilt to debug. Do you wish to rebuild and ")
 					<< TR("run the debugger?");
 				BAlert *alert = new BAlert("Paladin",
-													"debugging information compiled in and "
-													"will need to be rebuilt to debug. Do "
-													" you wish to rebuild and run the debugger?",
-											"Recompile","Cancel");
+													"Debugging information needs to compiled into "
+													"your project. This may take some time for large "
+													"projects. Do you wish to rebuild and run "
+													"the debugger?",
+											"Rebuild","Cancel");
 				if (alert->Go() == 1)
 					break;
 				
@@ -1438,7 +1439,7 @@ ProjectWindow::SetupMenus(void)
 	
 	fBuildMenu = new BMenu(TR("Build"));
 	
-	fBuildMenu->AddItem(new BMenuItem(TR("Make"),new BMessage(M_BUILD_PROJECT),'M'));
+	fBuildMenu->AddItem(new BMenuItem(TR("Make Project"),new BMessage(M_BUILD_PROJECT),'M'));
 	fBuildMenu->AddItem(new BMenuItem(TR("Run"),new BMessage(M_RUN_PROJECT),'R'));
 	fBuildMenu->AddItem(new BMenuItem(TR("Run Logged…"),new BMessage(M_RUN_IN_TERMINAL),
 										'R', B_COMMAND_KEY | B_SHIFT_KEY));
@@ -1455,7 +1456,7 @@ ProjectWindow::SetupMenus(void)
 	fBuildMenu->AddItem(item);
 	item->SetEnabled(gCCacheAvailable);
 	
-	fBuildMenu->AddItem(new BMenuItem(TR("Force Rebuild"),new BMessage(M_FORCE_REBUILD),'-'));
+	fBuildMenu->AddItem(new BMenuItem(TR("Force Project Rebuild"),new BMessage(M_FORCE_REBUILD),'-'));
 	fMenuBar->AddItem(fBuildMenu);
 	
 	fToolsMenu = new BMenu(TR("Tools"));

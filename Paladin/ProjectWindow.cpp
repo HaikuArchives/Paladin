@@ -1472,9 +1472,9 @@ ProjectWindow::SetupMenus(void)
 	msg->AddString("signature", "application/x-vnd.dw-SymbolFinder");
 	fToolsMenu->AddItem(new BMenuItem(TR("Symbol Finder…"), msg));
 	fToolsMenu->AddSeparatorItem();
-	fToolsMenu->AddItem(new BMenuItem(TR("Make Backup"),new BMessage(M_BACKUP_PROJECT)));
+	fToolsMenu->AddItem(new BMenuItem(TR("Make Project Backup"),new BMessage(M_BACKUP_PROJECT)));
 	fToolsMenu->AddSeparatorItem();
-	fToolsMenu->AddItem(new BMenuItem(TR("Add Software License…"),new BMessage(M_SHOW_LICENSES)));
+	fToolsMenu->AddItem(new BMenuItem(TR("Set Software License…"),new BMessage(M_SHOW_LICENSES)));
 	fMenuBar->AddItem(fToolsMenu);
 }
 

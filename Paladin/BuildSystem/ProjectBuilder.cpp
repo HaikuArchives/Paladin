@@ -412,7 +412,7 @@ ProjectBuilder::BuildThread(void *data)
 	// all the finishing work.
 	parent->Lock();
 	bool do_postprocess = true;
-	if (parent->fIsLinking || filesBuilt == 0)
+	if (parent->fIsLinking)
 		do_postprocess = false;
 	else
 		parent->fIsLinking = true;
@@ -543,13 +543,6 @@ ProjectBuilder::BuildThread(void *data)
 		
 		parent->DoPostBuild();
 	}
-	
-	if (filesBuilt == 0)
-	{
-		parent->fMsgr.SendMessage(M_BUILD_SUCCESS);
-		parent->DoPostBuild();
-	}
-	
 	parent->fManager.RemoveThread(thisThread);
 	return B_OK;
 }

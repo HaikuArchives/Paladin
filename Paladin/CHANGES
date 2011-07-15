@@ -13,6 +13,7 @@ Control + Alt + Shift + Up/Down are used to push to/pull from remote repositorie
 Add New File now includes templates for .rsrc resource files, generic text files, and bash shell scripts.
 Added an option to choose whether or not header files are automatically added to projects.
 Better build feedback when Paladin is used to build from the command line
+Wording in certain parts of the interface has been clarified
 
 Bugfixes
 The dirty file count doesn't change during builds on SMP machines

@@ -79,6 +79,7 @@ private:
 	bool				fIsLinking;
 	bool				fIsBuilding;
 	int32				fTotalFilesToBuild;
+	int32				fTotalFilesBuilt;
 	
 	int32				fPostBuildAction;
 	

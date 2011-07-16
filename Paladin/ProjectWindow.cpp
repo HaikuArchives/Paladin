@@ -911,6 +911,7 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		case M_MAKE_PROJECT:
 		case M_BUILD_PROJECT:
 		{
+			fBuildingFile = 0;
 			DoBuild(POSTBUILD_NOTHING);
 			break;
 		}
@@ -976,7 +977,8 @@ ProjectWindow::MessageReceived(BMessage *msg)
 					if (msg->FindInt32("count",&count) == B_OK &&
 						msg->FindInt32("total",&total) == B_OK)
 					{
-						out << "(" << count << "/" << total << ") ";
+						fBuildingFile = MAX(fBuildingFile, count);
+						out << "(" << fBuildingFile << "/" << total << ") ";
 					}
 					
 					out << TR("Building ") << item->Text();

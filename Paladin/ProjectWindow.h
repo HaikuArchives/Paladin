@@ -83,6 +83,7 @@ private:
 	add_file_struct		fAddFileStruct;
 	add_file_struct		fImportStruct;
 	ProjectBuilder		fBuilder;
+	int32				fBuildingFile;
 };
 
 

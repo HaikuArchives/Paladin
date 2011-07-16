@@ -29,6 +29,7 @@ ProjectBuilder::ProjectBuilder(void)
 	:	fIsLinking(false),
 		fIsBuilding(false),
 		fTotalFilesToBuild(0L),
+		fTotalFilesBuilt(0L),
 		fManager(gCPUCount)
 {
 }
@@ -39,6 +40,7 @@ ProjectBuilder::ProjectBuilder(const BMessenger &target)
 		fIsLinking(false),
 		fIsBuilding(false),
 		fTotalFilesToBuild(0L),
+		fTotalFilesBuilt(0L),
 		fManager(gCPUCount)
 {
 }
@@ -142,6 +144,7 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 	}
 	
 	fTotalFilesToBuild = proj->CountDirtyFiles();
+	fTotalFilesBuilt = 0;
 	for (int32 i = 0; i < threadcount; i++)
 		fManager.SpawnThread(BuildThread,this);
 }
@@ -287,8 +290,6 @@ ProjectBuilder::BuildThread(void *data)
 	proj->Lock();
 	proj->SortDirtyList();
 	
-	int32 filesBuilt = 0;
-	
 	SourceFile *file = proj->GetNextDirtyFile();
 	if (file)
 	{
@@ -304,12 +305,14 @@ ProjectBuilder::BuildThread(void *data)
 		
 		file->SetBuildFlag(BUILD_NO);
 		
-		filesBuilt++;
+		parent->Lock();
+		parent->fTotalFilesBuilt++;
+		parent->Unlock();
 		
 		msg.MakeEmpty();
 		msg.what = M_BUILDING_FILE;
 		msg.AddPointer("sourcefile",file);
-		msg.AddInt32("count",filesBuilt);
+		msg.AddInt32("count",parent->fTotalFilesBuilt);
 		msg.AddInt32("total",parent->fTotalFilesToBuild);
 		parent->fMsgr.SendMessage(&msg);
 		
@@ -413,7 +416,7 @@ ProjectBuilder::BuildThread(void *data)
 	parent->Lock();
 	bool do_postprocess = true;
 	
-	if (filesBuilt > 0)
+	if (parent->fTotalFilesBuilt > 0)
 	{
 		if (parent->fIsLinking)
 			do_postprocess = false;
@@ -563,7 +566,7 @@ ProjectBuilder::BuildThread(void *data)
 		parent->DoPostBuild();
 	}
 	
-	if (filesBuilt == 0)
+	if (parent->fTotalFilesBuilt == 0)
 	{
 		parent->fMsgr.SendMessage(M_BUILD_SUCCESS);
 		parent->DoPostBuild();

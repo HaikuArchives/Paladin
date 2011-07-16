@@ -17,10 +17,10 @@ Wording in certain parts of the interface has been clarified
 Project is re-linked only when necessary instead of each time the Make command is invoked
 
 Bugfixes
-The dirty file count doesn't change during builds on SMP machines
 Fixed a problem with files dropped from Tracker
 Shell scripts are now executed properly
 Automatically adjust types on .rsrc files so Edit Program Settings always works right.
+File counts during project builds are displayed properly on multicore machines
 
 Internal changes
 Removed some hardcoded paths from certain parts of the code

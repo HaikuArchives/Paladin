@@ -11,11 +11,10 @@ TODO:
 		assumptions made when the drag is performed -- pointers are used.
 
 Features to implement / consider:
+	Check in selected files
 	In-app help system
 	Bazaar support?
 	CVS import support
-	Possibly implement a command-line-only build tool with more options or expand the current
-		program's options
 	A finished online import via SCM feature
 	Tooltip for errors / warnings in the error window
 	File rename command in project window (tied to SCM rename command)

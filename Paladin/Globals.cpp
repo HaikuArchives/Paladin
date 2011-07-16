@@ -59,7 +59,10 @@ InitGlobals(void)
 	BPath path(&ai.ref);
 	gAppPath = path.Path();
 	
-	gSettings.Load("/boot/home/config/settings/Paladin_settings");
+	DPath settingsPath(B_USER_SETTINGS_DIRECTORY);
+	settingsPath << "Paladin_settings";
+	
+	gSettings.Load(settingsPath.GetFullPath());
 	
 	gDontManageHeaders = gSettings.GetBool("dontmanageheaders",true);
 	gSingleThreadedBuild = gSettings.GetBool("singlethreaded",false);
@@ -105,7 +108,9 @@ InitGlobals(void)
 	
 	gProjectPath.SetTo(gSettings.GetString("projectpath",PROJECT_PATH));
 	gLastProjectPath.SetTo(gSettings.GetString("lastprojectpath",PROJECT_PATH));
-	gBackupPath.SetTo(gSettings.GetString("backuppath","/boot/home/Desktop"));
+	
+	DPath defaultBackupPath(B_DESKTOP_DIRECTORY);
+	gBackupPath.SetTo(gSettings.GetString("backuppath", defaultBackupPath.GetFullPath()));
 	
 	gCodeLib.ScanFolders();
 }

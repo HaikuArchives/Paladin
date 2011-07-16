@@ -14,6 +14,7 @@ Add New File now includes templates for .rsrc resource files, generic text files
 Added an option to choose whether or not header files are automatically added to projects.
 Better build feedback when Paladin is used to build from the command line
 Wording in certain parts of the interface has been clarified
+Project is re-linked only when necessary instead of each time the Make command is invoked
 
 Bugfixes
 The dirty file count doesn't change during builds on SMP machines

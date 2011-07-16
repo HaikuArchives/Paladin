@@ -412,10 +412,29 @@ ProjectBuilder::BuildThread(void *data)
 	// all the finishing work.
 	parent->Lock();
 	bool do_postprocess = true;
-	if (parent->fIsLinking)
-		do_postprocess = false;
+	
+	if (filesBuilt > 0)
+	{
+		if (parent->fIsLinking)
+			do_postprocess = false;
+		else
+			parent->fIsLinking = true;
+	}
 	else
-		parent->fIsLinking = true;
+	{
+		// If no files have been built, it's possible that there was a linker
+		// error. When there is a linker error, the linker deletes the old target,
+		// so if the target exists, we can skip straight to the end.
+		proj->Lock();
+		DPath targetPath(proj->GetPath().GetFolder());
+		
+		targetPath << proj->GetTargetName();
+		proj->Unlock();
+		
+		if (BEntry(targetPath.GetFullPath()).Exists())
+			do_postprocess = false;
+	}
+	
 	parent->Unlock();
 	
 	if (do_postprocess)
@@ -543,6 +562,13 @@ ProjectBuilder::BuildThread(void *data)
 		
 		parent->DoPostBuild();
 	}
+	
+	if (filesBuilt == 0)
+	{
+		parent->fMsgr.SendMessage(M_BUILD_SUCCESS);
+		parent->DoPostBuild();
+	}
+	
 	parent->fManager.RemoveThread(thisThread);
 	return B_OK;
 }

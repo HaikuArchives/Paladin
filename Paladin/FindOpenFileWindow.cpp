@@ -2,6 +2,7 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <FindDirectory.h>
 #include <Path.h>
 #include <Screen.h>
 
@@ -92,21 +93,21 @@ FindOpenFileWindow::MessageReceived(BMessage *msg)
 			findmsg.AddString("name",fNameText->Text());
 			
 			if (fSystemBox->Value() == B_CONTROL_OFF)
-			{
 				findmsg.AddString("folder",gCurrentProject->GetPath().GetFolder());
-				findmsg.AddString("folder","/boot/develop/headers");
-				findmsg.AddString("folder","/boot/home/config/include");
-			}
-			else
+			
+			findmsg.AddString("folder","/boot/develop/headers");
+			
+			DPath path(B_USER_CONFIG_DIRECTORY);
+			path << "include";
+			findmsg.AddString("folder", path.GetFullPath());
+			
+			if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
 			{
-				if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
-					findmsg.AddString("folder","/boot/develop/headers/os");
-				else
-					findmsg.AddString("folder","/boot/develop/headers/be");
-				findmsg.AddString("folder","/boot/develop/headers/cpp");
-				findmsg.AddString("folder","/boot/develop/headers/gnu");
-				findmsg.AddString("folder","/boot/develop/headers/posix");
+				path.SetTo(B_COMMON_DIRECTORY);
+				path << "include";
+				findmsg.AddString("folder", path.GetFullPath());
 			}
+			
 			be_app->PostMessage(&findmsg);
 			PostMessage(B_QUIT_REQUESTED);
 			break;

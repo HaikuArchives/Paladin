@@ -18,6 +18,7 @@
 #include "DPath.h"
 #include "FileFactory.h"
 #include "Globals.h"
+#include "LaunchHelper.h"
 #include "SCMManager.h"
 #include "SourceFile.h"
 #include "TextFile.h"
@@ -1579,25 +1580,22 @@ DetectPlatform(void)
 	
 	// While, yes, there is a uname() function in sys/utsname.h, we use spawn a shell
 	// so that we can easily avoid the build mess of BONE vs netserver.
-	FILE *fd = popen("uname -o","r");
-	if (fd)
+	// Use ShellHelper class to avoid problems with popen() causing hangs. :/
+	ShellHelper shell;
+	BString osname;
+	
+	shell << "uname" << "-o";
+	shell.RunInPipe(osname, false);
+	
+	if (osname.Compare("Haiku\n") == 0)
 	{
-		BString osname;
-		char buffer[32];
-		while (fgets(buffer,32,fd))
-			osname += buffer;
-		pclose(fd);
-		
-		if (osname.Compare("Haiku\n") == 0)
-		{
-			BPath libpath;
-			find_directory(B_BEOS_LIB_DIRECTORY,&libpath);
-			libpath.Append("libsupc++.so");
-			type =  BEntry(libpath.Path()).Exists() ? PLATFORM_HAIKU_GCC4 : PLATFORM_HAIKU;
-		}
-		else if (osname.Compare("Zeta\n") == 0)
-			type = PLATFORM_ZETA;
+		BPath libpath;
+		find_directory(B_BEOS_LIB_DIRECTORY,&libpath);
+		libpath.Append("libsupc++.so");
+		type =  BEntry(libpath.Path()).Exists() ? PLATFORM_HAIKU_GCC4 : PLATFORM_HAIKU;
 	}
+	else if (osname.Compare("Zeta\n") == 0)
+		type = PLATFORM_ZETA;
 	
 	return type;
 };

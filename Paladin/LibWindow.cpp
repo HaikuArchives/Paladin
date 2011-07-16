@@ -139,6 +139,7 @@ LibraryWindow::ScanFolder(BPoint location, const char *path, float *maxwidth)
 	dir.Rewind();
 	entry_ref ref;
 	BRect r(location.x,location.y,location.x + 1,location.y + 1);
+	
 	while (dir.GetNextRef(&ref) == B_OK)
 	{
 		BString str(ref.name);
@@ -179,6 +180,10 @@ LibraryWindow::ScanFolder(BPoint location, const char *path, float *maxwidth)
 		width = MAX(r.right,width);
 		r.OffsetBy(0,r.Height());
 	}
+	
+	if (r.Height() == 1)
+		r.Set(0, 0, -1, -1);
+	
 	*maxwidth = width;
 	return r;
 }
@@ -204,7 +209,7 @@ LibraryWindow::ScanThread(void *data)
 	DPath sysPath = GetSystemPath(B_COMMON_DEVELOP_DIRECTORY);
 	sysPath << "lib/x86";
 	BRect out = win->ScanFolder(r.LeftTop(),sysPath.GetFullPath(),&maxwidth);
-	if (out != BRect(0,0,-1,-1));
+	if (out != BRect(0,0,-1,-1))
 	{
 		r = out;
 		r.OffsetBy(0,10);
@@ -222,7 +227,7 @@ LibraryWindow::ScanThread(void *data)
 		
 		out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_COMMON_LIB_DIRECTORY).GetFullPath(),
 							&maxwidth);
-		if (out != BRect(0,0,-1,-1));
+		if (out != BRect(0,0,-1,-1))
 		{
 			r = out;
 			r.OffsetBy(0,10);
@@ -239,7 +244,7 @@ LibraryWindow::ScanThread(void *data)
 	
 	out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
 						&maxwidth);
-	if (out != BRect(0,0,-1,-1));
+	if (out.IsValid())
 	{
 		r = out;
 		r.OffsetBy(0,10);
@@ -250,7 +255,7 @@ LibraryWindow::ScanThread(void *data)
 	BScrollView *scrollView = (BScrollView*)top->FindView("scrollView");
 	
 	BScrollBar *vbar = scrollView->ScrollBar(B_VERTICAL);
-	vbar->SetRange(0,r.top - scrollView->Bounds().Height());
+	vbar->SetRange(0, r.bottom - scrollView->Bounds().Height());
 	vbar->SetSteps(r.Height() * 2.0,r.Height() * 8.0);
 	gSettings.Lock();
 	BRect savedframe;

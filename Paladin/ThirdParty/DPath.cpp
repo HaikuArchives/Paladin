@@ -30,6 +30,12 @@ DPath::DPath(const entry_ref &ref)
 }
 
 
+DPath::DPath(const directory_which &which)
+{
+	SetTo(which);
+}
+
+
 DPath::DPath(void)
 	:	fFileNamePos(-1),
 		fExtensionPos(-1)
@@ -132,6 +138,15 @@ void
 DPath::SetTo(const entry_ref &ref)
 {
 	SetTo(BPath(&ref).Path());
+}
+
+
+void
+DPath::SetTo(const directory_which &which)
+{
+	BPath path;
+	if (find_directory(which, &path) == B_OK)
+		SetTo(path.Path());
 }
 
 

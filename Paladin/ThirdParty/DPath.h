@@ -6,6 +6,7 @@
 #ifndef DPATH_H
 #define	DPATH_H
 
+#include <FindDirectory.h>
 #include <String.h>
 #include <Entry.h>
 
@@ -16,6 +17,7 @@ public:
 							DPath(const BString &string);
 							DPath(const DPath &path);
 							DPath(const entry_ref &ref);
+							DPath(const directory_which &which);
 							DPath(void);
 	virtual					~DPath(void);
 	
@@ -26,6 +28,7 @@ public:
 			void			SetTo(const DPath &path);
 			void			SetTo(const BString &string);
 			void			SetTo(const entry_ref &ref);
+			void			SetTo(const directory_which &which);
 			
 			void			SetBaseName(const char *string);
 			void			SetExtension(const char *string);

@@ -614,7 +614,7 @@ lua_property_set_value(lua_State *L)
 	UserData *prop = (UserData*)lua_touserdata(L, 1);
 	if (prop && (prop->type == USERDATA_PROPERTY || prop->type == USERDATA_PROPERTY_PTR))
 	{
-		PValue *val;
+		PValue *val = NULL;
 		IntValue ival;
 		StringValue sval;
 		if (lua_isnumber(L, 2))

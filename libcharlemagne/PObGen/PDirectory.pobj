@@ -17,6 +17,7 @@ FriendlyName=Directory
 Description=An object representing a directory in the filesystem
 UsesView=false
 ParentClass=public PNode
+GetBackend=true
 
 [properties]
 Property int(0) EntryCount : The number of entries in the directory

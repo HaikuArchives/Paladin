@@ -152,6 +152,13 @@ PDirectory::SetProperty(const char *name, PValue *value, const int32 &index)
 }
 
 
+BDirectory *
+PDirectory::GetBackend(void) const
+{
+	return fBackend;
+}
+
+
 void
 PDirectory::InitProperties(void)
 {

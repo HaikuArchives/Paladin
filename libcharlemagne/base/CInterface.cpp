@@ -1784,6 +1784,32 @@ event_get_code(void *eventptr, const char **out)
 		*out = event->code.CountChars() ? strdup(event->code.String()) : NULL;
 }
 
+#pragma mark - handler functions
+
+void
+phandler_set_msg_handler(void *ph, long constant, MethodFunction func)
+{
+	PHandler *handler = static_cast<PHandler*>(ph);
+	handler->SetMsgHandler(constant, func);
+	
+}
+
+
+MethodFunction
+phandler_get_msg_handler(void *ph, long constant)
+{
+	PHandler *handler = static_cast<PHandler*>(ph);
+	return handler->GetMsgHandler(constant);
+}
+
+
+void
+phandler_remove_msg_handler(void *ph, long constant)
+{
+	PHandler *handler = static_cast<PHandler*>(ph);
+	handler->RemoveMsgHandler(constant);
+}
+
 
 #pragma mark - method functions
 

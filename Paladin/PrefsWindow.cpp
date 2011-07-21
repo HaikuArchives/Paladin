@@ -194,6 +194,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 	
 	fSCMChooser = new BMenuField(r, "scmchooser", "Preferred Source Control: ",
 								menu);
+	fSCMChooser->SetDivider(fSCMChooser->StringWidth("Preferred Source Control: ") + 5.0);
 	view->AddChild(fSCMChooser);
 	
 	#ifdef DISABLE_GIT_SUPPORT
@@ -228,6 +229,17 @@ PrefsWindow::PrefsWindow(BRect frame)
 		}
 	}
 	
+	r = fBackupFolder->Frame();
+	r.OffsetTo(10.0, fSCMChooser->Frame().bottom + 10.0);
+	fSVNRepoFolder = new PathBox(r,"svnrepofolder", gSVNRepoPath.GetFullPath(),
+								TR("Subversion Repository Folder:"),
+								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	view->AddChild(fSVNRepoFolder);
+	fSVNRepoFolder->SetDivider(fSVNRepoFolder->StringWidth(
+								"Subversion Repository Folder:") + 5.0);
+	fSVNRepoFolder->MakeValidating(true);
+	SetToolTip(fSVNRepoFolder,TR("Sets the location for the 'server' side of local Subversion repositories."));
+	
 	fActiveView = fViews[0];
 	fViews[1]->Hide();
 	
@@ -245,6 +257,9 @@ PrefsWindow::QuitRequested(void)
 	
 	gBackupPath = fBackupFolder->Path();
 	gSettings.SetString("backuppath",fBackupFolder->Path());
+	
+	gSVNRepoPath = fSVNRepoFolder->Path();
+	gSettings.SetString("svnrepopath",fSVNRepoFolder->Path());
 	
 	gShowFolderOnOpen = (fShowProjFolder->Value() == B_CONTROL_ON);
 	gSettings.SetBool("showfolderonopen",gShowFolderOnOpen);
@@ -268,6 +283,7 @@ PrefsWindow::QuitRequested(void)
 	
 	gDefaultSCM = (scm_t)fSCMChooser->Menu()->IndexOf(fSCMChooser->Menu()->FindMarked());
 	gSettings.SetInt32("defaultSCM", gDefaultSCM);
+	
 	return true;
 }
 

@@ -16,7 +16,8 @@ public:
 				void	MessageReceived(BMessage *msg);
 private:
 	PathBox			*fProjectFolder,
-					*fBackupFolder;
+					*fBackupFolder,
+					*fSVNRepoFolder;
 					
 	BCheckBox		*fShowProjFolder,
 					*fDontAddHeaders,

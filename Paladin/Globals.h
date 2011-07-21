@@ -51,6 +51,7 @@ extern DPath gAppPath;
 extern DPath gBackupPath;
 extern DPath gProjectPath;
 extern DPath gLastProjectPath;
+extern DPath gSVNRepoPath;
 extern bool	gBuildMode;
 extern bool gDontManageHeaders;
 extern bool gSingleThreadedBuild;

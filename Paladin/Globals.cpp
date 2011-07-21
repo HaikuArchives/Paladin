@@ -23,6 +23,7 @@ DPath gAppPath;
 DPath gBackupPath;
 DPath gProjectPath;
 DPath gLastProjectPath;
+DPath gSVNRepoPath;
 
 bool gBuildMode = false;
 bool gDontManageHeaders = true;
@@ -111,6 +112,11 @@ InitGlobals(void)
 	
 	DPath defaultBackupPath(B_DESKTOP_DIRECTORY);
 	gBackupPath.SetTo(gSettings.GetString("backuppath", defaultBackupPath.GetFullPath()));
+	
+	DPath defaultRepoPath(B_USER_DIRECTORY);
+	defaultRepoPath << "Paladin SVN Repos";
+	gSVNRepoPath.SetTo(gSettings.GetString("svnrepopath", defaultRepoPath.GetFullPath()));
+	
 	
 	gCodeLib.ScanFolders();
 }

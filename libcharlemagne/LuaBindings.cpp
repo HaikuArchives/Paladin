@@ -3336,7 +3336,7 @@ static const APIConstant sAPIConstants[] = {
 	{ "BSuccessColor", B_SUCCESS_COLOR },
 	{ "BFailureColor", B_FAILURE_COLOR },
 	
-	{ NULL, NULL }
+	{ NULL, 0 }
 };
 
 int

@@ -1660,7 +1660,7 @@ pobject_run_method(void *pobj, const char *name, PArgList *in,
 					PArgList *out, void *extra)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
-	return obj ? obj->RunMethod(name, *in, *out, extra) : NULL;
+	return obj ? obj->RunMethod(name, *in, *out, extra) : -1;
 }
 
 
@@ -1738,7 +1738,7 @@ pobject_run_event(void *pobj, const char *name, PArgList *in,
 					PArgList *out, void *extra)
 {
 	PObject *obj = static_cast<PObject*>(pobj);
-	return obj ? obj->RunMethod(name, *in, *out, extra) : NULL;
+	return obj ? obj->RunMethod(name, *in, *out, extra) : -1;
 }
 
 

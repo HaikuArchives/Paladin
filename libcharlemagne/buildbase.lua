@@ -1,5 +1,7 @@
 PBuildLoaded = true
 
+QUIT_ON_BUILD_FAILURE = true
+
 function GetSystemPath(path)
 	if (not path) then
 		return nil
@@ -99,6 +101,10 @@ end
 
 
 function DetectPlatform()
+	if (PLATFORM) then
+		return PLATFORM
+	end
+	
 	local phandle = io.popen("uname -o", "r")
 	local os = "r5"
 	if (phandle) then
@@ -111,11 +117,11 @@ function DetectPlatform()
 				os = "HaikuGCC4"
 			end
 		end
-		
-		return os
 	end
 	
-	return nil
+	PLATFORM = os
+	
+	return os
 end
 
 
@@ -229,6 +235,29 @@ function NewProject(targetName, projType)
 			return self.targetname
 		end
 	
+	out.SetPlatform = function(self, osName)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::SetPlatform")
+			end
+			
+			local validOS = { ["r5"]=true, ["Zeta"]=true, ["Haiku"]=true,
+								["HaikuGCC4"]=true }
+			
+			if (validOS[osName]) then
+				self.platform = osName
+			else
+				error("Invalid platform name %s in Project::SetPlatform", osName)
+			end
+		end
+	
+	out.GetPlatform = function(self)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::GetPlatform")
+			end
+			
+			return self.platform
+		end
+	
 	out.AddIncludes = function(self, includes)
 			if (type(self) ~= "table") then
 				error("Project not passed to Project::AddIncludes")
@@ -270,7 +299,7 @@ function NewProject(targetName, projType)
 			end
 		end
 	
-	out.GetSourceControl = function(self, scmName)
+	out.GetSourceControl = function(self)
 			if (type(self) ~= "table") then
 				error("Project not passed to Project::GetSourceControl")
 			end
@@ -370,9 +399,51 @@ function NewProject(targetName, projType)
 			end
 		end
 	
+	out.RemoveLibraries = function(self, libs)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::RemoveLibraries")
+			end
+			
+			local libtype = type(libs)
+			if (libtype == "string") then
+				local index = self:HasLibrary(libs)
+				if (index) then
+					table.remove(self.libraries, index)
+				end
+			elseif (libtype == "table") then
+				for i = 1, #libs do
+					local index = self:HasLibrary(libs[i])
+					if (index) then
+						table.remove(self.libraries, index)
+					end
+				end
+			else
+				error("libs argument is expected to be a string " ..
+						"or table of strings in Project::RemoveLibraries")
+			end
+		end
+	
+	out.HasLibrary = function(self, libname)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::HasLibrary")
+			end
+			
+			if (not libname) then
+				error("nil library name passed to Project::HasLibrary")
+			end
+			
+			for i = 1, #self.libraries do
+				if (self.libraries[i] == libname) then
+					return i
+				end
+			end
+			
+			return nil
+		end
+	
 	out.GetLibraries = function(self)
 			if (type(self) ~= "table") then
-				error("Project not passed to Project::IncludeAt")
+				error("Project not passed to Project::GetLibraries")
 			end
 			
 			return self.libraries
@@ -386,7 +457,7 @@ function NewProject(targetName, projType)
 			local out = {}
 			table.insert(out, "TARGETNAME=" .. self.targetname)
 			table.insert(out, "SCM=" .. self.sourceControl)
-			table.insert(out, "PLATFORM=Haiku")
+			table.insert(out, "PLATFORM=" .. self.platform)
 			
 			local AddSourceGroups = function(groupName, group)
 					table.insert(out, "GROUP=" .. groupName)
@@ -401,6 +472,33 @@ function NewProject(targetName, projType)
 			table.insert(out, "SYSTEMINCLUDE=/boot/develop/headers/cpp")
 			table.insert(out, "SYSTEMINCLUDE=/boot/develop/headers/posix")
 			table.insert(out, "SYSTEMINCLUDE=/boot/home/config/include")
+			
+			if (self.platform == "HaikuGCC4") then 
+				if (not self:HasLibrary("libsupc++.so")) then
+					self:AddLibraries("libsupc++.so")
+				end
+				
+				local stdcpp = self:HasLibrary("libstdc++.r4.so")
+				if (stdcpp) then
+					-- By calling the remove directly, we eliminate an
+					-- extra search of the libraries table
+					table.remove(self.libraries, stdcpp)
+					self:AddLibraries("libstdc++.so")
+					print("Mapping libstdc++.r4.so to libstdc++.so for platform Haiku GCC4")
+				end			
+			else
+				-- We don't check platform here because the only one which
+				-- uses libstdc++.so is Haiku GCC4
+				
+				local stdcpp = self:HasLibrary("libstdc++.so")
+				if (stdcpp) then
+					-- By calling the remove directly, we eliminate an
+					-- extra search of the libraries table
+					table.remove(self.libraries, stdcpp)
+					self:AddLibraries("libstdc++.r4.so")
+					print("Mapping libstdc++.so to libstdc++.so for platform " .. self.platform)
+				end
+			end
 			
 			for i = 1, #self.libraries do
 				table.insert(out, "LIBRARY=" .. self.libraries[i])
@@ -469,6 +567,7 @@ function NewProject(targetName, projType)
 	out:SetSourceControl("none")
 	out:SetTarget(targetName)
 	out:SetType(projType)
+	out:SetPlatform(DetectPlatform())
 	out:AddLibraries{ "libroot.so", "libbe.so" }
 	
 	out.Build = function(self, path)
@@ -495,7 +594,12 @@ function NewProject(targetName, projType)
 			local out = phandle:read("*l")
 			phandle:close()
 			
-			return tonumber(out)
+			local exitCode = tonumber(out)
+			if (QUIT_ON_BUILD_FAILURE and exitCode ~= 0) then
+				os.exit(exitCode)
+			end
+			
+			return exitCode
 		end
 	
 	return out

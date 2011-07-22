@@ -1,7 +1,4 @@
-if (not PBuildLoaded) then
-	LoadPBuild = assert(loadfile("buildbase.lua"))
-	LoadPBuild()
-end
+require "pbuild"
 
 gLibSources = {
 	"app/PApplication.cpp",

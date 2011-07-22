@@ -1,5 +1,124 @@
 PBuildLoaded = true
 
+function GetSystemPath(path)
+	if (not path) then
+		return nil
+	end
+	
+	local systemPaths = {
+		["B_DESKTOP_DIRECTORY"] = true,
+		["B_TRASH_DIRECTORY"] = true,
+	
+		["B_SYSTEM_DIRECTORY"] = true,
+		["B_SYSTEM_ADDONS_DIRECTORY"] = true,
+		["B_SYSTEM_BOOT_DIRECTORY"] = true,
+		["B_SYSTEM_FONTS_DIRECTORY"] = true,
+		["B_SYSTEM_LIB_DIRECTORY"] = true,
+	 	["B_SYSTEM_SERVERS_DIRECTORY"] = true,
+		["B_SYSTEM_APPS_DIRECTORY"] = true,
+		["B_SYSTEM_BIN_DIRECTORY"] = true,
+		["B_SYSTEM_DOCUMENTATION_DIRECTORY"] = true,
+		["B_SYSTEM_PREFERENCES_DIRECTORY"] = true,
+		["B_SYSTEM_TRANSLATORS_DIRECTORY"] = true,
+		["B_SYSTEM_MEDIA_NODES_DIRECTORY"] = true,
+		["B_SYSTEM_SOUNDS_DIRECTORY"] = true,
+		["B_SYSTEM_DATA_DIRECTORY"] = true,
+	
+		["B_COMMON_DIRECTORY"] = true,
+		["B_COMMON_SYSTEM_DIRECTORY"] = true,
+		["B_COMMON_ADDONS_DIRECTORY"] = true,
+		["B_COMMON_BOOT_DIRECTORY"] = true,
+		["B_COMMON_FONTS_DIRECTORY"] = true,
+		["B_COMMON_LIB_DIRECTORY"] = true,
+		["B_COMMON_SERVERS_DIRECTORY"] = true,
+		["B_COMMON_BIN_DIRECTORY"] = true,
+		["B_COMMON_ETC_DIRECTORY"] = true,
+		["B_COMMON_DOCUMENTATION_DIRECTORY"] = true,
+		["B_COMMON_SETTINGS_DIRECTORY"] = true,
+		["B_COMMON_DEVELOP_DIRECTORY"] = true,
+		["B_COMMON_LOG_DIRECTORY"] = true,
+		["B_COMMON_SPOOL_DIRECTORY"] = true,
+		["B_COMMON_TEMP_DIRECTORY"] = true,
+		["B_COMMON_VAR_DIRECTORY"] = true,
+		["B_COMMON_TRANSLATORS_DIRECTORY"] = true,
+		["B_COMMON_MEDIA_NODES_DIRECTORY"] = true,
+		["B_COMMON_SOUNDS_DIRECTORY"] = true,
+		["B_COMMON_DATA_DIRECTORY"] = true,
+		["B_COMMON_CACHE_DIRECTORY"] = true,
+	
+		["B_USER_DIRECTORY"] = true,
+		["B_USER_CONFIG_DIRECTORY"] = true,
+		["B_USER_ADDONS_DIRECTORY"] = true,
+		["B_USER_BOOT_DIRECTORY"] = true,
+		["B_USER_FONTS_DIRECTORY"] = true,
+		["B_USER_LIB_DIRECTORY"] = true,
+		["B_USER_SETTINGS_DIRECTORY"] = true,
+		["B_USER_DESKBAR_DIRECTORY"] = true,
+		["B_USER_PRINTERS_DIRECTORY"] = true,
+		["B_USER_TRANSLATORS_DIRECTORY"] = true,
+		["B_USER_MEDIA_NODES_DIRECTORY"] = true,
+		["B_USER_SOUNDS_DIRECTORY"] = true,
+		["B_USER_DATA_DIRECTORY"] = true,
+		["B_USER_CACHE_DIRECTORY"] = true,
+	
+		["B_APPS_DIRECTORY"] = true,
+		["B_PREFERENCES_DIRECTORY"] = true,
+		["B_UTILITIES_DIRECTORY"] = true,
+	
+		["B_BEOS_DIRECTORY"] = true,
+		["B_BEOS_SYSTEM_DIRECTORY"] = true,
+		["B_BEOS_ADDONS_DIRECTORY"] = true,
+		["B_BEOS_BOOT_DIRECTORY"] = true,
+		["B_BEOS_FONTS_DIRECTORY"] = true,
+		["B_BEOS_LIB_DIRECTORY"] = true,
+	 	["B_BEOS_SERVERS_DIRECTORY"] = true,
+		["B_BEOS_APPS_DIRECTORY"] = true,
+		["B_BEOS_BIN_DIRECTORY"] = true,
+		["B_BEOS_ETC_DIRECTORY"] = true,
+		["B_BEOS_DOCUMENTATION_DIRECTORY"] = true,
+		["B_BEOS_PREFERENCES_DIRECTORY"] = true,
+		["B_BEOS_TRANSLATORS_DIRECTORY"] = true,
+		["B_BEOS_MEDIA_NODES_DIRECTORY"] = true,
+		["B_BEOS_SOUNDS_DIRECTORY"] = true,
+		["B_BEOS_DATA_DIRECTORY"] = true,
+	}
+	
+	if (not systemPaths[path]) then
+		return nil
+	end
+	
+	local handle = io.popen("finddir " .. path, "r")
+	if (not handle) then
+		return nil
+	end
+	
+	local line = handle:read("*l")
+	handle:close()
+	return line
+end
+
+
+function DetectPlatform()
+	local phandle = io.popen("uname -o", "r")
+	local os = "r5"
+	if (phandle) then
+		os = phandle:read("*l")
+		
+		if (os == "Haiku") then
+			local libdir = GetSystemPath("B_SYSTEM_LIB_DIRECTORY") .. "/libsupc++.so"
+			local temp = io.open(libdir)
+			if (temp) then
+				os = "HaikuGCC4"
+			end
+		end
+		
+		return os
+	end
+	
+	return nil
+end
+
+
 PBuild = {}
 PBuild.FindPaladinApp = function()
 		local phandle = io.popen("query -f -v /boot '(name==Paladin)&&(BEOS:APP_SIG=application/x-vnd.dw-Paladin)'", "r")

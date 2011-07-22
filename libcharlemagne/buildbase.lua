@@ -583,16 +583,16 @@ function NewProject(targetName, projType)
 			
 			PBuild.EnsurePaladinApp()
 			print("Building target " .. self.targetname)
-			local command = "Paladin -b '" .. self.path .. "'"
+			local command = "Paladin -b '" .. self.path .. "'; echo $? > /tmp/PBuild.txt"
 			local phandle = io.popen(command, "r")
 			local out = phandle:read("*a")
 			phandle:close()
 			
 			io.stdout:write(out)
 			
-			local phandle = io.popen("echo $?", "r")
-			local out = phandle:read("*l")
-			phandle:close()
+			local file = io.open("/tmp/PBuild.txt", "r")
+			local out = file:read("*l")
+			file:close()
 			
 			local exitCode = tonumber(out)
 			if (QUIT_ON_BUILD_FAILURE and exitCode ~= 0) then

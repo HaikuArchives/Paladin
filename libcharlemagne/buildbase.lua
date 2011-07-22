@@ -136,6 +136,29 @@ function NewProject(targetName, projType)
 			return self.includes
 		end
 	
+	out.SetSourceControl = function(self, scmName)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::SetSourceControl")
+			end
+			
+			local validSCM = { ["hg"]=true, ["git"]=true, ["svn"]=true, ["none"]=true }
+			
+			if (validSCM[scmName]) then
+				self.sourceControl = scmName
+			else
+				error("Invalid source control name %s in Project::SetSourceControl",
+						scmName)
+			end
+		end
+	
+	out.GetSourceControl = function(self, scmName)
+			if (type(self) ~= "table") then
+				error("Project not passed to Project::GetSourceControl")
+			end
+			
+			return self.sourceControl
+		end
+	
 	out.AddSources = function(self, groupName, sources)
 			if (type(self) ~= "table") then
 				error("Project not passed to Project::AddSources")
@@ -243,7 +266,8 @@ function NewProject(targetName, projType)
 			
 			local out = {}
 			table.insert(out, "TARGETNAME=" .. self.targetname)
-			table.insert(out, "SCM=none\nPLATFORM=Haiku")
+			table.insert(out, "SCM=" .. self.sourceControl)
+			table.insert(out, "PLATFORM=Haiku")
 			
 			local AddSourceGroups = function(groupName, group)
 					table.insert(out, "GROUP=" .. groupName)
@@ -323,6 +347,7 @@ function NewProject(targetName, projType)
 			return true
 		end
 	
+	out:SetSourceControl("none")
 	out:SetTarget(targetName)
 	out:SetType(projType)
 	out:AddLibraries{ "libroot.so", "libbe.so" }

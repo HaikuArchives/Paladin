@@ -1787,11 +1787,10 @@ event_get_code(void *eventptr, const char **out)
 #pragma mark - handler functions
 
 void
-phandler_set_msg_handler(void *ph, long constant, MethodFunction func)
+phandler_set_msg_handler(void *ph, long constant, MethodFunction func, void *ptr)
 {
 	PHandler *handler = static_cast<PHandler*>(ph);
-	handler->SetMsgHandler(constant, func);
-	
+	handler->SetMsgHandler(constant, func, ptr);
 }
 
 
@@ -1808,6 +1807,24 @@ phandler_remove_msg_handler(void *ph, long constant)
 {
 	PHandler *handler = static_cast<PHandler*>(ph);
 	handler->RemoveMsgHandler(constant);
+}
+
+
+int
+phandler_set_code(void *ph, long constant, const char *code)
+{
+	PHandler *handler = static_cast<PHandler*>(ph);
+	return handler->SetHandlerCode(constant, code);
+}
+
+
+void
+phandler_get_code(void *ph, long constant, const char **out)
+{
+	PHandler *handler = static_cast<PHandler*>(ph);
+	
+	const char *code = handler->GetHandlerCode(constant);
+	*out = code ? strdup(code) : NULL;
 }
 
 

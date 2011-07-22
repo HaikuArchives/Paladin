@@ -65,9 +65,9 @@ PHandler::Duplicate(void) const
 
 
 void
-PHandler::SetMsgHandler(const int32 &constant, MethodFunction handler)
+PHandler::SetMsgHandler(const int32 &constant, MethodFunction handler, void *ptr)
 {
-	fMsgHandlerMap[constant] = handler;
+	fMsgHandlerMap[constant] = HandlerData(handler, ptr);
 }
 
 
@@ -75,7 +75,7 @@ MethodFunction
 PHandler::GetMsgHandler(const int32 &constant)
 {
 	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
-	return (i == fMsgHandlerMap.end()) ? NULL : i->second;
+	return (i == fMsgHandlerMap.end()) ? NULL : i->second.handler;
 }
 
 
@@ -87,6 +87,26 @@ PHandler::RemoveMsgHandler(const int32 &constant)
 
 
 status_t
+PHandler::SetHandlerCode(const int32 &constant, const char *code)
+{
+	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
+	if (i == fMsgHandlerMap.end())
+		return B_NAME_NOT_FOUND;
+	
+	i->second.code = code;
+	return B_OK;
+}
+
+
+const char *
+PHandler::GetHandlerCode(const int32 &constant)
+{
+	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
+	return (i == fMsgHandlerMap.end()) ? NULL : i->second.code.String();
+}
+
+
+status_t
 PHandler::RunMessageHandler(const int32 &constant, PArgList &args)
 {
 	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
@@ -94,7 +114,7 @@ PHandler::RunMessageHandler(const int32 &constant, PArgList &args)
 		return B_NAME_NOT_FOUND;
 	
 	PArgList out;
-	return i->second(this, &args, &out, NULL);
+	return i->second.handler(this, &args, &out, NULL);
 }
 
 

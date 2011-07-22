@@ -43,6 +43,7 @@ struct APIConstant
 };
 
 int lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
+int lua_run_msg_handler(void *pobject, PArgList *in, PArgList *out, void *extraData);
 
 
 int
@@ -93,6 +94,58 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	}
 	
 	ReadReturnValues(L, out, event->interface, 2);
+	lua_pop(L, -1);
+	
+	return 0;
+}
+
+
+int
+lua_run_msg_handler(void *pobject, PArgList *in, PArgList *out, void *extraData)
+{
+	PArgs inArgs;
+	int32 constant;
+	if (inArgs.FindInt32("constant", &constant) != B_OK)
+		return 0;
+	
+	PHandler *handler = static_cast<PHandler*>(pobject);
+	if (!handler)
+		return 0;
+	
+	// The extraData pointer should contain a pointer to the necessary Lua state.
+	lua_State *L = (lua_State*)extraData;
+	
+	// From here we need to:
+	// 1) Empty the stack
+	// 2) Get the Lua code to call
+	// 3) Set up the call by pushing all of the arguments to the stack
+	// 4) Call the handler function
+	// 5) Empty the stack
+	
+	lua_pop(L, -1);
+	
+	// This will push the function setup onto the top of the stack
+	
+	lua_getglobal(L, handler->GetHandlerCode(constant));
+	if (lua_isnil(L, lua_gettop(L)))
+	{
+		lua_pop(L, -1);
+		BString error;
+		error << "Couldn't find handler for value '" << constant << "' in handler_run_msg_handler";
+		lua_pushstring(L, error.String());
+		lua_error(L);
+		return 0;
+	}
+	
+	PushArgList(L, in);
+	
+	if (lua_pcall(L, 1, 0, inArgs.CountItems()) != 0)
+	{
+		lua_pushfstring(L, "Error running handler for value %ld: %s", constant, lua_tostring(L, -1));
+		lua_error(L);
+		return 0;
+	}
+	
 	lua_pop(L, -1);
 	
 	return 0;
@@ -2152,6 +2205,58 @@ lua_object_connect_event(lua_State *L)
 	return 0;
 }
 
+#pragma mark - Message handler methods
+
+static
+int
+lua_handler_set_msg_handler(lua_State *L)
+{
+	if (lua_gettop(L) != 4)
+	{
+		lua_pushfstring(L, "Wrong number of arguments in handler_set_msg_handler()");
+		lua_error(L);
+		return 0;
+	}
+	
+	if (!ISPOINTER(L, 1) || !lua_isnumber(L, 2) || !ISPOINTER(L, 3))
+	{
+		lua_pushfstring(L, "Bad argument type in handler_set_msg_handler()");
+		lua_error(L);
+		return 0;
+	}
+	
+	UserData *pobj = (UserData*)lua_touserdata(L, 1);
+	if (!pobj || pobj->type != USERDATA_OBJECT_PTR)
+		return 0;
+	
+	int32 constant = lua_tointeger(L, 2);
+	
+	// Just like PMethods, EventData instances also have a code attribute which can be used
+	// to either hold a function name or actual code. For Lua, we use function names for
+	// events and methods
+	phandler_set_msg_handler(pobj->data, constant, lua_run_msg_handler, L);
+	phandler_set_code(pobj->data, constant, lua_tostring(L, 3));
+	
+	return 0;
+}
+
+
+static
+int
+lua_handler_get_msg_handler(lua_State *L)
+{
+	return 0;
+}
+
+
+static
+int
+lua_handler_remove_msg_handler(lua_State *L)
+{
+	return 0;
+}
+
+
 #pragma mark - PMethodInterface methods
 
 
@@ -3257,6 +3362,10 @@ static const luaL_Reg charlemagnelib[] = {
 	{ "object_count_events", lua_object_count_events },
 	{ "object_run_event", lua_object_run_event },
 	{ "object_connect_event", lua_object_connect_event },
+	
+	{ "handler_set_msg_handler", lua_handler_set_msg_handler },
+	{ "handler_get_msg_handler", lua_handler_get_msg_handler },
+	{ "handler_remove_msg_handler", lua_handler_remove_msg_handler },
 	
 	{ "interface_create", lua_interface_create },
 	{ "interface_destroy", lua_interface_destroy },

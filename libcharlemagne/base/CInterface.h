@@ -298,9 +298,12 @@ void				event_get_code(void *event, const char **out);
 	PHandler-related definitions
 	
    ------------------------------------------------------------------------------------- */
-void				phandler_set_msg_handler(void *ph, long constant, MethodFunction func);
+void				phandler_set_msg_handler(void *ph, long constant, MethodFunction func,
+											void *ptr);
 MethodFunction		phandler_get_msg_handler(void *ph, long constant);
 void				phandler_remove_msg_handler(void *ph, long constant);
+int					phandler_set_code(void *ph, long constant, const char *code);
+void				phandler_get_code(void *ph, long constant, const char **out);
 
 /* -------------------------------------------------------------------------------------
 	PMethod-related definitions

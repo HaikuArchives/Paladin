@@ -1,6 +1,68 @@
-PBuildLoaded = true
+#!lua
+
+-- Anything in the PBuild table is internal-only
+PBuild = {}
+
+PBuild.workingDir = os.getenv("PWD")
+if (PBuild.workingDir:sub(-1,1) ~= "/") then
+	PBuild.workingDir = PBuild.workingDir .. "/"
+end
+
+PBuild.shellDir = PBuild.workingDir
+
+-----------------------------------------------------------------------------
+-- Globals and file-callable functions
 
 QUIT_ON_BUILD_FAILURE = true
+
+function WorkingDir()
+	return PBuild.workingDir
+end
+
+
+function ShellDir()
+	return PBuild.shellDir
+end
+
+
+function SetShellDir(path)
+	if (not path) then
+		error("Nil passed to SetShellDir()")
+	end
+	
+	if (path:sub(1,1) == "/") then
+		PBuild.shellDir = path
+	else
+		PBuild.shellDir = WorkingDir() .. path
+	end
+end
+
+
+function Shell(command)
+	if (not command) then
+		error("Nil passed to Shell()")
+		return nil
+	end
+	
+	local cmdstring = "cd '" .. WorkingDir() .. "'; " .. command
+	print(command)
+	
+	return os.execute(cmdstring)
+end
+
+
+function Include(path)
+	if (not path) then
+		error("Nil passed to Include()")
+		return nil
+	end
+	
+	local includePath = PBuild.workingdir .. "path"
+	
+	assert(loadfile(includePath))()
+	return true
+end
+
 
 function GetSystemPath(path)
 	if (not path) then
@@ -124,8 +186,6 @@ function DetectPlatform()
 	return os
 end
 
-
-PBuild = {}
 PBuild.FindPaladinApp = function()
 		local phandle = io.popen("query -f -v /boot '(name==Paladin)&&(BEOS:APP_SIG=application/x-vnd.dw-Paladin)'", "r")
 		local out = nil
@@ -148,6 +208,7 @@ PBuild.TestPaladinApp = function()
 		return success
 	end
 
+
 PBuild.EnsurePaladinApp = function()
 		if (not PBuild.TestPaladinApp()) then
 			local appPath = PBuild.FindPaladinApp()
@@ -165,6 +226,7 @@ PBuild.EnsurePaladinApp = function()
 		end
 		return true
 	end
+
 
 function NewProject(targetName, projType)
 	local out = {}
@@ -603,4 +665,28 @@ function NewProject(targetName, projType)
 		end
 	
 	return out
+end
+
+-----------------------------------------------------------------------------
+-- main script execution
+
+assert(loadfile(PBuild.workingDir .. "pbuildfile"))()
+
+local target = arg[1]
+if (target) then
+	if (_G[target]) then
+		if (type(_G[target]) == "function") then
+			_G[target]()
+		else
+			print("Target '" .. target .. "' is not a function, but needs to be")
+			os.exit(1)
+		end
+	else
+		print("Target '" .. target .. "' doesn't exist")
+		os.exit(1)
+	end
+else
+	if (build and type(build) == "function") then
+		build()
+	end
 end

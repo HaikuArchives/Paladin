@@ -1,4 +1,3 @@
-require "pbuild"
 
 gLibSources = {
 	"app/PApplication.cpp",
@@ -48,7 +47,6 @@ gLibSources = {
 libcharlemagne = NewProject("libcharlemagne.so", "sharedlib")
 libcharlemagne:SetSourceControl("hg");
 libcharlemagne:AddSources("Source Files", gLibSources)
-libcharlemagne:Build("libcharlemagne.pld")
 
 chartest = NewProject("chartest", "app")
 chartest:SetSourceControl("hg");
@@ -56,10 +54,27 @@ chartest:AddSources("Libcharlemagne", gLibSources)
 chartest:AddSources("Test Sources",
 					{ "chartest.cpp", "LuaBindings.cpp", "LuaSupport.cpp" })
 chartest:AddLibraries{"liblua.so", "libstdc++.r4.so"}
-chartest:Build("chartested.pld") 
 
 luacharlemagne = NewProject("luacharlemagne.so", "sharedlib")
 luacharlemagne:SetSourceControl("hg");
 luacharlemagne:AddSources("Source Files", gLibSources)
 luacharlemagne:AddSources("Lua Sources", { "LuaBindings.cpp", "LuaSupport.cpp" })
-luacharlemagne:Build("libcharlemagne_lua.pld")
+
+-- Build targets
+
+function clean()
+	Shell('rm -r \\(*')
+	Shell("rm libcharlemagne.pld chartested.pld libcharlemagne_lua.pld")
+	Shell("rm *.so")
+end
+
+function build()
+	libcharlemagne:Build("libcharlemagne.pld")
+	
+	QUIT_ON_BUILD_FAILURE = false
+	chartest:Build("chartested.pld") 
+	QUIT_ON_BUILD_FAILURE = true
+	
+	luacharlemagne:Build("libcharlemagne_lua.pld")
+end
+

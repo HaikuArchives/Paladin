@@ -1,0 +1,132 @@
+## INCOMPLETE: Methods need written (a lot of them)
+
+[global]
+Module=PMenu
+Header=PMenu.h
+CodeFileName=PMenu.cpp
+ParentHeaderName="PView.h"
+
+[includes]
+<Menu.h>
+
+[object]
+Name=PMenu
+FriendlyName=Menu
+Description=A menu
+UsesView=true
+ParentClass=public PView
+GetBackend=true
+
+[properties]
+Property bool(false) LabelFromMarked : If true, the menu's label is taken from the marked item in the menu
+	GetValue:IsLabelFromMarked(bool)
+	SetValue:SetLabelFromMarked(bool)
+
+Property bool(true) Enabled : The 'enabled' state for the item.
+	GetValue:IsEnabled(void)
+	SetValue:SetEnabled(bool)
+
+Property bool(false) RadioMode : If true, only one item in the menu can be marked at a time
+	GetValue:IsRadioMode(bool)
+	SetValue:SetRadioMode(bool)
+
+Property bool(true) TriggersEnabled : True if triggers are enabled
+	GetValue:AreTriggersEnabled(void)
+	SetValue:SetTriggersEnabled(bool)
+
+Property float(0.0) MaxContentWidth : The maximum width for item contents
+	GetValue:MaxContentWidth(void)
+	SetValue:SetMaxContentWidth(void)
+
+
+
+[methods]
+## TODO: Write embedded methods
+
+Method SetShortcut
+	Param char shortcut(char), 1 : character to define as the item's shortcut
+	Param int32 modifiers(int32)[0], 2 : constants for modifier keys, like the Control key.
+
+Method GetShortcut
+	CallName Shortcut
+	Return char shortcut(char), -1 : the item's shortcut character
+	Return uint32 modifiers(&uint32), 1 : the item's shortcut modifier keys
+
+Method Submenu
+	Return int64 id(int64), 1 : object ID of the submenu, if there is one.
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs outArgs(out);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	BMenu *submenu = backend->Submenu();
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	
+	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(submenu);
+	if (menuBackend)
+	{
+		PMenu *pmenu = menuBackend->GetOwner();
+		outArgs.AddInt64("id", pmenu->GetID());
+	}
+	else
+		outArgs.AddInt64("id", 0);
+	
+	return B_OK;
+EndEmbeddedCode
+
+Method Submenu
+	Return int64 id(int64), 1 : object ID of the owning menu, if there is one.
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs outArgs(out);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	BMenu *menu = backend->Menu();
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	
+	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(menu);
+	if (menuBackend)
+	{
+		PMenu *pmenu = menuBackend->GetOwner();
+		outArgs.AddInt64("id", pmenu->GetID());
+	}
+	else
+		outArgs.AddInt64("id", 0);
+	
+	return B_OK;
+EndEmbeddedCode
+
+[backend]
+Type=Single
+Class=BMenu
+InitCode=""
+
+## TODO: Add InvalidateLayout and DoLayout events

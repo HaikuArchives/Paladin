@@ -2,3 +2,5 @@ PBitmap - The interface between the object code and the backend is weird because
 PNode - Lots of methods which require list data (GetAttrInfo, etc.)
 PDragger - The backend is messy because it requires a BView target in the constructor and will not allow any changes.
 PShelf - Same reason as PShelf
+
+PMenu - Generated with manual tweaks -- backend definition needs to be in a shared header for PMenuItem's sake

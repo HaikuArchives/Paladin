@@ -27,11 +27,28 @@
 	Options:
 		-f, --fixed			PATTERN is to be treated as a literal string, not a pattern
 		-i, --ignore-case	perform a case-insensitive search
-		-r, --recursive		recurse into directories
 ]]
+
+local results = {}
 
 function GrepFile(path, options)
 	-- actually searches the file
+	if (not path) then
+		error("Nil path in GrepFile")
+	end
+	
+	local file = io.open(path, "r")
+	if (not file) then
+		print("Couldn't open file '" .. path .. "'")
+		os.exit(1)
+	end
+	
+	local data = {}
+	for line in file:lines() do
+		table.insert(data, line)
+	end
+	
+	--TODO: do the actual pattern matching
 end
 
 
@@ -40,3 +57,27 @@ function PrintResultsNormal(results)
 	-- The format is filename:\t<result>
 end
 
+-----------------------------------------------------------------------------
+-- Main script execution
+
+local optionList = {
+	["-f"] = "fixed",
+	["--fixed"] = "fixed",
+	["-i"] = "insensitive",
+	["--ignore-case"] = "insensitive",	
+}
+
+local options = {}
+local fileList = {}
+
+for i = 1, #arg do
+	if (optionList[arg[i]]) then
+		options[optionList[arg[i]]] = true
+	else
+		table.insert(fileList, arg[i])
+	end
+end
+
+for i = 1, #fileList do
+	GrepFile(fileList[i], options)
+end

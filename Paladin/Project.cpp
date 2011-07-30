@@ -1587,14 +1587,14 @@ DetectPlatform(void)
 	shell << "uname" << "-o";
 	shell.RunInPipe(osname, false);
 	
-	if (osname.Compare("Haiku\n") == 0)
+	if (osname.FindFirst("Haiku\n") == 0)
 	{
 		BPath libpath;
 		find_directory(B_BEOS_LIB_DIRECTORY,&libpath);
 		libpath.Append("libsupc++.so");
 		type =  BEntry(libpath.Path()).Exists() ? PLATFORM_HAIKU_GCC4 : PLATFORM_HAIKU;
 	}
-	else if (osname.Compare("Zeta\n") == 0)
+	else if (osname.FindFirst("Zeta\n") == 0)
 		type = PLATFORM_ZETA;
 	else
 		printf("Detected platform from uname: %s\n", osname.String());

@@ -15,6 +15,7 @@ Added an option to choose whether or not header files are automatically added to
 Better build feedback when Paladin is used to build from the command line
 Wording in certain parts of the interface has been clarified
 Project is re-linked only when necessary instead of each time the Make command is invoked
+Some project templates are automatically generated if the Templates folder is missing
 
 Bugfixes
 Fixed a problem with files dropped from Tracker
@@ -26,4 +27,4 @@ Scrollbar range is fixed in the Libraries window
 Internal changes
 Removed some hardcoded paths from certain parts of the code
 The shell scripts used to build the suite have been made to dynamically build all C++ files in the Paladin folder.
-Paladin now depends on the existence of the Lua language.
+Some Paladin features depend on the existence of the Lua language and are disabled if it is not installed.

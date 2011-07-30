@@ -11,10 +11,12 @@
 class TextFile : public BFile
 {
 public:
+					TextFile(void);
 					TextFile(const char *path, const uint32 &openmode);
 					TextFile(const entry_ref &ref, const uint32 &openmode);
 					~TextFile(void);
 	const char *	ReadLine(void);
+	ssize_t			WriteString(const char *string);
 	
 private:
 	void			InitObject(void);

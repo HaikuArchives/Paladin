@@ -8,15 +8,22 @@
 #include <OS.h>
 #include <string.h>
 
+TextFile::TextFile(void)
+	:	BFile()
+{
+	InitObject();
+}
+
+
 TextFile::TextFile(const char *path, const uint32 &openmode)
- : BFile(path,openmode)
+	:	BFile(path,openmode)
 {
 	InitObject();
 }
 
 
 TextFile::TextFile(const entry_ref &ref, const uint32 &openmode)
- : BFile(&ref,openmode)
+	:	BFile(&ref,openmode)
 {
 	InitObject();
 }
@@ -84,3 +91,15 @@ TextFile::ReadLine(void)
 	// do we need to add a \0?
 	return fReadBuffer;
 }
+
+
+ssize_t
+TextFile::WriteString(const char *string)
+{
+	if (!string)
+		return B_ERROR;
+	
+	size_t size = strlen(string);
+	return Write(string, size);
+}
+

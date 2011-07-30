@@ -1596,6 +1596,8 @@ DetectPlatform(void)
 	}
 	else if (osname.Compare("Zeta\n") == 0)
 		type = PLATFORM_ZETA;
+	else
+		printf("Detected platform from uname: %s\n", osname.String());
 	
 	return type;
-};
+}

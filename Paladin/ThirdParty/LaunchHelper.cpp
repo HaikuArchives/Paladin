@@ -375,6 +375,7 @@ LaunchHelper::AsString(void)
 
 
 ShellHelper::ShellHelper(void)
+	:	fCallback(NULL)
 {
 }
 

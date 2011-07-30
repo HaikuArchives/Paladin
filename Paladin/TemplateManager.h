@@ -14,6 +14,8 @@ public:
 			int32		CountFiles(void) const;
 			entry_ref *	FileAt(int32 index);
 			
+			const char *ProjectFileName(void) const;
+			
 			int32		TargetType(void) const;
 			entry_ref	GetRef(void) const;
 			void		PrintToStream(void);
@@ -26,6 +28,7 @@ private:
 			
 	status_t				fStatus;
 	BObjectList<entry_ref>	fRefList;
+	BString					fProjFileName;
 	int32					fTargetType;
 	BObjectList<entry_ref>	fLibList;
 	entry_ref				fRef;

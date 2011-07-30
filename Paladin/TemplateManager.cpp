@@ -207,6 +207,10 @@ ProjectTemplate::Load(entry_ref ref)
 					if (ref.name)
 						fLibList.AddItem(new entry_ref(ref));
 				}
+				else if (key.ICompare("PROJFILE") == 0)
+				{
+					fProjFileName = value;
+				}
 			}
 			linedata = file.ReadLine();
 		}

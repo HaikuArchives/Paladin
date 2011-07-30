@@ -84,6 +84,7 @@ class ShellHelper : public ArgList
 {
 public:
 						ShellHelper(void);
+						ShellHelper(const char *firstArg);
 	
 	ShellHelper &		operator =(const ShellHelper &list);
 

@@ -380,6 +380,13 @@ ShellHelper::ShellHelper(void)
 }
 
 
+ShellHelper::ShellHelper(const char *firstArg)
+	:	fCallback(NULL)
+{
+	AddArg(firstArg);
+}
+
+
 ShellHelper &
 ShellHelper::operator =(const ShellHelper &from)
 {

@@ -525,8 +525,7 @@ FindWindow::Replace(void)
 		BString errorString = "The following files had problems replacing the search terms:\n";
 		errorString << errorLog;
 		
-		BAlert *alert = new BAlert("Paladin", errorString.String(), "OK");
-		alert->Go();
+		ShowAlert(errorString.String());
 	}
 	
 	PostMessage(M_FIND);

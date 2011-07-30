@@ -376,11 +376,9 @@ ProjectWindow::MessageReceived(BMessage *msg)
 			if (!fSourceControl)
 				break;
 			
-			BAlert *revertAlert = new BAlert("Paladin", TR("This will undo all changes "
-															"since the last commit. "
-															"Continue?"), "Don't Revert",
-															"Revert");
-			if (revertAlert->Go() == 1)
+			int32 result = ShowAlert(TR("This will undo all changes since the last commit. "
+										"Continue?"), "Don't Revert", "Revert");
+			if (result == 1)
 			{
 				SCMOutputWindow *win = new SCMOutputWindow(TR("Revert"));
 				win->Show();
@@ -772,8 +770,7 @@ ProjectWindow::MessageReceived(BMessage *msg)
 						{
 							BString errmsg = TR("Couldn't find XXXXX. It may have been moved or renamed.");
 							errmsg.ReplaceFirst("XXXXX",abspath.String());
-							BAlert *alert = new BAlert("Paladin",errmsg.String(),"OK");
-							alert->Go();
+							ShowAlert(errmsg.String());
 						}
 					}
 				}
@@ -820,6 +817,14 @@ ProjectWindow::MessageReceived(BMessage *msg)
 		}
 		case M_SHOW_FIND_IN_PROJECT_FILES:
 		{
+			if (!gLuaAvailable)
+			{
+				ShowAlert("Paladin's multi-file Find window depends on Lua. It will "
+						"need to be installed if you wish to use this feature.", "OK",
+						NULL, NULL, B_STOP_ALERT);
+				break;
+			}
+			
 			FindWindow *findwin = new FindWindow();
 			findwin->Show();
 			break;
@@ -932,13 +937,12 @@ ProjectWindow::MessageReceived(BMessage *msg)
 				BString errmsg = TR("Your project does not have debugging information compiled ");
 				errmsg << TR("in and will need to be rebuilt to debug. Do you wish to rebuild and ")
 					<< TR("run the debugger?");
-				BAlert *alert = new BAlert("Paladin",
-													"Debugging information needs to compiled into "
-													"your project. This may take some time for large "
-													"projects. Do you wish to rebuild and run "
-													"the debugger?",
-											"Rebuild","Cancel");
-				if (alert->Go() == 1)
+				int32 result = ShowAlert("Debugging information needs to compiled into "
+										"your project. This may take some time for large "
+										"projects. Do you wish to rebuild and run "
+										"the debugger?",
+										"Rebuild","Cancel");
+				if (result == 1)
 					break;
 				
 				fProject->SetDebug(true);
@@ -1651,9 +1655,7 @@ ProjectWindow::DoBuild(int32 postbuild)
 		SourceFileItem *item = dynamic_cast<SourceFileItem*>(fProjectList->ItemAt(i));
 		if (item && item->GetDisplayState() == SFITEM_MISSING)
 		{
-			BAlert *alert = new BAlert("Paladin",
-					TR("The project cannot be built because some of its files are missing."),"OK");
-			alert->Go();
+			ShowAlert(TR("The project cannot be built because some of its files are missing."));
 			return;
 		}
 	}

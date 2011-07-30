@@ -567,8 +567,7 @@ App::OpenPartner(entry_ref ref)
 	BString errmsg;
 	errmsg	<< "Couldn't find a partner file for " << ref.name
 			<< " in " << refpath.GetFolder() << "/ .";
-	BAlert *alert = new BAlert("Paladin",errmsg.String(),"OK");
-	alert->Go();
+	ShowAlert(errmsg.String());
 }
 
 
@@ -749,8 +748,8 @@ App::LoadProject(const entry_ref &givenRef)
 			scmMsg << "This project is not under source control. Would you "
 					<< "like to use " << SCM2LongName(gDefaultSCM)
 					<< " for this project?\nYou will only be asked this one time.";
-			BAlert *scmAlert = new BAlert("Paladin", scmMsg.String(), "No", "Yes");
-			if (scmAlert->Go() == 1)
+			int32 result = ShowAlert(scmMsg.String(), "No", "Yes");
+			if (result == 1)
 				proj->SetSourceControl(gDefaultSCM);
 		}
 	}
@@ -775,8 +774,7 @@ App::LoadProject(const entry_ref &givenRef)
 		errmsg << TR("This project is on a read-only disk. You will not be able ");
 		errmsg << TR("to build it, but you can still view its files and do anything ");
 		errmsg << TR("else that does not require saving to the disk. ");
-		BAlert *alert = new BAlert("Paladin",errmsg.String(), "OK");
-		alert->Go();
+		ShowAlert(errmsg.String());
 	}
 }
 

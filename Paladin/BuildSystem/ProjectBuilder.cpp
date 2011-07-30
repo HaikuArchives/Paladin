@@ -232,9 +232,7 @@ ProjectBuilder::DoPostBuild(void)
 						launcher.SetRef("/boot/apps/Development/bdb/bdb");
 					else
 					{
-						BAlert *alert = new BAlert("Paladin","Paladin can't seem to "
-													"find the debugger. Sorry.","OK");
-						alert->Go();
+						ShowAlert("Paladin can't seem to find the debugger. Sorry.");
 						break;
 					}
 				}

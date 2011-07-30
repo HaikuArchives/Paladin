@@ -1,6 +1,6 @@
 NAME=Paladin
 TARGETNAME=Paladin.new
-PLATFORM=HaikuGCC4
+PLATFORM=R5
 SCM=hg
 GROUP=Source Files
 EXPANDGROUP=yes
@@ -171,8 +171,8 @@ LIBRARY=/boot/develop/lib/x86/libbe.so
 LIBRARY=/boot/develop/lib/x86/libtracker.so
 LIBRARY=/boot/develop/lib/x86/libtranslation.so
 LIBRARY=/boot/common/lib/libpcre.so
-LIBRARY=/boot/develop/lib/x86/libstdc++.so
 LIBRARY=/boot/develop/lib/x86/libsupc++.so
+LIBRARY=/boot/develop/lib/x86/libstdc++.so
 RUNARGS=
 CCDEBUG=yes
 CCPROFILE=no

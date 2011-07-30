@@ -37,6 +37,7 @@ bool gFastDepAvailable = false;
 bool gHgAvailable = false;
 bool gGitAvailable = false;
 bool gSvnAvailable = false;
+bool gLuaAvailable = false;
 BString gDefaultEmail;
 
 Project *gCurrentProject = NULL;
@@ -107,6 +108,9 @@ InitGlobals(void)
 	if (system("svn > /dev/null 2>&1") == 1)
 		gSvnAvailable = true;
 	
+	if (system("lua -v > /dev/null 2>&1") == 0)
+		gLuaAvailable = true;
+	
 	gProjectPath.SetTo(gSettings.GetString("projectpath",PROJECT_PATH));
 	gLastProjectPath.SetTo(gSettings.GetString("lastprojectpath",PROJECT_PATH));
 	
@@ -134,8 +138,8 @@ MakeProjectFile(DPath folder, const char *name, const char *data, const char *ty
 	{
 		BString errstr = path.GetFullPath();
 		errstr << TR(" already exists. Do you want to overwrite it?");
-		BAlert *alert = new BAlert("Paladin",errstr.String(),TR("Overwrite"),TR("Cancel"));
-		if (alert->Go() == 1)
+		int32 result = ShowAlert(errstr.String(),TR("Overwrite"),TR("Cancel"));
+		if (result == 1)
 			return ref;
 	}
 	
@@ -567,8 +571,9 @@ ShowAlert(const char *message, const char *button1, const char *button2,
 	}
 	else
 	{
-		BAlert *alert = new BAlert("Paladin", message, button1, button2, button3,
-									B_WIDTH_AS_USUAL, type);
+		BString label1 = button1 ? button1 : "OK";
+		BAlert *alert = new BAlert("Paladin", message, label1.String(),
+									button2, button3, B_WIDTH_AS_USUAL, type);
 		result = alert->Go();
 	}
 	return result;

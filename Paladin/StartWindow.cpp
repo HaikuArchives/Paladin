@@ -256,11 +256,9 @@ StartWindow::MessageReceived(BMessage *msg)
 		{
 			if (!gHgAvailable && !gGitAvailable && !gSvnAvailable)
 			{
-				BAlert *alert = new BAlert("Paladin", "Online import requires Mercurial, "
-													"Git, and/or Subversion to be installed, "
-													"but Paladin can't find them. Sorry.",
-											"OK");
-				alert->Go();
+				ShowAlert("Online import requires Mercurial, "
+							"Git, and/or Subversion to be installed, "
+							"but Paladin can't find them. Sorry.");
 			}
 			else
 			{

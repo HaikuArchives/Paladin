@@ -252,8 +252,7 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 			if (item)
 			{
 				BString alertmsg = TR("This cannot be undone. Delete module?");
-				BAlert *alert = new BAlert("ModMan",alertmsg.String(),TR("Cancel"),TR("Delete"));
-				if (alert->Go())
+				if (ShowAlert("ModMan",alertmsg.String(),TR("Cancel"),TR("Delete")))
 				{
 					gCodeLib.DeleteModule(item->Text());
 					fCurrentModule = NULL;
@@ -326,10 +325,9 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 			if (!mod)
 				break;
 			
-			BAlert *alert = new BAlert("ModMan",
-									TR("These files (except libraries) will be permanently deleted. Remove them?"),
+			int32 result = ShowAlert(TR("These files (except libraries) will be permanently deleted. Remove them?"),
 									TR("Cancel"),TR("Remove"));
-			if (!alert->Go())
+			if (!result)
 				break;
 			
 			for (int32 i = fFileList->CountItems() - 1; i >= 0; i--)

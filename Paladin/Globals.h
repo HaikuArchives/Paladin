@@ -35,7 +35,7 @@ status_t	RunPipedCommand(const char *command, BString &out,
 							bool redirectStdErr);
 status_t	BeIDE2Paladin(const char *path, BString &outpath);
 bool		IsBeIDEProject(const entry_ref &ref);
-int32		ShowAlert(const char *message, const char *button1,
+int32		ShowAlert(const char *message, const char *button1 = NULL,
 						const char *button2 = NULL, const char *button3 = NULL,
 						alert_type type = B_INFO_ALERT);
 DPath		GetSystemPath(directory_which which);
@@ -65,6 +65,7 @@ extern bool gFastDepAvailable;
 extern bool gHgAvailable;
 extern bool gGitAvailable;
 extern bool gSvnAvailable;
+extern bool gLuaAvailable;
 extern BString gDefaultEmail;
 
 extern uint8 gCPUCount;

@@ -25,6 +25,7 @@ class StatCache;
 //#define DISABLE_ONLINE_IMPORT
 
 void		InitGlobals(void);
+void		EnsureTemplates(void);
 entry_ref	MakeProjectFile(DPath folder, const char *name,
 							const char *data = NULL,
 							const char *type = NULL);

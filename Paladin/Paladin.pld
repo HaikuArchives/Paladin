@@ -1,6 +1,6 @@
 NAME=Paladin
 TARGETNAME=Paladin.new
-PLATFORM=R5
+PLATFORM=HaikuGCC4
 SCM=hg
 GROUP=Source Files
 EXPANDGROUP=yes

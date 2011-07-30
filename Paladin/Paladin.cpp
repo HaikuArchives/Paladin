@@ -105,6 +105,7 @@ App::App(void)
 {
 	InitFileTypes();
 	InitGlobals();
+	EnsureTemplates();
 	
 	gProjectList = new LockableList<Project>(20,true);
 	gProjectWindowPoint.Set(5,24);

@@ -2,6 +2,7 @@
 
 #include <Application.h>
 #include <ctype.h>
+#include <Directory.h>
 #include <File.h>
 #include <Path.h>
 #include <Roster.h>
@@ -18,6 +19,7 @@
 #include "SourceTypeLib.h"
 #include "StatCache.h"
 #include <stdlib.h>
+#include "TextFile.h"
 
 DPath gAppPath;
 DPath gBackupPath;
@@ -123,6 +125,66 @@ InitGlobals(void)
 	
 	
 	gCodeLib.ScanFolders();
+}
+
+
+void
+EnsureTemplates(void)
+{
+	// Because creating a new project depends on the existence of the Templates folder,
+	// make sure that we have some (very) basic templates to work with if the folder
+	// has been deleted.
+	DPath templatePath = gAppPath.GetFolder();
+	templatePath << "Templates";
+	
+	bool missing = false;
+	BDirectory tempDir;
+	if (!BEntry(templatePath.GetFullPath()).Exists())
+	{
+		BDirectory appDir(gAppPath.GetFolder());
+		appDir.CreateDirectory("Templates", &tempDir);
+		missing = true;
+	}
+	else
+	{
+		tempDir.SetTo(templatePath.GetFullPath());
+		if (tempDir.CountEntries() == 0)
+			missing = true;
+	}
+	
+	if (missing)
+	{
+		BDirectory dir;
+		tempDir.CreateDirectory("Empty Application", &dir);
+		tempDir.CreateDirectory("Kernel Driver", &dir);
+		tempDir.CreateDirectory("Shared Library or Addon", &dir);
+		tempDir.CreateDirectory("Static Library", &dir);
+		
+		DPath filePath;
+		TextFile file;
+		
+		filePath = templatePath;
+		filePath << "Empty Application/TEMPLATEINFO";
+		file.SetTo(filePath.GetFullPath(), B_CREATE_FILE | B_READ_WRITE);
+		file.WriteString("TYPE=Application\nLIB=B_BEOS_LIB_DIRECTORY/libsupc++.so\n");
+		
+		filePath = templatePath;
+		filePath << "Kernel Driver/TEMPLATEINFO";
+		file.SetTo(filePath.GetFullPath(), B_CREATE_FILE | B_READ_WRITE);
+		file.WriteString("TYPE=Driver\n");
+		
+		filePath = templatePath;
+		filePath << "Shared Library or Addon/TEMPLATEINFO";
+		file.SetTo(filePath.GetFullPath(), B_CREATE_FILE | B_READ_WRITE);
+		file.WriteString("TYPE=Shared\n");
+		
+		filePath = templatePath;
+		filePath << "Static Library/TEMPLATEINFO";
+		file.SetTo(filePath.GetFullPath(), B_CREATE_FILE | B_READ_WRITE);
+		file.WriteString("TYPE=Static\n");
+		
+		file.Unset();
+	}
 }
 
 

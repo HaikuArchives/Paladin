@@ -1,4 +1,7 @@
 TODO:
+	Make PObGen act like a "standardized" command-line build tool
+	New executables to install in /common/bin: luagrep, luare, pobgen, pbuild
+	Add a check for Lua availability and put checks in place for dependent features
 	Expand template system to allow for Tracker Addon and Translator templates -- multiple .pld files, etc.
 	Implement support for Prebuild and Postbuild groups
 	Write a template for a Translator testing framework

@@ -24,9 +24,7 @@ public:
 	void	MessageReceived(BMessage *msg);
 	void	OpenFile(entry_ref ref, int32 line = -1);
 	void	OpenPartner(entry_ref ref);
-	Project *CreateNewProject(const char *projname, const char *target,
-							int32 type, const char *path, int32 scmType,
-							bool create_folder);
+	Project *CreateNewProject(const BMessage &settings);
 	bool	QuickImportProject(DPath folder);
 
 private:

@@ -106,6 +106,13 @@ ProjectTemplate::FileAt(int32 index)
 }
 
 
+const char *
+ProjectTemplate::ProjectFileName(void) const
+{
+	return fProjFileName.String();
+}
+
+
 int32
 ProjectTemplate::TargetType(void) const
 {

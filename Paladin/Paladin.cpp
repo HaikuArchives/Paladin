@@ -19,6 +19,7 @@
 #include "ErrorParser.h"
 #include "FileUtils.h"
 #include "Globals.h"
+#include "LaunchHelper.h"
 #include "MsgDefs.h"
 #include "ObjectList.h"
 #include "PLocale.h"
@@ -354,34 +355,21 @@ App::MessageReceived(BMessage *msg)
 		}
 		case M_CREATE_PROJECT:
 		{
-			BString name, target, path;
-			int32 type, scmtype;
-			bool createFolder;
-			if (msg->FindString("name",&name) == B_OK &&
-				msg->FindString("target",&target) == B_OK &&
-				msg->FindInt32("type",&type) == B_OK &&
-				msg->FindString("path",&path) == B_OK &&
-				msg->FindInt32("scmtype", &scmtype) == B_OK &&
-				msg->FindBool("createfolder",&createFolder) == B_OK)
+			Project *proj = CreateNewProject(*msg);
+			
+			entry_ref addRef;
+			int32 i = 0;
+			while (msg->FindRef("libs",i++,&addRef) == B_OK)
 			{
-				Project *proj = CreateNewProject(name.String(),target.String(),
-												type,path.String(),scmtype,
-												createFolder);
-				
-				entry_ref addRef;
-				int32 i = 0;
-				while (msg->FindRef("libs",i++,&addRef) == B_OK)
-				{
-					if (BEntry(&addRef).Exists())
-						proj->AddLibrary(DPath(addRef).GetFullPath());
-				}
-				
-				i = 0;
-				BMessage addMsg(M_IMPORT_REFS);
-				while (msg->FindRef("refs",i++,&addRef) == B_OK)
-					addMsg.AddRef("refs",&addRef);
-				PostToProjectWindow(&addMsg,NULL);
+				if (BEntry(&addRef).Exists())
+					proj->AddLibrary(DPath(addRef).GetFullPath());
 			}
+			
+			i = 0;
+			BMessage addMsg(M_IMPORT_REFS);
+			while (msg->FindRef("refs",i++,&addRef) == B_OK)
+				addMsg.AddRef("refs",&addRef);
+			PostToProjectWindow(&addMsg,NULL);
 			break;
 		}
 		case M_QUICK_IMPORT:
@@ -573,14 +561,141 @@ App::OpenPartner(entry_ref ref)
 
 
 Project *
-App::CreateNewProject(const char *projname, const char *target,	int32 type,
-						const char *path, int32 scmType, bool create_folder)
+App::CreateNewProject(const BMessage &settings)
 {
-	Project *proj = Project::CreateProject(projname,target,type,path,create_folder);
+	Project *proj = NULL;
+	
+	BString projectName, targetName, projectPath, templateName;
+	int32 projectType, scmType;
+	bool createFolder;
+	
+	settings.FindString("name",&projectName);
+	settings.FindString("target",&targetName);
+	settings.FindInt32("type",&projectType);
+	settings.FindString("path",&projectPath);
+	settings.FindInt32("scmtype", &scmType);
+	settings.FindBool("createfolder",&createFolder);
+	settings.FindString("template", &templateName);
+	
+	if (templateName.CountChars() > 0)
+	{
+		// Templates are now a directory with a TEMPLATEINFO file. All files in the
+		// directory are copies, allowing for much greater flexibility than before.
+		
+		BString projectFileName(projectName);
+		projectFileName << ".pld";
+		
+		DPath templatePath(gAppPath.GetFolder());
+		templatePath << "Templates" << templateName;
+		
+		// Copy the contents of the chosen template folder to the project path
+		DPath sourcePath(templatePath);
+		DPath destPath(gProjectPath);
+		
+		if (createFolder)
+		{
+			destPath << targetName;
+			create_directory(destPath.GetFullPath(), 0777);
+		}
+		
+		BString wildcard("'");
+		wildcard << sourcePath.GetFullPath() << "'/*";
+		ShellHelper shell("cp -a ");
+		shell << wildcard;
+		shell.AddQuotedArg(destPath.GetFullPath());
+		shell.Run();
+		
+		// The copy command copies *everything*, so we have to delete the
+		// TEMPLATEINFO file.
+		DPath templateInfo(destPath);
+		destPath << "TEMPLATEINFO";
+		BEntry infoEntry(destPath.GetFullPath());
+		infoEntry.Remove();
+		infoEntry.Unset();
+		
+		DPath finalPath;
+		
+		// Load project and set info or create one, if needed.
+		
+		// If the settings contain the name of a .pld project file, we'll search
+		// for that first. Assuming that it exists, we'll rename that file to the
+		// project name specified. If it doesn't exist or the .pld name is empty,
+		// we'll create a new project with the appropriate name.
+		
+		// The pldname field comes from the TEMPLATEINFO file, which can designate
+		// the main project file in a template. This allows a template to have
+		// multiple project files, such as for the Tracker Add-on development framework
+		// which has both a project file for generating the actual addon and another
+		// one which is the testing framework.
+		bool createProjFile = true;
+		BString pldName;
+		if (settings.FindString("pldname", &pldName) == B_OK)
+		{
+			// If a .pld project file was specified in TEMPLATEINFO, check to see if
+			// the file exists and rename it. If it doesn't exist, we'll create a new
+			// file, and if a .pld file already exists with the intended name, we won't
+			// do anything except tell the user what's happened.
+			DPath oldPldNamePath(destPath);
+			oldPldNamePath << pldName;
+			
+			BEntry oldPldNameEntry(oldPldNamePath.GetFullPath());
+			
+			DPath newPldNamePath(destPath);
+			newPldNamePath << projectName;
+			
+			BEntry newPldNameEntry(newPldNamePath.GetFullPath());
+			if (newPldNameEntry.Exists())
+			{
+				// createProjFile is false here only if there is a .pld file with the
+				// user's chosen project name. If that is the case, we keep both files and
+				// let the user sort it out.
+				BString errMsg;
+				errMsg << "Project file '" << projectName << ".pld' already exists. The "
+					"original file for this template is '" << pldName << "'. You'll need "
+					"to open the project folder and figure out which one you wish to keep.";
+				ShowAlert(errMsg);
+				createProjFile = false;
+				
+				finalPath = newPldNamePath;
+			}
+			else
+			if (!createProjFile && oldPldNameEntry.Exists())
+			{
+				oldPldNameEntry.Rename(projectName.String());
+				createProjFile = false;
+				
+				finalPath = newPldNamePath;
+			}
+		}
+		
+		if (createProjFile)
+		{
+			proj = Project::CreateProject(projectName.String(), targetName.String(),
+									projectType, projectPath.String(), createFolder);
+			if (proj)
+				finalPath = proj->GetPath();
+		}
+		else
+		{
+			proj = new Project();
+			if (proj->Load(finalPath.GetFullPath()) != B_OK)
+			{
+				delete proj;
+				return NULL;
+			}
+		}
+	}
+	else
+	{
+		// This case is for stuff like the Quick Import feature
+		proj = Project::CreateProject(projectName.String(), targetName.String(),
+									projectType, projectPath.String(), createFolder);
+	}
+	
 	if (!proj)
 		return NULL;
 	
-	scm_t detectedSCM = DetectSCM(path);
+	scm_t detectedSCM = DetectSCM(projectPath);
 	proj->SetSourceControl(detectedSCM == SCM_NONE ? (scm_t)scmType : detectedSCM);
 	
 	gCurrentProject = proj;
@@ -613,12 +728,19 @@ App::QuickImportProject(DPath folder)
 	// Quickly makes a project in a folder by importing all resource files and C++ sources.
 	if (!BEntry(folder.GetFullPath()).Exists())
 		return false;
+
+	BMessage settings;
+	settings.AddString("name", folder.GetFileName());
+	settings.AddString("target", folder.GetFileName());
+	// skipping templatename field on purpose
+	settings.AddInt32("type", PROJECT_GUI);
+	settings.AddString("path", folder.GetFullPath());
+	settings.AddInt32("scmtype", gDefaultSCM);
+	settings.AddBool("createfolder", false);
 	
 	DPath path(folder);
 	BEntry entry(path.GetFullPath());
-	Project *proj = CreateNewProject(folder.GetFileName(),folder.GetFileName(),
-									PROJECT_GUI,folder.GetFullPath(),gDefaultSCM,
-									false);
+	Project *proj = CreateNewProject(settings);
 	if (!proj)
 		return false;
 	

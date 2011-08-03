@@ -232,7 +232,8 @@ TemplateWindow::MessageReceived(BMessage *msg)
 			projmsg.AddString("target",fTargetBox->Text());
 			projmsg.AddInt32("type",ptemp->TargetType());
 			projmsg.AddString("path",fPathBox->Path());
-			
+			projmsg.AddString("template", ptemp->GetRef().name);
+			projmsg.AddString("pldfile", ptemp->ProjectFileName());
 			
 			BMenu *scmMenu = fSCMChooser->Menu();
 			int32 scm = scmMenu->IndexOf(scmMenu->FindMarked());

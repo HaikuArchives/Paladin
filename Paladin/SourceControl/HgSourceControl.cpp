@@ -271,7 +271,7 @@ HgSourceControl::Revert(const char *relPath)
 	command	<< "revert";
 	
 	if (relPath)
-		command << " '" << relPath << "'";
+		command << " '" << relPath << "' --no-backup";
 	else
 		command << " --all";
 	

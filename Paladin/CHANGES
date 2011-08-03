@@ -3,6 +3,7 @@ Changes in Paladin 1.4
 New Features
 The luare command has been added -- a sed replacement which uses Lua regular expressions.
 Project-wide file search and replace...FINALLY.
+There is a new template -- a Tracker Addon development framework
 
 User Interface
 Files are now sorted first by type and then by name
@@ -28,3 +29,4 @@ Internal changes
 Removed some hardcoded paths from certain parts of the code
 The shell scripts used to build the suite have been made to dynamically build all C++ files in the Paladin folder.
 Some Paladin features depend on the existence of the Lua language and are disabled if it is not installed.
+Template-handling code is much more flexible now.

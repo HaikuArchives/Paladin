@@ -239,11 +239,14 @@ TemplateWindow::MessageReceived(BMessage *msg)
 			int32 scm = scmMenu->IndexOf(scmMenu->FindMarked());
 			projmsg.AddInt32("scmtype",scm);
 			
-			for (int32 i = 0; i < ptemp->CountFiles(); i++)
-				projmsg.AddRef("refs",ptemp->FileAt(i));
-			
-			for (int32 i = 0; i < ptemp->CountLibs(); i++)
-				projmsg.AddRef("libs",ptemp->LibAt(i));
+			if (!ptemp->ProjectFileName())
+			{
+				for (int32 i = 0; i < ptemp->CountFiles(); i++)
+					projmsg.AddRef("refs",ptemp->FileAt(i));
+				
+				for (int32 i = 0; i < ptemp->CountLibs(); i++)
+					projmsg.AddRef("libs",ptemp->LibAt(i));
+			}
 			
 			projmsg.AddBool("createfolder",(fCreateFolder->Value() == B_CONTROL_ON));
 			be_app_messenger.SendMessage(&projmsg,&reply);

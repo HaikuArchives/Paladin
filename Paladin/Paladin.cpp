@@ -355,21 +355,7 @@ App::MessageReceived(BMessage *msg)
 		}
 		case M_CREATE_PROJECT:
 		{
-			Project *proj = CreateNewProject(*msg);
-			
-			entry_ref addRef;
-			int32 i = 0;
-			while (msg->FindRef("libs",i++,&addRef) == B_OK)
-			{
-				if (BEntry(&addRef).Exists())
-					proj->AddLibrary(DPath(addRef).GetFullPath());
-			}
-			
-			i = 0;
-			BMessage addMsg(M_IMPORT_REFS);
-			while (msg->FindRef("refs",i++,&addRef) == B_OK)
-				addMsg.AddRef("refs",&addRef);
-			PostToProjectWindow(&addMsg,NULL);
+			CreateNewProject(*msg);
 			break;
 		}
 		case M_QUICK_IMPORT:
@@ -565,9 +551,9 @@ App::CreateNewProject(const BMessage &settings)
 {
 	Project *proj = NULL;
 	
-	BString projectName, targetName, projectPath, templateName;
+	BString projectName, targetName, projectPath, templateName, pldName;
 	int32 projectType, scmType;
-	bool createFolder;
+	bool createFolder, populateProject = true;
 	
 	settings.FindString("name",&projectName);
 	settings.FindString("target",&targetName);
@@ -576,7 +562,8 @@ App::CreateNewProject(const BMessage &settings)
 	settings.FindInt32("scmtype", &scmType);
 	settings.FindBool("createfolder",&createFolder);
 	settings.FindString("template", &templateName);
-	
+	settings.FindString("pldfile", &pldName);
+
 	if (templateName.CountChars() > 0)
 	{
 		// Templates are now a directory with a TEMPLATEINFO file. All files in the
@@ -594,7 +581,7 @@ App::CreateNewProject(const BMessage &settings)
 		
 		if (createFolder)
 		{
-			destPath << targetName;
+			destPath << projectName;
 			create_directory(destPath.GetFullPath(), 0777);
 		}
 		
@@ -608,8 +595,8 @@ App::CreateNewProject(const BMessage &settings)
 		// The copy command copies *everything*, so we have to delete the
 		// TEMPLATEINFO file.
 		DPath templateInfo(destPath);
-		destPath << "TEMPLATEINFO";
-		BEntry infoEntry(destPath.GetFullPath());
+		templateInfo << "TEMPLATEINFO";
+		BEntry infoEntry(templateInfo.GetFullPath());
 		infoEntry.Remove();
 		infoEntry.Unset();
 		
@@ -628,8 +615,7 @@ App::CreateNewProject(const BMessage &settings)
 		// which has both a project file for generating the actual addon and another
 		// one which is the testing framework.
 		bool createProjFile = true;
-		BString pldName;
-		if (settings.FindString("pldname", &pldName) == B_OK)
+		if (pldName.CountChars() > 0)
 		{
 			// If a .pld project file was specified in TEMPLATEINFO, check to see if
 			// the file exists and rename it. If it doesn't exist, we'll create a new
@@ -637,11 +623,10 @@ App::CreateNewProject(const BMessage &settings)
 			// do anything except tell the user what's happened.
 			DPath oldPldNamePath(destPath);
 			oldPldNamePath << pldName;
-			
 			BEntry oldPldNameEntry(oldPldNamePath.GetFullPath());
 			
 			DPath newPldNamePath(destPath);
-			newPldNamePath << projectName;
+			newPldNamePath << projectFileName;
 			
 			BEntry newPldNameEntry(newPldNamePath.GetFullPath());
 			if (newPldNameEntry.Exists())
@@ -654,15 +639,15 @@ App::CreateNewProject(const BMessage &settings)
 					"original file for this template is '" << pldName << "'. You'll need "
 					"to open the project folder and figure out which one you wish to keep.";
 				ShowAlert(errMsg);
-				createProjFile = false;
+				populateProject = createProjFile = false;
 				
 				finalPath = newPldNamePath;
 			}
 			else
-			if (!createProjFile && oldPldNameEntry.Exists())
+			if (oldPldNameEntry.Exists())
 			{
-				oldPldNameEntry.Rename(projectName.String());
-				createProjFile = false;
+				oldPldNameEntry.Rename(projectFileName.String());
+				populateProject = createProjFile = false;
 				
 				finalPath = newPldNamePath;
 			}
@@ -716,6 +701,23 @@ App::CreateNewProject(const BMessage &settings)
 		entry_ref newprojref;
 		entry.GetRef(&newprojref);
 		UpdateRecentItems(newprojref);
+	}
+	
+	if (populateProject)
+	{
+		entry_ref addRef;
+		int32 i = 0;
+		while (settings.FindRef("libs",i++,&addRef) == B_OK)
+		{
+			if (BEntry(&addRef).Exists())
+				proj->AddLibrary(DPath(addRef).GetFullPath());
+		}
+		
+		i = 0;
+		BMessage addMsg(M_IMPORT_REFS);
+		while (settings.FindRef("refs",i++,&addRef) == B_OK)
+			addMsg.AddRef("refs",&addRef);
+		PostToProjectWindow(&addMsg,NULL);
 	}
 	
 	return proj;

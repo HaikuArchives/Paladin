@@ -83,6 +83,8 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	r.bottom = r.top + fNameBox->Bounds().Height();
 	fNameBox->ResizeTo(bounds.Width() - 20.0,r.Height());
 	fNameBox->SetDivider(divider);
+	SetToolTip(fNameBox, "The name of your project. It can be the same as the Target Name, "
+						"but it does not have to be.");
 	
 	r.OffsetBy(0,r.IntegerHeight() + 10);
 	fTargetBox = new AutoTextControl(r,"targetbox",TR("Target Name:"),"BeApp",
@@ -93,6 +95,7 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	r.bottom = r.top + fTargetBox->Bounds().Height();
 	fTargetBox->ResizeTo(bounds.Width() - 20.0,r.Height());
 	fTargetBox->SetDivider(divider);
+	SetToolTip(fTargetBox, "The name of the compiled application or library");
 	
 	if (!BEntry(PROJECT_PATH).Exists())
 		create_directory(PROJECT_PATH,0777);
@@ -105,6 +108,7 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	r.bottom = r.top + fPathBox->Bounds().Height();
 	fPathBox->ResizeTo(bounds.Width() - 20.0,r.Height());
 	fPathBox->SetDivider(divider);
+	SetToolTip(fPathBox, "Set the location for your project.");
 	
 	menu = new BMenu("SCM Chooser");
 	menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
@@ -135,6 +139,7 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fSCMChooser = new BMenuField(r, "scmchooser", "Source Control: ", menu);
 	top->AddChild(fSCMChooser);
 	fSCMChooser->SetDivider(divider);
+	SetToolTip(fSCMChooser, "Choose the source control manager for your project, if any.");
 	
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(gDefaultSCM)->SetMarked(true);
@@ -159,6 +164,8 @@ TemplateWindow::TemplateWindow(const BRect &frame)
 	fCreateFolder->MoveTo(divider + 10.0, r.top);
 	fCreateFolder->SetValue(B_CONTROL_ON);
 	top->AddChild(fCreateFolder);
+	SetToolTip(fCreateFolder, "If checked, a folder for your project will be created "
+							"in the folder in the Location box above.");
 	
 	r.OffsetBy(0,r.Height() + 5.0);
 	fOK = new BButton(r,"ok",TR("Create Project…"), new BMessage(M_CREATE_PROJECT));

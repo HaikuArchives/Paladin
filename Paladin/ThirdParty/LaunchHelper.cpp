@@ -412,6 +412,21 @@ ShellHelper::AddEscapedArg(const char *string)
 }
 
 
+ShellHelper &
+ShellHelper::AddQuotedArg(const char *string)
+{
+	if (string && strlen(string) > 0)
+	{
+		BString str(string);
+		str.CharacterEscape("\"", '\\');
+		str.Prepend("\"");
+		str.Append("\"");
+		AddArg(str.String());
+	}
+	return *this;
+}
+
+
 void
 ShellHelper::SetUpdateCallback(ShellHelperCallback cb)
 {

@@ -87,8 +87,9 @@ public:
 						ShellHelper(const char *firstArg);
 	
 	ShellHelper &		operator =(const ShellHelper &list);
-
+	
 	ShellHelper	&		AddEscapedArg(const char *string);
+	ShellHelper	&		AddQuotedArg(const char *string);
 	
 	void				SetUpdateCallback(ShellHelperCallback cb);
 	ShellHelperCallback	GetUpdateCallback(void) const;

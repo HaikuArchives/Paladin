@@ -484,13 +484,22 @@ FindWindow::Replace(void)
 	i++;
 	while (gitem)
 	{
-		BString replaceTerms;
-		replaceTerms << "'" << fFindBox->Text() << "' '" << fReplaceBox->Text()
-					<< "'";
+		BString findText(fFindBox->Text()), replaceText(fReplaceBox->Text());
 		
+		if (!fIsRegEx)
+		{
+			findText.CharacterEscape("^$()%.[]*+-?", '%');
+			replaceText.CharacterEscape("^$()%.[]*+-?", '%');
+		}
+		
+		findText.CharacterEscape("'", '\\');
+		replaceText.CharacterEscape("'", '\\');
+		
+		BString replaceTerms;
+		replaceTerms << "'" << findText << "' '" << replaceText << "'";
 		
 		DPath file(gitem->GetRef());
-
+		
 		ShellHelper shell;
 		shell << "luare" << replaceTerms;
 		shell.AddEscapedArg(file.GetFullPath());
@@ -546,10 +555,19 @@ FindWindow::ReplaceAll(void)
 	
 	for (int32 i = 0; i < fResultList->CountItems(); i++)
 	{
-		BString replaceTerms;
-		replaceTerms << "'" << fFindBox->Text() << "' '" << fReplaceBox->Text()
-					<< "'";
+		BString findText(fFindBox->Text()), replaceText(fReplaceBox->Text());
 		
+		if (!fIsRegEx)
+		{
+			findText.CharacterEscape("^$()%.[]*+-?", '%');
+			replaceText.CharacterEscape("^$()%.[]*+-?", '%');
+		}
+		
+		findText.CharacterEscape("'", '\\');
+		replaceText.CharacterEscape("'", '\\');
+		
+		BString replaceTerms;
+		replaceTerms << "'" << findText << "' '" << replaceText << "'";
 		
 		GrepListItem *gitem = (GrepListItem*)fResultList->ItemAt(i);
 		DPath file(gitem->GetRef());
@@ -558,7 +576,7 @@ FindWindow::ReplaceAll(void)
 		shell << "luare" << replaceTerms;
 		shell.AddEscapedArg(file.GetFullPath());
 		shell.AddEscapedArg(file.GetFullPath());
-		
+printf("replace command: %s\n", shell.AsString().String());
 		int32 outvalue = shell.Run();
 		if (outvalue)
 		{

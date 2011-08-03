@@ -93,6 +93,8 @@ StartWindow::StartWindow(void)
 									"OpenRecentButtonDown.png", M_OPEN_SELECTION);
 	top->AddChild(fOpenRecentButton);
 	fOpenRecentButton->MoveTo(10,fOpenButton->Frame().bottom + 10.0);
+	SetToolTip(fOpenRecentButton,TR("Open a project in the list on the right. You "
+									"can also press Command + a number key."));
 	
 	label = MakeLabel(fOpenRecentButton,TR("Open the selected project"));
 	top->AddChild(label);
@@ -109,7 +111,8 @@ StartWindow::StartWindow(void)
 											B_FOLLOW_ALL, false, true);
 	top->AddChild(scrollView);
 	fListView->SetInvocationMessage(new BMessage(M_OPEN_SELECTION));
-
+	SetToolTip(fListView, "Open a recent project. You can also press Command + a number key.");
+	
 	fQuickImportButton = MakeButton("quickimport","QuickImportButtonUp.png",
 									"QuickImportButtonDown.png",M_SHOW_IMPORT);
 	top->AddChild(fQuickImportButton);

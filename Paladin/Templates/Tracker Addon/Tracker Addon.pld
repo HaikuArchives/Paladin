@@ -5,7 +5,6 @@ SCM=none
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=TrackerAddon.cpp
-DEPENDENCY=/boot/home/projects/Tracker Addon/TrackerAddon.h
 SOURCEFILE=TrackerAddon.rsrc
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp

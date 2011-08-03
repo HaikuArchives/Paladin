@@ -14,7 +14,7 @@ TODO:
 		assumptions made when the drag is performed -- pointers are used.
 
 Features to implement / consider:
-	Check in selected files
+	Check in selected files -- this requires reworking of the ActOnSelectedFiles framework because of the multistep nature of the feature
 	In-app help system
 	Bazaar support?
 	CVS import support

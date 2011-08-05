@@ -489,7 +489,7 @@ FindWindow::Replace(void)
 		if (!fIsRegEx)
 		{
 			findText.CharacterEscape("^$()%.[]*+-?", '%');
-			replaceText.CharacterEscape("^$()%.[]*+-?", '%');
+			replaceText.CharacterEscape("%", '%');
 		}
 		
 		findText.CharacterEscape("'", '\\');
@@ -560,7 +560,7 @@ FindWindow::ReplaceAll(void)
 		if (!fIsRegEx)
 		{
 			findText.CharacterEscape("^$()%.[]*+-?", '%');
-			replaceText.CharacterEscape("^$()%.[]*+-?", '%');
+			replaceText.CharacterEscape("%", '%');
 		}
 		
 		findText.CharacterEscape("'", '\\');

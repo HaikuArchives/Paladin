@@ -1,5 +1,6 @@
 TODO:
 	Make PObGen act like a "standardized" command-line build tool
+	Add an option in Project Settings to change the SCM
 	New executables to install in /common/bin: luagrep, luare, pobgen, pbuild
 	Implement support for Prebuild and Postbuild groups
 	Write a template for a Translator testing framework

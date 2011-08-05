@@ -389,20 +389,13 @@ FindWindow::FindResults(void)
 	}
 	Unlock();
 
-
 	ShellHelper shell;
 	shell << "cd";
 	shell.AddEscapedArg(fWorkingDir.GetFullPath());
-	shell << ";" << "grep" << "-n";
 	
-	if (fIgnoreCase)
-		shell << "-i";
-	
-	if (fMatchWord)
-		shell << "-w";
-	
+	shell << ";" << "luagrep";
 	if (!fIsRegEx)
-		shell << "-F";
+		shell << "-f";
 	
 	shell.AddEscapedArg(fFindBox->Text());
 	

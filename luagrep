@@ -31,7 +31,7 @@
 
 local results = {}
 
-function GrepFile(path, options)
+function GrepFile(path, searchString, options)
 	-- actually searches the file
 	if (not path) then
 		error("Nil path in GrepFile")
@@ -48,13 +48,32 @@ function GrepFile(path, options)
 		table.insert(data, line)
 	end
 	
-	--TODO: do the actual pattern matching
+	local pattern = nil
+	
+	for i = 1, #data do
+		local line = data[i]:find(searchString, 1, options["fixed"])
+		if (line) then
+			local match = {}
+			match.file = path
+			match.line = i
+			match.string = data[i]
+			table.insert(results, match)
+		end
+	end
 end
 
 
-function PrintResultsNormal(results)
+function PrintResultsNormal(matches)
 	-- Takes a table and prints them
 	-- The format is filename:\t<result>
+	for i = 1, #matches do
+		local out = {}
+		out[1] = matches[i].file
+		out[2] = matches[i].line
+		out[3] = matches[i].string
+		print(table.concat(out,":"))
+	end
+	
 end
 
 -----------------------------------------------------------------------------
@@ -63,21 +82,21 @@ end
 local optionList = {
 	["-f"] = "fixed",
 	["--fixed"] = "fixed",
-	["-i"] = "insensitive",
-	["--ignore-case"] = "insensitive",	
 }
 
 local options = {}
-local fileList = {}
+local searchPattern = nil
 
-for i = 1, #arg do
-	if (optionList[arg[i]]) then
-		options[optionList[arg[i]]] = true
-	else
-		table.insert(fileList, arg[i])
-	end
+local argIndex = 1
+if (arg[1] == "-f" or arg[1] == "--fixed") then
+	optionList["fixed"] = true
+	argIndex = 2
 end
 
-for i = 1, #fileList do
-	GrepFile(fileList[i], options)
+searchPattern = arg[argIndex]
+
+for i = argIndex + 1, #arg do
+	GrepFile(arg[i], searchPattern, options)
 end
+
+PrintResultsNormal(results)

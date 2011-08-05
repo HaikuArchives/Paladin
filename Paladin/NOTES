@@ -4,7 +4,6 @@ TODO:
 	New executables to install in /common/bin: luagrep, luare, pobgen, pbuild
 	Implement support for Prebuild and Postbuild groups
 	Write a template for a Translator testing framework
-	Create a lua-based grep so that regular expressions in the find box are compatible with the replacement program (grep's UNIX re vs luare's Lua re)
 	Issue: Printing output for hg push doesn't happen until after the fact. This is mitigated by
 		setting the preoutgoing hook in the [hooks] section of .hgrc to echo something.
 	Need to handle password requests for SCMs -- use the getpass command along with setting SSH_ASKPASS and DISPLAY environment variables

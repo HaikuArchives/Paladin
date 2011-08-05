@@ -31,6 +31,31 @@
 
 local results = {}
 
+function CharacterEscape(string, set, escapeChar)
+	-- This performs the same function as the BString::CharacterEscape
+	-- function in the Haiku API. This is not a cheap function, so use it
+	-- sparingly
+	if (not string or (not set) or (not escapeChar) or
+		type(string) ~= "string" or type(set) ~= "string" or
+		type(escapeChar) ~= "string") then
+		return nil
+	end
+	
+	local out = {}
+	local length = string:len()
+	for i = 1, length do
+		local currentChar = string:sub(i,i), 1, plain
+		if (set:find(currentChar, 1, true)) then
+			table.insert(out, escapeChar)
+			table.insert(out, currentChar)
+		else
+			table.insert(out, currentChar)
+		end
+	end
+	return table.concat(out)
+end
+
+
 function GrepFile(path, searchString, options)
 	-- actually searches the file
 	if (not path) then
@@ -94,6 +119,10 @@ if (arg[1] == "-f" or arg[1] == "--fixed") then
 end
 
 searchPattern = arg[argIndex]
+
+if (optionList.fixed) then
+	searchPattern = CharacterEscape(searchPattern, "^$()%.[]*+-?", "%")
+end
 
 for i = argIndex + 1, #arg do
 	GrepFile(arg[i], searchPattern, options)

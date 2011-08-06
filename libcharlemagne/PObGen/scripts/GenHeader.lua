@@ -96,10 +96,16 @@ function GenerateViewHeader(def)
 	end
 	classDef = ApplyCustomPlaceholder(classDef, "%(INCLUDE_LIST)", includeString)
 	
-	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
-	classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
-									def.backend.Class .. ";\n" .. "class " ..
-									parentName .. ";")
+	local parentName = nil
+	if (def.backend.Type:lower() == "subclass") then
+		parentName = def.backend.ParentClass:match("%s([%w_]+)")
+		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
+										def.backend.Class .. ";\n" .. "class " ..
+										parentName .. ";")
+	else
+		parentName = def.backend.Class
+		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "")
+	end
 	
 	if (def.properties and GetTableSize(def.properties) > 0) then
 		classDef = classDef .. headerGetSetCode .. "\n"

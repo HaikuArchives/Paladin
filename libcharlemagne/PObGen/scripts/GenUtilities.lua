@@ -354,3 +354,8 @@ function TypeToPropertyClass(str)
 	
 	return nil
 end
+
+function DoError(message, code)
+	print(message)
+	os.exit(code)
+end

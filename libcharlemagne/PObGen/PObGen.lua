@@ -154,10 +154,10 @@ end
 function GenerateCodeFile(def)
 	-- The source file for a PObject is in sections as follows:
 	-- Includes
-	-- Method function declarations
+	-- Method hook declarations
 	-- Backend class 
 	-- PObject code
-	-- Method function definitions
+	-- Method hook definitions
 	-- Backend class code
 		
 	-- Start with the includes

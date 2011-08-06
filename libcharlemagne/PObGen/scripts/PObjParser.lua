@@ -99,7 +99,7 @@ end
 
 
 function ParseIncludeSection(sectionData)
-	-- This function just strips out blank lines and does some error checking
+	-- This just strips out blank lines and does some error checking
 	local outTable = {}
 	
 	for i = 1, #sectionData do
@@ -544,6 +544,63 @@ function ParseSections(sectionData)
 end
 
 
+function CheckDefinitionFieldExists(def, section, field)
+	if (not def[section]) then
+		DoError("Section .. " .. section .. " does not exist", 1)
+	end
+	
+	if (not def[section][field]) then
+		DoError("[" .. field ..  "]:" .. field .. " entry is required", 1)
+	end
+	
+end
+
+
+function CheckDefinitionLogic(def)
+	-- Here we do some basic checks on the definition to prevent major goofs and
+	-- bomb out when we encounter them
+	
+	CheckDefinitionFieldExists(def, "global", "Module")
+	CheckDefinitionFieldExists(def, "global", "Header")
+	CheckDefinitionFieldExists(def, "global", "CodeFileName")
+	CheckDefinitionFieldExists(def, "global", "ParentHeaderName")
+	
+	CheckDefinitionFieldExists(def, "object", "Name")
+	CheckDefinitionFieldExists(def, "object", "FriendlyName")
+	CheckDefinitionFieldExists(def, "object", "Description")
+	CheckDefinitionFieldExists(def, "object", "UsesView")
+	CheckDefinitionFieldExists(def, "object", "ParentClass")
+	CheckDefinitionFieldExists(def, "object", "GetBackend")
+	
+	if (def.backend) then
+		CheckDefinitionFieldExists(def, "backend", "Type")
+		CheckDefinitionFieldExists(def, "backend", "Class")
+		
+		local lowerType = def.backend.Type:lower()
+		
+		if (lowerType == "subclass") then
+			if (not def.backend.ParentClass) then
+				DoError("Subclass backends must have a ParentClass field", 1)
+			end
+			
+			local lowerParent = def.backend.ParentClass:lower()
+			
+			if ((not lowerParent:find("public")) and
+				(not lowerParent:find("protected")) and
+				(not lowerParent:find("private"))) then
+				
+				DoError("ParentClass field must include inheritance type (public/protected/private.", 1)
+			end
+			
+		elseif (lowerType ~= "single" and lowerType ~= "unique") then
+			DoError("Backend type must be 'Subclass', 'Single', or 'Unique'", 1)
+		end
+		
+	end
+	
+	return def
+end
+
 function ParsePObjFile(path)
 	local fileData = ReadIDL(path)
 	
@@ -559,6 +616,8 @@ function ParsePObjFile(path)
 	if (not defTable) then
 		return 1
 	end
+	
+	CheckDefinitionLogic(defTable)
 	
 	return defTable
 end

@@ -1,23 +1,24 @@
-#ifndef PMENUITEM_H
-#define PMENUITEM_H
+#ifndef PMENU_H
+#define PMENU_H
 
-#include "PObject.h"
-#include <MenuItem.h>
-#include "PMenu.h"
+#include "PView.h"
+#include <Menu.h>
+#include <Window.h>
+#include "PMenuItem.h"
 #include "PMenuPriv.h"
 
 
-class PMenuItemBackend;
-class BMenuItem;
+class PMenuBackend;
+class BMenu;
 
-class PMenuItem : public PObject
+class PMenu : public PView
 {
 public:
-							PMenuItem(void);
-							PMenuItem(BMessage *msg);
-							PMenuItem(const char *name);
-							PMenuItem(const PMenuItem &from);
-							~PMenuItem(void);
+							PMenu(void);
+							PMenu(BMessage *msg);
+							PMenu(const char *name);
+							PMenu(const PMenu &from);
+							~PMenu(void);
 
 	static	BArchivable *	Instantiate(BMessage *data);
 
@@ -27,7 +28,7 @@ public:
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 
-			BMenuItem *	GetBackend(void) const;
+			BMenu *	GetBackend(void) const;
 
 protected:
 	virtual	void			InitBackend(void);
@@ -35,8 +36,6 @@ protected:
 private:
 			void			InitProperties(void);
 			void			InitMethods(void);
-
-			PMenuItemBackend		*fBackend;
 
 };
 

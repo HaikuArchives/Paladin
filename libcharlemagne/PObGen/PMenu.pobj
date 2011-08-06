@@ -8,6 +8,9 @@ ParentHeaderName="PView.h"
 
 [includes]
 <Menu.h>
+<Window.h>
+"PMenuItem.h"
+"PMenuPriv.h"
 
 [object]
 Name=PMenu
@@ -43,15 +46,6 @@ Property float(0.0) MaxContentWidth : The maximum width for item contents
 [methods]
 ## TODO: Write embedded methods
 
-Method SetShortcut
-	Param char shortcut(char), 1 : character to define as the item's shortcut
-	Param int32 modifiers(int32)[0], 2 : constants for modifier keys, like the Control key.
-
-Method GetShortcut
-	CallName Shortcut
-	Return char shortcut(char), -1 : the item's shortcut character
-	Return uint32 modifiers(&uint32), 1 : the item's shortcut modifier keys
-
 Method Supermenu
 	Return int64 id(int64), 1 : object ID of the submenu, if there is one.
 BeginEmbeddedCode
@@ -79,7 +73,7 @@ BeginEmbeddedCode
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(supermenu);
 	if (menuBackend)
 	{
-		PMenu *pmenu = menuBackend->GetOwner();
+		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
 		outArgs.AddInt64("id", pmenu->GetID());
 	}
 	else
@@ -116,7 +110,7 @@ BeginEmbeddedCode
 	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(superitem);
 	if (menuBackend)
 	{
-		PMenuItem *pmenuitem = menuBackend->GetOwner();
+		PMenuItem *pmenuitem = static_cast<PMenuItem*>(menuBackend->GetOwner());
 		outArgs.AddInt64("id", pmenuitem->GetID());
 	}
 	else
@@ -147,7 +141,7 @@ BeginEmbeddedCode
 		return B_OK;
 	
 	int32 index;
-	if (inArgs.FindInt64("index", &index) != B_OK)
+	if (inArgs.FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	PObject *obj = BROKER->FindObject(id);
@@ -197,7 +191,7 @@ BeginEmbeddedCode
 		return B_OK;
 	
 	int32 index;
-	if (inArgs.FindInt64("index", &index) != B_OK)
+	if (inArgs.FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	PObject *obj = BROKER->FindObject(id);
@@ -205,16 +199,16 @@ BeginEmbeddedCode
 		return B_BAD_DATA;
 	
 	PMenu *pmenu = static_cast<PMenu*>(obj);
-	BMenu *submenu = (BMenu*)pmenu->GetBackend();
+	BMenu *submenu = (BMenu*)pmenu->GetView();
 		
 	if (backend->Window())
 		backend->Window()->Lock();
 	
 	bool status;
 	if (index < 0)
-		status = backend->AddItem(item);
+		status = backend->AddItem(submenu);
 	else
-		status = backend->AddItem(item, index);
+		status = backend->AddItem(submenu, index);
 	
 	if (backend->Window())
 		backend->Window()->Unlock();
@@ -227,33 +221,8 @@ EndEmbeddedCode
 
 
 Method AddSeparator
+	CallName AddSeparatorItem
 	Return bool success(bool), -1: true if the call succeeded
-BeginEmbeddedCode
-	if (!pobject || !in || !out)
-		return B_ERROR;
-	
-	PView *parent = static_cast<PView*>(pobject);
-	if (!parent)
-		return B_BAD_TYPE;
-	
-	BMenu *backend = (BMenu*)parent->GetView();
-	
-	PArgs outArgs(out);
-	
-	if (backend->Window())
-		backend->Window()->Lock();
-	
-	bool status = backend->AddSeparatorItem(item);
-	
-	if (backend->Window())
-		backend->Window()->Unlock();
-	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("success", status);
-	
-	return B_OK;
-EndEmbeddedCode
-
 
 Method RemoveItem
 	Param int64 id(int64), 1 : object ID of the item or menu to remove
@@ -283,7 +252,7 @@ BeginEmbeddedCode
 	if (obj->GetType().ICompare("PMenu") == 0)
 	{
 		PMenu *pmenu = static_cast<PMenu*>(obj);
-		menu = (BMenu*)pmenu->GetBackend();
+		menu = (BMenu*)pmenu->GetView();
 	}
 	else if (obj->GetType().ICompare("PMenuItem") == 0)
 	{
@@ -335,6 +304,7 @@ BeginEmbeddedCode
 		backend->Window()->Lock();
 	
 	BMenuItem *item = backend->RemoveItem(index);
+	bool status = (item != NULL);
 	delete item;
 	
 	if (backend->Window())
@@ -423,7 +393,7 @@ BeginEmbeddedCode
 	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(item);
 	if (menuBackend)
 	{
-		PMenuItem *pmenuitem = menuBackend->GetOwner();
+		PMenuItem *pmenuitem = static_cast<PMenuItem*>(menuBackend->GetOwner());
 		outArgs.AddInt64("id", pmenuitem->GetID());
 	}
 	else
@@ -465,7 +435,7 @@ BeginEmbeddedCode
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(item);
 	if (menuBackend)
 	{
-		PMenu *pmenu = menuBackend->GetOwner();
+		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
 		outArgs.AddInt64("id", pmenu->GetID());
 	}
 	else
@@ -496,20 +466,14 @@ BeginEmbeddedCode
 	if (inArgs.FindInt32("command", &command) != B_OK)
 		return B_OK;
 	
-	if (backend->Window())
-		backend->Window()->Lock();
-	
-	BMenuItem *item = backend->FindItem(command)
-	
-	if (backend->Window())
-		backend->Window()->Unlock();
+	BMenuItem *item = backend->FindItem(command);
 	
 	outArgs.MakeEmpty();
 	
 	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(item);
 	if (menuBackend)
 	{
-		PMenuItem *pmenuitem = menuBackend->GetOwner();
+		PMenuItem *pmenuitem = static_cast<PMenuItem*>(menuBackend->GetOwner());
 		outArgs.AddInt64("id", pmenuitem->GetID());
 	}
 	else
@@ -527,8 +491,9 @@ EndEmbeddedCode
 
 
 [backend]
-Type=Single
-Class=BMenu
+Type=Subclass
+Class=PMenuBackend
+ParentClass=public BMenu
 InitCode=""
 
 ## TODO: Add InvalidateLayout and DoLayout events

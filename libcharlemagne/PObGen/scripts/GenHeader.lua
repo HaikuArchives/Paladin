@@ -53,7 +53,8 @@ private:
 ]]
 	
 	local backType = def.backend.Type:lower()
-	if (backType == "single" or backType == "unique") then
+	if (backType == "single" or backType == "unique" or
+		(not def.object.UsesView) ) then
 		out = out .. "\n\t\t\t" .. def.backend.Class .. "\t\t*fBackend;\n"
 	end
 	
@@ -144,10 +145,11 @@ function GenerateNonViewHeader(def)
 	classDef = ApplyCustomPlaceholder(classDef, "%(INCLUDE_LIST)", includeString)
 	
 	local backType = def.backend.Type:lower()
+	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
 	if (backType == "subclass") then
 		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
 										def.backend.Class .. ";\n" .. "class " ..
-										def.backend.ParentClass .. ";")
+										parentName .. ";")
 	else
 		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
 										def.backend.Class .. ";\n")
@@ -159,12 +161,11 @@ function GenerateNonViewHeader(def)
 	
 	if (def.object.getBackend and
 			(backType == "subclass" and (not def.backend.ParentClass))) then
-		error("PBackend.Parent may not be empty if GetBackend() is to be used. Aborting.")
-		return nil
+		DoError("PBackend.ParentClass may not be empty if GetBackend() is to be used. Aborting.", 1)
 	end
 	
 	if (backType == "subclass") then
-		classDef = classDef .. "\t\t\t" .. def.backend.ParentClass ..
+		classDef = classDef .. "\t\t\t" .. parentName ..
 					" *\tGetBackend(void) const;\n"
 	else
 		classDef = classDef .. "\t\t\t" .. def.backend.Class ..
@@ -173,13 +174,11 @@ function GenerateNonViewHeader(def)
 	
 	classDef = classDef .. "\n" .. GenerateProtectedSection(def) ..
 				GeneratePrivateSection(def)
-	
 	classDef = classDef .. headerTailCode .. "\n"
 	
 	local header = io.open(def.global.Header, "w+")
 	if (not header) then
-		print("Couldn't open write header for module " .. def.global.Class)
-		return nil
+		DoError("Couldn't open write header for module " .. def.global.Class, 1)
 	end
 	
 	header:write(classDef)

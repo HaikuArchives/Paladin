@@ -3,4 +3,4 @@ PNode - Lots of methods which require list data (GetAttrInfo, etc.)
 PDragger - The backend is messy because it requires a BView target in the constructor and will not allow any changes.
 PShelf - Same reason as PShelf
 
-PMenu - Generated with manual tweaks -- backend definition needs to be in a shared header for PMenuItem's sake
+PMenu/PMenuItem - Generated with manual tweaks -- backend definitions need to be in a shared header

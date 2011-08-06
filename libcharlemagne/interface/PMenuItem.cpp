@@ -1,16 +1,18 @@
 #include "PMenuItem.h"
 
-#include <MenuItem.h>
 
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
-int32_t PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 int32_t PMenuItemGetShortcut(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PMenuItemSubmenu(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
 
 PMenuItem::PMenuItem(void)
 	:	PObject()
+
 {
 	fType = "PMenuItem";
 	fFriendlyType = "MenuItem";
@@ -23,6 +25,7 @@ PMenuItem::PMenuItem(void)
 
 PMenuItem::PMenuItem(BMessage *msg)
 	:	PObject(msg)
+
 {
 	fType = "PMenuItem";
 	fFriendlyType = "MenuItem";
@@ -36,6 +39,7 @@ PMenuItem::PMenuItem(BMessage *msg)
 
 PMenuItem::PMenuItem(const char *name)
 	:	PObject(name)
+
 {
 	fType = "PMenuItem";
 	fFriendlyType = "MenuItem";
@@ -48,6 +52,7 @@ PMenuItem::PMenuItem(const char *name)
 
 PMenuItem::PMenuItem(const PMenuItem &from)
 	:	PObject(from)
+
 {
 	fType = "PMenuItem";
 	fFriendlyType = "MenuItem";
@@ -60,7 +65,6 @@ PMenuItem::PMenuItem(const PMenuItem &from)
 
 PMenuItem::~PMenuItem(void)
 {
-	delete fBackend;
 }
 
 
@@ -210,7 +214,7 @@ void
 PMenuItem::InitBackend(void)
 {
 	if (!fBackend)
-		fBackend = new BMenuItem("", new BMessage(), 0, 0);
+		fBackend = new PMenuItemBackend(this);
 	StringValue sv("An item in a menu");
 	SetProperty("Description", &sv);
 }
@@ -229,6 +233,10 @@ PMenuItem::InitMethods(void)
 	pmi.AddArg("shortcut", PARG_CHAR, " character to define as the item's shortcut", 0);
 	pmi.AddArg("modifiers", PARG_INT32, " constants for modifier keys, like the Control key.", 0);
 	AddMethod(new PMethod("SetShortcut", PMenuItemSetShortcut, &pmi));
+	pmi.MakeEmpty();
+
+	pmi.AddReturnValue("id", PARG_INT64, " object ID of the owning menu, if there is one.");
+	AddMethod(new PMethod("Submenu", PMenuItemSubmenu, &pmi));
 	pmi.MakeEmpty();
 
 }
@@ -286,6 +294,44 @@ PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *extraData
 	backend->SetShortcut(shortcut, modifiers);
 
 	return B_OK;
+}
+
+
+int32_t
+PMenuItemSubmenu(void *pobject, PArgList *in, PArgList *out, void *extraData)
+{
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenuItem *backend = (BMenuItem*)parent->GetView();
+	
+	PArgs outArgs(out);
+	
+	BMenu *menu = backend->Menu();
+	
+	outArgs.MakeEmpty();
+	
+	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(menu);
+	if (menuBackend)
+	{
+		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
+		outArgs.AddInt64("id", pmenu->GetID());
+	}
+	else
+		outArgs.AddInt64("id", 0);
+	
+	return B_OK;
+}
+
+
+PMenuItemBackend::PMenuItemBackend(PObject *owner)
+	:	BMenuItem("", new BMessage(), 0, 0),
+		fOwner(owner)
+{
 }
 
 

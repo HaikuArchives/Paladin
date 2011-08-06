@@ -165,7 +165,7 @@ function GenerateCodeFile(def)
 	
 	-- These includes are used by a *lot* of PObjects
 	includeString = includeString .. '\n#include "PArgs.h"\n#include "EnumProperty.h"\n' ..
-					'#include "PMethod.h"\n\n'
+					'#include "PMethod.h"\n#include "PObjectBroker.h"\n\n'
 	
 	local methodDefs = GenerateMethodDefs(def)
 	local pobjectCode = GeneratePObject(def)

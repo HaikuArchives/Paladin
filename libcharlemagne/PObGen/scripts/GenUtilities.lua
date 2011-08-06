@@ -226,7 +226,7 @@ function ApplyBackendPlaceholders(str, def)
 	local out = string.gsub(str, "%%%(BACKENDNAME%)", def.backend.Class)
 	
 	local parentPattern = ""
-	if (def.backend.Type == "subclass" and def.backend.ParentClass) then
+	if (def.backend.Type:lower() == "subclass" and def.backend.ParentClass) then
 		parentPattern = def.backend.ParentClass:match("%s+([%w_]+)")
 	else
 		parentPattern = def.backend.Class

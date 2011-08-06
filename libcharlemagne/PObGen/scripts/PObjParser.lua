@@ -550,7 +550,7 @@ function CheckDefinitionFieldExists(def, section, field)
 	end
 	
 	if (not def[section][field]) then
-		DoError("[" .. field ..  "]:" .. field .. " entry is required", 1)
+		DoError("[" .. section ..  "]:" .. field .. " entry is required", 1)
 	end
 	
 end
@@ -568,7 +568,9 @@ function CheckDefinitionLogic(def)
 	CheckDefinitionFieldExists(def, "object", "Name")
 	CheckDefinitionFieldExists(def, "object", "FriendlyName")
 	CheckDefinitionFieldExists(def, "object", "Description")
-	CheckDefinitionFieldExists(def, "object", "UsesView")
+	
+	-- TODO: This bombs out when false. Need to change boolean logic for fields
+--	CheckDefinitionFieldExists(def, "object", "UsesView")
 	CheckDefinitionFieldExists(def, "object", "ParentClass")
 	CheckDefinitionFieldExists(def, "object", "GetBackend")
 	

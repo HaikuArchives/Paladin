@@ -71,13 +71,7 @@ BeginEmbeddedCode
 	
 	PArgs outArgs(out);
 	
-	if (backend->Window())
-		backend->Window()->Lock();
-	
 	BMenu *submenu = backend->Submenu();
-	
-	if (backend->Window())
-		backend->Window()->Unlock();
 	
 	outArgs.MakeEmpty();
 	
@@ -107,20 +101,14 @@ BeginEmbeddedCode
 	
 	PArgs outArgs(out);
 	
-	if (backend->Window())
-		backend->Window()->Lock();
-	
 	BMenu *menu = backend->Menu();
-	
-	if (backend->Window())
-		backend->Window()->Unlock();
 	
 	outArgs.MakeEmpty();
 	
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(menu);
 	if (menuBackend)
 	{
-		PMenu *pmenu = menuBackend->GetOwner();
+		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
 		outArgs.AddInt64("id", pmenu->GetID());
 	}
 	else
@@ -130,6 +118,7 @@ BeginEmbeddedCode
 EndEmbeddedCode
 
 [backend]
-Type=Single
-Class=BMenuItem
+Type=Subclass
+Class=PMenuItemBackend
+ParentClass=public BMenuItem
 InitCode="", new BMessage(), 0, 0

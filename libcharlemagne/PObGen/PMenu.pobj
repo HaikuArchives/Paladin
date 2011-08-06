@@ -52,7 +52,7 @@ Method GetShortcut
 	Return char shortcut(char), -1 : the item's shortcut character
 	Return uint32 modifiers(&uint32), 1 : the item's shortcut modifier keys
 
-Method Submenu
+Method Supermenu
 	Return int64 id(int64), 1 : object ID of the submenu, if there is one.
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
@@ -69,14 +69,14 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Lock();
 	
-	BMenu *submenu = backend->Submenu();
+	BMenu *supermenu = backend->Supermenu();
 	
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
 	outArgs.MakeEmpty();
 	
-	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(submenu);
+	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(supermenu);
 	if (menuBackend)
 	{
 		PMenu *pmenu = menuBackend->GetOwner();
@@ -88,8 +88,9 @@ BeginEmbeddedCode
 	return B_OK;
 EndEmbeddedCode
 
-Method Submenu
-	Return int64 id(int64), 1 : object ID of the owning menu, if there is one.
+
+Method Superitem
+	Return int64 id(int64), 1 : object ID of the submenu, if there is one.
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -105,14 +106,363 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Lock();
 	
-	BMenu *menu = backend->Menu();
+	BMenuItem *superitem = backend->Superitem();
 	
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
 	outArgs.MakeEmpty();
 	
-	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(menu);
+	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(superitem);
+	if (menuBackend)
+	{
+		PMenuItem *pmenuitem = menuBackend->GetOwner();
+		outArgs.AddInt64("id", pmenuitem->GetID());
+	}
+	else
+		outArgs.AddInt64("id", 0);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method AddItem
+	Param int64 id(int64), 1 : object ID of the menu item to add
+	Param int32 index(int32){-1}, 2 : index to place the item at
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int64 id;
+	if (inArgs.FindInt64("id", &id) != B_OK)
+		return B_OK;
+	
+	int32 index;
+	if (inArgs.FindInt64("index", &index) != B_OK)
+		index = -1;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PMenuItem") != 0)
+		return B_BAD_DATA;
+	
+	PMenuItem *pitem = static_cast<PMenuItem*>(obj);
+	BMenuItem *item = (BMenuItem*)pitem->GetBackend();
+		
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	bool status;
+	if (index < 0)
+		status = backend->AddItem(item);
+	else
+		status = backend->AddItem(item, index);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	outArgs.AddBool("success", status);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method AddMenu
+	Param int64 id(int64), 1 : object ID of the menu item to add
+	Param int32 index(int32){-1}, 2 : index to place the item at
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int64 id;
+	if (inArgs.FindInt64("id", &id) != B_OK)
+		return B_OK;
+	
+	int32 index;
+	if (inArgs.FindInt64("index", &index) != B_OK)
+		index = -1;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj || obj->GetType().ICompare("PMenu") != 0)
+		return B_BAD_DATA;
+	
+	PMenu *pmenu = static_cast<PMenu*>(obj);
+	BMenu *submenu = (BMenu*)pmenu->GetBackend();
+		
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	bool status;
+	if (index < 0)
+		status = backend->AddItem(item);
+	else
+		status = backend->AddItem(item, index);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	outArgs.AddBool("success", status);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method AddSeparator
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs outArgs(out);
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	bool status = backend->AddSeparatorItem(item);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	outArgs.AddBool("success", status);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method RemoveItem
+	Param int64 id(int64), 1 : object ID of the item or menu to remove
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int64 id;
+	if (inArgs.FindInt64("id", &id) != B_OK)
+		return B_OK;
+	
+	PObject *obj = BROKER->FindObject(id);
+	if (!obj)
+		return B_BAD_DATA;
+	
+	BMenu *menu = NULL;
+	BMenuItem *menuItem = NULL;
+	if (obj->GetType().ICompare("PMenu") == 0)
+	{
+		PMenu *pmenu = static_cast<PMenu*>(obj);
+		menu = (BMenu*)pmenu->GetBackend();
+	}
+	else if (obj->GetType().ICompare("PMenuItem") == 0)
+	{
+		PMenuItem *pmenuitem = static_cast<PMenuItem*>(obj);
+		menuItem = (BMenuItem*)pmenuitem->GetBackend();
+	}
+	else
+		return B_BAD_DATA;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	bool status;
+	if (menu)
+		status = backend->RemoveItem(menu);
+	else
+		status = backend->RemoveItem(menuItem);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	outArgs.AddBool("success", status);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method RemoveItemAt
+	Param int32 index(int32), 1 : Index of the first menu item to remove
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int32 index;
+	if (inArgs.FindInt32("index", &index) != B_OK)
+		return B_OK;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	BMenuItem *item = backend->RemoveItem(index);
+	delete item;
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	outArgs.AddBool("success", status);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method RemoveItems
+	Param int32 index(int32), 1 : Index of the first menu item to remove
+	Param int32 count(int32), 2 : Number of items to remove
+	Param bool delete(bool){false}, 3 : True if the items should be deleted after removal
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int32 index;
+	if (inArgs.FindInt32("index", &index) != B_OK)
+		return B_OK;
+	
+	int32 count;
+	if (inArgs.FindInt32("count", &count) != B_OK)
+		return B_OK;
+	
+	bool deleteItems;
+	if (inArgs.FindBool("delete", &deleteItems) != B_OK)
+		deleteItems = false;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	bool status = backend->RemoveItems(index, count, deleteItems);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	outArgs.AddBool("success", status);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method ItemAt
+	Param int32 index(int32), 1 : Index of the menu item to find
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int32 index;
+	if (inArgs.FindInt32("index", &index) != B_OK)
+		return B_OK;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	BMenuItem *item = backend->ItemAt(index);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	
+	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(item);
+	if (menuBackend)
+	{
+		PMenuItem *pmenuitem = menuBackend->GetOwner();
+		outArgs.AddInt64("id", pmenuitem->GetID());
+	}
+	else
+		outArgs.AddInt64("id", 0);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+Method SubmenuAt
+	Param int32 index(int32), 1 : Index of the menu to find
+	Return bool success(bool), -1: true if the call succeeded
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int32 index;
+	if (inArgs.FindInt32("index", &index) != B_OK)
+		return B_OK;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	BMenu *item = backend->SubmenuAt(index);
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	
+	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(item);
 	if (menuBackend)
 	{
 		PMenu *pmenu = menuBackend->GetOwner();
@@ -123,6 +473,58 @@ BeginEmbeddedCode
 	
 	return B_OK;
 EndEmbeddedCode
+
+# IndexOf(BMenuItem)
+# IndexOf(BMenu)
+
+Method FindItem
+	Param int32 command(int32), 1 : Value of the what field of the menu item's message
+	Return int64 id(int64), -1: Object ID of the menu item
+BeginEmbeddedCode
+	if (!pobject || !in || !out)
+		return B_ERROR;
+	
+	PView *parent = static_cast<PView*>(pobject);
+	if (!parent)
+		return B_BAD_TYPE;
+	
+	BMenu *backend = (BMenu*)parent->GetView();
+	
+	PArgs inArgs(in), outArgs(out);
+	
+	int32 command;
+	if (inArgs.FindInt32("command", &command) != B_OK)
+		return B_OK;
+	
+	if (backend->Window())
+		backend->Window()->Lock();
+	
+	BMenuItem *item = backend->FindItem(command)
+	
+	if (backend->Window())
+		backend->Window()->Unlock();
+	
+	outArgs.MakeEmpty();
+	
+	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(item);
+	if (menuBackend)
+	{
+		PMenuItem *pmenuitem = menuBackend->GetOwner();
+		outArgs.AddInt64("id", pmenuitem->GetID());
+	}
+	else
+		outArgs.AddInt64("id", 0);
+	
+	return B_OK;
+EndEmbeddedCode
+
+
+## Methods to implement
+# IndexOf(BMenuItem)
+# IndexOf(BMenu)
+# FindItem(name)
+# SetTargetForItems
+
 
 [backend]
 Type=Single

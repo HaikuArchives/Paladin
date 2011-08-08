@@ -17,6 +17,7 @@ FriendlyName=Text Control
 Description=A single-line text editing control
 UsesView=true
 ParentClass=public PControl
+GetBackend=true
 
 [properties]
 Property string(NULL) Text : The control's text

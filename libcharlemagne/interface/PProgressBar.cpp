@@ -271,7 +271,7 @@ PProgressBar::InitProperties(void)
 void
 PProgressBar::InitMethods(void)
 {
-	PMethodInterface pmi;
+	//PMethodInterface pmi;
 	
 }
 
@@ -289,7 +289,7 @@ PProgressBarBackend::AttachedToWindow()
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::AttachedToWindow();
 }
@@ -301,7 +301,7 @@ PProgressBarBackend::DetachedFromWindow()
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::DetachedFromWindow();
 }
@@ -313,7 +313,7 @@ PProgressBarBackend::AllAttached()
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllAttached");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::AllAttached();
 }
@@ -325,7 +325,7 @@ PProgressBarBackend::AllDetached()
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::AllDetached();
 }
@@ -337,7 +337,7 @@ PProgressBarBackend::Pulse()
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("Pulse");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::Pulse();
 }
@@ -350,7 +350,7 @@ PProgressBarBackend::MakeFocus(bool param1)
 	in.AddBool("focus", param1);
 	EventData *data = fOwner->FindEvent("MakeFocus");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::MakeFocus(param1);
 }
@@ -363,7 +363,7 @@ PProgressBarBackend::FrameMoved(BPoint param1)
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::FrameMoved(param1);
 }
@@ -377,7 +377,7 @@ PProgressBarBackend::FrameResized(float param1, float param2)
 	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::FrameResized(param1, param2);
 }
@@ -390,7 +390,7 @@ PProgressBarBackend::MouseDown(BPoint param1)
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("MouseDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::MouseDown(param1);
 }
@@ -403,7 +403,7 @@ PProgressBarBackend::MouseUp(BPoint param1)
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("MouseUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::MouseUp(param1);
 }
@@ -418,7 +418,7 @@ PProgressBarBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * p
 	in.AddPointer("message", (void*) param3);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::MouseMoved(param1, param2, param3);
 }
@@ -431,7 +431,7 @@ PProgressBarBackend::WindowActivated(bool param1)
 	in.AddBool("active", param1);
 	EventData *data = fOwner->FindEvent("WindowActivated");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::WindowActivated(param1);
 }
@@ -444,7 +444,7 @@ PProgressBarBackend::Draw(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("Draw");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::Draw(param1);
 }
@@ -457,7 +457,7 @@ PProgressBarBackend::DrawAfterChildren(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("DrawAfterChildren");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::DrawAfterChildren(param1);
 }
@@ -467,11 +467,11 @@ void
 PProgressBarBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::KeyDown(bytes, count);
 }
@@ -481,11 +481,11 @@ void
 PProgressBarBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BStatusBar::KeyUp(bytes, count);
 }

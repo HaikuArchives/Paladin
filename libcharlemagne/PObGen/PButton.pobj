@@ -14,6 +14,7 @@ Name=PButton
 FriendlyName=Button
 Description=A button
 UsesView=true
+GetBackend=true
 ParentClass=public PControl
 
 [backend]

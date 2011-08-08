@@ -15,6 +15,7 @@ Name=PBox
 FriendlyName=Box
 Description=A group box
 UsesView=true
+GetBackend=true
 ParentClass=public PView
 
 [properties]

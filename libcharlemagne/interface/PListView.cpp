@@ -4,27 +4,28 @@
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
-int32_t PListViewScrollToSelection(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewIndexOf(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewScrollToPoint(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewRemoveItems(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewSwapItems(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewMakeEmpty(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewScrollTo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewMoveItem(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewSelectRange(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewDeselect(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewSelect(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewIsItemSelected(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewInvoke(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewDeselectExcept(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewAddItem(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewInvalidateItem(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewDeselectAll(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewRemoveItem(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewAddItems(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PListViewItemFrame(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PListViewScrollToSelection(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewIndexOf(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewScrollToPoint(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewRemoveItems(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewSwapItems(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewMakeEmpty(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewScrollTo(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewMoveItem(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewSelectRange(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewDeselect(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewSelect(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewIsItemSelected(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewInvoke(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewDeselectExcept(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewAddItem(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewInvalidateItem(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewDeselectAll(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewRemoveItem(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewAddItems(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PListViewItemFrame(void *pobject, void *in, void *out, void *ptr = NULL);
 
 class PListViewBackend : public BListView
 {
@@ -151,7 +152,7 @@ PListView::GetProperty(const char *name, PValue *value, const int32 &index) cons
 	if (!prop)
 		return B_NAME_NOT_FOUND;
 	
-	PListViewBackend *backend = (PListViewBackend*)fView;
+	BListView *backend = (BListView*)fView;
 
 	if (backend->Window())
 		backend->Window()->Lock();
@@ -223,7 +224,7 @@ PListView::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
-	PListViewBackend *backend = (PListViewBackend*)fView;
+	BListView *backend = (BListView*)fView;
 	
 	BoolValue boolval;
 	CharValue charval;
@@ -310,97 +311,97 @@ PListView::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
-	pmi.AddArg("label", PARG_STRING, " Text label of the new item. Optional.", 0);
-	pmi.AddArg("index", PARG_INT32, " Index to insert the new item. If omitted, item is inserted at the end of the list.", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, " True if successful");
+	pmi.AddArg("label", B_STRING_TYPE, " Text label of the new item. Optional.", 0);
+	pmi.AddArg("index", B_INT32_TYPE, " Index to insert the new item. If omitted, item is inserted at the end of the list.", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, " True if successful");
 	AddMethod(new PMethod("AddItem", PListViewAddItem, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("label", PARG_LIST, " Text label of the new item. Optional.", 0);
-	pmi.AddArg("index", PARG_INT32, " Index to insert the new item. If omitted, item is inserted at the end of the list.", 0);
+	pmi.AddArg("label", B_STRING_TYPE, " List of labels for the new items", 0);
+	pmi.AddArg("index", B_INT32_TYPE, " Index to insert the new item. If omitted, item is inserted at the end of the list.", 0);
 	AddMethod(new PMethod("AddItems", PListViewAddItems, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, "", 0);
+	pmi.AddArg("index", B_INT32_TYPE, "", 0);
 	AddMethod(new PMethod("Deselect", PListViewDeselect, &pmi));
 	pmi.MakeEmpty();
 
 	AddMethod(new PMethod("DeselectAll", PListViewDeselectAll, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("from", PARG_INT32, "", 0);
-	pmi.AddArg("to", PARG_INT32, "", 0);
+	pmi.AddArg("from", B_INT32_TYPE, "", 0);
+	pmi.AddArg("to", B_INT32_TYPE, "", 0);
 	AddMethod(new PMethod("DeselectExcept", PListViewDeselectExcept, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("point", PARG_POINT, "", 0);
+	pmi.AddArg("point", B_POINT_TYPE, "", 0);
 	AddMethod(new PMethod("IndexOf", PListViewIndexOf, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, "", 0);
+	pmi.AddArg("index", B_INT32_TYPE, "", 0);
 	AddMethod(new PMethod("InvalidateItem", PListViewInvalidateItem, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("message", PARG_INT32, " The optional message constant to send", 0);
+	pmi.AddArg("message", B_INT32_TYPE, " The optional message constant to send", 0);
 	AddMethod(new PMethod("Invoke", PListViewInvoke, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, "", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, "");
+	pmi.AddArg("index", B_INT32_TYPE, "", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, "");
 	AddMethod(new PMethod("IsItemSelected", PListViewIsItemSelected, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, "", 0);
-	pmi.AddReturnValue("value", PARG_RECT, "");
+	pmi.AddArg("index", B_INT32_TYPE, "", 0);
+	pmi.AddReturnValue("value", B_RECT_TYPE, "");
 	AddMethod(new PMethod("ItemFrame", PListViewItemFrame, &pmi));
 	pmi.MakeEmpty();
 
 	AddMethod(new PMethod("MakeEmpty", PListViewMakeEmpty, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("from", PARG_INT32, " Index of the item to move", 0);
-	pmi.AddArg("to", PARG_INT32, " Index to move the item to", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, " True if successful");
+	pmi.AddArg("from", B_INT32_TYPE, " Index of the item to move", 0);
+	pmi.AddArg("to", B_INT32_TYPE, " Index to move the item to", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, " True if successful");
 	AddMethod(new PMethod("MoveItem", PListViewMoveItem, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, " Index of the item to remove", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, "");
+	pmi.AddArg("index", B_INT32_TYPE, " Index of the item to remove", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, "");
 	AddMethod(new PMethod("RemoveItem", PListViewRemoveItem, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, " Starting index of first item to remove", 0);
-	pmi.AddArg("count", PARG_INT32, " Number of items to remove", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, "");
+	pmi.AddArg("index", B_INT32_TYPE, " Starting index of first item to remove", 0);
+	pmi.AddArg("count", B_INT32_TYPE, " Number of items to remove", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, "");
 	AddMethod(new PMethod("RemoveItems", PListViewRemoveItems, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("x", PARG_FLOAT, "", 0);
-	pmi.AddArg("y", PARG_FLOAT, "", 0);
+	pmi.AddArg("x", B_FLOAT_TYPE, "", 0);
+	pmi.AddArg("y", B_FLOAT_TYPE, "", 0);
 	AddMethod(new PMethod("ScrollTo", PListViewScrollTo, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("pt", PARG_POINT, "", 0);
+	pmi.AddArg("pt", B_POINT_TYPE, "", 0);
 	AddMethod(new PMethod("ScrollToPoint", PListViewScrollToPoint, &pmi));
 	pmi.MakeEmpty();
 
 	AddMethod(new PMethod("ScrollToSelection", PListViewScrollToSelection, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("index", PARG_INT32, " Index of the item to select.", 0);
-	pmi.AddArg("extend", PARG_BOOL, " True: add the item to the selection. False: Replace the selection with the item.", 0);
+	pmi.AddArg("index", B_INT32_TYPE, " Index of the item to select.", 0);
+	pmi.AddArg("extend", B_BOOL_TYPE, " True: add the item to the selection. False: Replace the selection with the item.", 0);
 	AddMethod(new PMethod("Select", PListViewSelect, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("from", PARG_INT32, "", 0);
-	pmi.AddArg("to", PARG_INT32, "", 0);
-	pmi.AddArg("extend", PARG_BOOL, " True: add the item to the selection. False: Replace the selection with the item.", 0);
+	pmi.AddArg("from", B_INT32_TYPE, "", 0);
+	pmi.AddArg("to", B_INT32_TYPE, "", 0);
+	pmi.AddArg("extend", B_BOOL_TYPE, " True: add the item to the selection. False: Replace the selection with the item.", 0);
 	AddMethod(new PMethod("SelectRange", PListViewSelectRange, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("first", PARG_INT32, " Index of the first item to swap", 0);
-	pmi.AddArg("second", PARG_INT32, " Index of the second item to swap", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, " True if successful");
+	pmi.AddArg("first", B_INT32_TYPE, " Index of the first item to swap", 0);
+	pmi.AddArg("second", B_INT32_TYPE, " Index of the second item to swap", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, " True if successful");
 	AddMethod(new PMethod("SwapItems", PListViewSwapItems, &pmi));
 	pmi.MakeEmpty();
 
@@ -408,7 +409,7 @@ PListView::InitMethods(void)
 
 
 int32_t
-PListViewAddItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewAddItem(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -419,13 +420,13 @@ PListViewAddItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	BString label;
-	if (args.FindString("label", &label) != B_OK)
+	if (args->FindString("label", &label) != B_OK)
 		label = "";
 	
 	int32 index;
-	if (args.FindInt32("index", &index) != B_OK)
+	if (args->FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	if (backend->Window())
@@ -441,15 +442,15 @@ PListViewAddItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", outValue);
 	
 	return B_OK;
 }
 
 
 int32_t
-PListViewAddItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewAddItems(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -460,28 +461,22 @@ PListViewAddItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in), outArgs(out);
-	PArgs nameList;
-	if (args.FindList("items", nameList) != B_OK)
-		return B_ERROR;
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 index;
-	if (args.FindInt32("index", &index) != B_OK)
+	if (args->FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	if (backend->Window())
 		backend->Window()->Lock();
 	
-	PArgListItem *item = nameList.GetFirstItem();
 	BList list;
-	while (item)
+	BString itemName;
+	int32 nameIndex = 0;
+	while (args->FindString("items", &itemName, nameIndex) == B_OK)
 	{
-		if (item->type == PARG_STRING)
-		{
-			BStringItem *newItem = new BStringItem((const char *)item->data);
-			list.AddItem(newItem);
-		}
-		item = nameList.GetNextItem(item);
+		list.AddItem(new BString(itemName));
+		nameIndex++;
 	}
 	
 	bool outValue = true;
@@ -496,15 +491,19 @@ PListViewAddItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue);
+	for (int32 i = 0; i < list.CountItems(); i++)
+		delete ((BString*)list.ItemAt(i));
+	list.MakeEmpty();
+	
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", outValue);
 	
 	return B_OK;
 }
 
 
 int32_t
-PListViewDeselect(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewDeselect(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -513,12 +512,13 @@ PListViewDeselect(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -535,7 +535,7 @@ PListViewDeselect(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PListViewDeselectAll(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewDeselectAll(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -544,10 +544,7 @@ PListViewDeselectAll(void *pobject, PArgList *in, PArgList *out, void *extraData
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
+	BListView *backend = (BListView*)parent->GetView();
 	if (backend->Window())
 		backend->Window()->Lock();
 
@@ -562,7 +559,7 @@ PListViewDeselectAll(void *pobject, PArgList *in, PArgList *out, void *extraData
 
 
 int32_t
-PListViewDeselectExcept(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewDeselectExcept(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -571,16 +568,17 @@ PListViewDeselectExcept(void *pobject, PArgList *in, PArgList *out, void *extraD
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	int32 from;
-	if (inArgs.FindInt32("from", &from) != B_OK)
+	if (inArgs->FindInt32("from", &from) != B_OK)
 		return B_ERROR;
 
 	int32 to;
-	if (inArgs.FindInt32("to", &to) != B_OK)
+	if (inArgs->FindInt32("to", &to) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -597,7 +595,7 @@ PListViewDeselectExcept(void *pobject, PArgList *in, PArgList *out, void *extraD
 
 
 int32_t
-PListViewIndexOf(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewIndexOf(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -606,12 +604,13 @@ PListViewIndexOf(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	BPoint point;
-	if (inArgs.FindPoint("point", &point) != B_OK)
+	if (inArgs->FindPoint("point", &point) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -628,7 +627,7 @@ PListViewIndexOf(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PListViewInvalidateItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewInvalidateItem(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -637,12 +636,13 @@ PListViewInvalidateItem(void *pobject, PArgList *in, PArgList *out, void *extraD
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -659,7 +659,7 @@ PListViewInvalidateItem(void *pobject, PArgList *in, PArgList *out, void *extraD
 
 
 int32_t
-PListViewInvoke(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewInvoke(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -670,9 +670,9 @@ PListViewInvoke(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	int32 what;
-	if (args.FindInt32("message", &what) != B_OK)
+	if (args->FindInt32("message", &what) != B_OK)
 		what = -1;
 	
 	if (backend->Window())
@@ -694,7 +694,7 @@ PListViewInvoke(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PListViewIsItemSelected(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewIsItemSelected(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -703,12 +703,15 @@ PListViewIsItemSelected(void *pobject, PArgList *in, PArgList *out, void *extraD
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -721,14 +724,14 @@ PListViewIsItemSelected(void *pobject, PArgList *in, PArgList *out, void *extraD
 	if (backend->Window())
 		backend->Window()->Unlock();
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PListViewItemFrame(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewItemFrame(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -737,12 +740,15 @@ PListViewItemFrame(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -755,14 +761,14 @@ PListViewItemFrame(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (backend->Window())
 		backend->Window()->Unlock();
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PListViewMakeEmpty(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewMakeEmpty(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -771,10 +777,7 @@ PListViewMakeEmpty(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
+	BListView *backend = (BListView*)parent->GetView();
 	if (backend->Window())
 		backend->Window()->Lock();
 
@@ -789,7 +792,7 @@ PListViewMakeEmpty(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PListViewMoveItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewMoveItem(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -798,16 +801,19 @@ PListViewMoveItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 from;
-	if (inArgs.FindInt32("from", &from) != B_OK)
+	if (inArgs->FindInt32("from", &from) != B_OK)
 		return B_ERROR;
 
 	int32 to;
-	if (inArgs.FindInt32("to", &to) != B_OK)
+	if (inArgs->FindInt32("to", &to) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -820,14 +826,14 @@ PListViewMoveItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (backend->Window())
 		backend->Window()->Unlock();
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PListViewRemoveItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewRemoveItem(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -838,9 +844,9 @@ PListViewRemoveItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	int32 index;
-	if (args.FindInt32("index", &index) != B_OK)
+	if (args->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 	
 	if (backend->Window())
@@ -851,15 +857,15 @@ PListViewRemoveItem(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", outValue);
 	
 	return B_OK;
 }
 
 
 int32_t
-PListViewRemoveItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewRemoveItems(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -868,16 +874,19 @@ PListViewRemoveItems(void *pobject, PArgList *in, PArgList *out, void *extraData
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 
 	int32 count;
-	if (inArgs.FindInt32("count", &count) != B_OK)
+	if (inArgs->FindInt32("count", &count) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -890,14 +899,14 @@ PListViewRemoveItems(void *pobject, PArgList *in, PArgList *out, void *extraData
 	if (backend->Window())
 		backend->Window()->Unlock();
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PListViewScrollTo(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewScrollTo(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -906,16 +915,17 @@ PListViewScrollTo(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	float x;
-	if (inArgs.FindFloat("x", &x) != B_OK)
+	if (inArgs->FindFloat("x", &x) != B_OK)
 		return B_ERROR;
 
 	float y;
-	if (inArgs.FindFloat("y", &y) != B_OK)
+	if (inArgs->FindFloat("y", &y) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -932,7 +942,7 @@ PListViewScrollTo(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PListViewScrollToPoint(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewScrollToPoint(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -941,12 +951,13 @@ PListViewScrollToPoint(void *pobject, PArgList *in, PArgList *out, void *extraDa
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	BPoint pt;
-	if (inArgs.FindPoint("pt", &pt) != B_OK)
+	if (inArgs->FindPoint("pt", &pt) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -963,7 +974,7 @@ PListViewScrollToPoint(void *pobject, PArgList *in, PArgList *out, void *extraDa
 
 
 int32_t
-PListViewScrollToSelection(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewScrollToSelection(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -972,10 +983,7 @@ PListViewScrollToSelection(void *pobject, PArgList *in, PArgList *out, void *ext
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
-
-	PArgs inArgs(in), outArgs(out);
-
+	BListView *backend = (BListView*)parent->GetView();
 	if (backend->Window())
 		backend->Window()->Lock();
 
@@ -990,7 +998,7 @@ PListViewScrollToSelection(void *pobject, PArgList *in, PArgList *out, void *ext
 
 
 int32_t
-PListViewSelect(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewSelect(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -999,16 +1007,17 @@ PListViewSelect(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 
 	bool extend;
-	if (inArgs.FindBool("extend", &extend) != B_OK)
+	if (inArgs->FindBool("extend", &extend) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -1025,7 +1034,7 @@ PListViewSelect(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PListViewSelectRange(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewSelectRange(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -1034,20 +1043,21 @@ PListViewSelectRange(void *pobject, PArgList *in, PArgList *out, void *extraData
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	int32 from;
-	if (inArgs.FindInt32("from", &from) != B_OK)
+	if (inArgs->FindInt32("from", &from) != B_OK)
 		return B_ERROR;
 
 	int32 to;
-	if (inArgs.FindInt32("to", &to) != B_OK)
+	if (inArgs->FindInt32("to", &to) != B_OK)
 		return B_ERROR;
 
 	bool extend;
-	if (inArgs.FindBool("extend", &extend) != B_OK)
+	if (inArgs->FindBool("extend", &extend) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -1064,7 +1074,7 @@ PListViewSelectRange(void *pobject, PArgList *in, PArgList *out, void *extraData
 
 
 int32_t
-PListViewSwapItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PListViewSwapItems(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -1073,16 +1083,19 @@ PListViewSwapItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (!parent)
 		return B_BAD_TYPE;
 	
-	PListViewBackend *backend = (PListViewBackend*)parent->GetView();
+	BListView *backend = (BListView*)parent->GetView();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 first;
-	if (inArgs.FindInt32("first", &first) != B_OK)
+	if (inArgs->FindInt32("first", &first) != B_OK)
 		return B_ERROR;
 
 	int32 second;
-	if (inArgs.FindInt32("second", &second) != B_OK)
+	if (inArgs->FindInt32("second", &second) != B_OK)
 		return B_ERROR;
 
 	if (backend->Window())
@@ -1095,7 +1108,7 @@ PListViewSwapItems(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	if (backend->Window())
 		backend->Window()->Unlock();
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
@@ -1112,13 +1125,13 @@ void
 PListViewBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
-		PListViewBackend::KeyUp(bytes, count);
+		BListView::KeyUp(bytes, count);
 }
 
 
@@ -1128,7 +1141,7 @@ PListViewBackend::AttachedToWindow(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::AttachedToWindow();
 }
@@ -1140,7 +1153,7 @@ PListViewBackend::Pulse(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("Pulse");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::Pulse();
 }
@@ -1152,7 +1165,7 @@ PListViewBackend::DetachedFromWindow(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::DetachedFromWindow();
 }
@@ -1164,7 +1177,7 @@ PListViewBackend::AllDetached(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::AllDetached();
 }
@@ -1177,7 +1190,7 @@ PListViewBackend::WindowActivated(bool param1)
 	in.AddBool("active", param1);
 	EventData *data = fOwner->FindEvent("WindowActivated");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::WindowActivated(param1);
 }
@@ -1190,7 +1203,7 @@ PListViewBackend::MouseDown(BPoint param1)
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("MouseDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::MouseDown(param1);
 }
@@ -1200,13 +1213,13 @@ void
 PListViewBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
-		PListViewBackend::KeyDown(bytes, count);
+		BListView::KeyDown(bytes, count);
 }
 
 
@@ -1217,7 +1230,7 @@ PListViewBackend::FrameMoved(BPoint param1)
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::FrameMoved(param1);
 }
@@ -1231,7 +1244,7 @@ PListViewBackend::FrameResized(float param1, float param2)
 	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::FrameResized(param1, param2);
 }
@@ -1243,9 +1256,9 @@ PListViewBackend::SelectionChanged(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("SelectionChanged");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
-		PListViewBackend::SelectionChanged();
+		BListView::SelectionChanged();
 }
 
 
@@ -1256,7 +1269,7 @@ PListViewBackend::Draw(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("Draw");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::Draw(param1);
 }
@@ -1268,7 +1281,7 @@ PListViewBackend::AllAttached(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllAttached");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::AllAttached();
 }
@@ -1281,7 +1294,7 @@ PListViewBackend::MakeFocus(bool param1)
 	in.AddBool("focus", param1);
 	EventData *data = fOwner->FindEvent("MakeFocus");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::MakeFocus(param1);
 }
@@ -1294,7 +1307,7 @@ PListViewBackend::MouseUp(BPoint param1)
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("MouseUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::MouseUp(param1);
 }
@@ -1307,7 +1320,7 @@ PListViewBackend::DrawAfterChildren(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("DrawAfterChildren");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::DrawAfterChildren(param1);
 }
@@ -1322,7 +1335,7 @@ PListViewBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * para
 	in.AddPointer("message", (void*) param3);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BListView::MouseMoved(param1, param2, param3);
 }
@@ -1338,14 +1351,14 @@ PListViewBackend::InitiateDrag(BPoint pt, int32 index, bool initiallySelected)
 	EventData *data = fOwner->FindEvent("SelectionChanged");
 	if (data->hook)
 	{
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 		bool outValue;
 		if (out.FindBool("value", &outValue) != B_OK)
 			outValue = false;
 		return outValue;
 	}
 	else
-		return PListViewBackend::InitiateDrag(pt, index, initiallySelected);
+		return BListView::InitiateDrag(pt, index, initiallySelected);
 	
 	// Quiet the compiler
 	return false;

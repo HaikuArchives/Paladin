@@ -69,11 +69,10 @@ BeginEmbeddedCode
 	
 	BMenuItem *backend = (BMenuItem*)parent->GetView();
 	
-	PArgs outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	BMenu *submenu = backend->Submenu();
-	
-	outArgs.MakeEmpty();
 	
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(submenu);
 	if (menuBackend)
@@ -99,20 +98,19 @@ BeginEmbeddedCode
 	
 	BMenuItem *backend = (BMenuItem*)parent->GetView();
 	
-	PArgs outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	BMenu *menu = backend->Menu();
-	
-	outArgs.MakeEmpty();
 	
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(menu);
 	if (menuBackend)
 	{
 		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenu->GetID());
+		outArgs->AddInt64("id", pmenu->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 EndEmbeddedCode

@@ -137,12 +137,12 @@ DumpLuaStack(lua_State *L)
 
 
 int
-PushArgList(lua_State *L, PArgList *list)
+PushArgList(lua_State *L, PArgs *list)
  {
 	if (!list)
 		return 0;
 	
-	PArgListItem *item = get_parg_first(list);
+	PArgsItem *item = get_parg_first(list);
 	if (item)
 		lua_newtable(L);
 	else
@@ -157,49 +157,49 @@ PushArgList(lua_State *L, PArgList *list)
 			lua_pushstring(L, item->name);
 			switch (item->type)
 			{
-				case PARG_INT8:
+				case B_INT8_TYPE:
 				{
 					lua_pushinteger(L, *((int8*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_INT16:
+				case B_INT16_TYPE:
 				{
 					lua_pushinteger(L, *((int16*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_INT32:
+				case B_INT32_TYPE:
 				{
 					lua_pushinteger(L, *((int32*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_INT64:
+				case B_INT64_TYPE:
 				{
 					lua_pushinteger(L, *((int64*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_FLOAT:
+				case B_FLOAT_TYPE:
 				{
 					lua_pushnumber(L, *((float*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_DOUBLE:
+				case B_DOUBLE_TYPE:
 				{
 					lua_pushnumber(L, *((double*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_BOOL:
+				case B_BOOL_TYPE:
 				{
 					lua_pushboolean(L, *((bool*)item->data));
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_CHAR:
+				case B_CHAR_TYPE:
 				{
 					char str[2];
 					str[0] = *((char*)item->data);
@@ -208,13 +208,13 @@ PushArgList(lua_State *L, PArgList *list)
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_STRING:
+				case B_STRING_TYPE:
 				{
 					lua_pushstring(L, (const char *)item->data);
 					lua_settable(L, -3);
 					break;
 				}
-				case PARG_RECT:
+				case B_RECT_TYPE:
 				{
 					BRect *r = (BRect*)item->data;
 					lua_newtable(L);
@@ -224,7 +224,7 @@ PushArgList(lua_State *L, PArgList *list)
 					PUSH_TABLE_FLOAT(L,"bottom",r->bottom);
 					break;
 				}
-				case PARG_POINT:
+				case B_POINT_TYPE:
 				{
 					BPoint *p = (BPoint*)item->data;
 					lua_newtable(L);
@@ -232,7 +232,7 @@ PushArgList(lua_State *L, PArgList *list)
 					PUSH_TABLE_FLOAT(L,"y",p->y);
 					break;
 				}
-				case PARG_COLOR:
+				case B_RGB_COLOR_TYPE:
 				{
 					rgb_color *c = (rgb_color*)item->data;
 					lua_newtable(L);
@@ -242,7 +242,7 @@ PushArgList(lua_State *L, PArgList *list)
 					PUSH_TABLE_INT(L,"alpha",c->blue);
 					break;
 				}
-				case PARG_POINTER:
+				case B_POINTER_TYPE:
 				{
 					lua_pushlightuserdata(L, *((void**)item->data));
 					lua_settable(L, -3);
@@ -266,7 +266,7 @@ PushArgList(lua_State *L, PArgList *list)
 
 
 int32
-ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex)
+ReadMethodArgs(lua_State *L, PArgs *list, PMethodInterface pmi, int32 tableIndex)
 {
 	// This function is for reading in all of the necessary data to call a
 	// method owned by a PObject.
@@ -309,52 +309,52 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 		
 		switch (pmi.ArgTypeAt(i))
 		{
-			case PARG_INT8:
+			case B_INT8_TYPE:
 			{
 				args.AddInt8(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_INT16:
+			case B_INT16_TYPE:
 			{
 				args.AddInt16(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_INT32:
+			case B_INT32_TYPE:
 			{
 				args.AddInt32(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_INT64:
+			case B_INT64_TYPE:
 			{
 				args.AddInt64(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_FLOAT:
+			case B_FLOAT_TYPE:
 			{
 				args.AddFloat(name.String(), lua_tonumber(L, -1));
 				break;
 			}
-			case PARG_DOUBLE:
+			case B_DOUBLE_TYPE:
 			{
 				args.AddDouble(name.String(), lua_tonumber(L, -1));
 				break;
 			}
-			case PARG_BOOL:
+			case B_BOOL_TYPE:
 			{
 				args.AddBool(name.String(), lua_toboolean(L, -1));
 				break;
 			}
-			case PARG_CHAR:
+			case B_CHAR_TYPE:
 			{
 				args.AddChar(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_STRING:
+			case B_STRING_TYPE:
 			{
 				args.AddString(name.String(), lua_tostring(L, -1));
 				break;
 			}
-			case PARG_RECT:
+			case B_RECT_TYPE:
 			{
 				BRect r;
 				
@@ -381,7 +381,7 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 				args.AddRect(name.String(), r);
 				break;
 			}
-			case PARG_POINT:
+			case B_POINT_TYPE:
 			{
 				BPoint pt;
 				
@@ -398,7 +398,7 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 				args.AddPoint(name.String(), pt);
 				break;
 			}
-			case PARG_COLOR:
+			case B_RGB_COLOR_TYPE:
 			{
 				rgb_color c;
 				
@@ -425,7 +425,7 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 				args.AddColor(name.String(), c);
 				break;
 			}
-			case PARG_POINTER:
+			case B_POINTER_TYPE:
 			{
 				args.AddPointer(name.String(), (void*)lua_topointer(L, -1));
 				break;
@@ -450,7 +450,7 @@ ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIn
 
 
 int32
-ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex)
+ReadReturnValues(lua_State *L, PArgs *list, PMethodInterface pmi, int tableIndex)
 {
 	// This function is for reading in all of the data returned from a Lua hook function,
 	// which is expected to be a table
@@ -484,52 +484,52 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 		
 		switch (pmi.ReturnTypeAt(i))
 		{
-			case PARG_INT8:
+			case B_INT8_TYPE:
 			{
 				args.AddInt8(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_INT16:
+			case B_INT16_TYPE:
 			{
 				args.AddInt16(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_INT32:
+			case B_INT32_TYPE:
 			{
 				args.AddInt32(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_INT64:
+			case B_INT64_TYPE:
 			{
 				args.AddInt64(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_FLOAT:
+			case B_FLOAT_TYPE:
 			{
 				args.AddFloat(name.String(), lua_tonumber(L, -1));
 				break;
 			}
-			case PARG_DOUBLE:
+			case B_DOUBLE_TYPE:
 			{
 				args.AddDouble(name.String(), lua_tonumber(L, -1));
 				break;
 			}
-			case PARG_BOOL:
+			case B_BOOL_TYPE:
 			{
 				args.AddBool(name.String(), lua_toboolean(L, -1));
 				break;
 			}
-			case PARG_CHAR:
+			case B_CHAR_TYPE:
 			{
 				args.AddChar(name.String(), lua_tointeger(L, -1));
 				break;
 			}
-			case PARG_STRING:
+			case B_STRING_TYPE:
 			{
 				args.AddString(name.String(), lua_tostring(L, -1));
 				break;
 			}
-			case PARG_RECT:
+			case B_RECT_TYPE:
 			{
 				BRect r;
 				
@@ -556,7 +556,7 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 				args.AddRect(name.String(), r);
 				break;
 			}
-			case PARG_POINT:
+			case B_POINT_TYPE:
 			{
 				BPoint pt;
 				
@@ -573,7 +573,7 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 				args.AddPoint(name.String(), pt);
 				break;
 			}
-			case PARG_COLOR:
+			case B_RGB_COLOR_TYPE:
 			{
 				rgb_color c;
 				
@@ -600,7 +600,7 @@ ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIn
 				args.AddColor(name.String(), c);
 				break;
 			}
-			case PARG_POINTER:
+			case B_POINTER_TYPE:
 			{
 				args.AddPointer(name.String(), (void*)lua_topointer(L, -1));
 				break;

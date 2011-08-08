@@ -16,6 +16,7 @@ FriendlyName=Label
 Description=A text label
 UsesView=true
 ParentClass=public PView
+GetBackend=true
 
 [properties]
 Property string(NULL) Text : The label's text

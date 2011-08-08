@@ -65,13 +65,13 @@ public:
 	
 			uint64			GetID(void) const;
 	
-	virtual	status_t		RunMethod(const char *name, PArgList &in, PArgList &out,
+	virtual	status_t		RunMethod(const char *name, PArgs &in, PArgs &out,
 										void *extraData);
 			PMethod *		FindMethod(const char *name);
 			PMethod *		MethodAt(const int32 &index) const;
 			int32			CountMethods(void) const;
 			
-	virtual	status_t		RunInheritedMethod(const char *name, PArgList &in, PArgList &out,
+	virtual	status_t		RunInheritedMethod(const char *name, PArgs &in, PArgs &out,
 												void *extraData);
 			PMethod *		FindInheritedMethod(const char *name);
 			PMethod *		InheritedMethodAt(const int32 &index) const;
@@ -88,15 +88,15 @@ public:
 			EventData *		EventAt(const int32 &index) const;
 			int32			CountEvents(void) const;
 			EventData *		FindEvent(const char *name);
-			status_t		RunEvent(const char *name, PArgList &in, PArgList &out);
-	virtual	status_t		RunEvent(EventData *data, PArgList &in, PArgList &out);
+			status_t		RunEvent(const char *name, PArgs &in, PArgs &out);
+	virtual	status_t		RunEvent(EventData *data, PArgs &in, PArgs &out);
 			status_t		ConnectEvent(const char *name, MethodFunction func,
 										void *extraData = NULL);
 			
 	virtual	void			PrintToStream(void);
 	
-			void			ConvertMsgToArgs(BMessage &in, PArgList &out);
-			void			ConvertArgsToMsg(PArgList &in, BMessage &out);
+			void			ConvertMsgToArgs(BMessage &in, PArgs &out);
+			void			ConvertArgsToMsg(PArgs &in, BMessage &out);
 			
 protected:
 			void			AddInterface(const char *name);

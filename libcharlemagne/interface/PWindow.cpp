@@ -12,11 +12,11 @@
 #include "PView.h"
 #include "PWindowPriv.h"
 
-int32_t PWindowAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PWindowChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PWindowCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PWindowFindView(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PWindowAddChild(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PWindowRemoveChild(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PWindowChildAt(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PWindowCountChildren(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PWindowFindView(void *pobject, void *in, void *out, void *ptr = NULL);
 
 PWindow::PWindow(void)
 	:	fWindow(NULL)
@@ -377,54 +377,54 @@ void
 PWindow::InitBackend(void)
 {
 	PMethodInterface pmi;
-	pmi.AddArg("id", PARG_INT64, "The object ID of the child view to add");
+	pmi.AddArg("id", B_INT64_TYPE, "The object ID of the child view to add");
 	AddMethod(new PMethod("AddChild", PWindowAddChild, &pmi));
 	
-	pmi.SetArg(0, "id", PARG_INT64, "The object ID of the child view to remove");
+	pmi.SetArg(0, "id", B_INT64_TYPE, "The object ID of the child view to remove");
 	AddMethod(new PMethod("RemoveChild", PWindowRemoveChild, &pmi));
 	
-	pmi.SetArg(0, "index", PARG_INT32, "The index of the child to get");
-	pmi.AddReturnValue("ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
+	pmi.SetArg(0, "index", B_INT32_TYPE, "The index of the child to get");
+	pmi.AddReturnValue("ChildID", B_INT64_TYPE, "The ID of the child. 0 is returned if no child is found.");
 	AddMethod(new PMethod("ChildAt", PWindowChildAt, &pmi));
 	
 	pmi.RemoveArg(0);
-	pmi.SetReturnValue(0, "Count", PARG_INT32, "The number of children of the window");
+	pmi.SetReturnValue(0, "Count", B_INT32_TYPE, "The number of children of the window");
 	AddMethod(new PMethod("CountChildren", PWindowCountChildren, &pmi));
 	
-	pmi.AddArg("name", PARG_STRING, "The name of the child view to find.");
-	pmi.SetReturnValue(0, "ChildID", PARG_INT64, "The ID of the child. 0 is returned if no child is found.");
+	pmi.AddArg("name", B_STRING_TYPE, "The name of the child view to find.");
+	pmi.SetReturnValue(0, "ChildID", B_INT64_TYPE, "The ID of the child. 0 is returned if no child is found.");
 	AddMethod(new PMethod("FindView", PWindowFindView, &pmi));
 	
 	
 	AddEvent("MenusBeginning", "The window is about to show a menu.");
 	AddEvent("MenusEnded", "The windows has finished showing a menu.");
 	
-		pmi.SetArg(0, "where", PARG_POINT, "The new location of the window in screen coordinates.");
+		pmi.SetArg(0, "where", B_POINT_TYPE, "The new location of the window in screen coordinates.");
 	AddEvent("FrameMoved", "The window was moved.", &pmi);
 	
-	pmi.SetArg(0, "width", PARG_FLOAT, "The new width of the window.");
-	pmi.AddArg("height", PARG_FLOAT, "The new height of the window.");
+	pmi.SetArg(0, "width", B_FLOAT_TYPE, "The new width of the window.");
+	pmi.AddArg("height", B_FLOAT_TYPE, "The new height of the window.");
 	AddEvent("FrameResized", "The window was resized.", &pmi);
 	
 	pmi.RemoveArg(0);
-	pmi.AddReturnValue("value", PARG_BOOL, "Whether or not the window should really quit.");
+	pmi.AddReturnValue("value", B_BOOL_TYPE, "Whether or not the window should really quit.");
 	AddEvent("QuitRequested", "The window was asked to quit.", &pmi);
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("frame", PARG_RECT, "The new size and location of the screen.");
-	pmi.AddArg("color_space", PARG_INT32, "The new color space constant for the screen.");
+	pmi.AddArg("frame", B_RECT_TYPE, "The new size and location of the screen.");
+	pmi.AddArg("color_space", B_INT32_TYPE, "The new color space constant for the screen.");
 	AddEvent("ScreenChanged", "The screen has changed color space, size, or location.", &pmi);
 	pmi.RemoveArg(1);
 	
-	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the window has the focus.");
+	pmi.SetArg(0, "active", B_BOOL_TYPE, "Whether or not the window has the focus.");
 	AddEvent("WindowActivated", "The window gained or lost focus.", &pmi);
 	
-	pmi.SetArg(0, "workspace", PARG_INT32, "The index of the workspace which changed.");
-	pmi.AddArg("active", PARG_BOOL, "If the workspace is currently active.");
+	pmi.SetArg(0, "workspace", B_INT32_TYPE, "The index of the workspace which changed.");
+	pmi.AddArg("active", B_BOOL_TYPE, "If the workspace is currently active.");
 	AddEvent("WorkspaceActivated", "The user has changed workspaces.", &pmi);
 	
-	pmi.SetArg(0, "old", PARG_INT32, "The index of the old workspace.");
-	pmi.SetArg(1, "new", PARG_INT32, "The index of the new workspace.");
+	pmi.SetArg(0, "old", B_INT32_TYPE, "The index of the old workspace.");
+	pmi.SetArg(1, "new", B_INT32_TYPE, "The index of the new workspace.");
 	AddEvent("WorkspacesChanged", "The window has changed workspaces.", &pmi);
 		
 	fWindow = new PWindowBackend(this);
@@ -501,7 +501,7 @@ PWindowBackend::FrameMoved(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("point", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("FrameMoved", in, out);
 }
 
 
@@ -511,7 +511,7 @@ PWindowBackend::FrameResized(float w, float h)
 	PArgs in, out;
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("FrameResized", in, out);
 }
 
 
@@ -519,7 +519,7 @@ void
 PWindowBackend::MenusBeginning(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("MenusBeginning", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("MenusBeginning", in, out);
 }
 
 
@@ -527,7 +527,7 @@ void
 PWindowBackend::MenusEnded(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("MenusEnded", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("MenusEnded", in, out);
 }
 
 
@@ -536,7 +536,7 @@ PWindowBackend::WindowActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("WindowActivated", in, out);
 }
 
 
@@ -546,7 +546,7 @@ PWindowBackend::ScreenChanged(BRect frame, color_space mode)
 	PArgs in, out;
 	in.AddRect("frame", frame);
 	in.AddInt32("color_space", mode);
-	fOwner->RunEvent("ScreenChanged", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("ScreenChanged", in, out);
 }
 
 
@@ -556,7 +556,7 @@ PWindowBackend::WorkspaceActivated(int32 workspace, bool active)
 	PArgs in, out;
 	in.AddInt32("workspace", workspace);
 	in.AddBool("active", active);
-	fOwner->RunEvent("WorkspaceActivated", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("WorkspaceActivated", in, out);
 }
 
 
@@ -566,7 +566,7 @@ PWindowBackend::WorkspacesChanged(uint32 oldspace, uint32 newspace)
 	PArgs in, out;
 	in.AddInt32("old", oldspace);
 	in.AddInt32("new", newspace);
-	fOwner->RunEvent("WorkspacesChanged", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("WorkspacesChanged", in, out);
 }
 
 
@@ -575,7 +575,7 @@ PWindowBackend::QuitRequested(void)
 {
 	STRACE(("PWindow Quit Requested\n"), TRACE_DESTROY);
 	PArgs in, out;
-	fOwner->RunEvent("QuitRequested", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("QuitRequested", in, out);
 	
 	bool quit;
 	if (out.FindBool("value", &quit) != B_OK)
@@ -602,8 +602,8 @@ PWindowBackend::MessageReceived(BMessage *msg)
 	if (window->GetMsgHandler(msg->what))
 	{
 		PArgs args;
-		window->ConvertMsgToArgs(*msg, args.ListRef());
-		if (window->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+		window->ConvertMsgToArgs(*msg, args);
+		if (window->RunMessageHandler(msg->what, args) == B_OK)
 			return;
 	}
 	
@@ -633,7 +633,7 @@ PWindowBackend::GetOwner(void)
 
 
 int32_t
-PWindowAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PWindowAddChild(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -644,14 +644,12 @@ PWindowAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	empty_parglist(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	uint64 id;
-	if (find_parg_int64(in, "id",(int64*)&id) != B_OK)
-	{
-		add_parg_int32(out, "error", B_ERROR);
+	if (args->FindInt64("id",(int64*)&id) != B_OK)
 		return B_ERROR;
-	}
 	
 	fWindow->Lock();
 	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
@@ -669,7 +667,7 @@ PWindowAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PWindowRemoveChild(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -680,14 +678,12 @@ PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	empty_parglist(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	uint64 id;
-	if (find_parg_int64(in, "id",(int64*)&id) != B_OK)
-	{
-		add_parg_int32(out, "error", B_ERROR);
+	if (args->FindInt64("id",(int64*)&id) != B_OK)
 		return B_ERROR;
-	}
 	
 	fWindow->Lock();
 	
@@ -707,7 +703,7 @@ PWindowRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PWindowChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PWindowChildAt(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -718,7 +714,8 @@ PWindowChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	empty_parglist(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	int32_t index;
 	if (find_parg_int32(in, "index",&index) != B_OK)
@@ -745,7 +742,7 @@ PWindowChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PWindowCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PWindowCountChildren(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -756,7 +753,8 @@ PWindowCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	
 	BWindow *fWindow = pwin->GetWindow();
 	
-	empty_parglist(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	fWindow->Lock();
 	add_parg_int32(out, "count", fWindow->CountChildren());
@@ -767,7 +765,7 @@ PWindowCountChildren(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PWindowFindView(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PWindowFindView(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject)
 		return B_ERROR;
@@ -775,33 +773,28 @@ PWindowFindView(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	PWindow *pwin = static_cast<PWindow*>(pobject);
 	if (!pwin)
 		return B_BAD_TYPE;
+	PWindowBackend *fWindow = static_cast<PWindowBackend*>(pwin->GetWindow());
 	
-	BWindow *fWindow = pwin->GetWindow();
-	
-	empty_parglist(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	BPoint point;
-	char *name;
-	if (find_parg_string(in, "name", &name) != B_OK &&
-		find_parg_point(in, "point", &point.x, &point.y) != B_OK)
-	{
-		add_parg_int32(out, "error", B_ERROR);
+	BString name;
+	if (args->FindString("name", &name) != B_OK &&
+		args->FindPoint("point", &point) != B_OK)
 		return B_ERROR;
-	}
 	
 	fWindow->Lock();
 	
-	BView *view = (strlen(name) > 0) ? fWindow->FindView(name) : 
+	BView *view = (name.CountChars() > 0) ? fWindow->FindView(name.String()) : 
 					fWindow->FindView(point);
-	
-	free(name);
 	
 	PView *pview = dynamic_cast<PView*>(view);
 	
 	if (!view || !pview)
-		add_parg_int32(out, "id", 0);
+		outArgs->AddInt64("id", 0);
 	else
-		add_parg_int32(out, "id", pview->GetID());
+		outArgs->AddInt64("id", pview->GetID());
 	
 	fWindow->Unlock();
 	

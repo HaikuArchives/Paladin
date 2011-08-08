@@ -432,7 +432,7 @@ PScrollBarBackend::AttachedToWindow(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::AttachedToWindow();
 }
@@ -444,7 +444,7 @@ PScrollBarBackend::AllAttached(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllAttached");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::AllAttached();
 }
@@ -456,7 +456,7 @@ PScrollBarBackend::DetachedFromWindow(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("DetachedFromWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::DetachedFromWindow();
 }
@@ -468,7 +468,7 @@ PScrollBarBackend::AllDetached(void)
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("AllDetached");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::AllDetached();
 }
@@ -481,7 +481,7 @@ PScrollBarBackend::MakeFocus(bool value)
 	in.AddBool("focus", value);
 	EventData *data = fOwner->FindEvent("FocusChanged");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::MakeFocus(value);
 }
@@ -494,7 +494,7 @@ PScrollBarBackend::FrameMoved(BPoint pt)
 	in.AddPoint("where", pt);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::FrameMoved(pt);
 }
@@ -508,7 +508,7 @@ PScrollBarBackend::FrameResized(float w, float h)
 	in.AddFloat("height", h);
 	EventData *data = fOwner->FindEvent("AttachedToWindow");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::FrameResized(w, h);
 }
@@ -518,11 +518,11 @@ void
 PScrollBarBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::KeyDown(bytes, count);
 }
@@ -532,11 +532,11 @@ void
 PScrollBarBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::KeyUp(bytes, count);
 }
@@ -549,7 +549,7 @@ PScrollBarBackend::MouseDown(BPoint pt)
 	in.AddPoint("where", pt);
 	EventData *data = fOwner->FindEvent("MouseDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::MouseDown(pt);
 }
@@ -562,7 +562,7 @@ PScrollBarBackend::MouseUp(BPoint pt)
 	in.AddPoint("where", pt);
 	EventData *data = fOwner->FindEvent("MouseUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::MouseUp(pt);
 }
@@ -577,7 +577,7 @@ PScrollBarBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 	in.AddPointer("message", (void*)msg);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::MouseMoved(pt, transit, msg);
 }
@@ -590,7 +590,7 @@ PScrollBarBackend::WindowActivated(bool active)
 	in.AddBool("active", active);
 	EventData *data = fOwner->FindEvent("WindowActivated");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::WindowActivated(active);
 }
@@ -605,7 +605,7 @@ PScrollBarBackend::Draw(BRect update)
 	
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("Draw", in, out);
 	
 	if (IsFocus())
 	{
@@ -624,7 +624,7 @@ PScrollBarBackend::DrawAfterChildren(BRect update)
 	in.AddRect("update", update);
 	EventData *data = fOwner->FindEvent("DrawAfterChildren");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BScrollBar::DrawAfterChildren(update);
 }
@@ -637,8 +637,8 @@ PScrollBarBackend::MessageReceived(BMessage *msg)
 	if (view->GetMsgHandler(msg->what))
 	{
 		PArgs args;
-		view->ConvertMsgToArgs(*msg, args.ListRef());
-		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+		view->ConvertMsgToArgs(*msg, args);
+		if (view->RunMessageHandler(msg->what, args) == B_OK)
 			return;
 	}
 	

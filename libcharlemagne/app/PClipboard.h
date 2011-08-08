@@ -1,11 +1,16 @@
 #ifndef PCLIPBOARD_H
 #define PCLIPBOARD_H
 
-#include "PHandler.h"
+#include "PObject.h"
+#include <Application.h>
+#include <Clipboard.h>
+#include <Window.h>
+
 
 class BClipboard;
 
-class PClipboard : public PHandler
+
+class PClipboard : public PObject
 {
 public:
 							PClipboard(void);
@@ -31,7 +36,8 @@ private:
 			void			InitProperties(void);
 			void			InitMethods(void);
 
-			BClipboard *fBackend;
+			BClipboard		*fBackend;
+
 };
 
 #endif

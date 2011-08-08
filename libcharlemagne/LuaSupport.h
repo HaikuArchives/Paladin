@@ -21,9 +21,9 @@
 BString		LuaTypeToString(lua_State *L, int index, int type);
 void		DumpLuaTable(lua_State *L, int tableIndex);
 void		DumpLuaStack(lua_State *L);
-int			PushArgList(lua_State *L, PArgList *list);
-int32		ReadMethodArgs(lua_State *L, PArgList *list, PMethodInterface pmi, int32 tableIndex);
-int32		ReadReturnValues(lua_State *L, PArgList *list, PMethodInterface pmi, int tableIndex);
+int			PushArgList(lua_State *L, PArgs *list);
+int32		ReadMethodArgs(lua_State *L, PArgs *list, PMethodInterface pmi, int32 tableIndex);
+int32		ReadReturnValues(lua_State *L, PArgs *list, PMethodInterface pmi, int tableIndex);
 
 int			GetTableSize(lua_State *L, int tableIndex);
 int			CountTableData(lua_State *L, int tableIndex);

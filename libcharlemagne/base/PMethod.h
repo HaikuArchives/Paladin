@@ -26,7 +26,7 @@ class PMethodInterfaceData
 public:
 							PMethodInterfaceData(void)
 							{
-								type = PARG_END;
+								type = 0;
 							}
 							PMethodInterfaceData(PMethodInterfaceData &from)
 							{
@@ -35,7 +35,7 @@ public:
 								description = from.description;
 							}
 							PMethodInterfaceData(const char *inName,
-												const PArgType &inType,
+												const type_code &inType,
 												const char *inDescription,
 												uint32 inFlags = 0)
 							{
@@ -46,7 +46,7 @@ public:
 							}
 							
 			BString			name;
-			PArgType		type;
+			type_code		type;
 			BString			description;
 			int32			flags;
 };
@@ -64,29 +64,29 @@ public:
 			void			MakeEmpty(void);
 			
 	virtual	status_t		SetArg(const int32 &index, const char *name,
-									const PArgType &type,
+									const type_code &type,
 									const char *description = NULL,
 									const int32 &flags = 0);
-	virtual	status_t		AddArg(const char *name, const PArgType &type,
+	virtual	status_t		AddArg(const char *name, const type_code &type,
 									const char *description = NULL,
 									const int32 &flags = 0);
 	virtual	status_t		RemoveArg(const int32 &index);
 	
 			BString			ArgNameAt(const int32 &index);
-			PArgType		ArgTypeAt(const int32 &index);
+			type_code		ArgTypeAt(const int32 &index);
 			BString			ArgDescAt(const int32 &index);
 			int32			ArgFlagsAt(const int32 &index);
 			int32			CountArgs(void) const;
 			int32			FindArg(const char *name) const;
 			
 	virtual	status_t		SetReturnValue(const int32 &index, const char *name,
-									const PArgType &type,
+									const type_code &type,
 									const char *description = NULL);
-	virtual	status_t		AddReturnValue(const char *name, const PArgType &type,
+	virtual	status_t		AddReturnValue(const char *name, const type_code &type,
 									const char *description = NULL);
 	virtual	status_t		RemoveReturnValue(const int32 &index);
 			BString			ReturnNameAt(const int32 &index);
-			PArgType		ReturnTypeAt(const int32 &index);
+			type_code		ReturnTypeAt(const int32 &index);
 			BString			ReturnDescAt(const int32 &index);
 			int32			ReturnFlagsAt(const int32 &index);
 			int32			CountReturnValues(void) const;
@@ -126,7 +126,7 @@ public:
 			void			SetCode(const BString &string);
 			BString			GetCode(void) const;
 	
-	virtual	status_t		Run(PObject *object, PArgList &in, PArgList &out,
+	virtual	status_t		Run(PObject *object, PArgs &in, PArgs &out,
 								void *extraData = NULL);
 	
 private:

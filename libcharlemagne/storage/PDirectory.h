@@ -27,7 +27,6 @@ public:
 	virtual	PObject *		Duplicate(void) const;
 	
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
-	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 
 			BDirectory *	GetBackend(void) const;
 

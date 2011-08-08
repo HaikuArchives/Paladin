@@ -1,35 +1,32 @@
 #include "PColorControl.h"
 
-#include <Application.h>
-#include <ColorControl.h>
-#include <stdio.h>
-#include <Window.h>
 
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
 class PColorControlBackend : public BColorControl
 {
 public:
 			PColorControlBackend(PObject *owner);
 
-	void	AttachedToWindow();
-	void	DetachedFromWindow();
-	void	AllAttached();
-	void	AllDetached();
-	void	Pulse();
-	void	MakeFocus(bool param1);
 	void	FrameMoved(BPoint param1);
 	void	FrameResized(float param1, float param2);
-	void	MouseDown(BPoint param1);
-	void	MouseUp(BPoint param1);
-	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
-	void	WindowActivated(bool param1);
-	void	Draw(BRect param1);
-	void	DrawAfterChildren(BRect param1);
-	void	KeyDown(const char *bytes, int32 count);
 	void	KeyUp(const char *bytes, int32 count);
+	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
+	void	Draw(BRect param1);
+	void	AttachedToWindow(void);
+	void	Pulse(void);
+	void	MouseDown(BPoint param1);
+	void	AllAttached(void);
+	void	MakeFocus(bool param1);
+	void	AllDetached(void);
+	void	MouseUp(BPoint param1);
+	void	WindowActivated(bool param1);
+	void	DrawAfterChildren(BRect param1);
+	void	DetachedFromWindow(void);
+	void	KeyDown(const char *bytes, int32 count);
 
 private:
 	PObject *fOwner;
@@ -38,25 +35,26 @@ private:
 
 PColorControl::PColorControl(void)
 	:	PControl()
+
 {
 	fType = "PColorControl";
 	fFriendlyType = "ColorControl";
 	AddInterface("PColorControl");
 	
 	InitBackend();
-	InitProperties();
 	InitMethods();
 }
 
 
 PColorControl::PColorControl(BMessage *msg)
 	:	PControl(msg)
+
 {
 	fType = "PColorControl";
 	fFriendlyType = "ColorControl";
 	AddInterface("PColorControl");
 	
-	BMessage viewmsg;
+		BMessage viewmsg;
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
 		fView = (BView*)PColorControlBackend::Instantiate(&viewmsg);
 
@@ -67,6 +65,7 @@ PColorControl::PColorControl(BMessage *msg)
 
 PColorControl::PColorControl(const char *name)
 	:	PControl(name)
+
 {
 	fType = "PColorControl";
 	fFriendlyType = "ColorControl";
@@ -79,6 +78,7 @@ PColorControl::PColorControl(const char *name)
 
 PColorControl::PColorControl(const PColorControl &from)
 	:	PControl(from)
+
 {
 	fType = "PColorControl";
 	fFriendlyType = "ColorControl";
@@ -116,6 +116,8 @@ PColorControl::Duplicate(void) const
 {
 	return new PColorControl(*this);
 }
+
+
 status_t
 PColorControl::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -132,10 +134,10 @@ PColorControl::GetProperty(const char *name, PValue *value, const int32 &index) 
 	if (backend->Window())
 		backend->Window()->Lock();
 
-	if (str.ICompare("CellSize") == 0)
-		((FloatProperty*)prop)->SetValue(backend->CellSize());
-	else if (str.ICompare("Layout") == 0)
+	if (str.ICompare("Layout") == 0)
 		((EnumProperty*)prop)->SetValue(backend->Layout());
+	else if (str.ICompare("CellSize") == 0)
+		((FloatProperty*)prop)->SetValue(backend->CellSize());
 	else if (str.ICompare("ValueAsColor") == 0)
 		((ColorProperty*)prop)->SetValue(backend->ValueAsColor());
 	else
@@ -170,6 +172,7 @@ PColorControl::SetProperty(const char *name, PValue *value, const int32 &index)
 	BColorControl *backend = (BColorControl*)fView;
 	
 	BoolValue boolval;
+	CharValue charval;
 	ColorValue colorval;
 	FloatValue floatval;
 	IntValue intval;
@@ -184,15 +187,15 @@ PColorControl::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (backend->Window())
 		backend->Window()->Lock();
 
-	if (str.ICompare("CellSize") == 0)
-	{
-		prop->GetValue(&floatval);
-		backend->SetCellSize(*floatval.value);
-	}
-	else if (str.ICompare("Layout") == 0)
+	if (str.ICompare("Layout") == 0)
 	{
 		prop->GetValue(&intval);
 		backend->SetLayout((color_control_layout)*intval.value);
+	}
+	else if (str.ICompare("CellSize") == 0)
+	{
+		prop->GetValue(&floatval);
+		backend->SetCellSize(*floatval.value);
 	}
 	else if (str.ICompare("ValueAsColor") == 0)
 	{
@@ -215,35 +218,35 @@ PColorControl::SetProperty(const char *name, PValue *value, const int32 &index)
 
 
 void
-PColorControl::InitBackend(void)
-{
-	if (!fView)
-		fView = new PColorControlBackend(this);
-	StringValue sv("A button");
-	SetProperty("Description", &sv);
-}
-
-
-void
 PColorControl::InitProperties(void)
 {
 	SetStringProperty("Description", "A button");
 
-	AddProperty(new FloatProperty("CellSize", 10.0));
 
 	EnumProperty *prop = NULL;
 
 	prop = new EnumProperty();
 	prop->SetName("Layout");
 	prop->SetValue((int32)B_CELLS_16x16);
-	prop->AddValuePair("4 x 64", B_CELLS_4x64);
-	prop->AddValuePair("8 x 32", B_CELLS_8x32);
-	prop->AddValuePair("16 x 16", B_CELLS_16x16);
-	prop->AddValuePair("32 x 8", B_CELLS_32x8);
-	prop->AddValuePair("64 x 4", B_CELLS_64x4);
+	prop->AddValuePair("", B_CELLS_4x64);
+	prop->AddValuePair("", B_CELLS_8x32);
+	prop->AddValuePair("", B_CELLS_16x16);
+	prop->AddValuePair("", B_CELLS_32x8);
+	prop->AddValuePair("", B_CELLS_64x4);
 	AddProperty(prop);
 
+	AddProperty(new FloatProperty("CellSize", 10.0));
 	AddProperty(new ColorProperty("ValueAsColor", 0,0,0));
+}
+
+
+void
+PColorControl::InitBackend(void)
+{
+	if (!fView)
+		fView = new PColorControlBackend(this);
+	StringValue sv("A button");
+	SetProperty("Description", &sv);
 }
 
 
@@ -263,86 +266,13 @@ PColorControlBackend::PColorControlBackend(PObject *owner)
 
 
 void
-PColorControlBackend::AttachedToWindow()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AttachedToWindow");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::AttachedToWindow();
-}
-
-
-void
-PColorControlBackend::DetachedFromWindow()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("DetachedFromWindow");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::DetachedFromWindow();
-}
-
-
-void
-PColorControlBackend::AllAttached()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllAttached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::AllAttached();
-}
-
-
-void
-PColorControlBackend::AllDetached()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllDetached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::AllDetached();
-}
-
-
-void
-PColorControlBackend::Pulse()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("Pulse");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::Pulse();
-}
-
-
-void
-PColorControlBackend::MakeFocus(bool param1)
-{
-	PArgs in, out;
-	in.AddBool("focus", param1);
-	EventData *data = fOwner->FindEvent("MakeFocus");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::MakeFocus(param1);
-}
-
-
-void
 PColorControlBackend::FrameMoved(BPoint param1)
 {
 	PArgs in, out;
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BColorControl::FrameMoved(param1);
 }
@@ -356,35 +286,23 @@ PColorControlBackend::FrameResized(float param1, float param2)
 	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BColorControl::FrameResized(param1, param2);
 }
 
 
 void
-PColorControlBackend::MouseDown(BPoint param1)
+PColorControlBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddPoint("where", param1);
-	EventData *data = fOwner->FindEvent("MouseDown");
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
+	in.AddInt32("count", count);
+	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
-		BColorControl::MouseDown(param1);
-}
-
-
-void
-PColorControlBackend::MouseUp(BPoint param1)
-{
-	PArgs in, out;
-	in.AddPoint("where", param1);
-	EventData *data = fOwner->FindEvent("MouseUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::MouseUp(param1);
+		BColorControl::KeyUp(bytes, count);
 }
 
 
@@ -397,22 +315,9 @@ PColorControlBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * 
 	in.AddPointer("message", (void*) param3);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BColorControl::MouseMoved(param1, param2, param3);
-}
-
-
-void
-PColorControlBackend::WindowActivated(bool param1)
-{
-	PArgs in, out;
-	in.AddBool("active", param1);
-	EventData *data = fOwner->FindEvent("WindowActivated");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::WindowActivated(param1);
 }
 
 
@@ -423,9 +328,109 @@ PColorControlBackend::Draw(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("Draw");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BColorControl::Draw(param1);
+}
+
+
+void
+PColorControlBackend::AttachedToWindow(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::AttachedToWindow();
+}
+
+
+void
+PColorControlBackend::Pulse(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("Pulse");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::Pulse();
+}
+
+
+void
+PColorControlBackend::MouseDown(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::MouseDown(param1);
+}
+
+
+void
+PColorControlBackend::AllAttached(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::AllAttached();
+}
+
+
+void
+PColorControlBackend::MakeFocus(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("focus", param1);
+	EventData *data = fOwner->FindEvent("MakeFocus");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::MakeFocus(param1);
+}
+
+
+void
+PColorControlBackend::AllDetached(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::AllDetached();
+}
+
+
+void
+PColorControlBackend::MouseUp(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::MouseUp(param1);
+}
+
+
+void
+PColorControlBackend::WindowActivated(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("active", param1);
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::WindowActivated(param1);
 }
 
 
@@ -436,9 +441,21 @@ PColorControlBackend::DrawAfterChildren(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("DrawAfterChildren");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BColorControl::DrawAfterChildren(param1);
+}
+
+
+void
+PColorControlBackend::DetachedFromWindow(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		BColorControl::DetachedFromWindow();
 }
 
 
@@ -446,27 +463,13 @@ void
 PColorControlBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BColorControl::KeyDown(bytes, count);
-}
-
-
-void
-PColorControlBackend::KeyUp(const char *bytes, int32 count)
-{
-	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
-	in.AddInt32("count", count);
-	EventData *data = fOwner->FindEvent("KeyUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		BColorControl::KeyUp(bytes, count);
 }
 
 

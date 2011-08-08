@@ -6,9 +6,9 @@
 #include "PMethod.h"
 #include "PObjectBroker.h"
 
-int32_t PMenuItemGetShortcut(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PMenuItemSubmenu(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PMenuItemGetShortcut(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PMenuItemSubmenu(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PMenuItemSetShortcut(void *pobject, void *in, void *out, void *ptr = NULL);
 
 PMenuItem::PMenuItem(void)
 	:	PObject()
@@ -225,17 +225,17 @@ PMenuItem::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
-	pmi.AddReturnValue("shortcut", PARG_CHAR, " the item's shortcut character");
-	pmi.AddReturnValue("modifiers", PARG_INT32, " the item's shortcut modifier keys");
+	pmi.AddReturnValue("shortcut", B_CHAR_TYPE, " the item's shortcut character");
+	pmi.AddReturnValue("modifiers", B_INT32_TYPE, " the item's shortcut modifier keys");
 	AddMethod(new PMethod("GetShortcut", PMenuItemGetShortcut, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("shortcut", PARG_CHAR, " character to define as the item's shortcut", 0);
-	pmi.AddArg("modifiers", PARG_INT32, " constants for modifier keys, like the Control key.", 0);
+	pmi.AddArg("shortcut", B_CHAR_TYPE, " character to define as the item's shortcut", 0);
+	pmi.AddArg("modifiers", B_INT32_TYPE, " constants for modifier keys, like the Control key.", 0);
 	AddMethod(new PMethod("SetShortcut", PMenuItemSetShortcut, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddReturnValue("id", PARG_INT64, " object ID of the owning menu, if there is one.");
+	pmi.AddReturnValue("id", B_INT64_TYPE, " object ID of the owning menu, if there is one.");
 	AddMethod(new PMethod("Submenu", PMenuItemSubmenu, &pmi));
 	pmi.MakeEmpty();
 
@@ -243,7 +243,7 @@ PMenuItem::InitMethods(void)
 
 
 int32_t
-PMenuItemGetShortcut(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PMenuItemGetShortcut(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -254,22 +254,23 @@ PMenuItemGetShortcut(void *pobject, PArgList *in, PArgList *out, void *extraData
 	
 	BMenuItem *backend = (BMenuItem*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	char outValue1;
 	uint32 outValue2;
 
 	outValue1 = backend->Shortcut(&outValue2);
 
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("modifiers", outValue2);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("modifiers", outValue2);
 
 	return B_OK;
 }
 
 
 int32_t
-PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PMenuItemSetShortcut(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -280,15 +281,16 @@ PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *extraData
 	
 	BMenuItem *backend = (BMenuItem*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
 
 	char shortcut;
-	if (inArgs.FindChar("shortcut", &shortcut) != B_OK)
+	if (inArgs->FindChar("shortcut", &shortcut) != B_OK)
 		return B_ERROR;
 
 	int32 modifiers;
 	modifiers = 0;
-	inArgs.FindInt32("modifiers", &modifiers);
+	inArgs->FindInt32("modifiers", &modifiers);
 
 
 	backend->SetShortcut(shortcut, modifiers);
@@ -298,7 +300,7 @@ PMenuItemSetShortcut(void *pobject, PArgList *in, PArgList *out, void *extraData
 
 
 int32_t
-PMenuItemSubmenu(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PMenuItemSubmenu(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -309,20 +311,19 @@ PMenuItemSubmenu(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BMenuItem *backend = (BMenuItem*)parent->GetView();
 	
-	PArgs outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	BMenu *menu = backend->Menu();
-	
-	outArgs.MakeEmpty();
 	
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(menu);
 	if (menuBackend)
 	{
 		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenu->GetID());
+		outArgs->AddInt64("id", pmenu->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 }

@@ -46,16 +46,16 @@ BeginEmbeddedCode
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	BDirectory newDir;
 	status_t status = backend->CreateDirectory(path.String(), &newDir);
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	if (status == B_OK)
 	{
@@ -65,11 +65,11 @@ BeginEmbeddedCode
 		{
 			BPath dirPath;
 			status = entry.GetPath(&dirPath);
-			outArgs.AddString("path", dirPath.Path());
+			outArgs->AddString("path", dirPath.Path());
 		}
 	}
 	
-	outArgs.AddInt32("status", status);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -89,22 +89,22 @@ BeginEmbeddedCode
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	bool dontClobber = false;
-	if (args.FindBool("dontclobber", &dontClobber) != B_OK)
+	if (args->FindBool("dontclobber", &dontClobber) != B_OK)
 		return B_ERROR;
 	
 	BFile newFile;
 	status_t status = backend->CreateFile(path.String(), &newFile,
 										dontClobber);
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -124,22 +124,22 @@ BeginEmbeddedCode
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	BString target;
-	if (args.FindString("target", &target) != B_OK)
+	if (args->FindString("target", &target) != B_OK)
 		return B_ERROR;
 	
 	BSymLink link;
 	status_t status = backend->CreateSymLink(path.String(),
 											target.String(), &link);
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -157,7 +157,8 @@ BeginEmbeddedCode
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	PArgs nameList;
 	backend->Rewind();
@@ -165,11 +166,8 @@ BeginEmbeddedCode
 	while (backend->GetNextRef(&ref) == B_OK)
 	{
 		if (ref.name)
-			nameList.AddString("name", ref.name);
+			outArgs->AddString("name", ref.name);
 	}
-	
-	outArgs.MakeEmpty();
-	outArgs.AddList("entries", nameList);
 	
 	return B_OK;
 EndEmbeddedCode

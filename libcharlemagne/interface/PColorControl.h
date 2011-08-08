@@ -2,8 +2,14 @@
 #define PCOLORCONTROL_H
 
 #include "PControl.h"
+#include <Application.h>
+#include <ColorControl.h>
+#include <stdio.h>
+#include <Window.h>
 
 
+class PColorControlBackend;
+class BColorControl;
 
 class PColorControl : public PControl
 {
@@ -22,6 +28,7 @@ public:
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 
+			BColorControl *	GetBackend(void) const;
 
 protected:
 	virtual	void			InitBackend(void);

@@ -4,12 +4,13 @@
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
-int32_t PDirectoryCreateFile(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PDirectoryGetEntries(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PDirectoryContains(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PDirectoryCreateSymLink(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PDirectoryCreateDirectory(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PDirectoryCreateFile(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PDirectoryGetEntries(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PDirectoryContains(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PDirectoryCreateSymLink(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PDirectoryCreateDirectory(void *pobject, void *in, void *out, void *ptr = NULL);
 
 PDirectory::PDirectory(void)
 	:	PNode()
@@ -119,39 +120,6 @@ PDirectory::GetProperty(const char *name, PValue *value, const int32 &index) con
 }
 
 
-status_t
-PDirectory::SetProperty(const char *name, PValue *value, const int32 &index)
-{
-	if (!name || !value)
-		return B_ERROR;
-	
-	BString str(name);
-	PProperty *prop = FindProperty(name,index);
-	if (!prop)
-		return B_NAME_NOT_FOUND;
-	
-	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
-		return B_READ_ONLY;
-	
-	BDirectory *backend = (BDirectory*)fBackend;
-	
-	BoolValue boolval;
-	CharValue charval;
-	ColorValue colorval;
-	FloatValue floatval;
-	IntValue intval;
-	PointValue pointval;
-	RectValue rectval;
-	StringValue stringval;
-	
-	status_t status = prop->SetValue(value);
-	if (status != B_OK)
-		return status;
-
-	return PNode::SetProperty(name, value, index);
-}
-
-
 BDirectory *
 PDirectory::GetBackend(void) const
 {
@@ -184,31 +152,31 @@ PDirectory::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
-	pmi.AddArg("path", PARG_STRING, " A relative path or filename", 0);
-	pmi.AddArg("type", PARG_INT32, " An optional node type", 0);
-	pmi.AddReturnValue("value", PARG_BOOL, " True if the directory (or a subdirectory) constains the path");
+	pmi.AddArg("path", B_STRING_TYPE, " A relative path or filename", 0);
+	pmi.AddArg("type", B_INT32_TYPE, " An optional node type", 0);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, " True if the directory (or a subdirectory) constains the path");
 	AddMethod(new PMethod("Contains", PDirectoryContains, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("path", PARG_STRING, " A relative path", 0);
-	pmi.AddReturnValue("path", PARG_STRING, " The full path of the created directory");
-	pmi.AddReturnValue("status", PARG_INT32, " The error status of the call");
+	pmi.AddArg("path", B_STRING_TYPE, " A relative path", 0);
+	pmi.AddReturnValue("path", B_STRING_TYPE, " The full path of the created directory");
+	pmi.AddReturnValue("status", B_INT32_TYPE, " The error status of the call");
 	AddMethod(new PMethod("CreateDirectory", PDirectoryCreateDirectory, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("path", PARG_STRING, " A relative path", 0);
-	pmi.AddArg("dontclobber", PARG_BOOL, " Fail if the file already exists if true", 0);
-	pmi.AddReturnValue("status", PARG_INT32, " The error status of the call");
+	pmi.AddArg("path", B_STRING_TYPE, " A relative path", 0);
+	pmi.AddArg("dontclobber", B_BOOL_TYPE, " Fail if the file already exists if true", 0);
+	pmi.AddReturnValue("status", B_INT32_TYPE, " The error status of the call");
 	AddMethod(new PMethod("CreateFile", PDirectoryCreateFile, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("path", PARG_STRING, " A relative path", 0);
-	pmi.AddArg("target", PARG_STRING, " Path of the link's target", 0);
-	pmi.AddReturnValue("status", PARG_INT32, " The error status of the call");
+	pmi.AddArg("path", B_STRING_TYPE, " A relative path", 0);
+	pmi.AddArg("target", B_STRING_TYPE, " Path of the link's target", 0);
+	pmi.AddReturnValue("status", B_INT32_TYPE, " The error status of the call");
 	AddMethod(new PMethod("CreateSymLink", PDirectoryCreateSymLink, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddReturnValue("entries", PARG_LIST, " A list of filenames in the directory");
+	pmi.AddReturnValue("entries", B_LIST_TYPE, " A list of filenames in the directory");
 	AddMethod(new PMethod("GetEntries", PDirectoryGetEntries, &pmi));
 	pmi.MakeEmpty();
 
@@ -216,7 +184,7 @@ PDirectory::InitMethods(void)
 
 
 int32_t
-PDirectoryContains(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PDirectoryContains(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -227,28 +195,31 @@ PDirectoryContains(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	BString path;
-	if (inArgs.FindString("path", &path) != B_OK)
+	if (inArgs->FindString("path", &path) != B_OK)
 		return B_ERROR;
 
 	int32 type;
-	if (inArgs.FindInt32("type", &type) != B_OK)
+	if (inArgs->FindInt32("type", &type) != B_OK)
 		return B_ERROR;
 
 	bool outValue1;
 
 	outValue1 = backend->Contains(path.String(), type);
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PDirectoryCreateDirectory(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PDirectoryCreateDirectory(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -259,16 +230,16 @@ PDirectoryCreateDirectory(void *pobject, PArgList *in, PArgList *out, void *extr
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	BDirectory newDir;
 	status_t status = backend->CreateDirectory(path.String(), &newDir);
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	if (status == B_OK)
 	{
@@ -278,18 +249,18 @@ PDirectoryCreateDirectory(void *pobject, PArgList *in, PArgList *out, void *extr
 		{
 			BPath dirPath;
 			status = entry.GetPath(&dirPath);
-			outArgs.AddString("path", dirPath.Path());
+			outArgs->AddString("path", dirPath.Path());
 		}
 	}
 	
-	outArgs.AddInt32("status", status);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PDirectoryCreateFile(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PDirectoryCreateFile(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -300,29 +271,29 @@ PDirectoryCreateFile(void *pobject, PArgList *in, PArgList *out, void *extraData
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	bool dontClobber = false;
-	if (args.FindBool("dontclobber", &dontClobber) != B_OK)
+	if (args->FindBool("dontclobber", &dontClobber) != B_OK)
 		return B_ERROR;
 	
 	BFile newFile;
 	status_t status = backend->CreateFile(path.String(), &newFile,
 										dontClobber);
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PDirectoryCreateSymLink(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PDirectoryCreateSymLink(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -333,29 +304,29 @@ PDirectoryCreateSymLink(void *pobject, PArgList *in, PArgList *out, void *extraD
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	BString target;
-	if (args.FindString("target", &target) != B_OK)
+	if (args->FindString("target", &target) != B_OK)
 		return B_ERROR;
 	
 	BSymLink link;
 	status_t status = backend->CreateSymLink(path.String(),
 											target.String(), &link);
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PDirectoryGetEntries(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PDirectoryGetEntries(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -366,7 +337,8 @@ PDirectoryGetEntries(void *pobject, PArgList *in, PArgList *out, void *extraData
 	
 	BDirectory *backend = (BDirectory*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	PArgs nameList;
 	backend->Rewind();
@@ -374,11 +346,8 @@ PDirectoryGetEntries(void *pobject, PArgList *in, PArgList *out, void *extraData
 	while (backend->GetNextRef(&ref) == B_OK)
 	{
 		if (ref.name)
-			nameList.AddString("name", ref.name);
+			outArgs->AddString("name", ref.name);
 	}
-	
-	outArgs.MakeEmpty();
-	outArgs.AddList("entries", nameList);
 	
 	return B_OK;
 }

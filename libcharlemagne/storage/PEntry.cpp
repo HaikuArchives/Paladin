@@ -1,19 +1,18 @@
 #include "PEntry.h"
 
-#include <Directory.h>
-#include <Entry.h>
-#include <Path.h>
 
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
-int32_t PEntryRemove(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PEntryRename(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PEntryMoveTo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PEntryRemove(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PEntryRename(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PEntryMoveTo(void *pobject, void *in, void *out, void *ptr = NULL);
 
 PEntry::PEntry(void)
 	:	PObject()
+
 {
 	fType = "PEntry";
 	fFriendlyType = "Entry";
@@ -26,6 +25,7 @@ PEntry::PEntry(void)
 
 PEntry::PEntry(BMessage *msg)
 	:	PObject(msg)
+
 {
 	fType = "PEntry";
 	fFriendlyType = "Entry";
@@ -39,6 +39,7 @@ PEntry::PEntry(BMessage *msg)
 
 PEntry::PEntry(const char *name)
 	:	PObject(name)
+
 {
 	fType = "PEntry";
 	fFriendlyType = "Entry";
@@ -51,6 +52,7 @@ PEntry::PEntry(const char *name)
 
 PEntry::PEntry(const PEntry &from)
 	:	PObject(from)
+
 {
 	fType = "PEntry";
 	fFriendlyType = "Entry";
@@ -236,16 +238,16 @@ PEntry::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
-	pmi.AddArg("path", PARG_STRING, " The new path to receive the entry", 0);
-	pmi.AddReturnValue("error", PARG_INT32, " Success or error state of the call");
+	pmi.AddArg("path", B_STRING_TYPE, " The new path to receive the entry", 0);
+	pmi.AddReturnValue("error", B_INT32_TYPE, " Success or error state of the call");
 	AddMethod(new PMethod("MoveTo", PEntryMoveTo, &pmi));
 	pmi.MakeEmpty();
 
 	AddMethod(new PMethod("Remove", PEntryRemove, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("newname", PARG_STRING, " The new name of the entry", 0);
-	pmi.AddReturnValue("error", PARG_INT32, " Success or error state of the call");
+	pmi.AddArg("newname", B_STRING_TYPE, " The new name of the entry", 0);
+	pmi.AddReturnValue("error", B_INT32_TYPE, " Success or error state of the call");
 	AddMethod(new PMethod("Rename", PEntryRename, &pmi));
 	pmi.MakeEmpty();
 
@@ -253,7 +255,7 @@ PEntry::InitMethods(void)
 
 
 int32_t
-PEntryMoveTo(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PEntryMoveTo(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -264,23 +266,24 @@ PEntryMoveTo(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BEntry *backend = (BEntry*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	
 	BString string;
-	if (args.FindString("path", &string) != B_OK)
+	if (args->FindString("path", &string) != B_OK)
 		return B_ERROR;
 	
 	BDirectory dir(string.String());
 	status_t status = backend->MoveTo(&dir);
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PEntryRemove(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PEntryRemove(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -290,9 +293,6 @@ PEntryRemove(void *pobject, PArgList *in, PArgList *out, void *extraData)
 		return B_BAD_TYPE;
 	
 	BEntry *backend = (BEntry*)parent->GetBackend();
-
-	PArgs inArgs(in), outArgs(out);
-
 
 	backend->Remove();
 
@@ -301,7 +301,7 @@ PEntryRemove(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PEntryRename(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PEntryRename(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -312,15 +312,16 @@ PEntryRename(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BEntry *backend = (BEntry*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+		
 	BString string;
-	if (args.FindString("newname", &string) != B_OK)
+	if (args->FindString("newname", &string) != B_OK)
 		return B_ERROR;
 	
 	status_t status = backend->Rename(string.String());
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }

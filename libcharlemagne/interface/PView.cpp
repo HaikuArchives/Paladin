@@ -22,9 +22,9 @@ static const uint32 ksFollowBottom = B_FOLLOW_BOTTOM;
 static const uint32 ksFollowTopBottom = B_FOLLOW_TOP_BOTTOM;
 static const uint32 ksFollowVCenter = B_FOLLOW_V_CENTER;
 
-int32_t PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PViewRemoveChild(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PViewChildAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PViewAddChild(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PViewRemoveChild(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PViewChildAt(void *pobject, void *in, void *out, void *ptr = NULL);
 
 class PViewBackend : public BView
 {
@@ -607,13 +607,13 @@ void
 PView::InitMethods(void)
 {
 	PMethodInterface pmi;
-	pmi.AddArg("id", PARG_INT64, "The object ID of the child view to add.");
+	pmi.AddArg("id", B_INT64_TYPE, "The object ID of the child view to add.");
 	AddMethod(new PMethod("AddChild", PViewAddChild, &pmi));
 	
-	pmi.SetArg(0, "id", PARG_INT64, "The object ID of the child view to remove.");
+	pmi.SetArg(0, "id", B_INT64_TYPE, "The object ID of the child view to remove.");
 	AddMethod(new PMethod("RemoveChild", PViewRemoveChild, &pmi));
 	
-	pmi.SetArg(0, "index", PARG_INT32, "The index of the child to return.");
+	pmi.SetArg(0, "index", B_INT64_TYPE, "The object ID of the child at the specified index.");
 	AddMethod(new PMethod("ChildAt", PViewChildAt, &pmi));
 	
 	// These all void which return no data, so no interface needs to be set.
@@ -622,46 +622,46 @@ PView::InitMethods(void)
 	AddEvent("DetachedFromWindow", "The view was removed from a window.");
 	AddEvent("AllDetached", "All views have been removed from the window.");
 	
-	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the view currently has the focus.");
+	pmi.SetArg(0, "active", B_BOOL_TYPE, "Whether or not the view currently has the focus.");
 	AddEvent("MakeFocus", "The view gained or lost focus.", &pmi);
 	
-	pmi.SetArg(0, "where", PARG_POINT, "The new location of the view in its parent's coordinates.");
+	pmi.SetArg(0, "where", B_POINT_TYPE, "The new location of the view in its parent's coordinates.");
 	AddEvent("FrameMoved", "The view was moved.", &pmi);
 	
-	pmi.SetArg(0, "width", PARG_FLOAT, "The new width of the view.");
-	pmi.AddArg("height", PARG_FLOAT, "The new height of the view.");
+	pmi.SetArg(0, "width", B_FLOAT_TYPE, "The new width of the view.");
+	pmi.AddArg("height", B_FLOAT_TYPE, "The new height of the view.");
 	AddEvent("FrameResized", "The view was resized.", &pmi);
 	
-	pmi.SetArg(0, "bytes", PARG_RAW, "An array of characters representing the key. It is not "
+	pmi.SetArg(0, "bytes", B_RAW_TYPE, "An array of characters representing the key. It is not "
 									"a zero-terminated string.");
-	pmi.SetArg(1, "count", PARG_INT32, "The size of the bytes field");
+	pmi.SetArg(1, "count", B_INT32_TYPE, "The size of the bytes field");
 	AddEvent("KeyDown", "A key was pressed.", &pmi);
 	AddEvent("KeyUp", "A key was released.", &pmi);
 	pmi.RemoveArg(1);
 	
-	pmi.SetArg(0, "where", PARG_POINT, "The location of the mouse when the button was pressed.");
+	pmi.SetArg(0, "where", B_POINT_TYPE, "The location of the mouse when the button was pressed.");
 	AddEvent("MouseDown", "A button was pressed over the view.", &pmi);
 	
-	pmi.SetArg(0, "where", PARG_POINT, "The current location of the mouse.");
-	pmi.AddArg("transit", PARG_INT32, "The transition state.");
-	pmi.AddArg("message", PARG_POINTER, "Attached data if dragging something.");
+	pmi.SetArg(0, "where", B_POINT_TYPE, "The current location of the mouse.");
+	pmi.AddArg("transit", B_INT32_TYPE, "The transition state.");
+	pmi.AddArg("message", B_POINTER_TYPE, "Attached data if dragging something.");
 	AddEvent("MouseMoved", "The mouse was moved over the view.", &pmi);
 	pmi.RemoveArg(2);
 	pmi.RemoveArg(1);
 	
-	pmi.SetArg(0, "where", PARG_POINT, "The location of the mouse when the button was released.");
+	pmi.SetArg(0, "where", B_POINT_TYPE, "The location of the mouse when the button was released.");
 	AddEvent("MouseUp", "A button was released over the view.", &pmi);
 	
 	// Also a method with no data in or out
 	AddEvent("Pulse", "Called at regular intervals.");
 	
-	pmi.SetArg(0, "update", PARG_RECT, "The area needing to be redrawn.");
+	pmi.SetArg(0, "update", B_RECT_TYPE, "The area needing to be redrawn.");
 	AddEvent("Draw", "The view was asked to draw itself.", &pmi);
 	
-	pmi.SetArg(0, "update", PARG_RECT, "The area that was needing redrawn in Draw()");
+	pmi.SetArg(0, "update", B_RECT_TYPE, "The area that was needing redrawn in Draw()");
 	AddEvent("DrawAfterChildren", "Invoked when the view is to draw after its children.", &pmi);
 	
-	pmi.SetArg(0, "active", PARG_BOOL, "Whether or not the window is now active.");
+	pmi.SetArg(0, "active", B_BOOL_TYPE, "Whether or not the window is now active.");
 	AddEvent("WindowActivated", "The window was activated.", &pmi);
 }
 
@@ -798,7 +798,7 @@ void
 PViewBackend::AttachedToWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AttachedToWindow", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("AttachedToWindow", in, out);
 }
 
 
@@ -806,7 +806,7 @@ void
 PViewBackend::AllAttached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllAttached", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("AllAttached", in, out);
 }
 
 
@@ -814,7 +814,7 @@ void
 PViewBackend::DetachedFromWindow(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("DetachedFromWindow", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("DetachedFromWindow", in, out);
 }
 
 
@@ -822,7 +822,7 @@ void
 PViewBackend::AllDetached(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AllDetached", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("AllDetached", in, out);
 }
 
 
@@ -833,7 +833,7 @@ PViewBackend::MakeFocus(bool value)
 	in.AddBool("focus", value);
 	EventData *data = fOwner->FindEvent("FocusChanged");
 	if (data && data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		BView::MakeFocus(value);
 }
@@ -844,7 +844,7 @@ PViewBackend::FrameMoved(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("FrameMoved", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("FrameMoved", in, out);
 }
 
 
@@ -854,7 +854,7 @@ PViewBackend::FrameResized(float w, float h)
 	PArgs in, out;
 	in.AddFloat("width", w);
 	in.AddFloat("height", h);
-	fOwner->RunEvent("FrameResized", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("FrameResized", in, out);
 }
 
 
@@ -862,9 +862,9 @@ void
 PViewBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyDown", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("KeyDown", in, out);
 }
 
 
@@ -872,9 +872,9 @@ void
 PViewBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
-	fOwner->RunEvent("KeyUp", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("KeyUp", in, out);
 }
 
 
@@ -883,7 +883,7 @@ PViewBackend::MouseDown(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseDown", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("MouseDown", in, out);
 }
 
 
@@ -892,7 +892,7 @@ PViewBackend::MouseUp(BPoint pt)
 {
 	PArgs in, out;
 	in.AddPoint("where", pt);
-	fOwner->RunEvent("MouseUp", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("MouseUp", in, out);
 }
 
 
@@ -903,7 +903,7 @@ PViewBackend::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 	in.AddPoint("where", pt);
 	in.AddInt32("transit", transit);
 	in.AddPointer("message", (void*)msg);
-	fOwner->RunEvent("MouseMoved", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("MouseMoved", in, out);
 }
 
 
@@ -912,7 +912,7 @@ PViewBackend::WindowActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("WindowActivated", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("WindowActivated", in, out);
 }
 
 
@@ -921,7 +921,7 @@ PViewBackend::Draw(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("Draw", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("Draw", in, out);
 	
 	if (IsFocus())
 	{
@@ -938,7 +938,7 @@ PViewBackend::DrawAfterChildren(BRect update)
 {
 	PArgs in, out;
 	in.AddRect("update", update);
-	fOwner->RunEvent("DrawAfterChildren", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("DrawAfterChildren", in, out);
 }
 
 
@@ -949,8 +949,8 @@ PViewBackend::MessageReceived(BMessage *msg)
 	if (view->GetMsgHandler(msg->what))
 	{
 		PArgs args;
-		view->ConvertMsgToArgs(*msg, args.ListRef());
-		if (view->RunMessageHandler(msg->what, args.ListRef()) == B_OK)
+		view->ConvertMsgToArgs(*msg, args);
+		if (view->RunMessageHandler(msg->what, args) == B_OK)
 			return;
 	}
 	
@@ -959,7 +959,7 @@ PViewBackend::MessageReceived(BMessage *msg)
 
 
 int32_t
-PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PViewAddChild(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -970,14 +970,12 @@ PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BView *fView = parent->GetView();
 	
-	empty_parglist(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	uint64 id;
-	if (find_parg_int64(in, "id", (int64*)&id) != B_OK)
-	{
-		add_parg_int32(out, "error", B_ERROR);
+	if (args->FindInt64("id", (int64*)&id) != B_OK)
 		return B_ERROR;
-	}
 	
 	bool unlock = false;
 	if (fView->Window())
@@ -986,9 +984,7 @@ PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 		unlock = true;
 	}
 	
-	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
-	
-	PView *pview = dynamic_cast<PView*>(broker->FindObject(id));
+	PView *pview = dynamic_cast<PView*>(BROKER->FindObject(id));
 	
 	if (pview)
 		fView->AddChild(pview->GetView());
@@ -1001,7 +997,7 @@ PViewAddChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PViewRemoveChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PViewRemoveChild(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -1012,14 +1008,12 @@ PViewRemoveChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BView *fView = parent->GetView();
 	
-	empty_parglist(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
 	uint64 id;
-	if (find_parg_int64(in, "id", (int64*)&id) != B_OK)
-	{
-		add_parg_int32(out, "error", B_ERROR);
+	if (args->FindInt64("id", (int64*)&id) != B_OK)
 		return B_ERROR;
-	}
 	
 	bool unlock = false;
 	if (fView->Window())
@@ -1044,7 +1038,7 @@ PViewRemoveChild(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int32_t
-PViewChildAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PViewChildAt(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -1055,14 +1049,12 @@ PViewChildAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BView *fView = parent->GetView();
 	
-	empty_parglist(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
 	
-	int32_t index;
-	if (find_parg_int32(in, "index", &index) != B_OK)
-	{
-		add_parg_int32(out, "error", B_ERROR);
+	int32 index;
+	if (args->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
-	}
 	
 	bool unlock = false;
 	
@@ -1076,9 +1068,9 @@ PViewChildAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	PView *pview = dynamic_cast<PView*>(view);
 	
 	if (!view || !pview)
-		add_parg_int32(out, "id", 0);
+		outArgs->AddInt64("id", 0);
 	else
-		add_parg_int32(out, "id", pview->GetID());
+		outArgs->AddInt64("id", pview->GetID());
 	
 	if (unlock)
 		fView->Window()->Unlock();

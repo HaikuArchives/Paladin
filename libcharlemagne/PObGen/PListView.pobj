@@ -17,6 +17,7 @@ FriendlyName=List
 Description=A list
 UsesView=true
 ParentClass=public PView
+GetBackend=true
 
 [properties]
 Property int(0) ItemCount : The number of items in the list. Read-only.
@@ -137,9 +138,9 @@ BeginEmbeddedCode
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	int32 what;
-	if (args.FindInt32("message", &what) != B_OK)
+	if (args->FindInt32("message", &what) != B_OK)
 		what = -1;
 	
 	if (backend->Window())
@@ -187,13 +188,13 @@ BeginEmbeddedCode
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	BString label;
-	if (args.FindString("label", &label) != B_OK)
+	if (args->FindString("label", &label) != B_OK)
 		label = "";
 	
 	int32 index;
-	if (args.FindInt32("index", &index) != B_OK)
+	if (args->FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	if (backend->Window())
@@ -209,14 +210,14 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", outValue);
 	
 	return B_OK;
 EndEmbeddedCode
 
 Method AddItems
-	Param list label(list), 1 : Text label of the new item. Optional.
+	Param string label(list), 1 : List of labels for the new items
 	Param int32 index(int32), 2? : Index to insert the new item. If omitted, item is inserted at the end of the list.
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
@@ -228,28 +229,22 @@ BeginEmbeddedCode
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in), outArgs(out);
-	PArgs nameList;
-	if (args.FindList("items", nameList) != B_OK)
-		return B_ERROR;
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 index;
-	if (args.FindInt32("index", &index) != B_OK)
+	if (args->FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	if (backend->Window())
 		backend->Window()->Lock();
 	
-	PArgListItem *item = nameList.GetFirstItem();
 	BList list;
-	while (item)
+	BString itemName;
+	int32 nameIndex = 0;
+	while (args->FindString("items", &itemName, nameIndex) == B_OK)
 	{
-		if (item->type == PARG_STRING)
-		{
-			BStringItem *newItem = new BStringItem((const char *)item->data);
-			list.AddItem(newItem);
-		}
-		item = nameList.GetNextItem(item);
+		list.AddItem(new BString(itemName));
+		nameIndex++;
 	}
 	
 	bool outValue = true;
@@ -264,8 +259,12 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue);
+	for (int32 i = 0; i < list.CountItems(); i++)
+		delete ((BString*)list.ItemAt(i));
+	list.MakeEmpty();
+	
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", outValue);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -283,9 +282,9 @@ BeginEmbeddedCode
 	
 	BListView *backend = (BListView*)parent->GetView();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	int32 index;
-	if (args.FindInt32("index", &index) != B_OK)
+	if (args->FindInt32("index", &index) != B_OK)
 		return B_ERROR;
 	
 	if (backend->Window())
@@ -296,8 +295,8 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", outValue);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", outValue);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -323,7 +322,7 @@ void
 	PArgs in, out;
 	EventData *data = fOwner->FindEvent("SelectionChanged");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		%(BACKEND_PARENT_NAME)::SelectionChanged();
 }
@@ -344,7 +343,7 @@ bool
 	EventData *data = fOwner->FindEvent("SelectionChanged");
 	if (data->hook)
 	{
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 		bool outValue;
 		if (out.FindBool("value", &outValue) != B_OK)
 			outValue = false;

@@ -145,7 +145,10 @@ function GenerateNonViewHeader(def)
 	classDef = ApplyCustomPlaceholder(classDef, "%(INCLUDE_LIST)", includeString)
 	
 	local backType = def.backend.Type:lower()
-	local parentName = def.backend.ParentClass:match("%s([%w_]+)")
+	local parentName = nil
+	if (def.backend.ParentClass) then
+		parentName = def.backend.ParentClass:match("%s([%w_]+)")
+	end
 	if (backType == "subclass") then
 		classDef = ApplyCustomPlaceholder(classDef, "%(BACKEND_CLASS_DECL)", "class " .. 
 										def.backend.Class .. ";\n" .. "class " ..

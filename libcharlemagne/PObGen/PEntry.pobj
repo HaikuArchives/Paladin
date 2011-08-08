@@ -50,6 +50,7 @@ Property int(0) ErrorStatus : Returns the error status of the entry
 [methods]
 Method MoveTo
 	Param string path(string), 1 : The new path to receive the entry
+	Return int32 error(int32), -1 : Success or error state of the call
 BeginEmbeddedCode
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -60,20 +61,20 @@ BeginEmbeddedCode
 	
 	BEntry *backend = (BEntry*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	
 	BString string;
-	if (args.FindString("path", &string) != B_OK)
+	if (args->FindString("path", &string) != B_OK)
 		return B_ERROR;
 	
 	BDirectory dir(string.String());
 	status_t status = backend->MoveTo(&dir);
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 EndEmbeddedCode
-	Return int32 error(int32), -1 : Success or error state of the call
 
 Method Remove
 
@@ -90,15 +91,16 @@ BeginEmbeddedCode
 	
 	BEntry *backend = (BEntry*)parent->GetBackend();
 	
-	PArgs args(in), outArgs(out);
+	PArgs *args = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+		
 	BString string;
-	if (args.FindString("newname", &string) != B_OK)
+	if (args->FindString("newname", &string) != B_OK)
 		return B_ERROR;
 	
 	status_t status = backend->Rename(string.String());
 	
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 EndEmbeddedCode

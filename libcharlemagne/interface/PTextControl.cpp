@@ -1,38 +1,34 @@
 #include "PTextControl.h"
 
-#include <Application.h>
-#include <Slider.h>
-#include <stdio.h>
-#include <Window.h>
-#include "AutoTextControl.h"
 
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
-int32_t PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PTextControlSetPreferredDivider(void *pobject, void *in, void *out, void *ptr = NULL);
 
 class PTextControlBackend : public AutoTextControl
 {
 public:
 			PTextControlBackend(PObject *owner);
 
-	void	AttachedToWindow();
-	void	DetachedFromWindow();
-	void	AllAttached();
-	void	AllDetached();
-	void	Pulse();
-	void	MakeFocus(bool param1);
 	void	FrameMoved(BPoint param1);
 	void	FrameResized(float param1, float param2);
-	void	MouseDown(BPoint param1);
-	void	MouseUp(BPoint param1);
-	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
-	void	WindowActivated(bool param1);
-	void	Draw(BRect param1);
-	void	DrawAfterChildren(BRect param1);
-	void	KeyDown(const char *bytes, int32 count);
 	void	KeyUp(const char *bytes, int32 count);
+	void	MouseMoved(BPoint param1, uint32 param2, const BMessage * param3);
+	void	Draw(BRect param1);
+	void	AttachedToWindow(void);
+	void	Pulse(void);
+	void	MouseDown(BPoint param1);
+	void	AllAttached(void);
+	void	MakeFocus(bool param1);
+	void	AllDetached(void);
+	void	MouseUp(BPoint param1);
+	void	WindowActivated(bool param1);
+	void	DrawAfterChildren(BRect param1);
+	void	DetachedFromWindow(void);
+	void	KeyDown(const char *bytes, int32 count);
 
 private:
 	PObject *fOwner;
@@ -41,25 +37,26 @@ private:
 
 PTextControl::PTextControl(void)
 	:	PControl()
+
 {
 	fType = "PTextControl";
 	fFriendlyType = "Text Control";
 	AddInterface("PTextControl");
 	
 	InitBackend();
-	InitProperties();
 	InitMethods();
 }
 
 
 PTextControl::PTextControl(BMessage *msg)
 	:	PControl(msg)
+
 {
 	fType = "PTextControl";
 	fFriendlyType = "Text Control";
 	AddInterface("PTextControl");
 	
-	BMessage viewmsg;
+		BMessage viewmsg;
 	if (msg->FindMessage("backend", &viewmsg) == B_OK)
 		fView = (BView*)PTextControlBackend::Instantiate(&viewmsg);
 
@@ -70,6 +67,7 @@ PTextControl::PTextControl(BMessage *msg)
 
 PTextControl::PTextControl(const char *name)
 	:	PControl(name)
+
 {
 	fType = "PTextControl";
 	fFriendlyType = "Text Control";
@@ -82,6 +80,7 @@ PTextControl::PTextControl(const char *name)
 
 PTextControl::PTextControl(const PTextControl &from)
 	:	PControl(from)
+
 {
 	fType = "PTextControl";
 	fFriendlyType = "Text Control";
@@ -119,6 +118,8 @@ PTextControl::Duplicate(void) const
 {
 	return new PTextControl(*this);
 }
+
+
 status_t
 PTextControl::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -135,16 +136,16 @@ PTextControl::GetProperty(const char *name, PValue *value, const int32 &index) c
 	if (backend->Window())
 		backend->Window()->Lock();
 
-	if (str.ICompare("Text") == 0)
-		((StringProperty*)prop)->SetValue(backend->Text());
-	else if (str.ICompare("Divider") == 0)
-		((FloatProperty*)prop)->SetValue(backend->Divider());
-	else if (str.ICompare("TextAlignment") == 0)
+	if (str.ICompare("TextAlignment") == 0)
 	{
 		alignment label, text;
 		backend->GetAlignment(&label, &text);
 		((IntProperty*)prop)->SetValue(text);
 	}
+	else if (str.ICompare("Text") == 0)
+		((StringProperty*)prop)->SetValue(backend->Text());
+	else if (str.ICompare("Divider") == 0)
+		((FloatProperty*)prop)->SetValue(backend->Divider());
 	else if (str.ICompare("LabelAlignment") == 0)
 	{
 		alignment label, text;
@@ -183,6 +184,7 @@ PTextControl::SetProperty(const char *name, PValue *value, const int32 &index)
 	AutoTextControl *backend = (AutoTextControl*)fView;
 	
 	BoolValue boolval;
+	CharValue charval;
 	ColorValue colorval;
 	FloatValue floatval;
 	IntValue intval;
@@ -197,7 +199,16 @@ PTextControl::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (backend->Window())
 		backend->Window()->Lock();
 
-	if (str.ICompare("Text") == 0)
+	if (str.ICompare("TextAlignment") == 0)
+	{
+		prop->GetValue(&intval);
+		
+		alignment label,text;
+		backend->GetAlignment(&label,&text);
+		text = (alignment)*intval.value;
+		backend->SetAlignment(label,text);
+	}
+	else if (str.ICompare("Text") == 0)
 	{
 		prop->GetValue(&stringval);
 		backend->SetText(*stringval.value);
@@ -206,15 +217,6 @@ PTextControl::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		prop->GetValue(&floatval);
 		backend->SetDivider(*floatval.value);
-	}
-	else if (str.ICompare("TextAlignment") == 0)
-	{
-		prop->GetValue(&intval);
-		
-		alignment label,text;
-		backend->GetAlignment(&label,&text);
-		text = (alignment)*intval.value;
-		backend->SetAlignment(label,text);
 	}
 	else if (str.ICompare("LabelAlignment") == 0)
 	{
@@ -241,24 +243,10 @@ PTextControl::SetProperty(const char *name, PValue *value, const int32 &index)
 
 
 void
-PTextControl::InitBackend(void)
-{
-	if (!fView)
-		fView = new PTextControlBackend(this);
-	
-	// The Value property for this control is pretty much useless
-	PProperty *prop = FindProperty("Value");
-	SetFlagsForProperty(prop, PROPERTY_HIDE_IN_EDITOR);
-}
-
-
-void
 PTextControl::InitProperties(void)
 {
 	SetStringProperty("Description", "A single-line text editing control");
 
-	AddProperty(new StringProperty("Text", NULL, "The control's text"));
-	AddProperty(new FloatProperty("Divider", 0.0));
 
 	EnumProperty *prop = NULL;
 
@@ -270,6 +258,8 @@ PTextControl::InitProperties(void)
 	prop->AddValuePair("Right", B_ALIGN_RIGHT);
 	AddProperty(prop);
 
+	AddProperty(new StringProperty("Text", NULL, " The control's text"));
+	AddProperty(new FloatProperty("Divider", 0.0));
 	prop = new EnumProperty();
 	prop->SetName("LabelAlignment");
 	prop->SetValue((int32)B_ALIGN_LEFT);
@@ -278,6 +268,16 @@ PTextControl::InitProperties(void)
 	prop->AddValuePair("Right", B_ALIGN_RIGHT);
 	AddProperty(prop);
 
+}
+
+
+void
+PTextControl::InitBackend(void)
+{
+	if (!fView)
+		fView = new PTextControlBackend(this);
+	StringValue sv("A single-line text editing control");
+	SetProperty("Description", &sv);
 }
 
 
@@ -293,7 +293,7 @@ PTextControl::InitMethods(void)
 
 
 int32_t
-PTextControlSetPreferredDivider(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PTextControlSetPreferredDivider(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -331,86 +331,13 @@ PTextControlBackend::PTextControlBackend(PObject *owner)
 
 
 void
-PTextControlBackend::AttachedToWindow()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AttachedToWindow");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::AttachedToWindow();
-}
-
-
-void
-PTextControlBackend::DetachedFromWindow()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("DetachedFromWindow");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::DetachedFromWindow();
-}
-
-
-void
-PTextControlBackend::AllAttached()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllAttached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::AllAttached();
-}
-
-
-void
-PTextControlBackend::AllDetached()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("AllDetached");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::AllDetached();
-}
-
-
-void
-PTextControlBackend::Pulse()
-{
-	PArgs in, out;
-	EventData *data = fOwner->FindEvent("Pulse");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::Pulse();
-}
-
-
-void
-PTextControlBackend::MakeFocus(bool param1)
-{
-	PArgs in, out;
-	in.AddBool("focus", param1);
-	EventData *data = fOwner->FindEvent("MakeFocus");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::MakeFocus(param1);
-}
-
-
-void
 PTextControlBackend::FrameMoved(BPoint param1)
 {
 	PArgs in, out;
 	in.AddPoint("where", param1);
 	EventData *data = fOwner->FindEvent("FrameMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		AutoTextControl::FrameMoved(param1);
 }
@@ -424,35 +351,23 @@ PTextControlBackend::FrameResized(float param1, float param2)
 	in.AddFloat("height", param2);
 	EventData *data = fOwner->FindEvent("FrameResized");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		AutoTextControl::FrameResized(param1, param2);
 }
 
 
 void
-PTextControlBackend::MouseDown(BPoint param1)
+PTextControlBackend::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddPoint("where", param1);
-	EventData *data = fOwner->FindEvent("MouseDown");
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
+	in.AddInt32("count", count);
+	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
-		AutoTextControl::MouseDown(param1);
-}
-
-
-void
-PTextControlBackend::MouseUp(BPoint param1)
-{
-	PArgs in, out;
-	in.AddPoint("where", param1);
-	EventData *data = fOwner->FindEvent("MouseUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::MouseUp(param1);
+		AutoTextControl::KeyUp(bytes, count);
 }
 
 
@@ -465,22 +380,9 @@ PTextControlBackend::MouseMoved(BPoint param1, uint32 param2, const BMessage * p
 	in.AddPointer("message", (void*) param3);
 	EventData *data = fOwner->FindEvent("MouseMoved");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		AutoTextControl::MouseMoved(param1, param2, param3);
-}
-
-
-void
-PTextControlBackend::WindowActivated(bool param1)
-{
-	PArgs in, out;
-	in.AddBool("active", param1);
-	EventData *data = fOwner->FindEvent("WindowActivated");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::WindowActivated(param1);
 }
 
 
@@ -491,9 +393,109 @@ PTextControlBackend::Draw(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("Draw");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		AutoTextControl::Draw(param1);
+}
+
+
+void
+PTextControlBackend::AttachedToWindow(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AttachedToWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::AttachedToWindow();
+}
+
+
+void
+PTextControlBackend::Pulse(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("Pulse");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::Pulse();
+}
+
+
+void
+PTextControlBackend::MouseDown(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseDown");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::MouseDown(param1);
+}
+
+
+void
+PTextControlBackend::AllAttached(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllAttached");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::AllAttached();
+}
+
+
+void
+PTextControlBackend::MakeFocus(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("focus", param1);
+	EventData *data = fOwner->FindEvent("MakeFocus");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::MakeFocus(param1);
+}
+
+
+void
+PTextControlBackend::AllDetached(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("AllDetached");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::AllDetached();
+}
+
+
+void
+PTextControlBackend::MouseUp(BPoint param1)
+{
+	PArgs in, out;
+	in.AddPoint("where", param1);
+	EventData *data = fOwner->FindEvent("MouseUp");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::MouseUp(param1);
+}
+
+
+void
+PTextControlBackend::WindowActivated(bool param1)
+{
+	PArgs in, out;
+	in.AddBool("active", param1);
+	EventData *data = fOwner->FindEvent("WindowActivated");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::WindowActivated(param1);
 }
 
 
@@ -504,9 +506,21 @@ PTextControlBackend::DrawAfterChildren(BRect param1)
 	in.AddRect("update", param1);
 	EventData *data = fOwner->FindEvent("DrawAfterChildren");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		AutoTextControl::DrawAfterChildren(param1);
+}
+
+
+void
+PTextControlBackend::DetachedFromWindow(void)
+{
+	PArgs in, out;
+	EventData *data = fOwner->FindEvent("DetachedFromWindow");
+	if (data->hook)
+		fOwner->RunEvent(data, in, out);
+	else
+		AutoTextControl::DetachedFromWindow();
 }
 
 
@@ -514,27 +528,13 @@ void
 PTextControlBackend::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		AutoTextControl::KeyDown(bytes, count);
-}
-
-
-void
-PTextControlBackend::KeyUp(const char *bytes, int32 count)
-{
-	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
-	in.AddInt32("count", count);
-	EventData *data = fOwner->FindEvent("KeyUp");
-	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
-	else
-		AutoTextControl::KeyUp(bytes, count);
 }
 
 

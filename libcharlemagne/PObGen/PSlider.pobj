@@ -16,6 +16,7 @@ FriendlyName=Slider
 Description=A slider
 UsesView=true
 ParentClass=public PControl
+GetBackend=true
 
 [properties]
 Property color(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT)) BarColor : The bar's color

@@ -135,7 +135,7 @@ PObject::operator[](const BString &name)
 PObject::~PObject(void)
 {
 	PArgs in, out;
-	RunEvent("Destroy", in.ListRef(), out.ListRef());
+	RunEvent("Destroy", in, out);
 	
 	PObjectBroker *broker = PObjectBroker::GetBrokerInstance();
 	broker->UnregisterObject(this);
@@ -207,7 +207,7 @@ PObject::GetID(void) const
 
 
 status_t
-PObject::RunMethod(const char *name, PArgList &in, PArgList &out, void *extraData)
+PObject::RunMethod(const char *name, PArgs &in, PArgs &out, void *extraData)
 {
 	PMethod *method = FindMethod(name);
 	if (!method)
@@ -249,7 +249,7 @@ PObject::CountMethods(void) const
 
 
 status_t
-PObject::RunInheritedMethod(const char *name, PArgList &in, PArgList &out,
+PObject::RunInheritedMethod(const char *name, PArgs &in, PArgs &out,
 							void *extraData)
 {
 	PMethod *method = FindInheritedMethod(name);
@@ -395,13 +395,14 @@ PObject::PrintToStream(void)
 
 
 void
-PObject::ConvertMsgToArgs(BMessage &in, PArgList &out)
+PObject::ConvertMsgToArgs(BMessage &in, PArgs &out)
 {
+/*
 	char *fieldName;
 	uint32 fieldType;
 	int32 fieldCount;
 	
-	empty_parglist(&out);
+	out.MakeEmpty();
 	
 	int32 i = 0;
 	while (in.GetInfo(B_ANY_TYPE, i, &fieldName, &fieldType, &fieldCount) == B_OK)
@@ -412,64 +413,66 @@ PObject::ConvertMsgToArgs(BMessage &in, PArgList &out)
 			ssize_t size = 0;
 			in.FindData(fieldName, fieldType, j, (const void**)&ptr, &size);
 			
-			PArgType pargType;
+			type_code pargType;
 			switch (fieldType)
 			{
 				case B_INT8_TYPE:
-					pargType = PARG_INT8;
+					pargType = B_INT8_TYPE;
 					break;
 				case B_INT16_TYPE:
-					pargType = PARG_INT16;
+					pargType = B_INT16_TYPE;
 					break;
 				case B_INT32_TYPE:
-					pargType = PARG_INT32;
+					pargType = B_INT32_TYPE;
 					break;
 				case B_INT64_TYPE:
-					pargType = PARG_INT64;
+					pargType = B_INT64_TYPE;
 					break;
 				case B_FLOAT_TYPE:
-					pargType = PARG_FLOAT;
+					pargType = B_FLOAT_TYPE;
 					break;
 				case B_DOUBLE_TYPE:
-					pargType = PARG_DOUBLE;
+					pargType = B_DOUBLE_TYPE;
 					break;
 				case B_BOOL_TYPE:
-					pargType = PARG_BOOL;
+					pargType = B_BOOL_TYPE;
 					break;
 				case B_CHAR_TYPE:
-					pargType = PARG_CHAR;
+					pargType = B_CHAR_TYPE;
 					break;
 				case B_STRING_TYPE:
-					pargType = PARG_STRING;
+					pargType = B_STRING_TYPE;
 					break;
 				case B_RECT_TYPE:
-					pargType = PARG_RECT;
+					pargType = B_RECT_TYPE;
 					break;
 				case B_POINT_TYPE:
-					pargType = PARG_POINT;
+					pargType = B_POINT_TYPE;
 					break;
 				case B_RGB_COLOR_TYPE:
-					pargType = PARG_COLOR;
+					pargType = B_RGB_COLOR_TYPE;
 					break;
 				case B_POINTER_TYPE:
-					pargType = PARG_POINTER;
+					pargType = B_POINTER_TYPE;
 					break;
 				default:
-					pargType = PARG_RAW;
+					pargType = B_RAW_TYPE;
 					break;
 			}
-			add_parg(&out, fieldName, ptr, size, pargType);
+			out.AddData(fieldName, pargType, ptr, size);
 		}
 		
 		i++;
 	}
 	add_parg_int32(&out, "what", in.what);
+*/
 }
 
 
 void
-PObject::ConvertArgsToMsg(PArgList &in, BMessage &out)
+PObject::ConvertArgsToMsg(PArgs &in, BMessage &out)
 {
+/*
 	PArgListItem *item = get_parg_first(&in);
 	out.MakeEmpty();
 	
@@ -477,62 +480,62 @@ PObject::ConvertArgsToMsg(PArgList &in, BMessage &out)
 	{
 		switch (item->type)
 		{
-			case PARG_INT8:
+			case B_INT8_TYPE:
 			{
 				out.AddInt8(item->name, *((int8*)item->data));
 				break;
 			}
-			case PARG_INT16:
+			case B_INT16_TYPE:
 			{
 				out.AddInt16(item->name, *((int16*)item->data));
 				break;
 			}
-			case PARG_INT32:
+			case B_INT32_TYPE:
 			{
 				out.AddInt32(item->name, *((int32*)item->data));
 				break;
 			}
-			case PARG_INT64:
+			case B_INT64_TYPE:
 			{
 				out.AddInt64(item->name, *((int64*)item->data));
 				break;
 			}
-			case PARG_FLOAT:
+			case B_FLOAT_TYPE:
 			{
 				out.AddFloat(item->name, *((float*)item->data));
 				break;
 			}
-			case PARG_DOUBLE:
+			case B_DOUBLE_TYPE:
 			{
 				out.AddDouble(item->name, *((double*)item->data));
 				break;
 			}
-			case PARG_BOOL:
+			case B_BOOL_TYPE:
 			{
 				out.AddBool(item->name, *((bool*)item->data));
 				break;
 			}
-			case PARG_CHAR:
+			case B_CHAR_TYPE:
 			{
 				out.AddInt8(item->name, *((int8*)item->data));
 				break;
 			}
-			case PARG_STRING:
+			case B_STRING_TYPE:
 			{
 				out.AddString(item->name, (char*)item->data);
 				break;
 			}
-			case PARG_RECT:
+			case B_RECT_TYPE:
 			{
 				out.AddRect(item->name, *((BRect*)item->data));
 				break;
 			}
-			case PARG_POINT:
+			case B_POINT_TYPE:
 			{
 				out.AddPoint(item->name, *((BPoint*)item->data));
 				break;
 			}
-			case PARG_COLOR:
+			case B_RGB_COLOR_TYPE:
 			{
 				rgb_color c;
 				uint8 *p = (uint8*)item->data;
@@ -545,7 +548,7 @@ PObject::ConvertArgsToMsg(PArgList &in, BMessage &out)
 							sizeof(rgb_color));
 				break;
 			}
-			case PARG_POINTER:
+			case B_POINTER_TYPE:
 			{
 				out.AddPointer(item->name, item->data);
 				break;
@@ -554,6 +557,7 @@ PObject::ConvertArgsToMsg(PArgList &in, BMessage &out)
 				break;
 		}
 	}
+*/
 }
 
 
@@ -704,7 +708,7 @@ PObject::FindEvent(const char *name)
 
 
 status_t
-PObject::RunEvent(const char *name, PArgList &in, PArgList &out)
+PObject::RunEvent(const char *name, PArgs &in, PArgs &out)
 {
 	if (!name)
 		return B_ERROR;
@@ -714,8 +718,11 @@ PObject::RunEvent(const char *name, PArgList &in, PArgList &out)
 
 
 status_t
-PObject::RunEvent(EventData *data, PArgList &in, PArgList &out)
+PObject::RunEvent(EventData *data, PArgs &in, PArgs &out)
 {
+	// TODO: Fix
+	debugger("RunEvent needs updated");
+/*
 	if (!data)
 		return B_ERROR;
 	
@@ -727,20 +734,20 @@ PObject::RunEvent(EventData *data, PArgList &in, PArgList &out)
 		PArgListItem *eventName = find_parg(&in, "EventName", NULL);
 		if (eventName)
 			set_parg(eventName, data->name.String(), data->name.Length(),
-					PARG_STRING);
+					B_STRING_TYPE);
 		else
 			add_parg_string(&in, "EventName", data->name.String());
 		
 		PArgListItem *extraArg = find_parg(&in, "ExtraData", NULL);
 		if (extraArg)
 			set_parg(extraArg, data->extraData, sizeof(data->extraData),
-					PARG_POINTER);
+					B_POINTER_TYPE);
 		else
 			add_parg_pointer(&in, "ExtraData", data->extraData);
 		
 		return data->hook(this, &in, &out, data->extraData);
 	}
-	
+*/	
 	return B_OK;
 }
 

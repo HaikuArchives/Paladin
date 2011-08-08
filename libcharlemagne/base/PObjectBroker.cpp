@@ -60,29 +60,29 @@ PObjectBroker::PObjectBroker(void)
 	fObjInfoList->AddItem(new PObjectInfo("PWindow","Window",PWindow::Instantiate,
 											PWindow::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PView","View",PView::Instantiate,PView::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PButton","Button",PButton::Instantiate,PButton::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PCheckBox","Checkbox",PCheckBox::Instantiate,
-											PCheckBox::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PButton","Button",PButton::Instantiate,PButton::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PCheckBox","Checkbox",PCheckBox::Instantiate,
+//											PCheckBox::Create));
 	fObjInfoList->AddItem(new PObjectInfo("PBox","Box",PBox::Instantiate,PBox::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PColorControl","Color Picker",PColorControl::Instantiate,
-											PColorControl::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PControl","Generic Control",PControl::Instantiate,
-											PControl::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PLabel","Label",PLabel::Instantiate,PLabel::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PProgressBar","Progress Bar",PProgressBar::Instantiate,
-											PProgressBar::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PRadioButton","RadioButton",PRadioButton::Instantiate,
-											PRadioButton::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PScrollBar","ScrollBar",PScrollBar::Instantiate,
-											PScrollBar::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PListView","List",
-											PListView::Instantiate,PListView::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PSlider","Slider",
-											PSlider::Instantiate,PSlider::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PTextControl","Text Control", PTextControl::Instantiate,
-											PTextControl::Create));
-	fObjInfoList->AddItem(new PObjectInfo("PTextView","Text View",PTextView::Instantiate,
-											PTextView::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PColorControl","Color Picker",PColorControl::Instantiate,
+//											PColorControl::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PControl","Generic Control",PControl::Instantiate,
+//											PControl::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PLabel","Label",PLabel::Instantiate,PLabel::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PProgressBar","Progress Bar",PProgressBar::Instantiate,
+//											PProgressBar::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PRadioButton","RadioButton",PRadioButton::Instantiate,
+//											PRadioButton::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PScrollBar","ScrollBar",PScrollBar::Instantiate,
+//											PScrollBar::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PListView","List",
+//											PListView::Instantiate,PListView::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PSlider","Slider",
+//											PSlider::Instantiate,PSlider::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PTextControl","Text Control", PTextControl::Instantiate,
+//											PTextControl::Create));
+//	fObjInfoList->AddItem(new PObjectInfo("PTextView","Text View",PTextView::Instantiate,
+//											PTextView::Create));
 }
 
 

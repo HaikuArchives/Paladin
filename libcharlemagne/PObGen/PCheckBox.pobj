@@ -15,6 +15,7 @@ Name=PCheckBox
 FriendlyName=CheckBox
 Description=A check box
 UsesView=true
+GetBackend=true
 ParentClass=public PControl
 
 [backend]

@@ -8,8 +8,8 @@
 #include "PObjectBroker.h"
 #include "PMethod.h"
 
-int32_t PMessengerLockTarget(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PMessengerSendMessage(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PMessengerLockTarget(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PMessengerSendMessage(void *pobject, void *in, void *out, void *ptr = NULL);
 
 
 PMessenger::PMessenger(void)
@@ -137,7 +137,7 @@ PMessenger::InitMethods(void)
 		SendMessage
 */
 	PMethodInterface pmi;
-	pmi.AddReturnValue("success", PARG_BOOL, "True if the target could be locked.");
+	pmi.AddReturnValue("success", B_BOOL_TYPE, "True if the target could be locked.");
 	AddMethod(new PMethod("LockTarget", PMessengerLockTarget, &pmi));
 	pmi.MakeEmpty();
 	
@@ -146,13 +146,13 @@ PMessenger::InitMethods(void)
 
 
 int32_t
-PMessengerLockTarget(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PMessengerLockTarget(void *pobject, void *in, void *out, void *ptr)
 {
 }
 
 
 int32_t
-PMessengerSendMessage(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PMessengerSendMessage(void *pobject, void *in, void *out, void *ptr)
 {
 	// SendMessage(command, BMessage reply, deliveryTimeout, replyTimeout)
 	// SendMessage(

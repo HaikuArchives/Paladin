@@ -2,6 +2,10 @@
 #define PENTRY_H
 
 #include "PObject.h"
+#include <Directory.h>
+#include <Entry.h>
+#include <Path.h>
+
 
 class BEntry;
 

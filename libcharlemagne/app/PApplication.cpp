@@ -13,10 +13,10 @@
 #include "PWindow.h"
 #include "PWindowPriv.h"
 
-int32_t PAppObscureCursor(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PAppRun(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PAppQuit(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PAppWindowAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PAppObscureCursor(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PAppRun(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PAppQuit(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PAppWindowAt(void *pobject, void *in, void *out, void *ptr = NULL);
 
 
 class PAppBackend : public BApplication
@@ -278,42 +278,42 @@ PApplication::InitBackend(void)
 	PMethodInterface pmi;
 	AddMethod(new PMethod("ObscureCursor", PAppObscureCursor, &pmi));
 	
-	pmi.AddReturnValue("thread_id", PARG_INT64, "The ID of the main thread.");
+	pmi.AddReturnValue("thread_id", B_INT64_TYPE, "The ID of the main thread.");
 	AddMethod(new PMethod("Run", PAppRun, &pmi));
 	pmi.MakeEmpty();
 	
 	AddMethod(new PMethod("Quit", PAppQuit, &pmi));
 	
-	pmi.AddArg("index", PARG_INT32, "The index of the window to return");
+	pmi.AddArg("index", B_INT32_TYPE, "The index of the window to return");
 	AddMethod(new PMethod("WindowAt", PAppWindowAt, &pmi));
 	
 	AddEvent("AboutRequested", "The app has been asked to show an about window.");
 	
-	pmi.SetArg(0, "active", PARG_BOOL, "The active status of the app.");
+	pmi.SetArg(0, "active", B_BOOL_TYPE, "The active status of the app.");
 	AddEvent("AppActivated", "The app has gained or lost focus.");
 	pmi.MakeEmpty();
 	
 	AddEvent("AppSetup", "The app is being set up.", &pmi);
 	
-	pmi.AddArg("argv", PARG_STRING, "A list of strings containing the arguments.");
+	pmi.AddArg("argv", B_STRING_TYPE, "A list of strings containing the arguments.");
 	AddEvent("ArgvReceived", "The window was launched from the command line.", &pmi);
 	pmi.MakeEmpty();
 	
 	AddEvent("Pulse", "Run at specified clock intervals.", &pmi);
 	
-	pmi.AddReturnValue("value", PARG_BOOL, "Whether or not the app should really quit.");
+	pmi.AddReturnValue("value", B_BOOL_TYPE, "Whether or not the app should really quit.");
 	AddEvent("QuitRequested", "The window was asked to quit.", &pmi);
 	pmi.MakeEmpty();
 	
 	AddEvent("ReadyToRun", "The app is ready to run.", &pmi);
 	
-	pmi.AddArg("refs", PARG_POINTER, "A list of entry_ref structures pointing to files/directories sent to the app.");
+	pmi.AddArg("refs", B_POINTER_TYPE, "A list of entry_ref structures pointing to files/directories sent to the app.");
 	AddEvent("RefsReceived", "The app was sent a list of files/directories.", &pmi);
 }
 
 
 int32_t
-PAppObscureCursor(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PAppObscureCursor(void *pobject, void *in, void *out, void *ptr)
 {
 	if (be_app)
 		be_app->ObscureCursor();
@@ -323,16 +323,19 @@ PAppObscureCursor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PAppRun(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PAppRun(void *pobject, void *in, void *out, void *ptr)
 {
 	thread_id id = -1;
 	if (be_app)
 	{
 		id = be_app->Run();
 	
-		PArgs outargs(out);
-		outargs.MakeEmpty();
-		outargs.AddInt64("thread_id", id);
+		PArgs *outargs = static_cast<PArgs*>(out);
+		if (!outargs)
+			return B_BAD_DATA;
+		
+		outargs->MakeEmpty();
+		outargs->AddInt64("thread_id", id);
 	}
 	
 	return be_app ? B_OK : B_NO_INIT;
@@ -340,7 +343,7 @@ PAppRun(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PAppQuit(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PAppQuit(void *pobject, void *in, void *out, void *ptr)
 {
 	if (be_app)
 		be_app->Quit();
@@ -350,15 +353,18 @@ PAppQuit(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PAppWindowAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PAppWindowAt(void *pobject, void *in, void *out, void *ptr)
 {
 	uint64_t id = 0;
 	if (be_app)
 	{
 		int32 windex;
 		
-		PArgs args(in);
-		if (args.FindInt32("index", &windex) != B_OK)
+		PArgs *args = static_cast<PArgs*>(in);
+		if (!args)
+			return B_BAD_DATA;
+		
+		if (args->FindInt32("index", &windex) != B_OK)
 			return B_ERROR;
 		
 		
@@ -374,9 +380,12 @@ PAppWindowAt(void *pobject, PArgList *in, PArgList *out, void *ptr)
 				id = obj->GetID();
 		}
 				
-		PArgs outargs(out);
-		outargs.MakeEmpty();
-		outargs.AddInt64("id", id);
+		PArgs *outargs = static_cast<PArgs*>(out);
+		if (!outargs)
+			return B_BAD_DATA;
+		
+		outargs->MakeEmpty();
+		outargs->AddInt64("id", id);
 		
 	}
 	
@@ -391,7 +400,7 @@ PAppBackend::PAppBackend(PObject *owner, const char *signature)
 {
 	PArgs in, out;
 	
-	fOwner->RunEvent("AppSetup", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("AppSetup", in, out);
 }
 
 
@@ -399,7 +408,7 @@ void
 PAppBackend::AboutRequested(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("AboutRequested", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("AboutRequested", in, out);
 }
 
 
@@ -408,7 +417,7 @@ PAppBackend::AppActivated(bool active)
 {
 	PArgs in, out;
 	in.AddBool("active", active);
-	fOwner->RunEvent("AppActivated", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("AppActivated", in, out);
 }
 
 
@@ -419,7 +428,7 @@ PAppBackend::ArgvReceived(int32 argc, char **argv)
 	
 	for (int32 i = 0; i < argc; i++)
 		in.AddString("argv", argv[i]);
-	fOwner->RunEvent("ArgvReceived", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("ArgvReceived", in, out);
 }
 
 
@@ -427,7 +436,7 @@ void
 PAppBackend::Pulse(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("Pulse", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("Pulse", in, out);
 }
 
 
@@ -435,7 +444,7 @@ bool
 PAppBackend::QuitRequested(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("QuitRequested", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("QuitRequested", in, out);
 	
 	bool quit;
 	if (out.FindBool("value", &quit) != B_OK)
@@ -449,7 +458,7 @@ void
 PAppBackend::ReadyToRun(void)
 {
 	PArgs in, out;
-	fOwner->RunEvent("ReadyToRun", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("ReadyToRun", in, out);
 }
 
 
@@ -467,6 +476,6 @@ PAppBackend::RefsReceived(BMessage *msg)
 			in.AddString("path", path.Path());
 	}
 	
-	fOwner->RunEvent("RefsReceived", in.ListRef(), out.ListRef());
+	fOwner->RunEvent("RefsReceived", in, out);
 }
 

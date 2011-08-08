@@ -58,7 +58,7 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
 	
 	if (backend->Window())
 		backend->Window()->Lock();
@@ -68,16 +68,16 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(supermenu);
 	if (menuBackend)
 	{
 		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenu->GetID());
+		outArgs->AddInt64("id", pmenu->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -95,7 +95,7 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs outArgs(out);
+	PArgs *outArgs = static_cast<PArgs*>(out);
 	
 	if (backend->Window())
 		backend->Window()->Lock();
@@ -105,16 +105,16 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(superitem);
 	if (menuBackend)
 	{
 		PMenuItem *pmenuitem = static_cast<PMenuItem*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenuitem->GetID());
+		outArgs->AddInt64("id", pmenuitem->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -134,14 +134,14 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int64 id;
-	if (inArgs.FindInt64("id", &id) != B_OK)
+	if (inArgs->FindInt64("id", &id) != B_OK)
 		return B_OK;
 	
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	PObject *obj = BROKER->FindObject(id);
@@ -163,8 +163,8 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("success", status);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("success", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -184,14 +184,14 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int64 id;
-	if (inArgs.FindInt64("id", &id) != B_OK)
+	if (inArgs->FindInt64("id", &id) != B_OK)
 		return B_OK;
 	
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		index = -1;
 	
 	PObject *obj = BROKER->FindObject(id);
@@ -213,8 +213,8 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("success", status);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("success", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -237,10 +237,10 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int64 id;
-	if (inArgs.FindInt64("id", &id) != B_OK)
+	if (inArgs->FindInt64("id", &id) != B_OK)
 		return B_OK;
 	
 	PObject *obj = BROKER->FindObject(id);
@@ -274,8 +274,8 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("success", status);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("success", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -294,10 +294,10 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_OK;
 	
 	if (backend->Window())
@@ -310,8 +310,8 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("success", status);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("success", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -332,18 +332,18 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_OK;
 	
 	int32 count;
-	if (inArgs.FindInt32("count", &count) != B_OK)
+	if (inArgs->FindInt32("count", &count) != B_OK)
 		return B_OK;
 	
 	bool deleteItems;
-	if (inArgs.FindBool("delete", &deleteItems) != B_OK)
+	if (inArgs->FindBool("delete", &deleteItems) != B_OK)
 		deleteItems = false;
 	
 	if (backend->Window())
@@ -354,8 +354,8 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
-	outArgs.AddBool("success", status);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("success", status);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -374,10 +374,10 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_OK;
 	
 	if (backend->Window())
@@ -388,16 +388,16 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(item);
 	if (menuBackend)
 	{
 		PMenuItem *pmenuitem = static_cast<PMenuItem*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenuitem->GetID());
+		outArgs->AddInt64("id", pmenuitem->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -416,10 +416,10 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 index;
-	if (inArgs.FindInt32("index", &index) != B_OK)
+	if (inArgs->FindInt32("index", &index) != B_OK)
 		return B_OK;
 	
 	if (backend->Window())
@@ -430,16 +430,16 @@ BeginEmbeddedCode
 	if (backend->Window())
 		backend->Window()->Unlock();
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	PMenuBackend *menuBackend = static_cast<PMenuBackend*>(item);
 	if (menuBackend)
 	{
 		PMenu *pmenu = static_cast<PMenu*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenu->GetID());
+		outArgs->AddInt64("id", pmenu->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 EndEmbeddedCode
@@ -460,24 +460,24 @@ BeginEmbeddedCode
 	
 	BMenu *backend = (BMenu*)parent->GetView();
 	
-	PArgs inArgs(in), outArgs(out);
+	PArgs *inArgs = static_cast<PArgs*>(in), *outArgs = static_cast<PArgs*>(out);
 	
 	int32 command;
-	if (inArgs.FindInt32("command", &command) != B_OK)
+	if (inArgs->FindInt32("command", &command) != B_OK)
 		return B_OK;
 	
 	BMenuItem *item = backend->FindItem(command);
 	
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 	
 	PMenuItemBackend *menuBackend = static_cast<PMenuItemBackend*>(item);
 	if (menuBackend)
 	{
 		PMenuItem *pmenuitem = static_cast<PMenuItem*>(menuBackend->GetOwner());
-		outArgs.AddInt64("id", pmenuitem->GetID());
+		outArgs->AddInt64("id", pmenuitem->GetID());
 	}
 	else
-		outArgs.AddInt64("id", 0);
+		outArgs->AddInt64("id", 0);
 	
 	return B_OK;
 EndEmbeddedCode

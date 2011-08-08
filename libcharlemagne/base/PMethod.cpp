@@ -129,7 +129,7 @@ PMethod::GetCode(void) const
 
 	
 status_t
-PMethod::Run(PObject *object, PArgList &in, PArgList &out, void *extra)
+PMethod::Run(PObject *object, PArgs &in, PArgs &out, void *extra)
 {
 	return fFunction(object, &in, &out, extra);
 }
@@ -193,7 +193,7 @@ PMethodInterface::MakeEmpty(void)
 
 status_t
 PMethodInterface::SetArg(const int32 &index, const char *name,
-						const PArgType &type, const char *description,
+						const type_code &type, const char *description,
 						const int32 &flags)
 {
 	if (!name)
@@ -213,7 +213,7 @@ PMethodInterface::SetArg(const int32 &index, const char *name,
 
 
 status_t
-PMethodInterface::AddArg(const char *name, const PArgType &type,
+PMethodInterface::AddArg(const char *name, const type_code &type,
 						const char *description, const int32 &flags)
 {
 	if (!name)
@@ -242,11 +242,11 @@ PMethodInterface::ArgNameAt(const int32 &index)
 }
 
 
-PArgType
+type_code
 PMethodInterface::ArgTypeAt(const int32 &index)
 {
 	PMethodInterfaceData *data = fIn.ItemAt(index);
-	return data ? data->type : PARG_END;
+	return data ? data->type : B_RAW_TYPE;
 }
 
 
@@ -288,7 +288,7 @@ PMethodInterface::FindArg(const char *name) const
 
 status_t
 PMethodInterface::SetReturnValue(const int32 & index, const char *name,
-						const PArgType &type, const char *description)
+						const type_code &type, const char *description)
 {
 	if (!name)
 		return B_ERROR;
@@ -306,7 +306,7 @@ PMethodInterface::SetReturnValue(const int32 & index, const char *name,
 
 
 status_t
-PMethodInterface::AddReturnValue(const char *name, const PArgType &type,
+PMethodInterface::AddReturnValue(const char *name, const type_code &type,
 						const char *description)
 {
 	if (!name)
@@ -335,11 +335,11 @@ PMethodInterface::ReturnNameAt(const int32 &index)
 }
 
 
-PArgType
+type_code
 PMethodInterface::ReturnTypeAt(const int32 &index)
 {
 	PMethodInterfaceData *data = fOut.ItemAt(index);
-	return data ? data->type : PARG_END;
+	return data ? data->type : B_RAW_TYPE;
 }
 
 

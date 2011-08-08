@@ -49,7 +49,7 @@ public:
 	virtual	status_t		SetHandlerCode(const int32 &constant, const char *code);
 			const char *	GetHandlerCode(const int32 &constant);
 	
-	virtual	status_t		RunMessageHandler(const int32 &constant, PArgList &args);
+	virtual	status_t		RunMessageHandler(const int32 &constant, PArgs &args);
 	
 	virtual	status_t		SendMessage(BMessage *msg);
 	

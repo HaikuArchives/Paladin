@@ -112,7 +112,7 @@ function GenerateMethodDefs(def)
 	local i = 1
 	for k, v in pairs(def.methods) do
 		out = out .. "int32_t " .. def.object.Name .. k ..
-			"(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);\n"
+			"(void *pobject, void *in, void *out, void *ptr = NULL);\n"
 	end
 	
 	out = out .. "\n"
@@ -127,7 +127,7 @@ function GenerateMethod(def, methodName, method)
 	
 	-- Start with the top part of the function definition
 	local methodCode = "int32_t\n" .. def.object.Name .. methodName ..
-					"(void *pobject, PArgList *in, PArgList *out, void *extraData)\n{\n"
+					"(void *pobject, void *in, void *out, void *extraData)\n{\n"
 	
 	if (method.embeddedCode and method.embeddedCode:len() > 0) then
 		methodCode = methodCode .. method.embeddedCode .. "}\n\n\n"
@@ -174,8 +174,21 @@ function GenerateMethod(def, methodName, method)
 	
 	-- Declare the argument wrappers which we'll use to get input to the 
 	-- backend call
-	methodCode = methodCode .. "\n\tPArgs inArgs(in), outArgs(out);\n\n"
+	if (#method.params > 0 or #method.returnvals > 0) then
+		methodCode = methodCode .. "\n"
+	end
 	
+	if (#method.params > 0) then
+		methodCode = methodCode .. "\n\tPArgs *inArgs = static_cast<PArgs*>(in);\n"
+	end
+	
+	if (#method.returnvals > 0) then
+		methodCode = methodCode .. "\n\tPArgs *outArgs = static_cast<PArgs*>(out);\n"
+	end
+	
+	if (#method.params > 0 or #method.returnvals > 0) then
+		methodCode = methodCode .. "\n"
+	end
 	
 	-- For each input argument, declare a variable of the proper type and
 	-- attempt to get it from the input arguments. We will return B_ERROR if
@@ -201,10 +214,10 @@ function GenerateMethod(def, methodName, method)
 		
 		if (entry.defaultValue) then
 			entryCode = entryCode .. "\t" .. entry.name .. " = " ..
-						entry.defaultValue .. ";\n\tinArgs.Find" .. capType ..
+						entry.defaultValue .. ";\n\tinArgs->Find" .. capType ..
 						'("' .. entry.name .. '", &' .. entry.name .. ');\n\n'
 		else
-			entryCode = entryCode .. "\tif (inArgs.Find" .. capType ..
+			entryCode = entryCode .. "\tif (inArgs->Find" .. capType ..
 						'("' .. entry.name .. '", &' .. entry.name ..
 						') != B_OK)\n\t\treturn B_ERROR;\n\n'
 		end
@@ -309,7 +322,7 @@ function GenerateMethod(def, methodName, method)
 	end
 	
 	if (#method.returnvals > 0) then
-		methodCode = methodCode .. "\toutArgs.MakeEmpty();\n"
+		methodCode = methodCode .. "\toutArgs->MakeEmpty();\n"
 		
 		for j = 1, #argTable do
 			if (argTable[j].argType and argTable[j].argType == "returnval") then
@@ -318,7 +331,7 @@ function GenerateMethod(def, methodName, method)
 				if (outType:sub(1,1) == "U") then
 					outType = outType:sub(2,2):upper() .. outType:sub(3)
 				end
-				methodCode = methodCode .. "\toutArgs.Add" .. outType .. '("' ..
+				methodCode = methodCode .. "\toutArgs->Add" .. outType .. '("' ..
 							outEntry.name ..'", ' .. outEntry.varName .. ");\n"
 			end
 		end

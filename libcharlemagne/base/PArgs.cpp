@@ -1,44 +1,26 @@
-	#include "PArgs.h"
-
-#include <string.h>
+#include "PArgs.h"
 
 PArgs::PArgs(void)
-	:	fFreeList(true)
 {
-	fArgList = create_parglist();
 }
 
 
 PArgs::PArgs(PArgs &from)
 {
-	fArgList = create_parglist();
-	copy_parglist(fArgList, from.fArgList);
-}
-
-
-PArgs::PArgs(PArgList *from, bool own)
-	:	fArgList(from),
-		fFreeList(own)
-{
-	if (!from)
-	{
-		fArgList = create_parglist();
-		fFreeList = true;
-	}
+	*this = from;
 }
 
 
 PArgs::~PArgs(void)
 {
-	if (fFreeList)
-		destroy_parglist(fArgList);
 }
 
 
 PArgs &
 PArgs::operator=(const PArgs &from)
 {
-	copy_parglist(fArgList, from.fArgList);
+	fBackend = from.fBackend;
+	
 	return *this;
 }
 
@@ -46,518 +28,633 @@ PArgs::operator=(const PArgs &from)
 void
 PArgs::SetTo(const PArgs &from)
 {
-	copy_parglist(fArgList, from.fArgList);
-}
-
-
-void
-PArgs::SetTo(PArgList *from, bool own)
-{
-	// If own is true, we copy the entire list, but it is false,
-	// we just copy the pointer to the list
-	if (fFreeList)
-		empty_parglist(fArgList);
-	else if (own)
-	{
-		// If we don't already own the list but we're going to,
-		// then we will need to allocate a new list to hold the
-		// new list items
-		fArgList = create_parglist();
-	}
-	
-	if (!from)
-		return;
-	
-	if (own)
-	{
-		copy_parglist(from, fArgList);
-		fFreeList = true;
-	}
-	else
-	{
-		destroy_parglist(fArgList);
-		fArgList = from;
-		fFreeList = false;
-	}
+	*this = from;
 }
 
 
 void
 PArgs::MakeEmpty(void)
 {
-	empty_parglist(fArgList);
+	fBackend.MakeEmpty();
 }
 
 
-int32
-PArgs::AddItem(PArgListItem *item)
+void
+PArgs::PrintToStream(void)
 {
-	return add_pargitem(fArgList, item);
+	fBackend.PrintToStream();
 }
 
 
-int32
-PArgs::AddItem(const char *name, void *arg, size_t argsize,
-							PArgType type)
+status_t
+PArgs::CountFieldItems(const char *name, int32 *count)
 {
-	return add_parg(fArgList, name, arg, argsize, type);
+	type_code type;
+	return fBackend.GetInfo(name, &type, count);
 }
 
 
-int32
-PArgs::RemoveItem(PArgListItem *item)
+status_t
+PArgs::RemoveData(const char *name, int32 index)
 {
-	return remove_parg(fArgList, item);
+	return fBackend.RemoveData(name, index);
 }
 
 
-int32
-PArgs::CountItems(void)
+status_t
+PArgs::RemoveName(const char *name)
 {
-	return count_pargs(fArgList);
+	return fBackend.RemoveName(name);
 }
 
 
-int32
-PArgs::AddInt8(const char *name, int8 arg)
+#pragma mark - Add methods
+
+
+status_t
+PArgs::AddData(const char *name, type_code type, const void *data, int32_t numBytes)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(int8_t), PARG_INT8);
+	return fBackend.AddData(name, type, data, numBytes, false);
 }
 
 
-int32
-PArgs::AddInt16(const char *name, int16 arg)
+status_t
+PArgs::AddChar(const char *name, char value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(int16_t), PARG_INT16);
+	return fBackend.AddData(name, B_CHAR_TYPE, &value, sizeof(char));
 }
 
 
-int32
-PArgs::AddInt32(const char *name, int32 arg)
+status_t
+PArgs::AddRect(const char *name, BRect value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(int32_t), PARG_INT32);
+	return fBackend.AddRect(name, value);
 }
 
 
-int32
-PArgs::AddInt64(const char *name, int64 arg)
+status_t
+PArgs::AddPoint(const char *name, BPoint value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(int64_t), PARG_INT64);
+	return fBackend.AddPoint(name, value);
 }
 
 
-int32
-PArgs::AddFloat(const char *name, float arg)
+status_t
+PArgs::AddString(const char *name, const char *value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(float), PARG_FLOAT);
+	return fBackend.AddString(name, value);
 }
 
 
-int32
-PArgs::AddDouble(const char *name, double arg)
+status_t
+PArgs::AddString(const char *name, const BString &value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(double), PARG_DOUBLE);
+	return fBackend.AddString(name, value);
 }
 
 
-int32
-PArgs::AddBool(const char *name, bool arg)
+status_t
+PArgs::AddInt8(const char *name, int8 value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(bool), PARG_BOOL);
+	return fBackend.AddInt8(name, value);
 }
 
 
-int32
-PArgs::AddChar(const char *name, char arg)
+status_t
+PArgs::AddUInt8(const char *name, uint8 value)
 {
-	return add_parg(fArgList, name, (void*)&arg, sizeof(char), PARG_CHAR);
+	return fBackend.AddUInt8(name, value);
 }
 
 
-int32
-PArgs::AddString(const char *name, const char *arg)
+status_t
+PArgs::AddInt16(const char *name, int16 value)
 {
-	return add_parg(fArgList, name, (void*)arg, strlen(arg) + 1, PARG_STRING);
+	return fBackend.AddInt16(name, value);
 }
 
 
-int32
-PArgs::AddPoint(const char *name, BPoint arg)
+status_t
+PArgs::AddUInt16(const char *name, uint16 value)
 {
-	return add_parg_point(fArgList, name, arg.x, arg.y);
+	return fBackend.AddUInt16(name, value);
 }
 
 
-int32
-PArgs::AddRect(const char *name, BRect arg)
+status_t
+PArgs::AddInt32(const char *name, int32 value)
 {
-	return add_parg_rect(fArgList, name, arg.left, arg.top, arg.right, arg.bottom);
+	return fBackend.AddInt32(name, value);
 }
 
 
-int32
-PArgs::AddColor(const char *name, uint8 red, uint8 green, uint8 blue,
-				uint8 alpha)
+status_t
+PArgs::AddUInt32(const char *name, uint32 value)
 {
-	return add_parg_color(fArgList, name, red, green, blue, alpha);
+	return fBackend.AddUInt32(name, value);
 }
 
 
-int32
-PArgs::AddColor(const char *name, rgb_color color)
+status_t
+PArgs::AddInt64(const char *name, int64 value)
 {
-	return add_parg_rect(fArgList, name, color.red, color.green, color.blue,
-						color.alpha);
+	return fBackend.AddInt64(name, value);
 }
 
 
-int32
-PArgs::AddPointer(const char *name, void *arg)
+status_t
+PArgs::AddUInt64(const char *name, uint64 value)
 {
-	return add_parg_pointer(fArgList, name, &arg);
+	return fBackend.AddUInt64(name, value);
 }
 
 
-int32
-PArgs::AddList(const char *name, const PArgList *list)
+status_t
+PArgs::AddBool(const char *name, bool value)
 {
-	return add_parg_list(fArgList, name, list);
+	return fBackend.AddBool(name, value);
 }
 
 
-int32
-PArgs::AddList(const char *name, const PArgs &list)
+status_t
+PArgs::AddFloat(const char *name, float value)
 {
-	return add_parg_list(fArgList, name, list.fArgList);
+	return fBackend.AddFloat(name, value);
 }
 
 
-int32
-PArgs::AddRef(const char *name, const entry_ref &ref)
+status_t
+PArgs::AddDouble(const char *name, double value)
 {
-	if (!name)
+	return fBackend.AddDouble(name, value);
+}
+
+
+status_t
+PArgs::AddPointer(const char *name, const void *value)
+{
+	return fBackend.AddPointer(name, value);
+}
+
+
+status_t
+PArgs::AddMessenger(const char *name, const BMessenger &value)
+{
+	return fBackend.AddMessenger(name, value);
+}
+
+
+status_t
+PArgs::AddRef(const char *name, const entry_ref &value)
+{
+	return fBackend.AddRef(name, &value);
+}
+
+
+status_t
+PArgs::AddPArg(const char *name, const PArgs &value)
+{
+	return fBackend.AddMessage(name, &value.fBackend);
+}
+
+
+status_t
+PArgs::AddColor(const char *name, const rgb_color &value)
+{
+	return fBackend.AddData(name, B_RGB_COLOR_TYPE, &value, sizeof(rgb_color));
+}
+
+
+#pragma mark - Find methods
+
+
+status_t
+PArgs::FindData(const char *name, type_code type, const void **data,
+				int32_t *numBytes, const int32 index) const
+{
+	return fBackend.FindData(name, type, index, data, (ssize_t*)numBytes);
+}
+
+
+status_t
+PArgs::FindChar(const char *name, char *value, int32 index) const
+{
+	ssize_t size;
+	return fBackend.FindData(name, B_CHAR_TYPE, index, (const void **)&value, &size);
+}
+
+
+status_t
+PArgs::FindRect(const char *name, BRect *value, int32 index) const
+{
+	return fBackend.FindRect(name, index, value);
+}
+
+
+status_t
+PArgs::FindPoint(const char *name, BPoint *value, int32 index) const
+{
+	return fBackend.FindPoint(name, index, value);
+}
+
+
+status_t
+PArgs::FindString(const char *name, const char **value, int32 index) const
+{
+	return fBackend.FindString(name, index, value);
+}
+
+
+status_t
+PArgs::FindString(const char *name, BString *value, int32 index) const
+{
+	return fBackend.FindString(name, index, value);
+}
+
+
+status_t
+PArgs::FindInt8(const char *name, int8 *value, int32 index) const
+{
+	return fBackend.FindInt8(name, index, value);
+}
+
+
+status_t
+PArgs::FindUInt8(const char *name, uint8 *value, int32 index) const
+{
+	return fBackend.FindUInt8(name, index, value);
+}
+
+
+status_t
+PArgs::FindInt16(const char *name, int16 *value, int32 index) const
+{
+	return fBackend.FindInt16(name, index, value);
+}
+
+
+status_t
+PArgs::FindUInt16(const char *name, uint16 *value, int32 index) const
+{
+	return fBackend.FindUInt16(name, index, value);
+}
+
+
+status_t
+PArgs::FindInt32(const char *name, int32 *value, int32 index) const
+{
+	return fBackend.FindInt32(name, index, value);
+}
+
+
+status_t
+PArgs::FindUInt32(const char *name, uint32 *value, int32 index) const
+{
+	return fBackend.FindUInt32(name, index, value);
+}
+
+
+status_t
+PArgs::FindInt64(const char *name, int64 *value, int32 index) const
+{
+	return fBackend.FindInt64(name, index, value);
+}
+
+
+status_t
+PArgs::FindUInt64(const char *name, uint64 *value, int32 index) const
+{
+	return fBackend.FindUInt64(name, index, value);
+}
+
+
+status_t
+PArgs::FindBool(const char *name, bool *value, int32 index) const
+{
+	return fBackend.FindBool(name, index, value);
+}
+
+
+status_t
+PArgs::FindFloat(const char *name, float *value, int32 index) const
+{
+	return fBackend.FindFloat(name, index, value);
+}
+
+
+status_t
+PArgs::FindDouble(const char *name, double *value, int32 index) const
+{
+	return fBackend.FindDouble(name, index, value);
+}
+
+
+status_t
+PArgs::FindPointer(const char *name,  void **value, int32 index) const
+{
+	return fBackend.FindPointer(name, index, value);
+}
+
+
+status_t
+PArgs::FindMessenger(const char *name, BMessenger *value, int32 index) const
+{
+	return fBackend.FindMessenger(name, index, value);
+}
+
+
+status_t
+PArgs::FindRef(const char *name, entry_ref *value, int32 index) const
+{
+	return fBackend.FindRef(name, index, value);
+}
+
+
+status_t
+PArgs::FindPArg(const char *name, PArgs *value, int32 index) const
+{
+	return fBackend.FindMessage(name, index, &value->fBackend);
+}
+
+
+status_t
+PArgs::FindColor(const char *name, rgb_color *value, int32 index) const
+{
+	ssize_t size;
+	return fBackend.FindData(name, B_RGB_COLOR_TYPE, index, 
+							(const void **)&value, &size);
+}
+
+
+#pragma mark - Replacement methods
+
+
+status_t
+PArgs::ReplaceData(const char *name, type_code type, const void *data,
+				int32_t numBytes, int32 index)
+{
+	return fBackend.ReplaceData(name, type, index, data, numBytes);
+}
+
+
+status_t
+PArgs::ReplaceChar(const char *name, char value, int32 index)
+{
+	return fBackend.ReplaceData(name, B_CHAR_TYPE, index, &value, sizeof(char));
+}
+
+
+status_t
+PArgs::ReplaceRect(const char *name, BRect value, int32 index)
+{
+	return fBackend.ReplaceRect(name, index, value);
+}
+
+
+status_t
+PArgs::ReplacePoint(const char *name, BPoint value, int32 index)
+{
+	return fBackend.ReplacePoint(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceString(const char *name, const char *value, int32 index)
+{
+	return fBackend.ReplaceString(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceString(const char *name, const BString &value, int32 index)
+{
+	return fBackend.ReplaceString(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceInt8(const char *name, int8 value, int32 index)
+{
+	return fBackend.ReplaceInt8(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceUInt8(const char *name, uint8 value, int32 index)
+{
+	return fBackend.ReplaceUInt8(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceInt16(const char *name, int16 value, int32 index)
+{
+	return fBackend.ReplaceInt16(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceUInt16(const char *name, uint16 value, int32 index)
+{
+	return fBackend.ReplaceUInt16(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceInt32(const char *name, int32 value, int32 index)
+{
+	return fBackend.ReplaceInt32(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceUInt32(const char *name, uint32 value, int32 index)
+{
+	return fBackend.ReplaceUInt32(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceInt64(const char *name, int64 value, int32 index)
+{
+	return fBackend.ReplaceInt64(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceUInt64(const char *name, uint64 value, int32 index)
+{
+	return fBackend.ReplaceUInt64(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceBool(const char *name, bool value, int32 index)
+{
+	return fBackend.ReplaceBool(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceFloat(const char *name, float value, int32 index)
+{
+	return fBackend.ReplaceFloat(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceDouble(const char *name, double value, int32 index)
+{
+	return fBackend.ReplaceDouble(name, index, value);
+}
+
+
+status_t
+PArgs::ReplacePointer(const char *name, const void *value, int32 index)
+{
+	return fBackend.ReplacePointer(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceMessenger(const char *name, BMessenger value, int32 index)
+{
+	return fBackend.ReplaceMessenger(name, index, value);
+}
+
+
+status_t
+PArgs::ReplaceRef(const char *name, const entry_ref &value, int32 index)
+{
+	return fBackend.ReplaceRef(name, index, &value);
+}
+
+
+status_t
+PArgs::ReplacePArg(const char *name, const PArgs &value, int32 index)
+{
+	return fBackend.ReplaceMessage(name, index, &value.fBackend);
+}
+
+
+status_t
+PArgs::ReplaceColor(const char *name, const rgb_color &value, int32 index)
+{
+	return fBackend.ReplaceData(name, B_RGB_COLOR_TYPE, index, &value, sizeof(rgb_color));
+}
+
+
+status_t
+PArgs::AddOrderInfo(const char *fieldName, type_code fieldType,
+								int32 callIndex, int32 fieldIndex)
+{
+	if (!fieldName)
 		return B_ERROR;
 	
-	PArgs refList;
-	refList.AddInt32("device", ref.device);
-	refList.AddInt64("directory", ref.directory);
-	refList.AddString("name", ref.name);
-	return AddList(name, refList);
-}
-
-
-PArgListItem *
-PArgs::FindItem(const char *name, int32 index)
-{
-	PArgListItem *item = find_parg_index(fArgList, index);
-	if (!item)
-		return NULL;
+	status_t status;
 	
-	return find_parg(fArgList, name, item);
-}
-
-
-int32
-PArgs::FindInt8(const char *name, int8 *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((int8_t*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindInt16(const char *name, int16 *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((int16_t*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindInt32(const char *name, int32 *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((int32_t*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindInt64(const char *name, int64 *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((int64_t*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindFloat(const char *name, float *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((float*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindDouble(const char *name, double *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((double*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindBool(const char *name, bool *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((bool*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindChar(const char *name, char *out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = *((char*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindString(const char *name, char **out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = strdup((char*)item->data);
-	return B_OK;
-}
-
-
-int32
-PArgs::FindString(const char *name, BString *out)
-{
-	if (!name || !out)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = (char *)item->data;
-	return B_OK;
-}
-
-
-int32
-PArgs::FindPoint(const char *name, BPoint *out)
-{
-	return find_parg_point(fArgList, name, &out->x, &out->y);
-}
-
-
-int32
-PArgs::FindRect(const char *name, BRect *out)
-{
-	return find_parg_rect(fArgList, name, &out->left, &out->top,
-							&out->right, &out->bottom);
-}
-
-
-int32
-PArgs::FindColor(const char *name, uint8 *red, uint8 *green, uint8 *blue,
-				uint8 *alpha)
-{
-	return find_parg_color(fArgList, name, red, green, blue, alpha);
-}
-
-
-int32
-PArgs::FindColor(const char *name, rgb_color *color)
-{
-	if (!color)
-		return B_BAD_DATA;
-	
-	return find_parg_color(fArgList, name, &color->red, &color->green,
-							&color->blue, &color->alpha);
-}
-
-
-int32
-PArgs::FindPointer(const char *name, void **out)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgListItem *item = find_parg(fArgList, name, NULL);
-	if (!item)
-		return B_NAME_NOT_FOUND;
-	
-	*out = item->data;
-	return B_OK;
-}
-
-
-int32
-PArgs::FindList(const char *name, PArgList **list)
-{
-	if (!name)
-		return B_ERROR;
-	
-	find_parg_list(fArgList, name, list);
-	
-	return (*list == NULL) ? B_NAME_NOT_FOUND : B_OK;
-}
-
-
-int32
-PArgs::FindList(const char *name, PArgs &list, bool copy)
-{
-	if (!name)
-		return B_ERROR;
-	
-	PArgList *ptr;
-	status_t status = find_parg_list(fArgList, name, &ptr);
+	status = AddString("fieldname", fieldName);
 	if (status != B_OK)
 		return status;
 	
-	SetTo(ptr, copy);
-	return B_OK;
+	status = AddInt32("type", fieldType);
+	if (status != B_OK)
+		return status;
+	
+	status = AddInt32("callindex", callIndex);
+	if (status != B_OK)
+		return status;
+	
+	status = AddInt32("fieldindex", fieldIndex);
+	
+	return status;
 }
 
 
-int32
-PArgs::FindRef(const char *name, entry_ref &ref)
+status_t
+PArgs::SetOrderInfo(int32 &index, const char *fieldName, type_code fieldType,
+					int32 callIndex, int32 fieldIndex)
 {
-	if (!name)
+	if (!fieldName)
 		return B_ERROR;
 	
-	PArgs refList;
-	status_t status = FindList(name, refList);
+	status_t status;
+	
+	status = ReplaceString("fieldname", fieldName, index);
 	if (status != B_OK)
 		return status;
 	
-	status = refList.FindInt32("device", &ref.device);
+	status = ReplaceInt32("type", fieldType, index);
 	if (status != B_OK)
 		return status;
 	
-	status = refList.FindInt64("directory", &ref.directory);
+	status = ReplaceInt32("callindex", callIndex, index);
 	if (status != B_OK)
 		return status;
 	
-	BString refName;
-	status = refList.FindString("name", &refName);
+	status = ReplaceInt32("fieldindex", fieldIndex, index);
+	
+	return status;
+}
+
+
+status_t
+PArgs::FindOrderInfo(int32 &index, BString &fieldName, type_code &fieldType,
+					int32 &callIndex, int32 &fieldIndex)
+{
+	status_t status;
+	
+	status = FindString("fieldname", &fieldName, index);
 	if (status != B_OK)
 		return status;
-	ref.set_name(refName.String());
 	
-	return B_OK;
+	status = FindInt32("type", (int32*)&fieldType, index);
+	if (status != B_OK)
+		return status;
+	
+	status = FindInt32("callindex", &callIndex, index);
+	if (status != B_OK)
+		return status;
+	
+	status = FindInt32("fieldindex", &fieldIndex, index);
+	
+	return status;
 }
 
 
-PArgListItem *
-PArgs::GetFirstItem(void)
+status_t
+PArgs::RemoveOrderInfo(const int32 &index)
 {
-	return get_parg_first(fArgList);
+	status_t status;
+	
+	status = RemoveData("fieldname", index);
+	if (status != B_OK)
+		return status;
+	
+	status = RemoveData("type", index);
+	if (status != B_OK)
+		return status;
+	
+	status = RemoveData("callindex", index);
+	if (status != B_OK)
+		return status;
+	
+	status = RemoveData("fieldindex", index);
+	
+	return status;
 }
 
 
-PArgListItem *
-PArgs::GetLastItem(void)
+void
+PArgs::SetBackend(const BMessage &msg)
 {
-	return get_parg_last(fArgList);
+	fBackend = msg;
 }
 
 
-PArgListItem *
-PArgs::GetNextItem(PArgListItem *item)
+BMessage
+PArgs::GetBackend(void) const
 {
-	return get_parg_next(fArgList, item);
-}
-
-
-PArgListItem *
-PArgs::GetPreviousItem(PArgListItem *item)
-{
-	return get_parg_previous(fArgList, item);
-}
-
-
-PArgListItem *
-PArgs::ItemAt(int32 index)
-{
-	return find_parg_index(fArgList, index);
-}
-
-
-PArgList *
-PArgs::List(void)
-{
-	return fArgList;
-}
-
-
-PArgList &
-PArgs::ListRef(void)
-{
-	return *fArgList;
+	return fBackend;
 }
 

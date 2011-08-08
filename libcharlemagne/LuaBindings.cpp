@@ -42,12 +42,12 @@ struct APIConstant
 	uint64 value;
 };
 
-int lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData);
-int lua_run_msg_handler(void *pobject, PArgList *in, PArgList *out, void *extraData);
+int lua_run_lua_event(void *pobject, PArgs *in, PArgs *out, void *extraData);
+int lua_run_msg_handler(void *pobject, PArgs *in, PArgs *out, void *extraData);
 
 
 int
-lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
+lua_run_lua_event(void *pobject, PArgs *in, PArgs *out, void *extraData)
 {
 	char *eventName;
 	if (find_parg_string(in, "EventName", &eventName) != B_OK)
@@ -66,7 +66,7 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	// 2) Find the Lua function to call
 	// 3) Set up the call by pushing all of the arguments to the stack
 	// 4) Call the function
-	// 5) Convert the return values into the out PArgList
+	// 5) Convert the return values into the out PArgs
 	// 6) Empty the stack
 	
 	lua_pop(L, -1);
@@ -101,7 +101,7 @@ lua_run_lua_event(void *pobject, PArgList *in, PArgList *out, void *extraData)
 
 
 int
-lua_run_msg_handler(void *pobject, PArgList *in, PArgList *out, void *extraData)
+lua_run_msg_handler(void *pobject, PArgs *in, PArgs *out, void *extraData)
 {
 	PArgs inArgs;
 	int32 constant;
@@ -2329,7 +2329,7 @@ lua_interface_set_arg(lua_State *L)
 	
 	int index = lua_tointeger(L, 2);
 	const char *name = lua_tostring(L, 3);
-	PArgType type = (PArgType)lua_tointeger(L, 4);
+	type_code type = (type_code)lua_tointeger(L, 4);
 	
 	const char *desc = NULL;
 	if (lua_gettop(L) == 5)
@@ -2368,7 +2368,7 @@ lua_interface_add_arg(lua_State *L)
 		return 0;
 	
 	const char *name = lua_tostring(L, 2);
-	PArgType type = (PArgType)lua_tointeger(L, 3);
+	type_code type = (type_code)lua_tointeger(L, 3);
 	
 	const char *desc = NULL;
 	if (lua_gettop(L) == 4)
@@ -2614,7 +2614,7 @@ lua_interface_set_rval(lua_State *L)
 	
 	int index = lua_tointeger(L, 2);
 	const char *name = lua_tostring(L, 3);
-	PArgType type = (PArgType)lua_tointeger(L, 4);
+	type_code type = (type_code)lua_tointeger(L, 4);
 	
 	const char *desc = NULL;
 	if (lua_gettop(L) == 5)
@@ -2653,7 +2653,7 @@ lua_interface_add_rval(lua_State *L)
 		return 0;
 	
 	const char *name = lua_tostring(L, 2);
-	PArgType type = (PArgType)lua_tointeger(L, 3);
+	type_code type = (type_code)lua_tointeger(L, 3);
 	
 	const char *desc = NULL;
 	if (lua_gettop(L) == 4)

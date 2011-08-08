@@ -2,6 +2,8 @@ Finish the PMessenger class
 
 Finish the PMenu methods and add its events
 
+Check to see if PProgressBar is finished and finish, if need be
+
 Fix change boolean logic in paired fields from true/false to yes/no so the parser can determine missing entries vs false entries
 
 Go back over PObject methods to make sure stuff like Archiving still works after all of the changes that have been made to it

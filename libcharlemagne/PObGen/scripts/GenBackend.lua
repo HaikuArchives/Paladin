@@ -63,11 +63,11 @@ void
 %(BACKENDNAME)::KeyDown(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyDown");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		%(BACKEND_PARENT_NAME)::KeyDown(bytes, count);
 }
@@ -82,11 +82,11 @@ void
 %(BACKENDNAME)::KeyUp(const char *bytes, int32 count)
 {
 	PArgs in, out;
-	in.AddItem("bytes", (void*)bytes, count, PARG_RAW);
+	in.AddData("bytes", B_RAW_TYPE, (void*)bytes, count);
 	in.AddInt32("count", count);
 	EventData *data = fOwner->FindEvent("KeyUp");
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		%(BACKEND_PARENT_NAME)::KeyUp(bytes, count);
 }
@@ -280,7 +280,7 @@ function GenerateBackendCode(def)
 			code = code .. '\tEventData *data = fOwner->FindEvent("' .. hookName .. '");\n' ..
 			[[
 	if (data->hook)
-		fOwner->RunEvent(data, in.ListRef(), out.ListRef());
+		fOwner->RunEvent(data, in, out);
 	else
 		]] .. parent .. "::" .. hookName
 			

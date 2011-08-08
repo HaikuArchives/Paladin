@@ -2,8 +2,13 @@
 #define PBUTTON_H
 
 #include "PControl.h"
+#include <Application.h>
+#include <Button.h>
+#include <stdio.h>
 
 
+class PButtonBackend;
+class BButton;
 
 class PButton : public PControl
 {
@@ -19,6 +24,7 @@ public:
 	static	PObject *		Create(void);
 	virtual	PObject *		Duplicate(void) const;
 	
+			BButton *	GetBackend(void) const;
 
 protected:
 	virtual	void			InitBackend(void);

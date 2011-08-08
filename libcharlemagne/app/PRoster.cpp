@@ -2,21 +2,21 @@
 #include <malloc.h>
 #include <string.h>
 
-int32_t PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterBroadcast(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PRosterActivateApp(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterAddToRecentDocuments(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterAddToRecentFolders(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterBroadcast(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterFindApp(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetActiveAppInfo(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetAppInfo(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetAppList(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetRecentApps(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetRecentDocuments(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetRecentFolders(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterGetRunningAppInfo(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterIsRunning(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterLaunch(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PRosterTeamFor(void *pobject, void *in, void *out, void *ptr = NULL);
 
 PRoster::PRoster(void)
 {
@@ -103,98 +103,101 @@ PRoster::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
-	pmi.AddArg("team", PARG_INT32, "Team ID of the app to activate");
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddArg("team", B_INT32_TYPE, "Team ID of the app to activate");
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
 	AddMethod(new PMethod("ActivateApp", PRosterActivateApp, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("message", PARG_LIST, "Argument list containing the message data");
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddArg("message", B_LIST_TYPE, "Argument list containing the message data");
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
 	AddMethod(new PMethod("Broadcast", PRosterBroadcast, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("entry_ref", PARG_LIST, "List containing entry_ref information");
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", B_STRING_TYPE, "path of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("entry_ref", B_LIST_TYPE, "List containing entry_ref information");
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
 	AddMethod(new PMethod("FindApp", PRosterFindApp, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("info_list", PARG_LIST, "List of lists containing the app_info information");
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", B_STRING_TYPE, "path of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("info_list", B_LIST_TYPE, "List of lists containing the app_info information");
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
 	AddMethod(new PMethod("GetAppInfo", PRosterGetAppInfo, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("signature", PARG_STRING, "Optional MIME type of a running app", PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("teams", PARG_LIST, "List of team_id values");
+	pmi.AddArg("signature", B_STRING_TYPE, "Optional MIME type of a running app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("teams", B_LIST_TYPE, "List of team_id values");
 	AddMethod(new PMethod("GetAppList", PRosterGetAppList, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddReturnValue("app_info", PARG_LIST, "List containing the app_info information");
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddReturnValue("app_info", B_LIST_TYPE, "List containing the app_info information");
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
 	AddMethod(new PMethod("GetActiveAppInfo", PRosterGetActiveAppInfo, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the possibly running app", PMIFLAG_OPTIONAL);
-	pmi.AddArg("path", PARG_STRING, "path of the possibly running app", PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("value", PARG_BOOL, "True if the specified app is running");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the possibly running app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", B_STRING_TYPE, "path of the possibly running app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("value", B_BOOL_TYPE, "True if the specified app is running");
 	AddMethod(new PMethod("IsRunning", PRosterIsRunning, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddArg("path", PARG_STRING, "path of the desired app", PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("value", PARG_INT32, "team_id of the specified app");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", B_STRING_TYPE, "path of the desired app", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("value", B_INT32_TYPE, "team_id of the specified app");
 	AddMethod(new PMethod("TeamFor", PRosterTeamFor, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("path", PARG_STRING, "Path of the document to add to the recent list.");
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the app used to open the document.", PMIFLAG_OPTIONAL);
+	pmi.AddArg("path", B_STRING_TYPE, "Path of the document to add to the recent list.");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the app used to open the document.", PMIFLAG_OPTIONAL);
 	AddMethod(new PMethod("AddToRecentDocuments", PRosterAddToRecentDocuments, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("path", PARG_STRING, "Path of the folder to add to the recent list.");
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the app used to open the folder.", PMIFLAG_OPTIONAL);
-	AddMethod(new PMethod("AddToRecentDocuments", PRosterAddToRecentFolders, &pmi));
+	pmi.AddArg("path", B_STRING_TYPE, "Path of the folder to add to the recent list.");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the app used to open the folder.", PMIFLAG_OPTIONAL);
+	AddMethod(new PMethod("AddToRecentFolders", PRosterAddToRecentFolders, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent apps to retrieve.");
-	pmi.AddReturnValue("refs", PARG_LIST, "List of entry_refs to recently-run applications");
+	pmi.AddArg("maxcount", B_INT32_TYPE, "The maximum number of recent apps to retrieve.");
+	pmi.AddReturnValue("refs", B_LIST_TYPE, "List of entry_refs to recently-run applications");
 	AddMethod(new PMethod("GetRecentApps", PRosterGetRecentApps, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent documents to retrieve.");
-	pmi.AddArg("types", PARG_LIST, "List of mimetypes desired.", PMIFLAG_OPTIONAL);
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the application used to open the "
+	pmi.AddArg("maxcount", B_INT32_TYPE, "The maximum number of recent documents to retrieve.");
+	pmi.AddArg("types", B_LIST_TYPE, "List of mimetypes desired.", PMIFLAG_OPTIONAL);
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the application used to open the "
 										"specified documents.",	PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("refs", PARG_LIST, "List of entry_refs to recently-used documents");
+	pmi.AddReturnValue("refs", B_LIST_TYPE, "List of entry_refs to recently-used documents");
 	AddMethod(new PMethod("GetRecentDocuments", PRosterGetRecentDocuments, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("maxcount", PARG_INT32, "The maximum number of recent documents to retrieve.");
-	pmi.AddArg("signature", PARG_STRING, "MIME type of the application used to open the "
+	pmi.AddArg("maxcount", B_INT32_TYPE, "The maximum number of recent documents to retrieve.");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME type of the application used to open the "
 										"specified documents.",	PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("refs", PARG_LIST, "List of entry_refs to recently-used folders");
+	pmi.AddReturnValue("refs", B_LIST_TYPE, "List of entry_refs to recently-used folders");
 	AddMethod(new PMethod("GetRecentFolders", PRosterGetRecentFolders, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("team", PARG_INT32, "TeamID of the desired application");
-	pmi.AddReturnValue("app_info", PARG_LIST, "List containing the app_info information");
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
+	pmi.AddArg("team", B_INT32_TYPE, "TeamID of the desired application");
+	pmi.AddReturnValue("app_info", B_LIST_TYPE, "List containing the app_info information");
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
 	AddMethod(new PMethod("GetRunningAppInfo", PRosterGetRunningAppInfo, &pmi));
 	pmi.MakeEmpty();
 	
-	pmi.AddArg("signature", PARG_STRING, "MIME signature of the application to launch");
-	pmi.AddArg("arglist", PARG_LIST, "List of string arguments (argc)", PMIFLAG_OPTIONAL);
-	pmi.AddReturnValue("status", PARG_INT32, "Error status of the call");
-	pmi.AddReturnValue("team", PARG_INT32, "Team ID of the launched process");
+	pmi.AddArg("signature", B_STRING_TYPE, "MIME signature of the application to launch");
+	pmi.AddArg("arglist", B_LIST_TYPE, "List of string arguments (argc)", PMIFLAG_OPTIONAL);
+	pmi.AddReturnValue("status", B_INT32_TYPE, "Error status of the call");
+	pmi.AddReturnValue("team", B_INT32_TYPE, "Team ID of the launched process");
 	AddMethod(new PMethod("Launch", PRosterLaunch, &pmi));
 }
 
 
+#pragma mark - Method functions
+
+
 int32_t
-PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterActivateApp(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -203,24 +206,24 @@ PRosterActivateApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	int32 team;
-	if (args.FindInt32("team", &team) != B_OK)
+	if (args->FindInt32("team", &team) != B_OK)
 		return B_ERROR;
 	
 	int32 status = be_roster->ActivateApp(team);
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterAddToRecentDocuments(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -229,14 +232,14 @@ PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *pt
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	BEntry entry(path.String());
@@ -252,7 +255,7 @@ PRosterAddToRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *pt
 
 
 int32_t
-PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterAddToRecentFolders(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -261,14 +264,14 @@ PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		return B_ERROR;
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	BEntry entry(path.String());
@@ -284,7 +287,7 @@ PRosterAddToRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 
 
 int32_t
-PRosterBroadcast(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterBroadcast(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -293,27 +296,25 @@ PRosterBroadcast(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	 
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	PArgs list;
-	if (args.FindList("message", list) != B_OK)
+	if (args->FindPArg("message", &list) != B_OK)
 		return B_ERROR;
 	
-	BMessage msg;
-	roster->ConvertArgsToMsg(list.ListRef(), msg);
-	
+	BMessage msg = list.GetBackend();
 	int32 status = be_roster->Broadcast(&msg);
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterFindApp(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -322,14 +323,14 @@ PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		path = "";
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	entry_ref ref;
@@ -354,17 +355,17 @@ PRosterFindApp(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	refList.AddInt64("directory", ref.directory);
 	refList.AddString("name", ref.name);
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("entry_ref", refList);
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("entry_ref", refList);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetActiveAppInfo(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -372,8 +373,6 @@ PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	PRoster *roster = static_cast<PRoster*>(pobject);
 	if (!roster)
 		return B_BAD_TYPE;
-	
-	PArgs args(in);
 	
 	app_info info;
 	status_t status = be_roster->GetActiveAppInfo(&info);
@@ -386,17 +385,17 @@ PRosterGetActiveAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	infoList.AddRef("entry_ref", info.ref);
 	infoList.AddString("signature", info.signature);
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("app_info", infoList);
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("app_info", infoList);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetAppInfo(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -405,14 +404,14 @@ PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		path = "";
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	app_info info;
@@ -440,17 +439,17 @@ PRosterGetAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	infoList.AddRef("entry_ref", info.ref);
 	infoList.AddString("signature", info.signature);
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("app_info", infoList);
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("app_info", infoList);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetAppList(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -459,11 +458,11 @@ PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString signature;
 	PArgs teamList;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	BList idList;
@@ -483,16 +482,16 @@ PRosterGetAppList(void *pobject, PArgList *in, PArgList *out, void *ptr)
 		outList.AddInt32(indexString.String(), *team);
 	}
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("teams", outArgs);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("teams", *outArgs);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetRecentApps(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -501,10 +500,10 @@ PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	int32 max;
-	if (args.FindInt32("maxcount", &max) != B_OK)
+	if (args->FindInt32("maxcount", &max) != B_OK)
 		return B_ERROR;
 	
 	BMessage refmsg;
@@ -521,16 +520,16 @@ PRosterGetRecentApps(void *pobject, PArgList *in, PArgList *out, void *ptr)
 		i++;
 	}
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("paths", outRefList);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("paths", outRefList);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetRecentDocuments(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -539,42 +538,40 @@ PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	int32 max;
-	if (args.FindInt32("maxcount", &max) != B_OK)
+	if (args->FindInt32("maxcount", &max) != B_OK)
 		return B_ERROR;
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	PArgs typeList;
-	int32 typeIndex = 0;
-	char **types = NULL;
-	if (args.FindList("types", typeList) == B_OK)
-	{
-		int32 typeCount = typeList.CountItems();
-		types = (char **)malloc(sizeof(char*) * typeCount);
-		
-		PArgListItem *item = typeList.GetFirstItem();
-		while (item && typeIndex < typeCount)
-		{
-			if (item->type == PARG_STRING)
-			{
-				types[typeIndex] = (char*)item->data;
-				typeIndex++;
-			}
-			
-			item = typeList.GetNextItem(item);
-		}
-	}
-	
+	int32 typeCount = 0;
 	BMessage refmsg;
-	be_roster->GetRecentDocuments(&refmsg, max, (const char **)types, typeIndex + 1,
-								signature.String());
-	
-	free(types);
+	if (typeList.CountFieldItems("types", &typeCount) == B_OK)
+	{
+		char *types[typeCount];
+		
+		BString type;
+		int32 typeIndex = 0;
+		while (typeList.FindString("types", &type, typeIndex) == B_OK)
+		{
+			types[typeIndex] = strdup(type.String());
+			typeIndex++;
+		}
+		
+		be_roster->GetRecentDocuments(&refmsg, max, (const char **)types, typeIndex + 1,
+									signature.String());
+		
+		for (int32 i = 0; i < typeCount; i++)
+			free(types[i]);
+		
+	}
+	else
+		return B_BAD_DATA;
 	
 	PArgs outRefList;
 	int32 i = 0;
@@ -587,16 +584,16 @@ PRosterGetRecentDocuments(void *pobject, PArgList *in, PArgList *out, void *ptr)
 		i++;
 	}
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("paths", outRefList);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("paths", outRefList);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetRecentFolders(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -605,14 +602,14 @@ PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	int32 max;
-	if (args.FindInt32("maxcount", &max) != B_OK)
+	if (args->FindInt32("maxcount", &max) != B_OK)
 		return B_ERROR;
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	BMessage refmsg;
@@ -629,16 +626,16 @@ PRosterGetRecentFolders(void *pobject, PArgList *in, PArgList *out, void *ptr)
 		i++;
 	}
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("refs", outRefList);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("refs", outRefList);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterGetRunningAppInfo(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -647,10 +644,10 @@ PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	int32 team;
-	if (args.FindInt32("team", &team) != B_OK)
+	if (args->FindInt32("team", &team) != B_OK)
 		return B_ERROR;
 	
 	app_info info;
@@ -664,17 +661,17 @@ PRosterGetRunningAppInfo(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	infoList.AddRef("entry_ref", info.ref);
 	infoList.AddString("signature", info.signature);
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddList("app_info", infoList);
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddPArg("app_info", infoList);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterIsRunning(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -683,14 +680,14 @@ PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		path = "";
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	bool isRunning;
@@ -709,16 +706,16 @@ PRosterIsRunning(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	else
 		return B_ERROR;
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddBool("value", isRunning);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddBool("value", isRunning);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterLaunch(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -727,50 +724,49 @@ PRosterLaunch(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
-	
+
 	PArgs argList;
-	int32 argIndex = 0;
-	char **launchArgs = NULL;
-	if (args.FindList("arglist", argList) == B_OK)
-	{
-		int32 typeCount = argList.CountItems();
-		launchArgs = (char **)malloc(sizeof(char*) * typeCount);
-		
-		PArgListItem *item = argList.GetFirstItem();
-		while (item && argIndex < typeCount)
-		{
-			if (item->type == PARG_STRING)
-			{
-				launchArgs[argIndex] = (char*)item->data;
-				argIndex++;
-			}
-			
-			item = argList.GetNextItem(item);
-		}
-	}
-	
+	int32 argCount = 0;
 	team_id team;
-	status_t status = be_roster->Launch(signature.String(), argIndex + 1,
+	status_t status;
+	if (argList.CountFieldItems("arglist", &argCount) == B_OK)
+	{
+		char *launchArgs[argCount];
+		
+		BString arg;
+		int32 argIndex = 0;
+		while (argList.FindString("args", &arg, argIndex) == B_OK)
+		{
+			launchArgs[argIndex] = strdup(arg.String());
+			argIndex++;
+		}
+		
+		status = be_roster->Launch(signature.String(), argIndex + 1,
 										launchArgs, &team);
+		
+		for (int32 i = 0; i < argCount; i++)
+			free(launchArgs[i]);
+		
+	}
+	else
+		return B_BAD_DATA;
 	
-	free(launchArgs);
-	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("team", team);
-	outArgs.AddInt32("status", status);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("team", team);
+	outArgs->AddInt32("status", status);
 	
 	return B_OK;
 }
 
 
 int32_t
-PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr)
+PRosterTeamFor(void *pobject, void *in, void *out, void *ptr)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -779,14 +775,14 @@ PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	if (!roster)
 		return B_BAD_TYPE;
 	
-	PArgs args(in);
+	PArgs *args = static_cast<PArgs*>(in);
 	
 	BString path;
-	if (args.FindString("path", &path) != B_OK)
+	if (args->FindString("path", &path) != B_OK)
 		path = "";
 	
 	BString signature;
-	if (args.FindString("signature", &signature) != B_OK)
+	if (args->FindString("signature", &signature) != B_OK)
 		signature = "";
 	
 	team_id team;
@@ -805,9 +801,9 @@ PRosterTeamFor(void *pobject, PArgList *in, PArgList *out, void *ptr)
 	else
 		return B_ERROR;
 	
-	PArgs outArgs(out);
-	outArgs.MakeEmpty();
-	outArgs.AddInt32("value", team);
+	PArgs *outArgs = static_cast<PArgs*>(out);
+	outArgs->MakeEmpty();
+	outArgs->AddInt32("value", team);
 	
 	return B_OK;
 }

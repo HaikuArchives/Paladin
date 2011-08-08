@@ -2,8 +2,15 @@
 #define PTEXTCONTROL_H
 
 #include "PControl.h"
+#include <Application.h>
+#include <Slider.h>
+#include <stdio.h>
+#include <Window.h>
+#include "AutoTextControl.h"
 
 
+class PTextControlBackend;
+class AutoTextControl;
 
 class PTextControl : public PControl
 {
@@ -22,6 +29,7 @@ public:
 	virtual	status_t		GetProperty(const char *name, PValue *value, const int32 &index = 0) const;
 	virtual	status_t		SetProperty(const char *name, PValue *value, const int32 &index = 0);
 
+			AutoTextControl *	GetBackend(void) const;
 
 protected:
 	virtual	void			InitBackend(void);

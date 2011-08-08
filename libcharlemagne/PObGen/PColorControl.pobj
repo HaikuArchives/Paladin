@@ -15,6 +15,7 @@ Name=PColorControl
 FriendlyName=ColorControl
 Description=A button
 UsesView=true
+GetBackend=true
 ParentClass=public PControl
 
 [properties]

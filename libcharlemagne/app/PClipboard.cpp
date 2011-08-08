@@ -1,28 +1,27 @@
 #include "PClipboard.h"
 
-#include <Application.h>
-#include <Clipboard.h>
-#include <Window.h>
 
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
 PClipboard::PClipboard(void)
-	:	PHandler()
+	:	PObject()
+
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
 	AddInterface("PClipboard");
 	
 	InitBackend();
-	InitProperties();
 	InitMethods();
 }
 
 
 PClipboard::PClipboard(BMessage *msg)
-	:	PHandler(msg)
+	:	PObject(msg)
+
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
@@ -35,7 +34,8 @@ PClipboard::PClipboard(BMessage *msg)
 
 
 PClipboard::PClipboard(const char *name)
-	:	PHandler(name)
+	:	PObject(name)
+
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
@@ -47,7 +47,8 @@ PClipboard::PClipboard(const char *name)
 
 
 PClipboard::PClipboard(const PClipboard &from)
-	:	PHandler(from)
+	:	PObject(from)
+
 {
 	fType = "PClipboard";
 	fFriendlyType = "Clipboard";
@@ -85,6 +86,8 @@ PClipboard::Duplicate(void) const
 {
 	return new PClipboard(*this);
 }
+
+
 status_t
 PClipboard::GetProperty(const char *name, PValue *value, const int32 &index) const
 {
@@ -99,15 +102,15 @@ PClipboard::GetProperty(const char *name, PValue *value, const int32 &index) con
 	BClipboard *backend = (BClipboard*)fBackend;
 	if (str.ICompare("Locked") == 0)
 		((BoolProperty*)prop)->SetValue(backend->IsLocked());
+	else if (str.ICompare("SystemCount") == 0)
+		((IntProperty*)prop)->SetValue(backend->SystemCount());
 	else if (str.ICompare("Name") == 0)
 		((StringProperty*)prop)->SetValue(backend->Name());
 	else if (str.ICompare("LocalCount") == 0)
 		((IntProperty*)prop)->SetValue(backend->LocalCount());
-	else if (str.ICompare("SystemCount") == 0)
-		((IntProperty*)prop)->SetValue(backend->SystemCount());
 	else
 	{
-		return PHandler::GetProperty(name, value, index);
+		return PObject::GetProperty(name, value, index);
 	}
 
 	return prop->GetValue(value);
@@ -128,7 +131,10 @@ PClipboard::SetProperty(const char *name, PValue *value, const int32 &index)
 	if (FlagsForProperty(prop) & PROPERTY_READ_ONLY)
 		return B_READ_ONLY;
 	
+	BClipboard *backend = (BClipboard*)fBackend;
+	
 	BoolValue boolval;
+	CharValue charval;
 	ColorValue colorval;
 	FloatValue floatval;
 	IntValue intval;
@@ -144,13 +150,13 @@ PClipboard::SetProperty(const char *name, PValue *value, const int32 &index)
 	{
 		prop->GetValue(&boolval);
 		if (*boolval.value)
-			fBackend->Lock();
+			backend->Lock();
 		else
-			fBackend->Unlock();
+			backend->Unlock();
 	}
 	else
 	{
-		return PHandler::SetProperty(name, value, index);
+		return PObject::SetProperty(name, value, index);
 	}
 
 	return prop->GetValue(value);
@@ -165,21 +171,24 @@ PClipboard::GetBackend(void) const
 
 
 void
-PClipboard::InitBackend(void)
-{
-	fBackend = new BClipboard("clipboard");
-}
-
-
-void
 PClipboard::InitProperties(void)
 {
 	SetStringProperty("Description", "A representation of the clipboard");
 
-	AddProperty(new BoolProperty("Locked", 0));
+	AddProperty(new BoolProperty("Locked", false));
+	AddProperty(new IntProperty("SystemCount", 0));
 	AddProperty(new StringProperty("Name", 0));
 	AddProperty(new IntProperty("LocalCount", 0));
-	AddProperty(new IntProperty("SystemCount", 0));
+}
+
+
+void
+PClipboard::InitBackend(void)
+{
+	if (!fBackend)
+		fBackend = be_clipboard;
+	StringValue sv("A representation of the clipboard");
+	SetProperty("Description", &sv);
 }
 
 

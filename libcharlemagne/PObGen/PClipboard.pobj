@@ -14,6 +14,7 @@ Name=PClipboard
 FriendlyName=Clipboard
 Description=A representation of the clipboard
 UsesView=false
+GetBackend=true
 ParentClass=public PObject
 
 [properties]

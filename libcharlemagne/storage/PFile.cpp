@@ -4,11 +4,12 @@
 #include "PArgs.h"
 #include "EnumProperty.h"
 #include "PMethod.h"
+#include "PObjectBroker.h"
 
-int32_t PFileWriteAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PFileRead(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PFileReadAt(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
-int32_t PFileWrite(void *pobject, PArgList *in, PArgList *out, void *ptr = NULL);
+int32_t PFileWriteAt(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PFileRead(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PFileReadAt(void *pobject, void *in, void *out, void *ptr = NULL);
+int32_t PFileWrite(void *pobject, void *in, void *out, void *ptr = NULL);
 
 PFile::PFile(void)
 	:	PNode()
@@ -203,29 +204,29 @@ PFile::InitMethods(void)
 {
 	PMethodInterface pmi;
 	
-	pmi.AddArg("buffer", PARG_POINTER, " A buffer to hold the data", 0);
-	pmi.AddArg("size", PARG_INT32, " The size of the buffer", 0);
-	pmi.AddReturnValue("bytesread", PARG_INT32, " The number of bytes actually read");
+	pmi.AddArg("buffer", B_POINTER_TYPE, " A buffer to hold the data", 0);
+	pmi.AddArg("size", B_INT32_TYPE, " The size of the buffer", 0);
+	pmi.AddReturnValue("bytesread", B_INT32_TYPE, " The number of bytes actually read");
 	AddMethod(new PMethod("Read", PFileRead, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("offset", PARG_INT32, " Offset in the file to start reading from", 0);
-	pmi.AddArg("buffer", PARG_POINTER, " A buffer to hold the data", 0);
-	pmi.AddArg("size", PARG_INT32, " The size of the buffer", 0);
-	pmi.AddReturnValue("bytesread", PARG_INT32, " The number of bytes actually read");
+	pmi.AddArg("offset", B_INT32_TYPE, " Offset in the file to start reading from", 0);
+	pmi.AddArg("buffer", B_POINTER_TYPE, " A buffer to hold the data", 0);
+	pmi.AddArg("size", B_INT32_TYPE, " The size of the buffer", 0);
+	pmi.AddReturnValue("bytesread", B_INT32_TYPE, " The number of bytes actually read");
 	AddMethod(new PMethod("ReadAt", PFileReadAt, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("buffer", PARG_POINTER, " A buffer holding the data to write", 0);
-	pmi.AddArg("size", PARG_INT32, " The size of the buffer", 0);
-	pmi.AddReturnValue("bytesread", PARG_INT32, " The number of bytes actually written");
+	pmi.AddArg("buffer", B_POINTER_TYPE, " A buffer holding the data to write", 0);
+	pmi.AddArg("size", B_INT32_TYPE, " The size of the buffer", 0);
+	pmi.AddReturnValue("bytesread", B_INT32_TYPE, " The number of bytes actually written");
 	AddMethod(new PMethod("Write", PFileWrite, &pmi));
 	pmi.MakeEmpty();
 
-	pmi.AddArg("offset", PARG_INT32, " Offset in the file to start reading from", 0);
-	pmi.AddArg("buffer", PARG_POINTER, " A buffer holding the data to write", 0);
-	pmi.AddArg("size", PARG_INT32, " The size of the buffer", 0);
-	pmi.AddReturnValue("bytesread", PARG_INT32, " The number of bytes actually written");
+	pmi.AddArg("offset", B_INT32_TYPE, " Offset in the file to start reading from", 0);
+	pmi.AddArg("buffer", B_POINTER_TYPE, " A buffer holding the data to write", 0);
+	pmi.AddArg("size", B_INT32_TYPE, " The size of the buffer", 0);
+	pmi.AddReturnValue("bytesread", B_INT32_TYPE, " The number of bytes actually written");
 	AddMethod(new PMethod("WriteAt", PFileWriteAt, &pmi));
 	pmi.MakeEmpty();
 
@@ -233,7 +234,7 @@ PFile::InitMethods(void)
 
 
 int32_t
-PFileRead(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PFileRead(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -244,28 +245,31 @@ PFileRead(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BFile *backend = (BFile*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	void * buffer;
-	if (inArgs.FindPointer("buffer", &buffer) != B_OK)
+	if (inArgs->FindPointer("buffer", &buffer) != B_OK)
 		return B_ERROR;
 
 	int32 size;
-	if (inArgs.FindInt32("size", &size) != B_OK)
+	if (inArgs->FindInt32("size", &size) != B_OK)
 		return B_ERROR;
 
 	int32 outValue1;
 
 	outValue1 = backend->Read(buffer, size);
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PFileReadAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PFileReadAt(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -276,32 +280,35 @@ PFileReadAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BFile *backend = (BFile*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
+	if (inArgs->FindInt32("offset", &offset) != B_OK)
 		return B_ERROR;
 
 	void * buffer;
-	if (inArgs.FindPointer("buffer", &buffer) != B_OK)
+	if (inArgs->FindPointer("buffer", &buffer) != B_OK)
 		return B_ERROR;
 
 	int32 size;
-	if (inArgs.FindInt32("size", &size) != B_OK)
+	if (inArgs->FindInt32("size", &size) != B_OK)
 		return B_ERROR;
 
 	int32 outValue1;
 
 	outValue1 = backend->ReadAt(offset, buffer, size);
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PFileWrite(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PFileWrite(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -312,28 +319,31 @@ PFileWrite(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BFile *backend = (BFile*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	void * buffer;
-	if (inArgs.FindPointer("buffer", &buffer) != B_OK)
+	if (inArgs->FindPointer("buffer", &buffer) != B_OK)
 		return B_ERROR;
 
 	int32 size;
-	if (inArgs.FindInt32("size", &size) != B_OK)
+	if (inArgs->FindInt32("size", &size) != B_OK)
 		return B_ERROR;
 
 	int32 outValue1;
 
 	outValue1 = backend->Write(buffer, size);
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }
 
 
 int32_t
-PFileWriteAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
+PFileWriteAt(void *pobject, void *in, void *out, void *extraData)
 {
 	if (!pobject || !in || !out)
 		return B_ERROR;
@@ -344,25 +354,28 @@ PFileWriteAt(void *pobject, PArgList *in, PArgList *out, void *extraData)
 	
 	BFile *backend = (BFile*)parent->GetBackend();
 
-	PArgs inArgs(in), outArgs(out);
+
+	PArgs *inArgs = static_cast<PArgs*>(in);
+
+	PArgs *outArgs = static_cast<PArgs*>(out);
 
 	int32 offset;
-	if (inArgs.FindInt32("offset", &offset) != B_OK)
+	if (inArgs->FindInt32("offset", &offset) != B_OK)
 		return B_ERROR;
 
 	void * buffer;
-	if (inArgs.FindPointer("buffer", &buffer) != B_OK)
+	if (inArgs->FindPointer("buffer", &buffer) != B_OK)
 		return B_ERROR;
 
 	int32 size;
-	if (inArgs.FindInt32("size", &size) != B_OK)
+	if (inArgs->FindInt32("size", &size) != B_OK)
 		return B_ERROR;
 
 	int32 outValue1;
 
 	outValue1 = backend->WriteAt(offset, buffer, size);
 
-	outArgs.MakeEmpty();
+	outArgs->MakeEmpty();
 
 	return B_OK;
 }

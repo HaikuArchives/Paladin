@@ -107,13 +107,13 @@ PHandler::GetHandlerCode(const int32 &constant)
 
 
 status_t
-PHandler::RunMessageHandler(const int32 &constant, PArgList &args)
+PHandler::RunMessageHandler(const int32 &constant, PArgs &args)
 {
 	MsgHandlerMap::iterator i = fMsgHandlerMap.find(constant);
 	if (i == fMsgHandlerMap.end())
 		return B_NAME_NOT_FOUND;
 	
-	PArgList out;
+	PArgs out;
 	return i->second.handler(this, &args, &out, NULL);
 }
 

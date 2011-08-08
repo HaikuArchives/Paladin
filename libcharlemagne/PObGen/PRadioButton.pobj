@@ -16,6 +16,7 @@ FriendlyName=RadioButton
 Description=A radio button
 UsesView=true
 ParentClass=public PControl
+GetBackend=true
 
 [backend]
 Type=Subclass

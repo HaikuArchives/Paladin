@@ -2,8 +2,14 @@
 #define PRADIOBUTTON_H
 
 #include "PControl.h"
+#include <Application.h>
+#include <RadioButton.h>
+#include <stdio.h>
+#include <Window.h>
 
 
+class PRadioButtonBackend;
+class BRadioButton;
 
 class PRadioButton : public PControl
 {
@@ -19,6 +25,7 @@ public:
 	static	PObject *		Create(void);
 	virtual	PObject *		Duplicate(void) const;
 	
+			BRadioButton *	GetBackend(void) const;
 
 protected:
 	virtual	void			InitBackend(void);

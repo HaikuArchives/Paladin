@@ -40,8 +40,8 @@ MakeLocate libhekkel.so : $(DISTRO_DIR)/lib ;
 
 DEFINES = $(SAVED_DEFINES) ;
 
-SubDirSysHdrs /boot/home/config/include ;
-LINKFLAGS += -L/boot/home/config/lib ;
+SubDirSysHdrs /boot/home/config/develop/headers ;
+LINKFLAGS += -L/boot/home/config/lib -L/boot/home/config/develop/lib ;
 
 #<pe-src>
 Application PalEdit : 

@@ -138,6 +138,7 @@ sed -i 's_/boot/develop/lib/x86_'`finddir B_SYSTEM_LIB_DIRECTORY`'_' $PE_FILES_S
 sed -i 's_/boot/home/config/etc_'`finddir B_USER_SETTINGS_DIRECTORY`'_' $PE_FILES_SED
 sed -i 's_/boot/common/include_'`finddir B_SYSTEM_HEADERS_DIRECTORY`'_' $PE_FILES_SED
 sed -i 's_/boot/develop/headers_'`finddir B_SYSTEM_HEADERS_DIRECTORY`'_' $PE_FILES_SED
+sed -i 's_\-L/boot/home/config/lib_-L/boot/home/config/lib -L'`finddir B_USER_DEVELOP_DIRECTORY`'/lib_' $PE_FILES_SED
 sed -i 's|COMMON_FOLDER = /boot/common|COMMON_FOLDER = '`finddir B_USER_CONFIG_DIRECTORY`'|' $PE_FILES_SED
 
 if [ "$MAKECLEAN" == 1 ]

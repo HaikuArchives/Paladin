@@ -7,7 +7,7 @@ if $(OS) = HAIKU {
 	CCFLAGS += -DBONE_BUILD ;
 	C++FLAGS += -DBONE_BUILD ;
 	LINKLIBS += -lnetwork ;
-	COMMON_FOLDER = /boot/common ;
+	COMMON_FOLDER = /boot/home/config ;
 } else {
 	# BeOS
 
@@ -24,11 +24,11 @@ if $(OS) = HAIKU {
 
 	if $(OSPLAT) = X86 {
 		# check for BONE...
-		local haveBone = [ GLOB /boot/develop/headers/be/bone/arpa : inet.h ] ;
+		local haveBone = [ GLOB /boot/system/develop/headers/be/bone/arpa : inet.h ] ;
 		if $(haveBone)	{
 			CCFLAGS += -DBONE_BUILD ;
 			C++FLAGS += -DBONE_BUILD ;
-			SYSHDRS += /boot/develop/headers/be/bone /boot/develop/headers/be/bone/sys ;
+			SYSHDRS += /boot/system/develop/headers/be/bone /boot/system/develop/headers/be/bone/sys ;
 			LINKLIBS += -lsocket -lbind ;
 		} else {
 			LINKLIBS += -lnet ;
@@ -36,21 +36,21 @@ if $(OS) = HAIKU {
 	}
 
 	# check for Zeta...
-	local haveZeta = [ GLOB /boot/develop/lib/x86 : libzeta.so ] ;
+	local haveZeta = [ GLOB /boot/system/lib : libzeta.so ] ;
 	if $(haveZeta)	{
 		LINKLIBS += -lzeta ;
 	}
 }
 
 # check for pcre...
-local haveHeadersPcre = [ GLOB /boot/develop/headers/pcre : pcre.h ] ;
+local haveHeadersPcre = [ GLOB /boot/system/develop/headers/pcre : pcre.h ] ;
 if $(haveHeadersPcre) {
-	CCFLAGS += -isystem /boot/develop/headers/pcre ;
-	C++FLAGS += -isystem /boot/develop/headers/pcre ;
+	CCFLAGS += -isystem /boot/system/develop/headers/pcre ;
+	C++FLAGS += -isystem /boot/system/develop/headers/pcre ;
 } else {
-	haveHeadersPcre = [ GLOB /boot/common/include : pcre.h ] ;
+	haveHeadersPcre = [ GLOB /boot/system/develop/headers : pcre.h ] ;
 	if ! $(haveHeadersPcre) {
-		haveHeadersPcre = [ GLOB /boot/home/config/include : pcre.h ] ;
+		haveHeadersPcre = [ GLOB /boot/home/config/develop/headers : pcre.h ] ;
 		if ! $(haveHeadersPcre) {
 			Exit "You need to have pcre installed on your system." ;
 		}

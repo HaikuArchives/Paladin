@@ -289,7 +289,7 @@ SourceFilePObj::Compile(BuildInfo &info, const char *options)
 
 
 DPath
-SourceFilePObj::GetObjectPath(BuildInfo &info)
+SourceFilePObj::GetSourcePath(BuildInfo &info)
 {
 	BString sourcename(GetPath().GetBaseName());
 	sourcename << ".cpp";

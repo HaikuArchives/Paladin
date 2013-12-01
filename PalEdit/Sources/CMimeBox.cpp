@@ -71,7 +71,7 @@ CMimeItem::CMimeItem(const char *mime)
 		try
 		{
 			char p[PATH_MAX];
-			if (find_directory(B_COMMON_TEMP_DIRECTORY, 0, true, p, PATH_MAX) == B_OK)
+			if (find_directory(B_SYSTEM_TEMP_DIRECTORY, 0, true, p, PATH_MAX) == B_OK)
 			{
 				BDirectory tmpdir;
 				FailOSErr(tmpdir.SetTo(p));

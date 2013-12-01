@@ -103,7 +103,7 @@ FindOpenFileWindow::MessageReceived(BMessage *msg)
 			
 			if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
 			{
-				path.SetTo(B_COMMON_DIRECTORY);
+				path.SetTo(B_USER_NONPACKAGED_DIRECTORY);
 				path << "include";
 				findmsg.AddString("folder", path.GetFullPath());
 			}

@@ -253,10 +253,10 @@ ProjectTemplate::RefForLib(const BString &path)
 		find_directory(B_USER_LIB_DIRECTORY,&bpath);
 		str.IReplaceFirst("B_USER_LIB_DIRECTORY",bpath.Path());
 	}
-	else if (str.IFindFirst("B_COMMON_LIB_DIRECTORY") >= 0)
+	else if (str.IFindFirst("B_USER_LIB_DIRECTORY") >= 0)
 	{
-		find_directory(B_COMMON_LIB_DIRECTORY,&bpath);
-		str.IReplaceFirst("B_COMMON_LIB_DIRECTORY",bpath.Path());
+		find_directory(B_USER_LIB_DIRECTORY,&bpath);
+		str.IReplaceFirst("B_USER_LIB_DIRECTORY",bpath.Path());
 	}
 	
 	entry_ref ref;

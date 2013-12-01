@@ -206,7 +206,7 @@ LibraryWindow::ScanThread(void *data)
 	
 	r.OffsetBy(0,r.Height() + 10);
 	
-	DPath sysPath = GetSystemPath(B_COMMON_DEVELOP_DIRECTORY);
+	DPath sysPath = GetSystemPath(B_USER_DEVELOP_DIRECTORY);
 	sysPath << "lib/x86";
 	BRect out = win->ScanFolder(r.LeftTop(),sysPath.GetFullPath(),&maxwidth);
 	if (out != BRect(0,0,-1,-1))
@@ -225,7 +225,7 @@ LibraryWindow::ScanThread(void *data)
 		
 		r.OffsetBy(0,r.Height() + 10);
 		
-		out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_COMMON_LIB_DIRECTORY).GetFullPath(),
+		out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
 							&maxwidth);
 		if (out != BRect(0,0,-1,-1))
 		{

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+START_DIRECTORY=`pwd`
+
 # ----------------------------------------------------------------------------
 # SETUP
 # ----------------------------------------------------------------------------
@@ -44,11 +46,14 @@ BuildNoDebug ()
 	
 	echo "Building temporary project $TMPPROJ"
 	OBJDIRNAME='(Objects.'$1'.nodebug)'
+	mkdir -p $OBJDIRNAME
 	
 	# do build here
-	sed 's/CCDEBUG=yes//' "$PROJNAME" | sed 's/CCOPLEVEL=[0-9]/CCOPLEVEL=3/' > "$TMPPROJ"
+	# using absolute paths here because chroot folder for some reasons that are
+	# unknown to me includes /system/develop, but does not contain /boot/system/develop
+	sed 's/CCDEBUG=yes//' "$PROJNAME" | sed 's/CCOPLEVEL=[0-9]/CCOPLEVEL=3/' | sed 's_/boot/develop_/system/develop_' | sed 's_/system/develop/headers/cpp_/system/develop/headers/c++_' | sed 's_/system/develop/lib/x86_/system/develop/lib_' > "$TMPPROJ"
 	
-	Paladin -b "$TMPPROJ"
+	$START_DIRECTORY/Paladin/Paladin -b "$TMPPROJ"
 	SUCCESS=$?
 	
 	if [ "$MAKECLEAN" == 1 ]
@@ -95,10 +100,10 @@ then
 fi
 
 # Make sure there's a link to make calling it easier
-if [ ! -e /boot/home/config/bin/Paladin ]
-then
-	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/Paladin"
-fi
+#if [ ! -e /boot/home/config/bin/Paladin ]
+#then
+#	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/Paladin"
+#fi
 
 # Paladin usually expects PalEdit (or a link) to be in the same directory
 # The link will be broken for the moment, but will work once the script
@@ -126,6 +131,16 @@ cd ..
 
 # PalEdit
 cd PalEdit
+# substitute old paths with new ones
+PE_FILES_SED='Jamrules Extensions/Jamfile Sources/Jamfile build/BuildSettings'
+sed -i 's_/boot/home/config/include_'`finddir B_USER_HEADERS_DIRECTORY`'_' $PE_FILES_SED
+sed -i 's_/boot/develop/lib/x86_'`finddir B_SYSTEM_LIB_DIRECTORY`'_' $PE_FILES_SED
+sed -i 's_/boot/home/config/etc_'`finddir B_USER_SETTINGS_DIRECTORY`'_' $PE_FILES_SED
+sed -i 's_/boot/common/include_'`finddir B_SYSTEM_HEADERS_DIRECTORY`'_' $PE_FILES_SED
+sed -i 's_/boot/develop/headers_'`finddir B_SYSTEM_HEADERS_DIRECTORY`'_' $PE_FILES_SED
+sed -i 's_\-L/boot/home/config/lib_-L/boot/home/config/lib -L'`finddir B_USER_DEVELOP_DIRECTORY`'/lib_' $PE_FILES_SED
+sed -i 's|COMMON_FOLDER = /boot/common|COMMON_FOLDER = '`finddir B_USER_CONFIG_DIRECTORY`'|' $PE_FILES_SED
+
 if [ "$MAKECLEAN" == 1 ]
 then
 	jam clean
@@ -138,6 +153,6 @@ BuildNoDebug SymbolFinder
 cd ..
 
 cd uncrustify
-configure --prefix=`finddir B_COMMON_DIRECTORY`
+configure --prefix=`finddir B_USER_CONFIG_DIRECTORY`
 make -j$CPUCOUNT
 cd ..

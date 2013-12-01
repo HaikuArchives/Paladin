@@ -451,7 +451,7 @@ void CDoc::AddRecent(const char *path)
 		BPath tp;
 		try
 		{
-			FailOSErr(find_directory(B_COMMON_TEMP_DIRECTORY, &tp));
+			FailOSErr(find_directory(B_SYSTEM_TEMP_DIRECTORY, &tp));
 			if (strncmp(tp.Path(), path, strlen(tp.Path())) == 0)
 				return;
 		}

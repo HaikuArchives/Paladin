@@ -215,7 +215,7 @@ Project::Load(const char *path)
 	if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform)
 	{
 		BPath libpath;
-		find_directory(B_COMMON_DEVELOP_DIRECTORY,&libpath);
+		find_directory(B_USER_DEVELOP_DIRECTORY,&libpath);
 		libpath.Append("lib/x86/libsupc++.so");
 		AddLibrary(libpath.Path());
 	}
@@ -1485,7 +1485,7 @@ Project::FindLibrary(const char *libname)
 		return outpath;
 	}
 	
-	find_directory(B_COMMON_LIB_DIRECTORY,&tempPath);
+	find_directory(B_USER_LIB_DIRECTORY,&tempPath);
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())
 	{
@@ -1497,7 +1497,7 @@ Project::FindLibrary(const char *libname)
 		return outpath;
 	}
 	
-	find_directory(B_COMMON_DEVELOP_DIRECTORY,&tempPath);
+	find_directory(B_USER_DEVELOP_DIRECTORY,&tempPath);
 	tempPath.Append("lib/x86/");
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())

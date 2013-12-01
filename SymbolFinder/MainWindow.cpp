@@ -130,7 +130,7 @@ MainWindow::DoSearch(const char *text)
 	if (status == B_OK && find_directory(B_USER_LIB_DIRECTORY,&path) == B_OK)
 		status = SearchLibPath(path.Path(),text);
 	
-	if (status == B_OK && BEntry("/boot/common").Exists() && find_directory(B_COMMON_LIB_DIRECTORY,&path) == B_OK)
+	if (status == B_OK && BEntry("/boot/common").Exists() && find_directory(B_USER_LIB_DIRECTORY,&path) == B_OK)
 		status = SearchLibPath(path.Path(),text);
 	
 	Lock();

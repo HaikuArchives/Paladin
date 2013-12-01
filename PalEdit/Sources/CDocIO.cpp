@@ -198,17 +198,6 @@ static bool CopyFile(BEntry& srcEntry, BEntry& dstEntry)
 	return true;
 }
 
-#ifndef B_ZETA_VERSION_1_2_0 // maybe even B_ZETA_VERSION_1_1_0
-bool operator< (const node_ref& left, const node_ref& right)
-{
-	if (left.node < right.node)
-		return true;
-	else
-		return left.device < right.device;
-}
-#endif
-
-
 // #pragma mark - CDocIO
 
 CDocIO::CDocIO(CDoc* doc)

@@ -8,10 +8,10 @@ DISTRO_DIR			= [ FDirName $(TOP) generated distro ] ;
 IS_GCC_4_PLATFORM = ;
 if $(OS) = HAIKU {
 	# Only Haiku might use gcc 4. We use the existence of a libstdc++.r4.so in
-	# /boot/develop/lib/x86 to judge whether this is a BeOS compatible and thus
+	# /boot/system/lib to judge whether this is a BeOS compatible and thus
 	# gcc 2 platform. This is not entirely correct, but should be good enough
 	# for the time being.
-	local hasLibStdC++.R4 = [ Glob /boot/develop/lib/x86 : libstdc++.r4.so ] ;
+	local hasLibStdC++.R4 = [ Glob /boot/system/lib : libstdc++.r4.so ] ;
 	if ! $(hasLibStdC++.R4) {
 		IS_GCC_4_PLATFORM = 1 ;
 	}

@@ -805,7 +805,7 @@ Project::Link(void)
 			}
 			case TARGET_SHARED_LIB:
 			{
-				linkString << "-nostart -Xlinker -soname=" << GetTargetName() << " ";
+				linkString << "-shared -Xlinker -soname=" << GetTargetName() << " ";
 				break;
 			}
 			default:

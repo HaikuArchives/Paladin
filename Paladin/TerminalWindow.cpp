@@ -9,9 +9,11 @@
 
 #define M_RUN_COMMAND 'rncm'
 
+
 TerminalWindow::TerminalWindow(const char *commandline)
-	:	DWindow(BRect(0,0,400,300),TR("Terminal Output")),
-		fCommand(commandline)
+	:
+	DWindow(BRect(0, 0, 400, 300), TR("Terminal output")),
+	fCommand(commandline)
 {
 	SetSizeLimits(300,30000,200,30000);
 	MakeCenteredOnShow(true);

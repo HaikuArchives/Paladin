@@ -13,19 +13,23 @@
 #include "Project.h"
 #include "Settings.h"
 
+#define B_USER_DEVELOP_DIRECTORY ((directory_which)3028)
+
+
 enum
 {
 	M_TOGGLE_LIB = 'tglb'
 };
 
+
 LibraryWindow::LibraryWindow(BRect frame, const BMessenger &parent, Project *project)
-	:	DWindow(frame,NULL,B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS |
-											B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE),
-		fParent(parent),
-		fProject(project)
+	:
+	DWindow(frame,NULL,B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS |
+		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE),
+	fParent(parent),
+	fProject(project)
 {
-	if (project)
-	{
+	if (project != NULL) {
 		BString title(TR("Libraries: "));
 		title << project->GetName();
 		SetTitle(title.String());
@@ -195,55 +199,54 @@ LibraryWindow::ScanThread(void *data)
 	LibraryWindow *win = (LibraryWindow *)data;
 
 	float maxwidth;
-	BRect r(5,5,105,20);
+	BRect r(5, 5, 105, 20);
 	
-	BView *systemheader = win->AddHeader(r.LeftTop(),TR("System Libraries:"));
-	
+	BView *systemheader = win->AddHeader(r.LeftTop(), TR("System Libraries:"));
+
 	win->Lock();
 	r = systemheader->Frame();
 	win->Unlock();
 	maxwidth = r.right;
-	
-	r.OffsetBy(0,r.Height() + 10);
-	
+
+	r.OffsetBy(0, r.Height() + 10);
+
 	DPath sysPath = GetSystemPath(B_USER_DEVELOP_DIRECTORY);
 	sysPath << "lib/x86";
-	BRect out = win->ScanFolder(r.LeftTop(),sysPath.GetFullPath(),&maxwidth);
-	if (out != BRect(0,0,-1,-1))
-	{
+	BRect out = win->ScanFolder(r.LeftTop(), sysPath.GetFullPath(), &maxwidth);
+	if (out != BRect(0, 0, -1, -1)) {
 		r = out;
-		r.OffsetBy(0,10);
+		r.OffsetBy(0, 10);
 	}
-	
+
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
 	{
-		BView *commonheader = win->AddHeader(r.LeftTop(),TR("Common Libraries:"));
+		BView *commonheader = win->AddHeader(r.LeftTop(), TR("Common Libraries:"));
 		win->Lock();
 		r = commonheader->Frame();
 		win->Unlock();
-		maxwidth = MAX(r.right,maxwidth);
-		
-		r.OffsetBy(0,r.Height() + 10);
-		
-		out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
-							&maxwidth);
-		if (out != BRect(0,0,-1,-1))
+		maxwidth = MAX(r.right, maxwidth);
+
+		r.OffsetBy(0, r.Height() + 10);
+
+		out = win->ScanFolder(r.LeftTop(), GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
+			&maxwidth);
+		if (out != BRect(0, 0, -1, -1))
 		{
 			r = out;
 			r.OffsetBy(0,10);
 		}
 	}
-	
-	BView *userheader = win->AddHeader(r.LeftTop(),TR("User Libraries:"));
+
+	BView *userheader = win->AddHeader(r.LeftTop(), TR("User Libraries:"));
 	win->Lock();
 	r = userheader->Frame();
 	win->Unlock();
 	maxwidth = MAX(r.right,maxwidth);
 	
-	r.OffsetBy(0,r.Height() + 10);
+	r.OffsetBy(0, r.Height() + 10);
 	
-	out = win->ScanFolder(r.LeftTop(),GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
-						&maxwidth);
+	out = win->ScanFolder(r.LeftTop(), GetSystemPath(B_USER_LIB_DIRECTORY).GetFullPath(),
+		&maxwidth);
 	if (out.IsValid())
 	{
 		r = out;
@@ -261,14 +264,16 @@ LibraryWindow::ScanThread(void *data)
 	BRect savedframe;
 	if (gSettings.FindRect("libwin_frame",&savedframe) == B_OK)
 		win->ResizeTo(savedframe.Width(),savedframe.Height());
+
 	gSettings.Unlock();
-	
+
 	BStringView *label = (BStringView*)top->FindView("label");
 	label->SetText(TR("Choose the system libraries for your project."));
 	float minw = label->Frame().right + 10;
 	win->SetSizeLimits(minw,30000,200,30000);
 	if (win->Bounds().Width() < minw)
 		win->ResizeTo(minw,win->Bounds().Height());
+
 	win->fScanThread = -1;
 	win->Unlock();
 	

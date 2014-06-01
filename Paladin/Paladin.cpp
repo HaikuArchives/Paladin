@@ -40,6 +40,7 @@ static int32 sWindowCount = 0;
 static BLocker sWindowLocker;
 int32 gQuitOnZeroWindows = 1;
 
+
 void
 RegisterWindow(void)
 {
@@ -99,10 +100,12 @@ PrintUsage(void)
 	#endif
 }
 
+
 App::App(void)
-	:	BApplication(APP_SIGNATURE),
-		fBuildCleanMode(false),
-		fBuilder(NULL)
+	:
+	BApplication(APP_SIGNATURE),
+	fBuildCleanMode(false),
+	fBuilder(NULL)
 {
 	InitFileTypes();
 	InitGlobals();
@@ -115,8 +118,8 @@ App::App(void)
 	BEntry entry(gLastProjectPath.GetFullPath());
 	entry_ref ref;
 	entry.GetRef(&ref);
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL,&msgr,&ref,B_FILE_NODE,true,
-								new BMessage(B_REFS_RECEIVED));
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, true,
+		new BMessage(B_REFS_RECEIVED));
 	fOpenPanel->Window()->SetTitle("Paladin: Open Project");
 }
 
@@ -194,8 +197,7 @@ App::ArgvReceived(int32 argc,char **argv)
 			}
 		}
 	}
-	
-	
+
 	if (gPrintDebugMode > 0 && verbose)
 		gPrintDebugMode = 2;
 	
@@ -263,9 +265,8 @@ App::ArgvReceived(int32 argc,char **argv)
 	
 	if (refcount > 0)
 		RefsReceived(&refmsg);
-	else
-		if (gBuildMode)
-			Quit();
+	else if (gBuildMode)
+		Quit();
 }
 
 
@@ -278,7 +279,7 @@ App::RefsReceived(BMessage *msg)
 	{
 		bool isPaladin = Project::IsProject(ref);
 		bool isBeIDE = IsBeIDEProject(ref);
-		
+
 		if (gBuildMode && isPaladin)
 			BuildProject(ref);
 		else
@@ -335,6 +336,7 @@ App::MessageReceived(BMessage *msg)
 			
 			break;
 		}
+
 		case M_OPEN_PARTNER:
 		{
 			entry_ref ref;
@@ -342,22 +344,26 @@ App::MessageReceived(BMessage *msg)
 				OpenPartner(ref);
 			break;
 		}
+
 		case M_NEW_PROJECT:
 		{
-			TemplateWindow *win = new TemplateWindow(BRect(100,100,400,300));
+			TemplateWindow *win = new TemplateWindow(BRect(100, 100, 400, 300));
 			win->Show();
 			break;
 		}
+
 		case M_SHOW_OPEN_PROJECT:
 		{
 			fOpenPanel->Show();
 			break;
 		}
+
 		case M_CREATE_PROJECT:
 		{
 			CreateNewProject(*msg);
 			break;
 		}
+
 		case M_QUICK_IMPORT:
 		{
 			entry_ref ref;
@@ -378,6 +384,7 @@ App::MessageReceived(BMessage *msg)
 			sWindowCount++;
 			break;
 		}
+
 		case M_DEREGISTER_WINDOW:
 		{
 			sWindowCount--;
@@ -385,6 +392,7 @@ App::MessageReceived(BMessage *msg)
 				PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+
 		case PALEDIT_OPEN_FILE:
 		{
 			int32 index = 0;
@@ -404,11 +412,13 @@ App::MessageReceived(BMessage *msg)
 			gLastProjectPath.SetTo(ref);
 			break;
 		}
+
 		case M_FIND_AND_OPEN_FILE:
 		{
 			FindAndOpenFile(msg);
 			break;
 		}
+
 		case M_BUILDING_FILE:
 		{
 			SourceFile *file;
@@ -418,16 +428,19 @@ App::MessageReceived(BMessage *msg)
 				printf("NULL pointer in M_BUILDING_FILE\n");
 			break;
 		}
+
 		case M_LINKING_PROJECT:
 		{
 			printf(TR("Linking\n"));
 			break;
 		}
+
 		case M_UPDATING_RESOURCES:
 		{
 			printf(TR("Updating Resources\n"));
 			break;
 		}
+
 		case M_BUILD_FAILURE:
 		{
 			BString errstr;
@@ -443,6 +456,7 @@ App::MessageReceived(BMessage *msg)
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+
 		case M_BUILD_WARNINGS:
 		{
 			BString errstr;
@@ -450,12 +464,14 @@ App::MessageReceived(BMessage *msg)
 				printf("%s\n",errstr.String());
 			break;
 		}
+
 		case M_BUILD_SUCCESS:
 		{
 			printf(TR("Success\n"));
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+
 		default:
 			BApplication::MessageReceived(msg);
 	}

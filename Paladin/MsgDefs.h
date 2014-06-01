@@ -26,22 +26,22 @@ enum
 	M_REMOVE_SELECTION_FROM_REPO = 'rfrp',
 	M_REVERT_SELECTION = 'rvsl',
 	M_DIFF_SELECTION = 'dfsl',
-	
+
 	PALEDIT_OPEN_FILE  = 'Cmdl',
 	
 	// Scripting messages
 	
 	// for experimental Compile on Save feature
 	M_BUILD_FILE = 'PBFl',
-	
+
 	// Duplicate the same message code as BeIDE for pe's sake
 	M_MAKE_PROJECT = 'MMak',
-	
+
 	M_RUN_PROJECT = 'PRun',
 	M_RUN_IN_TERMINAL = 'PRnT',
 	M_RUN_IN_DEBUGGER = 'PRnD',
 	M_RUN_WITH_ARGS = 'PRnA',
-	
+
 	M_ADD_FILE = 'PAFl',
 	M_REMOVE_FILE = 'PRFl',
 	M_FORCE_REBUILD = 'PFoR',

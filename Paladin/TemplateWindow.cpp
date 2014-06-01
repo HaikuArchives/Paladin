@@ -1,204 +1,197 @@
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "TemplateWindow.h"
 
+#include <algorithm>
+
+#include <Button.h>
+#include <CheckBox.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <Font.h>
+#include <LayoutBuilder.h>
 #include <Menu.h>
+#include <MenuField.h>
 #include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <Size.h>
+#include <StringView.h>
 
+#include "AutoTextControl.h"
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
+#include "PathBox.h"
 #include "PLocale.h"
 #include "Project.h"
 #include "Settings.h"
 
-enum
-{
-	M_NAME_CHANGED = 'nmch',
-	M_TARGET_CHANGED = 'tgch',
-	M_TEMPLATE_SELECTED = 'tmsl',
-	M_CHOOSE_LIBS = 'chlb',
-	M_CUSTOM_APP = 'csap',
-	M_CUSTOM_WIN = 'cswn'
+
+enum {
+	M_NAME_CHANGED		= 'nmch',
+	M_TARGET_CHANGED	= 'tgch',
+	M_TEMPLATE_SELECTED	= 'tmsl',
+	M_CHOOSE_LIBS		= 'chlb',
+	M_CUSTOM_APP		= 'csap',
+	M_CUSTOM_WIN		= 'cswn'
 };
 
-TemplateWindow::TemplateWindow(const BRect &frame)
-	:	DWindow(frame,TR("Choose a Project Type"),B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS |
-				B_NOT_V_RESIZABLE)
+
+TemplateWindow::TemplateWindow(const BRect& frame)
+	:
+	BWindow(frame, TR("Choose a project type"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	RegisterWindow();
-	
-	MakeCenteredOnShow(true);
-	
+
 	CheckTemplates();
-	
+
 	DPath templatePath(gAppPath.GetFolder());
 	templatePath << TR("Templates");
 	fTempList.ScanFolder(templatePath.GetFullPath());
-	
-	BView *top = GetBackgroundView();
-	
-	if (Bounds().Height() < 100)
-		ResizeTo(Bounds().Width(),100);
-	if (Bounds().Width() < 100)
-		ResizeTo(100,Bounds().Height());
-	
-	BRect r(Bounds());
-	BRect bounds(r);
-	
-	float divider = be_plain_font->StringWidth(TR("Source Control:")) + 5.0;
-	
-	BMenu *menu = new BMenu("Project Type");
-	for (int32 i = 0; i < fTempList.CountTemplates(); i++)
-	{
-		ProjectTemplate *ptemp = fTempList.TemplateAt(i);
+
+	// project type
+
+	BPopUpMenu* projectTypeMenu = new BPopUpMenu("Project type");
+	for (int32 i = 0; i < fTempList.CountTemplates(); i++) {
+		ProjectTemplate* ptemp = fTempList.TemplateAt(i);
 		entry_ref ref = ptemp->GetRef();
-		menu->AddItem(new BMenuItem(ref.name,new BMessage(M_TEMPLATE_SELECTED)));
+		projectTypeMenu->AddItem(new BMenuItem(ref.name,
+			new BMessage(M_TEMPLATE_SELECTED)));
 	}
-	
-	menu->SetRadioMode(true);
-	menu->SetLabelFromMarked(true);
-	menu->ItemAt(0L)->SetMarked(true);
-	
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-	float fontHeight = fh.ascent + fh.descent + fh.leading;
-	r.bottom = MAX(fontHeight,20.0);
-	
-	r.OffsetBy(10,10);
-	fTemplateField = new BMenuField(r,"templatefield",TR("Project Type: "), menu);
-	fTemplateField->SetDivider(be_plain_font->StringWidth(TR("Project Type:")) + 5);
-	top->AddChild(fTemplateField);
-	
-	// controls for the options for all project types
-	r.OffsetBy(0,r.IntegerHeight() + 10);
-	fNameBox = new AutoTextControl(r,"namebox",TR("Project Name:"),NULL,
-									new BMessage(M_NAME_CHANGED),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fNameBox);
-	fNameBox->ResizeToPreferred();
-	r.bottom = r.top + fNameBox->Bounds().Height();
-	fNameBox->ResizeTo(bounds.Width() - 20.0,r.Height());
-	fNameBox->SetDivider(divider);
-	SetToolTip(fNameBox, "The name of your project. It can be the same as the Target Name, "
-						"but it does not have to be.");
-	
-	r.OffsetBy(0,r.IntegerHeight() + 10);
-	fTargetBox = new AutoTextControl(r,"targetbox",TR("Target Name:"),"BeApp",
-									new BMessage(M_TARGET_CHANGED),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fTargetBox);
-	fTargetBox->ResizeToPreferred();
-	r.bottom = r.top + fTargetBox->Bounds().Height();
-	fTargetBox->ResizeTo(bounds.Width() - 20.0,r.Height());
-	fTargetBox->SetDivider(divider);
-	SetToolTip(fTargetBox, "The name of the compiled application or library");
-	
-	if (!BEntry(PROJECT_PATH).Exists())
-		create_directory(PROJECT_PATH,0777);
-	
-	r.OffsetBy(0,r.Height() + 10);
-	fPathBox = new PathBox(r,"pathbox",gProjectPath.GetFullPath(),TR("Location:"),
-							B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fPathBox);
-	fPathBox->ResizeToPreferred();
-	r.bottom = r.top + fPathBox->Bounds().Height();
-	fPathBox->ResizeTo(bounds.Width() - 20.0,r.Height());
-	fPathBox->SetDivider(divider);
-	SetToolTip(fPathBox, "Set the location for your project.");
-	
-	menu = new BMenu("SCM Chooser");
-	menu->AddItem(new BMenuItem("Mercurial", new BMessage()));
-	menu->AddItem(new BMenuItem("Git", new BMessage()));
-	menu->AddItem(new BMenuItem("Subversion", new BMessage()));
-	menu->AddItem(new BMenuItem("None", new BMessage()));
-	
-	if (!gHgAvailable)
-	{
-		menu->ItemAt(0)->SetEnabled(false);
-		menu->ItemAt(0)->SetLabel("Mercurial Unavailable");
+	projectTypeMenu->ItemAt(0L)->SetMarked(true);
+
+	fTemplateField = new BMenuField("templatefield", TR("Project type: "),
+		projectTypeMenu);
+	fTemplateField->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	// project name
+
+	fNameBox = new AutoTextControl("namebox", TR("Project name:"), "",
+		new BMessage(M_NAME_CHANGED));
+	SetToolTip(fNameBox, TR("The name of your project. "
+		"It can be the same as the Target name, but it does not have to be."));
+
+	// target name
+
+	fTargetBox = new AutoTextControl("targetbox", TR("Target name:"), "BeApp",
+		new BMessage(M_TARGET_CHANGED));
+	SetToolTip(fTargetBox, TR("The name of the compiled application or library"));
+
+	// project path
+
+	fPathBox = new PathBox("pathbox", gProjectPath.GetFullPath(), "");
+	fPathBox->SetExplicitMinSize(BSize(be_plain_font->StringWidth("M") * 36,
+		B_SIZE_UNSET)),
+	SetToolTip(fPathBox, TR("Set the location for your project."));
+
+	// source control
+
+	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
+	scmMenu->AddItem(new BMenuItem(TR("Mercurial"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(TR("Git"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(TR("Subversion"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(TR("None"), new BMessage()));
+
+	if (!gHgAvailable) {
+		scmMenu->ItemAt(0)->SetEnabled(false);
+		scmMenu->ItemAt(0)->SetLabel(TR("Mercurial unavailable"));
 	}
-	
-	if (!gGitAvailable)
-	{
-		menu->ItemAt(1)->SetEnabled(false);
-		menu->ItemAt(1)->SetLabel("Git Unavailable");
+	if (!gGitAvailable) {
+		scmMenu->ItemAt(1)->SetEnabled(false);
+		scmMenu->ItemAt(1)->SetLabel(TR("Git unavailable"));
 	}
-	
-	if (!gSvnAvailable)
-	{
-		menu->ItemAt(2)->SetEnabled(false);
-		menu->ItemAt(2)->SetLabel("Subversion Unavailable");
+	if (!gSvnAvailable) {
+		scmMenu->ItemAt(2)->SetEnabled(false);
+		scmMenu->ItemAt(2)->SetLabel(TR("Subversion unavailable"));
 	}
-	
-	
-	r.OffsetBy(0,r.Height() + 5.0);
-	fSCMChooser = new BMenuField(r, "scmchooser", "Source Control: ", menu);
-	top->AddChild(fSCMChooser);
-	fSCMChooser->SetDivider(divider);
-	SetToolTip(fSCMChooser, "Choose the source control manager for your project, if any.");
-	
-	menu->SetLabelFromMarked(true);
-	menu->ItemAt(gDefaultSCM)->SetMarked(true);
-	
-	BMenuItem *item = menu->FindMarked();
-	if (!item->IsEnabled())
-	{
+
+	fSCMChooser = new BMenuField("scmchooser", TR("Source control: "), scmMenu);
+	fSCMChooser->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetToolTip(fSCMChooser,
+		TR("Choose the source control manager for your project, if any."));
+
+	scmMenu->ItemAt(gDefaultSCM)->SetMarked(true);
+
+	BMenuItem* item = scmMenu->FindMarked();
+	if (!item->IsEnabled()) {
 		item->SetMarked(false);
-		for (int32 i = 0; i < menu->CountItems(); i++)
-		{
-			if (menu->ItemAt(i)->IsEnabled())
-			{
-				menu->ItemAt(i)->SetMarked(true);
+		for (int32 i = 0; i < scmMenu->CountItems(); i++) {
+			if (scmMenu->ItemAt(i)->IsEnabled()) {
+				scmMenu->ItemAt(i)->SetMarked(true);
 				break;
 			}
 		}
 	}
-	menu->SetLabelFromMarked(true);
-	
-	r.OffsetBy(0,r.Height() + 5.0);
-	fCreateFolder = new BCheckBox(r,"createfolder",TR("Create Project Folder"),NULL);
-	fCreateFolder->MoveTo(divider + 10.0, r.top);
+
+	// create folder check box
+
+	fCreateFolder = new BCheckBox(TR("Create project folder"));
 	fCreateFolder->SetValue(B_CONTROL_ON);
-	top->AddChild(fCreateFolder);
-	SetToolTip(fCreateFolder, "If checked, a folder for your project will be created "
-							"in the folder in the Location box above.");
-	
-	r.OffsetBy(0,r.Height() + 5.0);
-	fOK = new BButton(r,"ok",TR("Create Project…"), new BMessage(M_CREATE_PROJECT));
-	fOK->ResizeToPreferred();
-	top->AddChild(fOK);
-	fOK->SetEnabled(false);
-	fOK->MakeDefault(true);
-	
-	float offset = fPathBox->Divider();
-	fOK->MoveBy(offset,0);
-	
-	float minwidth = Bounds().Width();
-	float minheight = fOK->Frame().bottom + 10.0;
-	SetSizeLimits(minwidth,30000,minheight,30000);
-	
-	gSettings.Lock();
-	BRect savedframe;
-	if (gSettings.FindRect("template_frame",&savedframe) == B_OK)
-		ResizeTo(savedframe.Width(),savedframe.Height());
-	else
-		ResizeTo(minwidth,minheight);
-	gSettings.Unlock();
-		
+	SetToolTip(fCreateFolder, TR("If checked, a folder for your project will be created "
+		"in the folder in the Location box above."));
+
+	// create project button
+
+	fCreateProjectButton = new BButton("ok", TR("Create project") B_UTF8_ELLIPSIS,
+		new BMessage(M_CREATE_PROJECT));
+	fCreateProjectButton->SetEnabled(false);
+	fCreateProjectButton->MakeDefault(true);
+
+	// layout
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(fTemplateField->CreateLabelLayoutItem(), 0, 0)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1, 0)
+				.Add(fTemplateField->CreateMenuBarLayoutItem())
+				.AddGlue()
+				.End()
+
+			.Add(fNameBox->CreateLabelLayoutItem(), 0, 1)
+			.Add(fNameBox->CreateTextViewLayoutItem(), 1, 1)
+
+			.Add(fTargetBox->CreateLabelLayoutItem(), 0, 2)
+			.Add(fTargetBox->CreateTextViewLayoutItem(), 1, 2)
+
+			.Add(new BStringView("location", TR("Location:")), 0, 3)
+			.Add(fPathBox, 1, 3)
+
+			.Add(fSCMChooser->CreateLabelLayoutItem(), 0, 4)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1, 4)
+				.Add(fSCMChooser->CreateMenuBarLayoutItem())
+				.AddGlue()
+				.End()
+
+			.Add(fCreateFolder, 1, 5)
+			.End()
+		.AddGlue()
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fCreateProjectButton)
+			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.End();
+
 	fNameBox->MakeFocus(true);
+
+	CenterOnScreen();
 }
 
 
 TemplateWindow::~TemplateWindow(void)
 {
-	gSettings.Lock();
-	if (gSettings.ReplaceRect("template_frame",Frame()) != B_OK)
-		gSettings.AddRect("template_frame",Frame());
-	gSettings.Unlock();
 }
 
 
@@ -209,62 +202,63 @@ TemplateWindow::QuitRequested(void)
 	return true;
 }
 
+
 void
-TemplateWindow::MessageReceived(BMessage *msg)
+TemplateWindow::MessageReceived(BMessage* message)
 {
-	switch (msg->what)
-	{
+	switch (message->what) {
 		case M_NAME_CHANGED:
 		case M_TARGET_CHANGED:
 		{
 			if (fNameBox->Text() && strlen(fNameBox->Text()) > 0 &&
 				fTargetBox->Text() && strlen(fTargetBox->Text()) > 0)
-				fOK->SetEnabled(true);
+				fCreateProjectButton->SetEnabled(true);
 			else
-				fOK->SetEnabled(false);
+				fCreateProjectButton->SetEnabled(false);
 			break;
 		}
+
 		case M_CREATE_PROJECT:
 		{
-			BMenu *menu = fTemplateField->Menu();
-			BMenuItem *item = menu->FindMarked();
-			if (!item)
+			BMenu* menu = fTemplateField->Menu();
+			BMenuItem* item = menu->FindMarked();
+			if (item == NULL)
 				break;
-			
+
 			int32 selection = menu->IndexOf(item);
-			ProjectTemplate *ptemp = fTempList.TemplateAt(selection);
-			
-			BMessage projmsg(M_CREATE_PROJECT),reply;
-			projmsg.AddString("name",fNameBox->Text());
-			projmsg.AddString("target",fTargetBox->Text());
-			projmsg.AddInt32("type",ptemp->TargetType());
-			projmsg.AddString("path",fPathBox->Path());
-			projmsg.AddString("template", ptemp->GetRef().name);
-			projmsg.AddString("pldfile", ptemp->ProjectFileName());
-			
-			BMenu *scmMenu = fSCMChooser->Menu();
+			ProjectTemplate* ptemp = fTempList.TemplateAt(selection);
+
+			BMessage projectMessage(M_CREATE_PROJECT), reply;
+			projectMessage.AddString("name", fNameBox->Text());
+			projectMessage.AddString("target", fTargetBox->Text());
+			projectMessage.AddInt32("type", ptemp->TargetType());
+			projectMessage.AddString("path", fPathBox->Path());
+			projectMessage.AddString("template", ptemp->GetRef().name);
+			projectMessage.AddString("pldfile", ptemp->ProjectFileName());
+
+			BMenu* scmMenu = fSCMChooser->Menu();
 			int32 scm = scmMenu->IndexOf(scmMenu->FindMarked());
-			projmsg.AddInt32("scmtype",scm);
-			
-			if (!ptemp->ProjectFileName())
-			{
+			projectMessage.AddInt32("scmtype",scm);
+
+			if (!ptemp->ProjectFileName()) {
 				for (int32 i = 0; i < ptemp->CountFiles(); i++)
-					projmsg.AddRef("refs",ptemp->FileAt(i));
-				
+					projectMessage.AddRef("refs", ptemp->FileAt(i));
+
 				for (int32 i = 0; i < ptemp->CountLibs(); i++)
-					projmsg.AddRef("libs",ptemp->LibAt(i));
+					projectMessage.AddRef("libs", ptemp->LibAt(i));
 			}
-			
-			projmsg.AddBool("createfolder",(fCreateFolder->Value() == B_CONTROL_ON));
-			be_app_messenger.SendMessage(&projmsg,&reply);
+
+			if (!BEntry(PROJECT_PATH).Exists())
+				create_directory(PROJECT_PATH, 0755);
+
+			projectMessage.AddBool("createfolder", (fCreateFolder->Value() == B_CONTROL_ON));
+			be_app_messenger.SendMessage(&projectMessage, &reply);
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+
 		default:
-		{
-			DWindow::MessageReceived(msg);
-			break;
-		}
+			BWindow::MessageReceived(message);
 	}
 }
 
@@ -275,39 +269,37 @@ TemplateWindow::CheckTemplates(void)
 	// This checks for the Templates folder in the Paladin application directory
 	// and if it doesn't exist or it's empty, we make sure that it exists and
 	// at least has empty project templates for each of the four basic types of projects
-	
+
 	DPath templatePath(gAppPath.GetFolder());
 	templatePath << "Templates";
-	
+
 	bool needInit = false;
 	if (!BEntry(templatePath.GetFullPath()).Exists())
 		needInit = true;
-	
-	if (!needInit)
-	{
+
+	if (!needInit) {
 		BDirectory dir(templatePath.GetFullPath());
 		if (dir.CountEntries() == 0)
 			needInit = true;
 	}
-	
-	if (needInit)
-	{
-		create_directory(templatePath.GetFullPath(),0777);
-		
+
+	if (needInit) {
+		create_directory(templatePath.GetFullPath(), 0777);
+
 		DPath tpath(templatePath);
 		BFile file;
 		BString filedata;
-		
+
 		tpath.Append("Addon");
-		create_directory(tpath.GetFullPath(),0777);
+		create_directory(tpath.GetFullPath(), 0777);
 		tpath.Append("TEMPLATEINFO");
 		file.SetTo(tpath.GetFullPath(), B_READ_WRITE | B_CREATE_FILE);
 		filedata = "TYPE=Shared\n";
 		file.Write(filedata.String(),filedata.Length());
-		
+
 		tpath = templatePath;
 		tpath.Append("Empty Application");
-		create_directory(tpath.GetFullPath(),0777);
+		create_directory(tpath.GetFullPath(), 0777);
 		tpath.Append("TEMPLATEINFO");
 		file.SetTo(tpath.GetFullPath(), B_READ_WRITE | B_CREATE_FILE);
 		filedata = "TYPE=Application\n";
@@ -339,4 +331,3 @@ TemplateWindow::CheckTemplates(void)
 		
 	}
 }
-

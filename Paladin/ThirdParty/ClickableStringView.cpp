@@ -1,15 +1,24 @@
 #include "ClickableStringView.h"
 
-ClickableStringView::ClickableStringView(BRect frame, const char *name,
-										const char *text,
-										uint32 resize, uint32 flags)
-	:	BStringView(frame,name,text,resize,flags)
+
+ClickableStringView::ClickableStringView(BRect frame, const char* name,
+	const char* text, uint32 resizingMode, uint32 flags)
+	:
+	BStringView(frame, name, text, resizingMode, flags)
+{
+}
+
+
+ClickableStringView::ClickableStringView(const char* name, const char* text,
+	uint32 flags)
+	:
+	BStringView(name, text, flags)
 {
 }
 
 
 void
-ClickableStringView::MouseUp(BPoint pt)
+ClickableStringView::MouseUp(BPoint where)
 {
 	Invoke();
 }
@@ -29,4 +38,3 @@ ClickableStringView::DetachedFromWindow(void)
 	BStringView::DetachedFromWindow();
 	SetTarget(NULL);
 }
-

@@ -3,23 +3,26 @@
 #include <Screen.h>
 #include <View.h>
 
-DWindow::DWindow(BRect frame, const char *title, window_type type, uint32 flags,
-				uint32 workspace)
-	:	BWindow(frame,title, type, flags | B_ASYNCHRONOUS_CONTROLS, workspace),
-	 	fOldLocation(frame.LeftTop()),
- 		fScreenFrame(BScreen().Frame()),
- 		fCenterOnShow(false)
+
+DWindow::DWindow(BRect frame, const char* title, window_type type, uint32 flags,
+	uint32 workspace)
+	:
+	BWindow(frame,title, type, flags | B_ASYNCHRONOUS_CONTROLS, workspace),
+	fOldLocation(frame.LeftTop()),
+ 	fScreenFrame(BScreen().Frame()),
+ 	fCenterOnShow(false)
 {
 	DWindowInit();
 }
 
 
-DWindow::DWindow(BRect frame, const char *title, window_look look, window_feel feel,
-				uint32 flags, uint32 workspace)
-	:	BWindow(frame,title, look, feel, flags | B_ASYNCHRONOUS_CONTROLS, workspace),
-	 	fOldLocation(frame.LeftTop()),
- 		fScreenFrame(BScreen().Frame()),
- 		fCenterOnShow(false)
+DWindow::DWindow(BRect frame, const char* title, window_look look, window_feel feel,
+	uint32 flags, uint32 workspace)
+	:
+	BWindow(frame,title, look, feel, flags | B_ASYNCHRONOUS_CONTROLS, workspace),
+	fOldLocation(frame.LeftTop()),
+	fScreenFrame(BScreen().Frame()),
+	fCenterOnShow(false)
 {
 	DWindowInit();
 }
@@ -29,11 +32,11 @@ DWindow::~DWindow(void)
 {
 }
 
+
 void
 DWindow::WorkspaceActivated(int32 index, bool active)
 {
-	if (active)
-	{
+	if (active) {
 		fScreenFrame = BScreen().Frame();
 		ConstrainToScreen();
 	}
@@ -53,7 +56,7 @@ DWindow::Show(void)
 {
 	if (fCenterOnShow)
 		MoveToCenter();
-	
+
 	BWindow::Show();
 }
 
@@ -75,14 +78,14 @@ DWindow::IsCenteredOnShow(void) const
 void
 DWindow::MoveToCenter(void)
 {
-	BRect r(Frame());
-	
-	MoveTo( (fScreenFrame.right - r.Width()) / 2.0,
-			(fScreenFrame.bottom - r.Height()) / 2.0);
+	BRect rect(Frame());
+
+	MoveTo((fScreenFrame.right - rect.Width()) / 2.0,
+		(fScreenFrame.bottom - rect.Height()) / 2.0);
 }
 
 
-BView *
+BView*
 DWindow::GetBackgroundView(void)
 {
 	return fBackgroundView;
@@ -90,14 +93,14 @@ DWindow::GetBackgroundView(void)
 
 
 void
-DWindow::SetBackgroundColor(uint8 r, uint8 g, uint8 b)
+DWindow::SetBackgroundColor(uint8 red, uint8 green, uint8 blue)
 {
-	return fBackgroundView->SetViewColor(r,g,b);
+	return fBackgroundView->SetViewColor(red, green, blue);
 }
 
 
 void
-DWindow::SetBackgroundColor(const rgb_color &color)
+DWindow::SetBackgroundColor(const rgb_color& color)
 {
 	return fBackgroundView->SetViewColor(color);
 }
@@ -113,7 +116,8 @@ DWindow::GetBackgroundColor(void) const
 void
 DWindow::DWindowInit(void)
 {
-	fBackgroundView = new BView(Bounds(),"background_view",B_FOLLOW_ALL, B_WILL_DRAW);
+	fBackgroundView = new BView(Bounds(), "background_view", B_FOLLOW_ALL,
+		B_WILL_DRAW);
 	AddChild(fBackgroundView);
 	fBackgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -122,23 +126,18 @@ DWindow::DWindowInit(void)
 void
 DWindow::ConstrainToScreen(void)
 {
-
 	BPoint pt = Frame().LeftTop();
-	if (pt.y < 25)
-	{
+	if (pt.y < 25) {
 		MoveTo(pt.x,25);
 		pt.y = 25;
-	}
-	else if (pt.y > fScreenFrame.bottom + 1)
-	{
+	} else if (pt.y > fScreenFrame.bottom + 1) {
 		MoveTo(pt.x,fScreenFrame.bottom + 1);
 		pt.y = fScreenFrame.bottom + 1;
 	}
 	
 	if (pt.x > fScreenFrame.right - 35)
 		MoveTo(fScreenFrame.right - 35,pt.y);
-	else if (pt.x < 0)
-	{
+	else if (pt.x < 0) {
 		BPoint pt2(pt);
 		pt2.x = pt.x + Frame().Width();
 		if (pt2.x < 25)
@@ -150,22 +149,22 @@ DWindow::ConstrainToScreen(void)
 void
 DWindow::Zoom(BPoint origin, float width, float height)
 {
-	BWindow::Zoom(origin,width,height);
-	/*
+	BWindow::Zoom(origin, width, height);
+#if 0
 	BDeskbar bar;
 	deskbar_location loc = bar.Location();
 	BRect barframe(bar.Frame());
 	
-	switch (loc)
-	{
+	switch (loc) {
 		case B_DESKBAR_BOTTOM:
 		{
-			if (origin
+			if (origin)
+				;
 			break;
 		}
+
 		default:
 			break;
 	}
-	*/
+#endif
 }
-

@@ -1,39 +1,43 @@
-#ifndef STARTWINDOW_H
-#define STARTWINDOW_H
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+#ifndef START_WINDOW_H
+#define START_WINDOW_H
 
-#include "DWindow.h"
 
-#include <FilePanel.h>
-#include <ListView.h>
+#include <Window.h>
 
-class ClickableStringView;
+
 class BitmapButton;
+class BFilePanel;
+class BListView;
 class TypedRefFilter;
 
-class StartWindow : public DWindow
-{
+class StartWindow : public BWindow {
 public:
-				StartWindow(void);
-				~StartWindow(void);
-		bool	QuitRequested(void);
-		void	MessageReceived(BMessage *msg);
-		
+								StartWindow(void);
+	virtual						~StartWindow(void);
+
+	virtual	bool				QuitRequested(void);
+	virtual	void				MessageReceived(BMessage* message);
+
 private:
-		BitmapButton *	MakeButton(const char *name,
-									const char *up, const char *down,
-									int32 command);
-		ClickableStringView *
-						MakeLabel(BitmapButton *button, const char *label);
-		
-		BitmapButton	*fNewButton,
-						*fOpenButton,
-						*fOpenRecentButton,
-						*fQuickImportButton,
-						*fOnlineImportButton;
-		
-		BListView		*fListView;
-		BFilePanel		*fOpenPanel;
-		BFilePanel		*fImportPanel;
+			BitmapButton*		fNewButton;
+			BitmapButton*		fOpenButton;
+			BitmapButton*		fOpenRecentButton;
+			BitmapButton*		fQuickImportButton;
+			BitmapButton*		fOnlineImportButton;
+
+			BListView*			fRecentProjectsListView;
+			BFilePanel*			fOpenPanel;
+			BFilePanel*			fImportPanel;
 };
 
-#endif
+
+#endif	// START_WINDOW_H

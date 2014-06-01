@@ -1,17 +1,31 @@
+/*
+ * Copyright 2001-2009 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "Project.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <fs_attr.h>
+
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <fs_attr.h>
 #include <Message.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <Volume.h>
 
 #include "DebugTools.h"
@@ -23,45 +37,53 @@
 #include "SourceFile.h"
 #include "TextFile.h"
 
-static BString sPlatformArray[] = { BString("R5"), BString("Zeta"), BString("Haiku"), 
-									BString("HaikuGCC4") };
+#define B_USER_DEVELOP_DIRECTORY ((directory_which)3028)
+
+
+static BString sPlatformArray[] = {
+	BString("R5"),
+	BString("Zeta"),
+	BString("Haiku"), 
+	BString("HaikuGCC4")
+};
+
 
 Project::Project(const char *name, const char *targetname)
-	:	BLocker(name),
-		fName(name),
-		fTargetName(targetname),
-		fDirtyFiles(20,false),
-		fLibraryList(20,true),
-		fLocalIncludeList(20,true),
-		fSystemIncludeList(20,true),
-		fAccessList(20,true),
-		fGroupList(20,true),
-		fReadOnly(false),
-		fDebug(false),
-		fProfile(false),
-		fOpSize(false),
-		fOpLevel(0),
-		fTargetType(TARGET_APP),
-		fSCMType(gDefaultSCM)
+	:
+	BLocker(name),
+	fName(name),
+	fTargetName(targetname),
+	fDirtyFiles(20,false),
+	fLibraryList(20,true),
+	fLocalIncludeList(20,true),
+	fSystemIncludeList(20,true),
+	fAccessList(20,true),
+	fGroupList(20,true),
+	fReadOnly(false),
+	fDebug(false),
+	fProfile(false),
+	fOpSize(false),
+	fOpLevel(0),
+	fTargetType(TARGET_APP),
+	fSCMType(gDefaultSCM)
 {
-	if (name)
-	{
+	if (name != NULL) {
 		BString filename(name);
 		filename << ".pld";
-		
+
 		fPath = PROJECT_PATH;
 		fPath << name << filename;
-		
+
 		fObjectPath = PROJECT_PATH;
 		BString objfoldername("(Objects.");
 		objfoldername << name << ")";
 		fObjectPath << name << objfoldername;
-		
-		STRACE(1,("Creating Project %s\nObject Path is %s\n",name,fObjectPath.GetFullPath()));
+
+		STRACE(1, ("Creating Project %s\nObject Path is %s\n", name,
+			fObjectPath.GetFullPath()));
 	}
-	
+
 	fPlatform = DetectPlatform();
-	
 	fErrorList = new ErrorList;
 	UpdateBuildInfo();
 }
@@ -74,116 +96,100 @@ Project::~Project(void)
 
 
 status_t
-Project::Load(const char *path)
+Project::Load(const char* path)
 {
 	BEntry entry(path,true);
 	status_t status = entry.InitCheck();
 	if (status != B_OK)
 		return status;
-	
+
 	entry_ref ref;
 	entry.GetRef(&ref);
-	
+
 	fReadOnly = BVolume(ref.device).IsReadOnly();
-	
-	TextFile file(ref,B_READ_ONLY);
+
+	TextFile file(ref, B_READ_ONLY);
 	status = file.InitCheck();
 	if (status != B_OK)
 		return status;
-	
+
 	fGroupList.MakeEmpty();
-	
+
 	fPath = path;
 	fName = fPath.GetBaseName();
-	
+
 	platform_t actualPlatform = DetectPlatform();
-	
+
 	STRACE(2,("Loading project %s\n",path));
-	
+
 	// Set this to an out-of-bounds value to detect if
 	// there is no SCM entry in the project
 	fSCMType = SCM_INIT;
-	
+
 	SourceGroup *srcgroup = NULL;
 	SourceFile *srcfile = NULL;
 	BString line = file.ReadLine();
-	while (line.CountChars() > 0)
-	{
+	while (line.CountChars() > 0) {
 		int32 pos = line.FindFirst("=");
-		if (pos < 0)
-		{
+		if (pos < 0) {
 			line = file.ReadLine();
 			continue;
 		}
-		
+
 		BString entry = line;
 		entry.Truncate(pos);
-		
+
 		BString value = line.String() + pos + 1;
 		
-		STRACE(2,("Load Project: %s=%s\n",entry.String(),value.String()));
-		
-		if (value.CountChars() > 0)
-		{
+		STRACE(2, ("Load Project: %s=%s\n" ,entry.String(), value.String()));
+
+		if (value.CountChars() > 0) {
 			if (entry[0] == '#')
 				continue;
-			else
-			if (entry == "SOURCEFILE")
-			{
-				if (value.String()[0] != '/')
-				{
+			else if (entry == "SOURCEFILE") {
+				if (value.String()[0] != '/') {
 					value.Prepend("/");
 					value.Prepend(fPath.GetFolder());
 				}
 				srcfile = gFileFactory.CreateSourceFileItem(value.String());
 				AddFile(srcfile, srcgroup);
-			}
-			else if (entry == "DEPENDENCY")
-			{
+			} else if (entry == "DEPENDENCY") {
 				if (srcfile)
 					srcfile->fDependencies = value;
-			}
-			else if (entry == "LOCALINCLUDE")
-			{
+			} else if (entry == "LOCALINCLUDE") {
 				ProjectPath include(fPath.GetFolder(), value.String());
 				AddLocalInclude(include.Absolute().String());
-			}
-			else if (entry == "SYSTEMINCLUDE")
+			} else if (entry == "SYSTEMINCLUDE")
 				AddSystemInclude(value.String());
-			else if (entry == "LIBRARY")
-			{
+			else if (entry == "LIBRARY") {
 				if (actualPlatform == fPlatform)
 					AddLibrary(value.String());
 				else
 					ImportLibrary(value.String(),actualPlatform);
-			}
-			else if (entry == "GROUP")
+			} else if (entry == "GROUP") {
 				srcgroup = AddGroup(value.String());
-			else if (entry == "EXPANDGROUP")
-			{
+			} else if (entry == "EXPANDGROUP") {
 				if (srcgroup)
 					srcgroup->expanded = value == "yes" ? true : false;
-			}
-			else if (entry == "TARGETNAME")
+			} else if (entry == "TARGETNAME") {
 				fTargetName = value;
-			else if (entry == "CCDEBUG")
+			} else if (entry == "CCDEBUG") {
 				fDebug = value == "yes" ? true : false;
-			else if (entry == "CCPROFILE")
+			} else if (entry == "CCPROFILE") {
 				fProfile = value == "yes" ? true : false;
-			else if (entry == "CCOPSIZE")
+			} else if (entry == "CCOPSIZE") {
 				fOpSize = value == "yes" ? true : false;
-			else if (entry == "CCOPLEVEL")
+			} else if (entry == "CCOPLEVEL") {
 				fOpLevel = atoi(value.String());
-			else if (entry == "CCTARGETTYPE")
+			} else if (entry == "CCTARGETTYPE") {
 				fTargetType = atoi(value.String());
-			else if (entry == "CCEXTRA")
+			} else if (entry == "CCEXTRA") {
 				fExtraCompilerOptions = value;
-			else if (entry == "LDEXTRA")
+			} else if (entry == "LDEXTRA") {
 				fExtraLinkerOptions = value;
-			else if (entry == "RUNARGS")
+			} else if (entry == "RUNARGS") {
 				fRunArgs = value;
-			else if (entry == "SCM")
-			{
+			} else if (entry == "SCM") {
 				if (value.ICompare("hg") == 0)
 					fSCMType = SCM_HG;
 				else if (value.ICompare("git") == 0)
@@ -192,9 +198,7 @@ Project::Load(const char *path)
 					fSCMType = SCM_SVN;
 				else
 					fSCMType = SCM_NONE;
-			}
-			else if (entry == "PLATFORM")
-			{
+			} else if (entry == "PLATFORM") {
 				if (value.ICompare("Haiku") == 0)
 					fPlatform = PLATFORM_HAIKU;
 				else if (value.ICompare("HaikuGCC4") == 0)
@@ -203,134 +207,127 @@ Project::Load(const char *path)
 					fPlatform = PLATFORM_ZETA;
 				else
 					fPlatform = PLATFORM_R5;
-			}
-				
+			}	
 		}
-		
+
 		line = file.ReadLine();
 	}
-	
-	// Fix one of my pet peeves when changing platforms: having to add libsupc++.so whenever
-	// I change to Haiku GCC4 or GCC4hybrid from any other platform
-	if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform)
-	{
+
+	// Fix one of my pet peeves when changing platforms: having to add libsupc++.so
+	// whenever I change to Haiku GCC4 or GCC4hybrid from any other platform
+	if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform) {
 		BPath libpath;
-		find_directory(B_USER_DEVELOP_DIRECTORY,&libpath);
+		find_directory(B_USER_DEVELOP_DIRECTORY, &libpath);
 		libpath.Append("lib/x86/libsupc++.so");
 		AddLibrary(libpath.Path());
 	}
-	
+
 	fObjectPath = fPath.GetFolder();
-	
+
 	BString objfolder("(Objects.");
 	objfolder << GetName() << ")";
 	fObjectPath.Append(objfolder.String());
-	
+
 	UpdateBuildInfo();
-	
+
 	// We now set the platform to whatever we're building on. fPlatform is only used
 	// in the project loading code to be able to help cover over issues with changing platforms.
 	// Most of the time this is just the differences in libraries, but there may be other
 	// unforeseen issues that will come to light in the future.
 	fPlatform = actualPlatform;
-	
+
 	return B_OK;
 }
 
 
 void
-Project::Save(const char *path)
+Project::Save(const char* path)
 {
 	BString projectPath = fPath.GetFolder();
 	projectPath << "/";
-	
+
 	BString data;
 	data << "NAME=" << fName << "\nTARGETNAME=" << fTargetName << "\n";
 	data << "PLATFORM=" << sPlatformArray[fPlatform] << "\n";
-	
-	switch (fSCMType)
-	{
+
+	switch (fSCMType) {
 		case SCM_HG:
 		{
 			data << "SCM=hg\n";
 			break;
 		}
+
 		case SCM_GIT:
 		{
 			data << "SCM=git\n";
 			break;
 		}
+
 		case SCM_SVN:
 		{
 			data << "SCM=svn\n";
 			break;
 		}
+
 		case SCM_NONE:
 		{
 			data << "SCM=none\n";
 			break;
 		}
-		default:
-		{
-			break;
-		}
 	}
-	
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
+
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
 		data << "GROUP=" << group->name << "\n";
 		data << "EXPANDGROUP=" << (group->expanded ? "yes" : "no") << "\n";
 		
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *file = group->filelist.ItemAt(j);
-			
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* file = group->filelist.ItemAt(j);
+
 			BString temppath(file->GetPath().GetFullPath());
-			if (temppath.FindFirst(projectPath.String()) == 0)
-			{
+			if (temppath.FindFirst(projectPath.String()) == 0) {
 				// Absolute paths which include the project folder are stripped
 				// down into relative paths
 				temppath.RemoveFirst(projectPath.String());
 			}
-			
+
 			data << "SOURCEFILE=" << temppath << "\n";
 			if (file->GetDependencies() && strlen(file->GetDependencies()) > 0)
 				data << "DEPENDENCY=" << file->GetDependencies() << "\n";
 		}
 	}
-	
+
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 		data << "LOCALINCLUDE=" << fLocalIncludeList.ItemAt(i)->Relative() << "\n";
-	
-	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++)
-	{
-		BString *string = fSystemIncludeList.ItemAt(i);
+
+	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++) {
+		BString* string = fSystemIncludeList.ItemAt(i);
 		BString include = *string;
 		if (include[0] == '/')
 			include.RemoveFirst(projectPath.String());
+
 		data << "SYSTEMINCLUDE=" << include << "\n";
 	}
-	
-	for (int32 i = 0; i < fLibraryList.CountItems(); i++)
-	{
-		SourceFile *file = (SourceFile*)fLibraryList.ItemAt(i);
-		if (!file)
+
+	for (int32 i = 0; i < fLibraryList.CountItems(); i++) {
+		SourceFile* file = (SourceFile*)fLibraryList.ItemAt(i);
+		if (file == NULL)
 			continue;
-		
+
 		BString strpath(file->GetPath().GetFullPath());
-		if (gPlatform == PLATFORM_ZETA)
-		{
-			if (strpath.FindFirst("/boot/beos/etc/develop/zeta-r1-gcc2-x86/") == 0)
+		if (gPlatform == PLATFORM_ZETA) {
+			if (strpath.FindFirst("/boot/beos/etc/develop/zeta-r1-gcc2-x86/") == 0) {
 				strpath.ReplaceFirst("/boot/beos/etc/develop/zeta-r1-gcc2-x86/",
-										"/boot/develop/");
+					"/boot/develop/");
+			}
 		}
-		
+
 		if (strpath.FindFirst(projectPath.String()) == 0)
 			strpath.RemoveFirst(projectPath.String());
+
 		data << "LIBRARY=" << strpath.String() << "\n";
 	}
-	
+
 	data << "RUNARGS=" << fRunArgs << "\n";
 	data << "CCDEBUG=" << (fDebug ? "yes" : "no") << "\n";
 	data << "CCPROFILE=" << (fProfile ? "yes" : "no") << "\n";
@@ -339,28 +336,27 @@ Project::Save(const char *path)
 	data << "CCTARGETTYPE=" << fTargetType << "\n";
 	data << "CCEXTRA=" << fExtraCompilerOptions << "\n";
 	data << "LDEXTRA=" << fExtraLinkerOptions << "\n";
-	
+
 	BFile file(path,B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if (file.InitCheck() != B_OK)
-	{
+	if (file.InitCheck() != B_OK) {
 		STRACE(2,("Couldn't create project file %s. Bailing out\n",path));
 		return;
 	}
-	
+
 	STRACE(2,("Saved Project %s. Data as follows:\n%s\n",path,data.String()));
-	
+
 	file.Write(data.String(),data.Length());
-	
+
 	fPath = path;
 	fObjectPath = fPath.GetFolder();
-	
+
 	BString objfolder("(Objects.");
 	objfolder << GetName() << ")";
 	fObjectPath.Append(objfolder.String());
-	
+
 	BNodeInfo nodeInfo(&file);
 	nodeInfo.SetType(PROJECT_MIME_TYPE);
-	
+
 	UpdateBuildInfo();
 }
 
@@ -380,47 +376,46 @@ Project::IsReadOnly(void) const
 
 
 void
-Project::SetName(const char *name)
+Project::SetName(const char* name)
 {
 	fName = name ? name : "Untitled";
 }
 
 
 void
-Project::SetTargetName(const char *name)
+Project::SetTargetName(const char* name)
 {
 	fTargetName = name ? name : "BeApp";
 }
 
 
 BString
-Project::MakeAbsolutePath(const char *path)
+Project::MakeAbsolutePath(const char* path)
 {
 	BString out;
-	
-	if (!path)
+
+	if (path == NULL)
 		return out;
-	
+
 	if (path[0] != '/')
 		out << fPath.GetFolder() <<  "/";
-	
-	out << path;
-	return out;
+
+	return out << path;
 }
 
 
 DPath
-Project::GetPathForFile(SourceFile *file)
+Project::GetPathForFile(SourceFile* file)
 {
-	if (!file)
+	if (file == NULL)
 		return DPath();
-	
+
 	BString pathstr = file->GetPath().GetFullPath();
-	if (pathstr[0] != '/')
-	{
+	if (pathstr[0] != '/') {
 		pathstr.Prepend("/");
 		pathstr.Prepend(fPath.GetFolder());
 	}
+
 	return DPath(pathstr);
 }
 
@@ -428,109 +423,101 @@ Project::GetPathForFile(SourceFile *file)
 void
 Project::AddFile(SourceFile *file, SourceGroup *group, int32 index)
 {
-	if (!file)
-	{
+	if (file == NULL) {
 		STRACE(2,("%s::AddFile: NULL file in call\n",GetName()));
 		return;
 	}
-	
-	
-	if (!group)
-	{
+
+	if (group == NULL) {
 		STRACE(2,("%s::AddFile: NULL group in call\n",GetName()));
 		return;
 	}
 	
-	if (group->filelist.HasItem(file))
-	{
-		STRACE(2,("%s::AddFile: Project already has file %s\n",GetName(),
-				file->GetPath().GetFullPath()));
+	if (group->filelist.HasItem(file)) {
+		STRACE(2, ("%s::AddFile: Project already has file %s\n", GetName(),
+			file->GetPath().GetFullPath()));
 		return;
 	}
-	
+
 	if (index < 0)
 		group->filelist.AddItem(file);
 	else
 		group->filelist.AddItem(file,index);
-	
+
 	BString path = file->GetPath().GetFolder();
-	if (path != fPath.GetFolder())
-	{
+	if (path != fPath.GetFolder()) {
 		AddLocalInclude(file->GetPath().GetFolder());
 		UpdateBuildInfo();
 	}
-	
+
 	// Previously, we would strip out the absolute portion of the file's path.
 	// This created lots of problem everywhere, so now file paths are absolute while
 	// Paladin is running but saved as project relative in the project file
-	
-	STRACE(2,("%s::AddFile: Added file %s\n",GetName(),path.String()));
+
+	STRACE(2, ("%s::AddFile: Added file %s\n", GetName(), path.String()));
 }
 
 
 void
-Project::RemoveFile(SourceFile *file)
+Project::RemoveFile(SourceFile* file)
 {
-	if (!file)
-	{
-		STRACE(2,("%s:Remove File: NULL file in call\n",GetName()));
+	if (file == NULL) {
+		STRACE(2, ("%s:Remove File: NULL file in call\n", GetName()));
 		return;
 	}
-	
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
+
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
 		
-		if (group->filelist.HasItem(file))
-		{
+		if (group->filelist.HasItem(file)) {
 			file->RemoveObjects(fBuildInfo);
 			group->filelist.RemoveItem(file);
-			STRACE(2,("%s:Remove File: Removed file %s\n",GetName(),file->GetPath().GetFullPath()));
+			STRACE(2, ("%s:Remove File: Removed file %s\n", GetName(),
+				file->GetPath().GetFullPath()));
 		}
 	}
 }
 
 
 bool
-Project::HasFile(const char *path)
+Project::HasFile(const char* path)
 {
-	if (!path)
+	if (path == NULL)
 		return false;
-	
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
-		
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *src = group->filelist.ItemAt(j);
-			if (src && strcmp(src->GetPath().GetFullPath(),path) == 0)
+
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
+
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* source = group->filelist.ItemAt(j);
+			if (source != NULL && strcmp(source->GetPath().GetFullPath(), path) == 0)
 				return true;
 		}
 	}
+
 	return false;
 }
 
 
 bool
-Project::HasFileName(const char *name)
+Project::HasFileName(const char* name)
 {
-	if (!name)
+	if (name == NULL)
 		return false;
-	
+
 	DPath newfile(name);
-	
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
-		
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *src = group->filelist.ItemAt(j);
-			if (src && strcmp(src->GetPath().GetFileName(),newfile.GetFileName()) == 0)
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
+
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* source = group->filelist.ItemAt(j);
+			if (source != NULL && strcmp(source->GetPath().GetFileName(),
+					newfile.GetFileName()) == 0) {
 				return true;
+			}
 		}
 	}
+
 	return false;
 }
 
@@ -560,23 +547,21 @@ Project::LocateFile(const char *name, BPath& outPath)
 	return false;
 }
 
-SourceFile *
-Project::FindFile(const char *path)
+SourceFile*
+Project::FindFile(const char* path)
 {
-	if (!path)
+	if (path == NULL)
 		return NULL;
-	
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
-		
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *src = group->filelist.ItemAt(j);
-			if (src && strcmp(src->GetPath().GetFullPath(),path) == 0)
-				return src;
+
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* source = group->filelist.ItemAt(j);
+			if (source && strcmp(source->GetPath().GetFullPath(), path) == 0)
+				return source;
 		}
 	}
+
 	return NULL;
 }
 
@@ -587,42 +572,43 @@ Project::CountFiles(void)
 	int32 count = 0;
 	for (int32 i = 0; i < CountGroups(); i++)
 		count += GroupAt(i)->filelist.CountItems();
+
 	return count;
 }
 
 
 bool
-Project::IsFileDirty(SourceFile *file)
+Project::IsFileDirty(SourceFile* file)
 {
 	return fDirtyFiles.HasItem(file);
 }
 
 
 void
-Project::MakeFileDirty(SourceFile *file)
+Project::MakeFileDirty(SourceFile* file)
 {
-	if  (!file || !HasFile(GetPathForFile(file).GetFullPath()))
+	if  (file == NULL || !HasFile(GetPathForFile(file).GetFullPath()))
 		return;
-	
+
 	if (!fDirtyFiles.HasItem(file))
 		fDirtyFiles.AddItem(file);
 }
 
 
 void
-Project::MakeFileClean(SourceFile *file)
+Project::MakeFileClean(SourceFile* file)
 {
 	int32 index = fDirtyFiles.IndexOf(file);
 	fDirtyFiles.RemoveItemAt(index);
 }
 
 
-SourceFile *
+SourceFile*
 Project::GetNextDirtyFile(void)
 {
 	return fDirtyFiles.ItemAt(0L);
 }
-			
+
 
 int32
 Project::CountDirtyFiles(void) const
@@ -634,14 +620,11 @@ Project::CountDirtyFiles(void) const
 void
 Project::SortDirtyList(void)
 {
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *file = group->filelist.ItemAt(j);
-			if (IsFileDirty(file))
-			{
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* file = group->filelist.ItemAt(j);
+			if (IsFileDirty(file)) {
 				MakeFileClean(file);
 				MakeFileDirty(file);
 			}
@@ -651,9 +634,9 @@ Project::SortDirtyList(void)
 
 
 bool
-Project::CheckNeedsBuild(SourceFile *file, bool check_deps)
+Project::CheckNeedsBuild(SourceFile* file, bool check_deps)
 {
-	return file ? file->CheckNeedsBuild(fBuildInfo, check_deps) : false;
+	return file != NULL ? file->CheckNeedsBuild(fBuildInfo, check_deps) : false;
 }
 
 
@@ -662,87 +645,81 @@ Project::UpdateBuildInfo(void)
 {
 	fBuildInfo.projectFolder = fPath.GetFolder();
 	fBuildInfo.objectFolder = fObjectPath;
-	
+
 	fBuildInfo.includeList.MakeEmpty();
-	
+
 	fBuildInfo.includeString = "";
 	ProjectPath *projItem = new ProjectPath(fPath.GetFolder());
 	fBuildInfo.includeList.AddItem(projItem);
 	fBuildInfo.includeString << "-I '" << projItem->Absolute() << "'";
-	
-	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
-	{
-		ProjectPath *newitem = new ProjectPath(*fLocalIncludeList.ItemAt(i));
-		fBuildInfo.includeList.AddItem(newitem);
-		fBuildInfo.includeString << " -I '" << newitem->Absolute() << "'";
+
+	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++) {
+		ProjectPath* newItem = new ProjectPath(*fLocalIncludeList.ItemAt(i));
+		fBuildInfo.includeList.AddItem(newItem);
+		fBuildInfo.includeString << " -I '" << newItem->Absolute() << "'";
 	}
-	
-	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++)
-	{
-		BString *item = fSystemIncludeList.ItemAt(i);
-		ProjectPath *newitem = new ProjectPath("/", MakeAbsolutePath(item->String()).String());
-		fBuildInfo.includeList.AddItem(newitem);
-		fBuildInfo.includeString << " -I '" << newitem->Absolute() << "'";
+
+	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++) {
+		BString* item = fSystemIncludeList.ItemAt(i);
+		ProjectPath* newItem = new ProjectPath("/",
+			MakeAbsolutePath(item->String()).String());
+		fBuildInfo.includeList.AddItem(newItem);
+		fBuildInfo.includeString << " -I '" << newItem->Absolute() << "'";
 	}
-	
+
 	fBuildInfo.errorList.msglist.MakeEmpty();
 }
 
 
 void
-Project::PrecompileFile(SourceFile *file)
+Project::PrecompileFile(SourceFile* file)
 {
-	if (!file)
+	if (file == NULL)
 		return;
-	
+
 	DPath projfolder(GetPath().GetFolder());
 	file->Precompile(fBuildInfo,"");
 }
 
 
 void
-Project::CompileFile(SourceFile *file)
+Project::CompileFile(SourceFile* file)
 {
-	if (!file)
-	{
+	if (file == NULL)
 		return;
-	}
 	
 	BString compileString;
 	if (Debug())
 		compileString << "-g -O0 ";
-	else
-	{
+	else {
 		compileString << "-O" << (int)OpLevel() << " ";
-		
+
 		if (OpForSize())
 			compileString << "-Os ";
 	}
-	
+
 	if (Profiling())
 		compileString << "-p ";
-	
+
 	if (fExtraCompilerOptions.CountChars() > 0)
 		compileString << fExtraCompilerOptions << " ";
-	
+
 	compileString << "-I '" << fPath.GetFolder() << "' ";
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 		compileString << "-I '" << fLocalIncludeList.ItemAt(i)->Absolute() << "' ";
 
-	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++)
-	{
+	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++) {
 		BString item = *fSystemIncludeList.ItemAt(i);
-		
+
 		if (item == ".")
 			item = GetPath().GetFolder();
 		else if (item.CountChars() >= 2 && item[0] == '.' && item[1] == '/')
 			item.ReplaceFirst(".",GetPath().GetFolder());
-		else if (item[0] != '/')
-		{
+		else if (item[0] != '/') {
 			item.Prepend("/");
 			item.Prepend(GetPath().GetFolder());
 		}
-		
+
 		compileString << "-I '" << item.String() << "' ";
 	}
 
@@ -777,10 +754,7 @@ Project::Link(void)
 					linkString << "'" << file->GetObjectPath(fBuildInfo).GetFullPath() << "' ";
 			}
 		}
-	
-	}
-	else
-	{
+	} else {
 		linkString = "gcc -o '";
 		linkString << targetPath << "' ";
 			
@@ -795,25 +769,24 @@ Project::Link(void)
 					linkString << "'" << file->GetObjectPath(fBuildInfo).GetFullPath() << "' ";
 			}
 		}
-	
-		for (int32 i = 0; i < CountGroups(); i++)
-		{
-			SourceGroup *group = GroupAt(i);
+
+		for (int32 i = 0; i < CountGroups(); i++) {
+			SourceGroup* group = GroupAt(i);
 			
-			for (int32 j = 0; j < group->filelist.CountItems(); j++)
-			{
-				SourceFile *file = group->filelist.ItemAt(j);
-				if (file->GetLibraryPath(fBuildInfo).GetFullPath())
-					linkString << "'" << file->GetLibraryPath(fBuildInfo).GetFullPath() << "' ";
+			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+				SourceFile* file = group->filelist.ItemAt(j);
+				if (file->GetLibraryPath(fBuildInfo).GetFullPath()) {
+					linkString << "'" << file->GetLibraryPath(fBuildInfo).GetFullPath()
+						<< "' ";
+				}
 			}
 		}
-	
-		for (int32 i = 0; i < CountLibraries(); i++)
-		{
-			SourceFile *file = LibraryAt(i);
-			if (!file)
+
+		for (int32 i = 0; i < CountLibraries(); i++) {
+			SourceFile* file = LibraryAt(i);
+			if (file == NULL)
 				continue;
-			
+
 			BString filenamebase;
 			filenamebase = file->GetPath().GetBaseName();
 			if (filenamebase.FindFirst("lib") == 0)
@@ -821,7 +794,7 @@ Project::Link(void)
 			
 			linkString << "-l" << filenamebase << " ";
 		}
-		
+
 		if (TargetType() == TARGET_DRIVER)
 		{
 			BString kernelPath;
@@ -836,6 +809,7 @@ Project::Link(void)
 					kernelPath << path.Path() << "/lib/_KERNEL_";
 					break;
 				}
+
 				default:
 					kernelPath << "/boot/develop/lib/x86/_KERNEL_";
 					break;
@@ -845,37 +819,38 @@ Project::Link(void)
 		}
 
 		linkString << "-L/boot/home/config/lib ";
-		
-		switch (TargetType())
-		{
+
+		switch (TargetType()) {
 			case TARGET_DRIVER:
 			{
 				linkString << "-nostdlib ";
 				break;
 			}
+
 			case TARGET_SHARED_LIB:
 			{
 				linkString << "-shared -Xlinker -soname=" << GetTargetName() << " ";
 				break;
 			}
+
 			default:
 			{
 				// Application
 				linkString << "-Xlinker -soname=_APP_ ";
-				break;
 			}
 		}
 	}
-	
-	linkString << " 2>&1";
-	
-	BString errmsg;
-	PipeCommand(linkString.String(),errmsg);
 
-	STRACE(1,("Linking %s:\n%s\nErrors:\n%s\n",GetName(),linkString.String(),errmsg.String()));
-	
-	if (errmsg.CountChars() > 0)
-		ParseLDErrors(errmsg.String(),fBuildInfo.errorList);
+	linkString << " 2>&1";
+
+	BString errorMessage;
+	PipeCommand(linkString.String(),errorMessage);
+
+	STRACE(1, ("Linking %s:\n%s\nErrors:\n%s\n", GetName(), linkString.String(),
+		errorMessage.String()));
+
+	if (errorMessage.CountChars() > 0)
+		ParseLDErrors(errorMessage.String(),fBuildInfo.errorList);
 }
 
 
@@ -884,42 +859,34 @@ Project::UpdateResources(void)
 {
 	DPath targetpath(fPath.GetFolder());
 	targetpath.Append(GetTargetName());
-	
+
 	BString resFileString;
 	int32 resCount = 0;
-
-	for (int32 i = 0; i < CountGroups(); i++)
-	{
-		SourceGroup *group = GroupAt(i);
-		
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *file = group->filelist.ItemAt(j);
-			
-			if (file->GetResourcePath(fBuildInfo).GetFullPath())
-			{
-				resFileString << "'" << file->GetResourcePath(fBuildInfo).GetFullPath() << "' ";
+	for (int32 i = 0; i < CountGroups(); i++) {
+		SourceGroup* group = GroupAt(i);
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* file = group->filelist.ItemAt(j);
+			if (file->GetResourcePath(fBuildInfo).GetFullPath()) {
+				resFileString << "'" << file->GetResourcePath(fBuildInfo).GetFullPath()
+					<< "' ";
 				resCount++;
 			}
 		}
 	}
-	
-	if (resCount > 0)
-	{
+
+	if (resCount > 0) {
 		BString resString = "xres -o ";
 		resString << "'" << targetpath.GetFullPath() << "' " << resFileString;		
-		BString errmsg;
-		PipeCommand(resString.String(),errmsg);
-		
-		STRACE(1,("Resources for %s:\n%s\nErrors:%s\n",GetName(),resString.String(),errmsg.String()));
-		
-		if (errmsg.CountChars() > 0)
-			printf("Resource errors: %s\n",errmsg.String());
-	}
-	else
-	{
-		STRACE(1,("Resources for %s: No resource files to add\n",GetName()));
-	}
+		BString errorMessage;
+		PipeCommand(resString.String(),errorMessage);
+
+		STRACE(1, ("Resources for %s:\n%s\nErrors:%s\n", GetName(), resString.String(),
+			errorMessage.String()));
+
+		if (errorMessage.CountChars() > 0)
+			printf("Resource errors: %s\n",errorMessage.String());
+	} else
+		STRACE(1, ("Resources for %s: No resource files to add\n", GetName()));
 }
 
 
@@ -1563,11 +1530,10 @@ Project::FindLibrary(const char *libname)
 		return outpath;
 	}
 	
-	find_directory(B_USER_DEVELOP_DIRECTORY,&tempPath);
+	find_directory(B_USER_DEVELOP_DIRECTORY, &tempPath);
 	tempPath.Append("lib/x86/");
 	tempPath.Append(libname);
-	if (BEntry(tempPath.Path()).Exists())
-	{
+	if (BEntry(tempPath.Path()).Exists()) {
 		alertmsg << "Replacing it with " << tempPath.Path();
 		if (!gBuildMode)
 			ShowAlert(alertmsg.String(),"OK");
@@ -1614,27 +1580,23 @@ PipeCommand(const char *command, BString &data)
 bool
 ResourceToAttribute(BFile &file, BResources &res,type_code code, const char *name)
 {
-	if (!name)
+	if (name == NULL)
 		return false;
 	
 	int32 id;
 	size_t length;
-	if (res.GetResourceInfo(code,name,&id,&length))
-	{
+	if (res.GetResourceInfo(code, name, &id, &length)) {
 		const void *buffer = res.LoadResource(code,name,&length);
-		if (!buffer)
-		{
-			STRACE(2,("Resource %s exists, but couldn't be loaded\n",name));
+		if (buffer == NULL) {
+			STRACE(2, ("Resource %s exists, but couldn't be loaded\n", name));
 			return false;
 		}
-		file.WriteAttr(name,code,0,buffer,length);
-		STRACE(2,("Successfully wrote attribute %s\n",name));
+		file.WriteAttr(name, code, 0, buffer, length);
+		STRACE(2,("Successfully wrote attribute %s\n", name));
 		return true;
-	}
-	else
-	{
+	} else
 		STRACE(2,("Resource %s doesn't exist\n",name));
-	}
+
 	return false;
 }
 
@@ -1643,7 +1605,7 @@ platform_t
 DetectPlatform(void)
 {
 	platform_t type = PLATFORM_R5;
-	
+
 	// While, yes, there is a uname() function in sys/utsname.h, we use spawn a shell
 	// so that we can easily avoid the build mess of BONE vs netserver.
 	// Use ShellHelper class to avoid problems with popen() causing hangs. :/

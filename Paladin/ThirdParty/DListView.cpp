@@ -1,3 +1,14 @@
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "DListView.h"
 
 #include <Path.h>
@@ -5,11 +16,28 @@
 #include <String.h>
 #include <Window.h>
 
-DListView::DListView(BRect frame, const char *name, list_view_type type, int32 resize, int32 flags)
-	:	BOutlineListView(frame,name,type, resize, flags),
-		fPopUp(NULL),
-		fAcceptDrops(true),
-		fDropMessage(NULL)
+
+// #pragma mark - DListView
+
+
+DListView::DListView(BRect frame, const char* name, list_view_type type,
+	int32 resizingMode, int32 flags)
+	:
+	BListView(frame, name, type, resizingMode, flags),
+	fPopUp(NULL),
+	fAcceptDrops(true),
+	fDropMessage(NULL)
+{
+	fDropMessage = new BMessage(B_REFS_RECEIVED);
+}
+
+
+DListView::DListView(const char* name, list_view_type type, int32 flags)
+	:
+	BListView(name, type, flags),
+	fPopUp(NULL),
+	fAcceptDrops(true),
+	fDropMessage(NULL)
 {
 	fDropMessage = new BMessage(B_REFS_RECEIVED);
 }
@@ -25,23 +53,20 @@ DListView::~DListView(void)
 void
 DListView::MouseDown(BPoint mousept)
 {
-	if (!Window())
+	if (Window() == NULL)
 		return;
 	
 	uint32 buttons;
 	BPoint point;
-	if (fPopUp)
-	{
+	if (fPopUp) {
 		GetMouse(&point,&buttons);
-		if (buttons & B_SECONDARY_MOUSE_BUTTON)
-		{
-			BMessage *msg = Window()->CurrentMessage();
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+			BMessage* message = Window()->CurrentMessage();
 			int32 clicks;
-			msg->FindInt32("clicks",&clicks);
-			if (clicks > 1)
-			{
+			message->FindInt32("clicks", &clicks);
+			if (clicks > 1) {
 				clicks = 1;
-				msg->ReplaceInt32("clicks",clicks);
+				message->ReplaceInt32("clicks", clicks);
 			}
 		}
 	}
@@ -54,18 +79,16 @@ DListView::MouseDown(BPoint mousept)
 
 
 void
-DListView::MessageReceived(BMessage *msg)
+DListView::MessageReceived(BMessage* message)
 {
-	if (!msg->WasDropped() || msg->what != B_SIMPLE_DATA)
-	{
-		BListView::MessageReceived(msg);
+	if (!message->WasDropped() || message->what != B_SIMPLE_DATA) {
+		BListView::MessageReceived(message);
 		return;
 	}
 	
 	entry_ref ref;
 	int32 i = 0;
-	while (msg->FindRef("refs",i++,&ref) == B_OK)
-	{
+	while (message->FindRef("refs", i++, &ref) == B_OK) {
 		if (!ref.name)
 			continue;
 		
@@ -74,28 +97,29 @@ DListView::MessageReceived(BMessage *msg)
 }
 
 
-BScrollView *
-DListView::MakeScrollView(const char *name, bool horizontal, bool vertical)
+BScrollView*
+DListView::MakeScrollView(const char* name, bool horizontal, bool vertical)
 {
-	if (Parent())
+	if (Parent() != NULL)
 		RemoveSelf();
-	
-	BScrollView *sv = new BScrollView(name,this,ResizingMode(),0,horizontal,vertical);
-	sv->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
-	return sv;
+
+	BScrollView* scrollView = new BScrollView(name, this, 0, horizontal,
+		vertical);
+	scrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	return scrollView;
 }
 
 			
 void
-DListView::SetContextMenu(BPopUpMenu *menu)
+DListView::SetContextMenu(BPopUpMenu* menu)
 {
 	delete fPopUp;
 	fPopUp = menu;
 }
 
 
-BPopUpMenu *
+BPopUpMenu*
 DListView::ContextMenu(void) const
 {
 	return fPopUp;
@@ -103,13 +127,13 @@ DListView::ContextMenu(void) const
 
 
 void
-DListView::ShowContextMenu(BPoint viewpt)
+DListView::ShowContextMenu(BPoint where)
 {
-	BPoint screenpt = ConvertToScreen(viewpt);
-	screenpt.x -= 5;
-	screenpt.y -= 5;
-	
-	fPopUp->Go(screenpt,true,false);
+	BPoint screenPoint(ConvertToScreen(where));
+	screenPoint.x -= 5;
+	screenPoint.y -= 5;
+
+	fPopUp->Go(screenPoint, true, false);
 }
 
 
@@ -131,18 +155,17 @@ void
 DListView::RefDropped(entry_ref ref)
 {
 	// Implemented by child classes
-	if (AcceptsDrops())
-	{
-		BMessage *msg = new BMessage(*fDropMessage);
-		msg->RemoveData("refs");
-		msg->AddRef("refs",&ref);
-		Invoke(msg);
+	if (AcceptsDrops()) {
+		BMessage* message = new BMessage(*fDropMessage);
+		message->RemoveData("refs");
+		message->AddRef("refs", &ref);
+		Invoke(message);
 	}
 }
 
 
 void
-DListView::SetDropMessage(BMessage *message)
+DListView::SetDropMessage(BMessage* message)
 {
 	delete fDropMessage;
 	fDropMessage = message;
@@ -150,64 +173,73 @@ DListView::SetDropMessage(BMessage *message)
 
 
 BMessage
-DListView::DropMessage(const BMessage &message)
+DListView::DropMessage(const BMessage& message)
 {
 	return *fDropMessage;
 }
 
 
 int32
-DListView::AddItemSorted(BStringItem *item)
+DListView::AddItemSorted(BStringItem* item)
 {
-	if (!item)
+	if (item == NULL)
 		return -1;
+
 	int32 index = -1;
-	for (int32 i = 0; i < CountItems(); i++)
-	{
+	for (int32 i = 0; i < CountItems(); i++) {
 		BStringItem *temp = (BStringItem*)ItemAt(i);
 		int comp = strcmp(temp->Text(),item->Text());
-		if (comp > 0)
-		{
+		if (comp > 0) {
 			index = (i > 0) ? i - 1 : 0;
 			break;
 		}
 	}
-	
-	if (index < 0)
-	{
+
+	if (index < 0) {
 		AddItem(item);
 		index = CountItems() - 1;
-	}
-	else
+	} else
 		AddItem(item,index);
-	
+
 	return index;
 }
 
 
-BStringItem *
-DListView::FindItem(const char *text, bool matchcase, int32 offset)
+BStringItem*
+DListView::FindItem(const char* text, bool matchcase, int32 offset)
 {
 	BString str(text);
 	if (str.CountChars() < 1)
 		return NULL;
-	
-	for (int32 i = offset; i < CountItems(); i++)
-	{
+
+	for (int32 i = offset; i < CountItems(); i++) {
 		BStringItem *item = (BStringItem*)ItemAt(i);
 		if (matchcase && str.Compare(item->Text()) == 0)
 			return item;
 		else if (str.ICompare(item->Text()) == 0)
 			return item;
 	}
+
 	return NULL;
 }
 
 
+//	#pragma mark - RefListView
+
+
 RefListView::RefListView(BRect frame, const char *name, list_view_type type,
-						uint32 resize, uint32 flags)
-	:	DListView(frame,name,type,resize,flags),
-		fDefaultDisplayMode(REFITEM_FULL)
+	uint32 resizingMode, uint32 flags)
+	:
+	DListView(frame, name, type, resizingMode, flags),
+	fDefaultDisplayMode(REFITEM_FULL)
+{
+}
+
+
+RefListView::RefListView(const char* name, list_view_type type, uint32 flags)
+	:
+	DListView(name, type, flags),
+	fDefaultDisplayMode(REFITEM_FULL)
 {
 }
 
@@ -218,21 +250,19 @@ RefListView::~RefListView(void)
 
 
 void
-RefListView::MessageReceived(BMessage *msg)
+RefListView::MessageReceived(BMessage* message)
 {
-	if (!msg->WasDropped() || msg->what != B_SIMPLE_DATA)
-	{
-		BListView::MessageReceived(msg);
+	if (!message->WasDropped() || message->what != B_SIMPLE_DATA) {
+		BListView::MessageReceived(message);
 		return;
 	}
-	
+
 	entry_ref ref;
 	int32 i = 0;
-	while (msg->FindRef("refs",i++,&ref) == B_OK)
-	{
+	while (message->FindRef("refs", i++, &ref) == B_OK) {
 		if (!ref.name)
 			continue;
-		
+
 		RefDropped(ref);
 	}
 }
@@ -256,37 +286,39 @@ void
 RefListView::RefDropped(entry_ref ref)
 {
 	DListView::RefDropped(ref);
-	
+
 	if (AcceptsDrops())
-		AddItem(new RefListItem(ref,fDefaultDisplayMode));
+		AddItem(new RefListItem(ref, fDefaultDisplayMode));
 }
 
 
 bool
-RefListView::AddItem(BListItem *item)
+RefListView::AddItem(BListItem* item)
 {
-	RefListItem *refItem = dynamic_cast<RefListItem*>(item);
-	if (refItem)
+	RefListItem* refItem = dynamic_cast<RefListItem*>(item);
+	if (refItem != NULL)
 		refItem->SetDisplayMode(GetDefaultDisplayMode());
-	
+
 	return DListView::AddItem(item);
 }
 
+
 bool
-RefListView::AddItem(BListItem *item, int32 atIndex)
+RefListView::AddItem(BListItem* item, int32 atIndex)
 {
-	RefListItem *refItem = dynamic_cast<RefListItem*>(item);
-	if (refItem)
+	RefListItem* refItem = dynamic_cast<RefListItem*>(item);
+	if (refItem != NULL)
 		refItem->SetDisplayMode(GetDefaultDisplayMode());
-	
-	return DListView::AddItem(item,atIndex);
+
+	return DListView::AddItem(item, atIndex);
 }
 
 
 RefListItem::RefListItem(entry_ref ref, int32 mode, uint32 level,
-							bool expanded)
-	:	BStringItem("",level,expanded),
-		fItemMode(mode)
+	bool expanded)
+	:
+	BStringItem("",level,expanded),
+	fItemMode(mode)
 {
 	SetRef(ref);
 }
@@ -307,26 +339,21 @@ RefListItem::GetRef(void) const
 void
 RefListItem::SetRef(entry_ref ref)
 {
-	switch (fItemMode)
-	{
+	switch (fItemMode) {
 		case REFITEM_FULL:
 		{
 			BPath path(&ref);
 			SetText(path.Path());
 			break;
 		}
+
 		case REFITEM_NAME:
 		{
 			SetText(ref.name);
 			break;
 		}
-		default:
-		{
-			// Defaults to REFITEM_OTHER, which does nothing when the
-			// entry_ref changes
-			break;
-		}
 	}
+
 	fItemRef = ref;
 }
 
@@ -344,5 +371,3 @@ RefListItem::SetDisplayMode(int32 mode)
 	fItemMode = mode;
 	SetRef(fItemRef);
 }
-
-

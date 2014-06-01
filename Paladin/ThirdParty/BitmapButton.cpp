@@ -3,12 +3,30 @@
 	Written by DarkWyrm <darkwyrm@earthlink.net>, Copyright 2007
 	Released under the MIT license.
 */
+
+
 #include "BitmapButton.h"
 
-BitmapButton::BitmapButton(const BRect &frame, const char *name, BBitmap *up,
-						BBitmap *down, BMessage *msg, const int32 &resize,
-						const int32 &flags)
- :	BButton(frame, name, "", msg, resize, flags),
+
+BitmapButton::BitmapButton(const BRect &frame, const char* name, BBitmap* up,
+	BBitmap* down, BMessage* message, const int32 &resizingMode, const int32 &flags)
+	:
+	BButton(frame, name, "", message, resizingMode, flags),
+ 	fUp(up),
+ 	fDown(down),
+ 	fDisabled(NULL),
+ 	fFocusUp(NULL),
+ 	fFocusDown(NULL)
+{
+	fUp = up;
+	fDown = down;
+}
+
+
+BitmapButton::BitmapButton(const char* name, BBitmap* up, BBitmap* down,
+	BMessage* message, const int32 &flags)
+	:
+	BButton(name, "", message, flags),
  	fUp(up),
  	fDown(down),
  	fDisabled(NULL),
@@ -31,27 +49,27 @@ BitmapButton::~BitmapButton(void)
 
 
 void
-BitmapButton::SetBitmaps(BBitmap *up, BBitmap *down)
+BitmapButton::SetBitmaps(BBitmap* up, BBitmap* down)
 {
 	delete fUp;
 	delete fDown;
-	
+
 	fUp = up;
 	fDown = down;
-	
+
 	if (IsEnabled())
 		Invalidate();
 }
 
 
-BBitmap *
+BBitmap*
 BitmapButton::UpBitmap(void)
 {
 	return fUp;
 }
 
 
-BBitmap *
+BBitmap*
 BitmapButton::DownBitmap(void)
 {
 	return fDown;
@@ -62,15 +80,15 @@ void
 BitmapButton::SetDisabledBitmap(BBitmap *disabled)
 {
 	delete fDisabled;
-	
+
 	fDisabled = disabled;
-	
+
 	if (!IsEnabled())
 		Invalidate();
 }
 
 
-BBitmap *
+BBitmap*
 BitmapButton::DisabledBitmap(void) const
 {
 	return fDisabled;
@@ -78,24 +96,24 @@ BitmapButton::DisabledBitmap(void) const
 
 
 void
-BitmapButton::SetFocusBitmaps(BBitmap *up, BBitmap *down)
+BitmapButton::SetFocusBitmaps(BBitmap* up, BBitmap* down)
 {
 	delete fFocusUp;
 	delete fFocusDown;
-	
+
 	fFocusUp = up;
 	fFocusDown = down;
 }
 
 
-BBitmap *
+BBitmap*
 BitmapButton::UpFocusBitmap(void)
 {
 	return fFocusUp;
 }
 
 
-BBitmap *
+BBitmap*
 BitmapButton::DownFocusBitmap(void)
 {
 	return fFocusDown;
@@ -110,9 +128,10 @@ BitmapButton::Draw(BRect update)
 			DrawBitmap(fDisabled, BPoint(0,0));
 		else
 			StrokeRect(Bounds());
+
 		return;
 	}
-	
+
 	if (Value() == B_CONTROL_ON) {
 		if (IsFocus()) {
 			if (fFocusDown)
@@ -120,6 +139,7 @@ BitmapButton::Draw(BRect update)
 			else {
 				if (fDown)
 					DrawBitmap(fUp, BPoint(0,0));
+
 				SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 				StrokeRect(Bounds());
 			}
@@ -136,6 +156,7 @@ BitmapButton::Draw(BRect update)
 			else {
 				if (fUp)
 					DrawBitmap(fUp, BPoint(0,0));
+
 				SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 				StrokeRect(Bounds());
 			}

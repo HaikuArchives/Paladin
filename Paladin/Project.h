@@ -1,3 +1,12 @@
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
 #ifndef PROJECT_H
 #define PROJECT_H
 
@@ -14,6 +23,7 @@
 #include "ErrorParser.h"
 #include "ObjectList.h"
 #include "ProjectPath.h"
+
 
 class SourceFile;
 class SourceGroup;
@@ -58,7 +68,7 @@ typedef enum
 
 
 #define PROJECT_MIME_TYPE "text/x-vnd.dw-Paladin.Project"
-#define PROJECT_PATH "/boot/home/projects"
+#define PROJECT_PATH "/boot/home/Projects"
 
 class Project : public BLocker
 {

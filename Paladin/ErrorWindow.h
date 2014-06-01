@@ -1,55 +1,59 @@
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
 #ifndef ERROR_WINDOW_H
 #define ERROR_WINDOW_H
 
-#include <Button.h>
-#include <CheckBox.h>
-#include <ListView.h>
-#include "DWindow.h"
+
+#include <Window.h>
 
 #include "ErrorParser.h"
 
-class DListView;
-class ProjectWindow;
 
 #define M_ERRORWIN_CLOSED 'erwc'
 #define M_CLEAR_ERROR_LIST 'clel'
 #define M_ADD_WARNINGS 'adwn'
 
-class ErrorItem : public BStringItem
-{
+
+class BButton;
+class BCheckBox;
+class DListView;
+class ProjectWindow;
+
+class ErrorWindow : public BWindow {
 public:
-				ErrorItem(error_msg *msg);
-	void		DrawItem(BView *owner, BRect frame, bool complete);
-	
-	error_msg *	GetMessage(void) const { return fMessage; }
+								ErrorWindow(BRect frame, ProjectWindow* parent,
+									ErrorList* list = NULL);
+	virtual						~ErrorWindow(void);
+			void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested(void);
+
+			ProjectWindow*		GetParent(void) const { return fParent; }
+
 private:
-	error_msg	*fMessage;
+			void				AppendToList(ErrorList &list);
+			void				RefreshList(void);
+			void				ErrMsgToItem(error_msg *msg);
+			void				EmptyList(void);
+			void				CopyList(void);
+
+			ProjectWindow*		fParent;
+
+			BCheckBox*			fErrorBox;
+			BCheckBox*			fWarningBox;
+			BButton*			fCopyButton;
+			DListView*			fErrorList;
+
+			ErrorList			fErrors;
+			int32				fErrorCount;
+			int32				fWarningCount;
 };
 
-class ErrorWindow : public DWindow
-{
-public:
-							ErrorWindow(BRect frame, ProjectWindow *parent,
-										ErrorList *list = NULL);
-							~ErrorWindow(void);
-			void			MessageReceived(BMessage *msg);
-			ProjectWindow *	GetParent(void) const { return fParent; }
-			bool			QuitRequested(void);
-private:
-			void			AppendToList(ErrorList &list);
-			void			RefreshList(void);
-			void			ErrMsgToItem(error_msg *msg);
-			void			EmptyList(void);
-			void			CopyList(void);
-			
-			DListView		*fErrorList;
-			ProjectWindow	*fParent;
-			BCheckBox		*fErrorBox,
-							*fWarningBox;
-			BButton			*fCopyButton;
-			ErrorList		fErrors;
-			int32			fErrorCount,
-							fWarningCount;
-};
 
-#endif
+#endif	// ERROR_WINDOW_H

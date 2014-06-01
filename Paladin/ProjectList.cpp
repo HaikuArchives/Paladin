@@ -1,3 +1,14 @@
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "ProjectList.h"
 
 #include <Bitmap.h>
@@ -15,13 +26,27 @@
 
 #define SET_COLOR(c,r,g,b) { c.red = r; c.green = g; c.blue = b; c.alpha = 255; }
 
-int
-compare_bstringitems(BStringItem *one, BStringItem *two);
 
-ProjectList::ProjectList(Project *proj, const BRect &frame, const char *name,
-							const int32 &resize, const int32 flags)
-	:	BOutlineListView(frame,name,B_MULTIPLE_SELECTION_LIST, resize, flags),
-		fProject(proj)
+static const rgb_color white = (rgb_color){ 255, 255, 255, 255 };
+static const rgb_color black = (rgb_color){ 0, 0, 0, 255 };
+
+static int
+compare_bstringitems(BStringItem* one, BStringItem* two);
+
+
+ProjectList::ProjectList(Project* project, const BRect& frame, const char* name,
+	const int32& resizingMode, const int32 flags)
+	:
+	BOutlineListView(frame, name, B_MULTIPLE_SELECTION_LIST, resizingMode, flags),
+	fProject(project)
+{
+}
+
+
+ProjectList::ProjectList(Project* project, const char* name, const int32 flags)
+	:
+	BOutlineListView(name, B_MULTIPLE_SELECTION_LIST, flags),
+	fProject(project)
 {
 }
 
@@ -32,205 +57,181 @@ ProjectList::~ProjectList(void)
 
 
 void
-ProjectList::MessageReceived(BMessage *msg)
+ProjectList::MessageReceived(BMessage* message)
 {
-	if (msg->WasDropped() && Window())
-	{
+	if (message->WasDropped() && Window() != NULL) {
 		entry_ref refs;
-		if (msg->FindRef("refs",&refs) == B_OK && Window())
-		{
-//			BPoint dropPoint;
-//			msg->FindPoint("_drop_point_", &dropPoint);
-//			ConvertToParent(&dropPoint);
-//			msg->ReplacePoint("_drop_point_", dropPoint);
-			
-			Window()->PostMessage(msg);
-		}
-		else
-		if (msg->what == B_SIMPLE_DATA)
-		{
+		if (message->FindRef("refs", &refs) == B_OK)
+			Window()->PostMessage(message);
+		else if (message->what == B_SIMPLE_DATA) {
 			// We actually get the mouse point instead of calling
-			// msg->DropPoint() because on R5, it actually returns the
+			// message->DropPoint() because on R5, it actually returns the
 			// point from which it was dragged, NOT where it was dropped. :(
-			
-			BPoint droppt;
+			BPoint dropPoint;
 			uint32 buttons;
-			GetMouse(&droppt,&buttons);
-			HandleDragAndDrop(droppt, msg);
+			GetMouse(&dropPoint, &buttons);
+			HandleDragAndDrop(dropPoint, message);
 		}
-	}
-	else
-	switch (msg->what)
-	{
-		default:
-		{
-			BOutlineListView::MessageReceived(msg);
-			break;
-		}
-	}
+	} else
+		BOutlineListView::MessageReceived(message);
 }
 
 
 void
-ProjectList::MouseDown(BPoint pt)
+ProjectList::MouseDown(BPoint where)
 {
 	if (!Window()->IsActive())
 		Window()->Activate();
-		
+
 	uint32 buttons;
 	BPoint point;
 	GetMouse(&point,&buttons);
-	if (buttons & B_SECONDARY_MOUSE_BUTTON)
-	{
-		BMessage *msg = Window()->CurrentMessage();
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		BMessage* message = Window()->CurrentMessage();
 		int32 clicks;
-		msg->FindInt32("clicks",&clicks);
-		if (clicks > 1)
-		{
+		message->FindInt32("clicks", &clicks);
+		if (clicks > 1) {
 			clicks = 1;
-			msg->ReplaceInt32("clicks",clicks);
+			message->ReplaceInt32("clicks", clicks);
 		}
 	}
-	BOutlineListView::MouseDown(pt);
+
+	BOutlineListView::MouseDown(where);
 	
-	if (buttons & B_SECONDARY_MOUSE_BUTTON)
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
 		ShowContextMenu(point);
 }
 
 
 void
-ProjectList::KeyDown(const char *bytes,int32 numbytes)
+ProjectList::KeyDown(const char* bytes, int32 numBytes)
 {
-	if (numbytes == 1)
-	{
-		if (IsFilenameChar(bytes[0]))
-		{
-			Select(FindNextAlphabetical(bytes[0],CurrentSelection()));
+	if (numBytes == 1) {
+		if (IsFilenameChar(bytes[0])) {
+			Select(FindNextAlphabetical(bytes[0], CurrentSelection()));
 			ScrollToSelection();
 			return;
 		}
 	}
-	// Call the inherited version for everything that we don't specifically support
-	BOutlineListView::KeyDown(bytes,numbytes);
+
+	BOutlineListView::KeyDown(bytes, numBytes);
 }
 
 
-SourceFileItem *
+SourceFileItem*
 ProjectList::ItemForFile(SourceFile *file)
 {
-	if (!file)
+	if (file == NULL)
 		return NULL;
-	
-	for (int32 i = 0; i < FullListCountItems(); i++)
-	{
-		SourceFileItem *item = dynamic_cast<SourceFileItem*>
-								(FullListItemAt(i));
-		if (item && item->GetData() == file)
+
+	for (int32 i = 0; i < FullListCountItems(); i++) {
+		SourceFileItem* item = dynamic_cast<SourceFileItem*>(
+			FullListItemAt(i));
+		if (item != NULL && item->GetData() == file)
 			return item;
 	}
+
 	return NULL;
 }
 
 
-SourceGroupItem *
-ProjectList::ItemForGroup(SourceGroup *group)
+SourceGroupItem*
+ProjectList::ItemForGroup(SourceGroup* group)
 {
-	if (!group)
+	if (group == NULL)
 		return NULL;
 	
-	for (int32 i = 0; i < FullListCountItems(); i++)
-	{
-		SourceGroupItem *item = dynamic_cast<SourceGroupItem*>
-								(FullListItemAt(i));
-		if (item && item->GetData() == group)
+	for (int32 i = 0; i < FullListCountItems(); i++) {
+		SourceGroupItem* item = dynamic_cast<SourceGroupItem*>(
+			FullListItemAt(i));
+		if (item != NULL && item->GetData() == group)
 			return item;
 	}
+
 	return NULL;
 }
 
 
-SourceGroupItem *
-ProjectList::GroupForItem(BStringItem *item)
+SourceGroupItem*
+ProjectList::GroupForItem(BStringItem* item)
 {
-	SourceGroupItem *groupItem = dynamic_cast<SourceGroupItem*>(item);
-	if (groupItem)
+	SourceGroupItem* groupItem = dynamic_cast<SourceGroupItem*>(item);
+	if (groupItem != NULL)
 		return groupItem;
-	
-	SourceFileItem *fileItem = dynamic_cast<SourceFileItem*>(item);
-	if (!fileItem)
+
+	SourceFileItem* fileItem = dynamic_cast<SourceFileItem*>(item);
+	if (fileItem == NULL)
 		return NULL;
-	
+
 	return (SourceGroupItem*)Superitem(fileItem);
 }
 
 
 bool
-ProjectList::InitiateDrag(BPoint pt, int32 index, bool selected)
+ProjectList::InitiateDrag(BPoint where, int32 index, bool selected)
 {
-	BBitmap *bitmap = NULL;
-	
-	bitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT,"dragicon.png");
-	if (!bitmap)
-	{
-		bitmap = new BBitmap(BRect(0,0,15,15),B_CMAP8);
+	BBitmap* dragIcon = NULL;
+
+	dragIcon = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "dragicon.png");
+	if (dragIcon == NULL) {
+		dragIcon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 		BMimeType mime;
 		status_t s = mime.SetTo("text/plain");
-		s = mime.GetIcon(bitmap,B_MINI_ICON);
+		s = mime.GetIcon(dragIcon, B_MINI_ICON);
 	}
-	
-	BMessage msg(B_SIMPLE_DATA);
-	
+
+	BMessage message(B_SIMPLE_DATA);
 	int32 cookie = 0;
 	int32 selection = FullListCurrentSelection(cookie++);
-	
 	if (selection >= 0)
-		msg.AddPointer("owner",this);
+		message.AddPointer("owner", this);
 	
-	while (selection >= 0)
-	{
-		BStringItem *item = dynamic_cast<BStringItem*>(FullListItemAt(selection));
-		if (item)
-			msg.AddPointer("items",item);
+	while (selection >= 0) {
+		BStringItem* item = dynamic_cast<BStringItem*>(FullListItemAt(selection));
+		if (item != NULL)
+			message.AddPointer("items", item);
+
 		selection = FullListCurrentSelection(cookie++);
 	}
 	
-	DragMessage(&msg,bitmap,B_OP_ALPHA,BPoint(10,10));
+	DragMessage(&message, dragIcon, B_OP_ALPHA, BPoint(10, 10));
+
 	return true;
 }
 
 
 int32
-ProjectList::UnderIndexOf(BStringItem *item)
+ProjectList::UnderIndexOf(BStringItem* item)
 {
-	if (!item || !Superitem(item))
+	if (item == NULL || !Superitem(item))
 		return -1;
-	
-	BStringItem *super = (BStringItem*)Superitem(item);
-	int32 count = CountItemsUnder(super,true);
-	for (int32 i = 0; i < count; i++)
-	{
-		BStringItem *child = (BStringItem*)ItemUnderAt(super, true, i);
+
+	BStringItem* super = (BStringItem*)Superitem(item);
+	int32 count = CountItemsUnder(super, true);
+	for (int32 i = 0; i < count; i++) {
+		BStringItem* child = (BStringItem*)ItemUnderAt(super, true, i);
 		if (child == item)
 			return i;
 	}
+
 	return -1;
 }
 
 
 int32
-ProjectList::FullListUnderIndexOf(BStringItem *item)
+ProjectList::FullListUnderIndexOf(BStringItem* item)
 {
-	if (!item || !Superitem(item))
+	if (item == NULL || !Superitem(item))
 		return -1;
-	
-	BStringItem *super = (BStringItem*)Superitem(item);
-	int32 count = CountItemsUnder(super,true);
-	for (int32 i = 0; i < count; i++)
-	{
-		BStringItem *child = (BStringItem*)ItemUnderAt(super, true, i);
+
+	BStringItem* super = (BStringItem*)Superitem(item);
+	int32 count = CountItemsUnder(super, true);
+	for (int32 i = 0; i < count; i++) {
+		BStringItem* child = (BStringItem*)ItemUnderAt(super, true, i);
 		if (child == item)
 			return FullListIndexOf(child);
 	}
+
 	return -1;
 }
 
@@ -238,240 +239,231 @@ ProjectList::FullListUnderIndexOf(BStringItem *item)
 void
 ProjectList::RefreshList(void)
 {
-	if (Window())
+	if (Window() != NULL)
 		Window()->DisableUpdates();
-	
-	for (int32 i = FullListCountItems(); i >= 0; i--)
-	{
-		BStringItem *item = (BStringItem*)RemoveItem(i);
+
+	for (int32 i = FullListCountItems(); i >= 0; i--) {
+		BStringItem* item = (BStringItem*)RemoveItem(i);
 		delete item;
 	}
-	
-	for (int32 i = 0; i < fProject->CountGroups(); i++)
-	{
-		SourceGroup *group = fProject->GroupAt(i);
-		SourceGroupItem *groupitem = new SourceGroupItem(group);
+
+	for (int32 i = 0; i < fProject->CountGroups(); i++) {
+		SourceGroup* group = fProject->GroupAt(i);
+		SourceGroupItem* groupitem = new SourceGroupItem(group);
 		AddItem(groupitem);
 		groupitem->SetExpanded(group->expanded);
-		
-		for (int32 j = 0; j < group->filelist.CountItems(); j++)
-		{
-			SourceFile *file = group->filelist.ItemAt(j);
-			SourceFileItem *fileitem = new SourceFileItem(file,1);
-			
-			AddItem(fileitem);
+
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* file = group->filelist.ItemAt(j);
+			SourceFileItem* fileItem = new SourceFileItem(file,1);
+
+			AddItem(fileItem);
 			
 			BString abspath = file->GetPath().GetFullPath();
-			if (abspath[0] != '/')
-			{
+			if (abspath[0] != '/') {
 				abspath.Prepend("/");
 				abspath.Prepend(fProject->GetPath().GetFolder());
 			}
+
 			BEntry entry(abspath.String());
-			if (entry.Exists())
-			{
-				if (fProject->CheckNeedsBuild(file,false))
-				{
-					fileitem->SetDisplayState(SFITEM_NEEDS_BUILD);
-					InvalidateItem(IndexOf(fileitem));
-				}
-				else
+			if (entry.Exists()) {
+				if (fProject->CheckNeedsBuild(file, false)) {
+					fileItem->SetDisplayState(SFITEM_NEEDS_BUILD);
+					InvalidateItem(IndexOf(fileItem));
+				} else
 					file->SetBuildFlag(BUILD_NO);
-			}
-			else
-			{
-				fileitem->SetDisplayState(SFITEM_MISSING);
-				InvalidateItem(IndexOf(fileitem));
+			} else {
+				fileItem->SetDisplayState(SFITEM_MISSING);
+				InvalidateItem(IndexOf(fileItem));
 			}
 		}
 	}
-	
-	if (Window())
+
+	if (Window() != NULL)
 		Window()->EnableUpdates();
 }
 
 
 void
-ProjectList::ShowContextMenu(BPoint pt)
+ProjectList::ShowContextMenu(BPoint where)
 {
-	BPoint screenpt(pt);
-	ConvertToScreen(&screenpt);
-	screenpt.x += 1;
-	screenpt.y -= 5;
-	
-	BStringItem *stringItem = (BStringItem*)ItemAt(IndexOf(pt));
-	if (!stringItem)
+	BPoint screenPoint(where);
+	ConvertToScreen(&screenPoint);
+	screenPoint.x += 1;
+	screenPoint.y -= 5;
+
+	BStringItem* stringItem = (BStringItem*)ItemAt(IndexOf(where));
+	if (stringItem == NULL)
 		return;
-	
+
 	BPopUpMenu menu("context");
-	BMessage *msg = NULL;
-	
-	SourceFileItem *fileItem = dynamic_cast<SourceFileItem*>(stringItem);
-	
-	if (fileItem)
-	{
-		msg = new BMessage(M_OPEN_PARENT_FOLDER);
-		menu.AddItem(new BMenuItem(TR("Open Folder for File…"),msg));
-		
-		menu.AddItem(new BMenuItem(TR("Force File Rebuild"),new BMessage(M_REBUILD_FILE)));
-		
+	BMessage* message = NULL;
+
+	SourceFileItem* fileItem = dynamic_cast<SourceFileItem*>(stringItem);
+
+	if (fileItem != NULL) {
+		message = new BMessage(M_OPEN_PARENT_FOLDER);
+		menu.AddItem(new BMenuItem(TR("Open folder for file") B_UTF8_ELLIPSIS,
+			message));
+		menu.AddItem(new BMenuItem(TR("Force file rebuild"),
+			new BMessage(M_REBUILD_FILE)));
 		menu.AddSeparatorItem();
-		menu.AddItem(new BMenuItem(TR("Remove Selected Files"),new BMessage(M_REMOVE_FILES)));
-		
+		menu.AddItem(new BMenuItem(TR("Remove selected files"),
+			new BMessage(M_REMOVE_FILES)));
 		menu.AddSeparatorItem();
-		
-		BMenu *submenu = new BMenu("Source Control");
-		submenu->AddItem(new BMenuItem(TR("Add Selected Files to Repository"),
-											new BMessage(M_ADD_SELECTION_TO_REPO)));
-		submenu->AddItem(new BMenuItem(TR("Remove Selected Files from Repository"),
-											new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
-		submenu->AddItem(new BMenuItem(TR("Show Changes in Selected Files"),
-											new BMessage(M_DIFF_SELECTION)));
-		submenu->AddItem(new BMenuItem(TR("Revert Selected Files"),
-											new BMessage(M_REVERT_SELECTION)));
-		
+
+		BMenu* submenu = new BMenu("Source Control");
+		submenu->AddItem(new BMenuItem(TR("Add selected files to repository"),
+			new BMessage(M_ADD_SELECTION_TO_REPO)));
+		submenu->AddItem(new BMenuItem(TR("Remove selected files from repository"),
+			new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
+		submenu->AddItem(new BMenuItem(TR("Show changes in selected files"),
+			new BMessage(M_DIFF_SELECTION)));
+		submenu->AddItem(new BMenuItem(TR("Revert selected files"),
+			new BMessage(M_REVERT_SELECTION)));
+
 		menu.AddItem(submenu);
 		submenu->SetTargetForItems(Window());
-		
-		if (fileItem->GetData()->CountActions() > 0)
-		{
+
+		if (fileItem->GetData()->CountActions() > 0) {
 			menu.AddSeparatorItem();
 			fileItem->GetData()->AddActionsItems(&menu);
 		}
 	}
-	
-	SourceGroupItem *groupItem = dynamic_cast<SourceGroupItem*>(stringItem);
-	if (fileItem || groupItem)
-	{
-		if (fileItem)
+
+	SourceGroupItem* groupItem = dynamic_cast<SourceGroupItem*>(stringItem);
+	if (fileItem != NULL || groupItem != NULL) {
+		if (fileItem != NULL)
 			menu.AddSeparatorItem();
-		
-		menu.AddItem(new BMenuItem(TR("New Group"),new BMessage(M_NEW_GROUP)));
-		menu.AddItem(new BMenuItem(TR("Rename Group…"),new BMessage(M_SHOW_RENAME_GROUP)));
-		menu.AddItem(new BMenuItem(TR("Sort Group"),new BMessage(M_SORT_GROUP)));
-		
+
+		menu.AddItem(new BMenuItem(TR("New group"),
+			new BMessage(M_NEW_GROUP)));
+		menu.AddItem(new BMenuItem(TR("Rename group") B_UTF8_ELLIPSIS,
+			new BMessage(M_SHOW_RENAME_GROUP)));
+		menu.AddItem(new BMenuItem(TR("Sort group"),
+			new BMessage(M_SORT_GROUP)));
+
 		menu.SetTargetForItems(Window());
-		menu.Go(screenpt,true,false);
+		menu.Go(screenPoint, true, false);
 	}
 }
 
 
 void
-ProjectList::HandleDragAndDrop(BPoint droppt, const BMessage *msg)
+ProjectList::HandleDragAndDrop(BPoint dropPoint, const BMessage* message)
 {
 	// Be careful with this code -- slight tweaks may have unexpected effects!
-	
+
 //debugger("");
-	int32 listindex = FullListIndexOf(droppt);
-	
+	int32 listindex = FullListIndexOf(dropPoint);
+
 	if (listindex < 0)
 		listindex = (FullListCountItems() > 0) ? FullListCountItems() - 1 : 0;
-	
-	// Get the owning group item
-	BStringItem *destStringItem = (BStringItem*)FullListItemAt(listindex);
-	SourceGroupItem *destGroupItem = dynamic_cast<SourceGroupItem*>(destStringItem);
-	if (!destGroupItem)
-	{
-		BStringItem *super = (BStringItem*)Superitem(destStringItem);
-		if (super)
+
+	// get the owning group item
+	BStringItem* destStringItem = (BStringItem*)FullListItemAt(listindex);
+	SourceGroupItem* destGroupItem = dynamic_cast<SourceGroupItem*>(destStringItem);
+	if (destGroupItem == NULL) {
+		BStringItem* super = (BStringItem*)Superitem(destStringItem);
+		if (super != NULL)
 			destGroupItem = dynamic_cast<SourceGroupItem*>(super);
 	}
-	
+
 	// This is where it gets complicated. Here are some of the possible user actions:
 	// 1) Drag one or more source items within a group
 	// 2) Drag one or more source items from different groups to yet another group
-	// 3) Drag one or more source items from different groups into a group owning at least one item
-	// 		that is being dragged
+	// 3) Drag one or more source items from different groups into a group owning at
+	//    least one item that is being dragged
 	// 4) Drag one or more group items
-	
+
 	// Here are the program actions:
 	// 1) Dragging a group reorders it
 	// 2) Dropping an item adds it to the owning group
-	
-	BStringItem *srcStringItem;
-	SourceGroupItem *srcGroupItem;
-	SourceFileItem *srcFileItem;
+
+	BStringItem* srcStringItem;
+	SourceGroupItem* srcGroupItem;
+	SourceFileItem* srcFileItem;
 	int32 index = 0;
-	ProjectList *ownerList;
-	if (msg->FindPointer("owner",(void**)&ownerList) != B_OK)
+	ProjectList* ownerList;
+	if (message->FindPointer("owner",(void**)&ownerList) != B_OK)
 		ownerList = this;	
-	
-	while (msg->FindPointer("items",index,(void**)&srcStringItem) == B_OK)
-	{
+
+	while (message->FindPointer("items", index, (void**)&srcStringItem) == B_OK) {
 		// First, check to see if the item is a source file or a group header
 		srcGroupItem = dynamic_cast<SourceGroupItem*>(srcStringItem);
 		srcFileItem = dynamic_cast<SourceFileItem*>(srcStringItem);
-		if (srcFileItem)
-		{
-			srcGroupItem = dynamic_cast<SourceGroupItem*>(ownerList->Superitem(srcStringItem));
-			if (!srcGroupItem)
-			{
+		if (srcFileItem != NULL) {
+			srcGroupItem = dynamic_cast<SourceGroupItem*>(
+				ownerList->Superitem(srcStringItem));
+			if (srcGroupItem == NULL) {
 				debugger("BUG: NULL superitem for source file item");
 				return;
 			}
-			
-			// Ensure that we are not dropping an item onto its parent group item. While this
-			// does not seem so innocuous at first, doing so with the group's entire set of
-			// items ends up with some serious order issues
-			if (srcGroupItem != destStringItem)
-			{
-				if (ownerList == this)
-				{
+
+			// Ensure that we are not dropping an item onto its parent group item.
+			// While this does not seem so innocuous at first, doing so with the
+			// group's entire set of items ends up with some serious order issues.
+			if (srcGroupItem != destStringItem) {
+				if (ownerList == this) {
 					RemoveItem(srcFileItem);
 					AddItem(srcFileItem,listindex);
-					
+
 					// Find the group item index relative to its siblings so
 					// we can add its corresponding SourceFile to the proper
 					// place in its SourceGroup
 					int32 groupindex = UnderIndexOf(srcFileItem);
-								
-					srcGroupItem->GetData()->filelist.RemoveItem(srcFileItem->GetData(),false);
-					if (groupindex >= 0)
-						destGroupItem->GetData()->filelist.AddItem(srcFileItem->GetData(),groupindex);
-					else
-						destGroupItem->GetData()->filelist.AddItem(srcFileItem->GetData());
-				}
-				else
-				{
-					// Dragging from one project to another, so we'll copy the item instead of
-					// moving it. Very BeOS-like, if I do say so myself. ;) We'll accomplish
-					// this by converting the path for the SourceItem's file into a ref and
-					// posting a message to the Window so that each file is properly added to
-					// the project.
+
+					srcGroupItem->GetData()->filelist.RemoveItem(
+						srcFileItem->GetData(), false);
+					if (groupindex >= 0) {
+						destGroupItem->GetData()->filelist.AddItem(
+							srcFileItem->GetData(), groupindex);
+					} else {
+						destGroupItem->GetData()->filelist.AddItem(
+							srcFileItem->GetData());
+					}
+				} else {
+					// Dragging from one project to another, so we'll copy the
+					// item instead of moving it, very BeOS-like if I do say so
+					// myself. ;)
+					//
+					// We'll accomplish this by converting the path for the
+					// SourceItem's file into a ref and posting a message to the
+					// Window so that each file is properly added to the project.
 					DPath itemPath = srcFileItem->GetData()->GetPath();
-					BMessage msg(B_SIMPLE_DATA);
+					BMessage message(B_SIMPLE_DATA);
 					entry_ref ref = itemPath.GetRef();
-					msg.AddRef("refs",&ref);
-					Window()->PostMessage(&msg);
+					message.AddRef("refs", &ref);
+					Window()->PostMessage(&message);
 				}
 			}
-		}
-		else
-		{
-			// srcFileItem == NULL => dragging a group item. Reordering groups would be nice,
-			// but BOutlineListView didn't make this at all easy. Perhaps later.
-			
+		} else {
+			// srcFileItem == NULL => dragging a group item. Reordering groups
+			// would be nice, but BOutlineListView didn't make this at all easy.
+			// Perhaps later.
 			if (fProject->CountGroups() < 2)
 				return;
-			
-			// Find the group that was dropped on and insert the dropped group after it
-			destStringItem = (BStringItem*)FullListItemAt(FullListIndexOf(droppt));
-			if (!destStringItem)
+
+			// find the group that was dropped on and insert the dropped group
+			// after it
+			destStringItem = (BStringItem*)FullListItemAt(FullListIndexOf(dropPoint));
+			if (destStringItem == NULL)
 				destStringItem = (BStringItem*)LastItem();
-			
-			// Check to see if this group was dropped on a group item
+
+			// check to see if this group was dropped on a group item
 			destGroupItem = dynamic_cast<SourceGroupItem*>(destStringItem);
-			if (!destGroupItem)
+			if (destGroupItem == NULL)
 				destGroupItem = (SourceGroupItem*)Superitem(destStringItem);
+
 			fProject->MoveGroup(srcGroupItem->GetData(),
-								fProject->IndexOfGroup(destGroupItem->GetData()));
-			
+				fProject->IndexOfGroup(destGroupItem->GetData()));
+
 			RefreshList();
 		}
-		
+
 		index++;
 	}
-	
+
 	Window()->PostMessage(M_CULL_EMPTY_GROUPS);
 }
 
@@ -479,7 +471,7 @@ ProjectList::HandleDragAndDrop(BPoint droppt, const BMessage *msg)
 int32
 ProjectList::FindNextAlphabetical(char c, int32 index)
 {
-	BStringItem *stringitem;
+	BStringItem* stringItem;
 	char name[255];
 	if(index < -1)
 		index = -1;
@@ -492,10 +484,10 @@ ProjectList::FindNextAlphabetical(char c, int32 index)
 	{
 		if (i == CountItems())
 			i = 0;
-		stringitem = dynamic_cast<BStringItem*>(ItemAt(i));
-		if (stringitem)
+		stringItem = dynamic_cast<BStringItem*>(ItemAt(i));
+		if (stringItem)
 		{
-			strcpy(name,stringitem->Text());
+			strcpy(name,stringItem->Text());
 			if (charncmp(name[0],c) == 0)
 				return i;
 		}
@@ -593,38 +585,33 @@ SourceFileItem::SetDisplayState(uint8 state)
 
 
 void
-SourceFileItem::DrawItem(BView *owner, BRect frame, bool complete)
+SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
-	if (!Text())
+	if (Text() == NULL)
 		return;
-	
-	rgb_color textColor = {0,0,0,255};
-	rgb_color white = {255,255,255,255};
+
+	rgb_color textColor = {0, 0, 0, 255};
 	rgb_color backColor = white;
 	rgb_color selectColor = tint_color(white, B_DARKEN_2_TINT);
-	
-	if (IsSelected() || complete)
-	{
-		if (IsSelected())
-		{
+
+	if (IsSelected() || complete) {
+		if (IsSelected()) {
 			owner->SetHighColor(selectColor);
 			owner->SetLowColor(white);
-		}
-		else
+		} else
 			owner->SetHighColor(white);
-		
+
 		owner->FillRect(frame);
 	}
-	
+
 	owner->MovePenTo(frame.left, frame.top + fTextOffset);
-	
+
 	owner->SetFont(be_plain_font);
-	
+
 	if (IsSelected())
 		backColor = selectColor;
-	
-	switch (fDisplayState)
-	{
+
+	switch (fDisplayState) {
 		case SFITEM_MISSING:
 		{
 			BFont italics;
@@ -632,27 +619,24 @@ SourceFileItem::DrawItem(BView *owner, BRect frame, bool complete)
 			owner->SetFont(&italics);
 			break;
 		}
+
 		case SFITEM_BUILDING:
 		{
 			textColor.blue = 255;
 			break;
 		}
+
 		case SFITEM_NEEDS_BUILD:
 		{
-			if (IsSelected())
+			if (IsSelected()) {
 				textColor = white;
-			else
-			{
-				SET_COLOR(textColor,144,144,144);
+			} else {
+				SET_COLOR(textColor, 144, 144, 144);
 			}
 			break;
 		}
-		default:
-		{
-			break;
-		}
 	}
-	
+
 	owner->SetHighColor(textColor);
 	owner->SetLowColor(backColor);
 	owner->DrawString(Text());
@@ -660,9 +644,9 @@ SourceFileItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 
 void
-SourceFileItem::Update(BView *owner, const BFont *font)
+SourceFileItem::Update(BView* owner, const BFont* font)
 {
-	if (Text())
+	if (Text() != NULL)
 		SetWidth(font->StringWidth(Text()));
 
 	font_height height;
@@ -674,15 +658,16 @@ SourceFileItem::Update(BView *owner, const BFont *font)
 }
 
 
-SourceGroupItem::SourceGroupItem(SourceGroup *data)
-	:	BStringItem("",0,false),
-		fData(NULL)
+SourceGroupItem::SourceGroupItem(SourceGroup* data)
+	:
+	BStringItem("", 0, false),
+	fData(NULL)
 {
 	SetData(data);
 }
 		
 
-SourceGroup *
+SourceGroup*
 SourceGroupItem::GetData(void)
 {
 	return fData;
@@ -690,35 +675,33 @@ SourceGroupItem::GetData(void)
 
 
 void
-SourceGroupItem::SetData(SourceGroup *data)
+SourceGroupItem::SetData(SourceGroup* data)
 {
 	fData = data;
-	
-	BString str;
-	if (data)
-	{
-		str = data->name;
-		if (str.CountChars() < 1)
-			str = "Empty Group item";
-	}
-	else
-		str = "NULL Group item";
-	SetText(str.String());
+
+	BString string;
+	if (data != NULL) {
+		string = data->name;
+		if (string.CountChars() < 1)
+			string = "Empty group item";
+	} else
+		string = "NULL group item";
+
+	SetText(string.String());
 }
 
 
 void
-SourceGroupItem::DrawItem(BView *owner, BRect frame, bool complete)
+SourceGroupItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	// This is a workaround to ensure that the SourceGroup item's expansion
 	// state is in sync with its corresponding SourceGroupItem -- it
 	// wouldn't stay in sync when the expander triangle was clicked.
 	if (GetData()->expanded != IsExpanded())
 		GetData()->expanded = IsExpanded();
-	
+
 	owner->SetFont(be_bold_font);
-	owner->SetHighColor(0,0,0);
-	BStringItem::DrawItem(owner,frame,complete);
+	owner->SetHighColor(black);
+	BStringItem::DrawItem(owner, frame, complete);
 	owner->SetFont(be_plain_font);
 }
-

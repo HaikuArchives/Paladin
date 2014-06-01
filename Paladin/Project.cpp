@@ -792,15 +792,34 @@ Project::Link(void)
 		}
 		
 		if (TargetType() == TARGET_DRIVER)
-			linkString << "/boot/develop/lib/x86/_KERNEL_ ";
-		
+		{
+			BString kernelPath;
+
+			switch(DetectPlatform())
+			{
+				case PLATFORM_HAIKU_GCC4:
+				case PLATFORM_HAIKU:
+				{
+					BPath path;
+					find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &path, false);
+					kernelPath << path.Path() << "/lib/_KERNEL_";
+					break;
+				}
+				default:
+					kernelPath << "/boot/develop/lib/x86/_KERNEL_";
+					break;
+			}
+
+			linkString << kernelPath << " ";
+		}
+
 		linkString << "-L/boot/home/config/lib ";
 		
 		switch (TargetType())
 		{
 			case TARGET_DRIVER:
 			{
-				linkString << "-Xlinker -nostdlib ";
+				linkString << "-nostdlib ";
 				break;
 			}
 			case TARGET_SHARED_LIB:
@@ -1353,7 +1372,23 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 		}
 		case PROJECT_DRIVER:
 		{
-			newproj->AddLibrary("/boot/develop/lib/x86/_KERNEL_");
+			BString kernelPath;
+
+			switch(DetectPlatform())
+			{
+				case PLATFORM_HAIKU_GCC4:
+				case PLATFORM_HAIKU:
+				{
+					BPath path;
+					find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &path, false);
+					kernelPath << path.Path() << "/lib/_KERNEL_";
+					break;
+				}
+				default:
+					kernelPath << "/boot/develop/lib/x86/_KERNEL_";
+					break;
+			}
+			newproj->AddLibrary(kernelPath);
 			break;
 		}
 		case PROJECT_CONSOLE:

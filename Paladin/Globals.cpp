@@ -477,6 +477,10 @@ BeIDE2Paladin(const char *path, BString &outpath)
 	for (int32 i = 0; i < beide.CountFiles(); i++)
 	{
 		ProjectFile file = beide.FileAt(i);
+
+		if (file.path.FindFirst("/_KERNEL_") > 0)
+			continue;
+
 		SourceFile *srcFile = gFileFactory.CreateSourceFileItem(file.path.String());
 		
 		if (!srcFile)

@@ -441,8 +441,11 @@ BeIDE2Paladin(const char *path, BString &outpath)
 	
 	DPath dpath(path);
 	Project proj(dpath.GetBaseName(), beide.TargetName());
-	
 	proj.SetPlatform(PLATFORM_R5);
+
+	// NOTE: TARGET_* from Project.h & TARGET_* from BeIDEPRoject.h
+	// map perfectly, so no explicit conversion required
+	proj.SetTargetType(beide.TargetType());
 	
 	BString savepath(dpath.GetFolder());
 	savepath << "/" << dpath.GetBaseName() << ".pld";

@@ -534,6 +534,31 @@ Project::HasFileName(const char *name)
 	return false;
 }
 
+bool
+Project::LocateFile(const char *name, BPath& outPath)
+{
+	// Try to find file 'name' by searching include paths
+	BPath projPath(GetPath().GetFolder());
+	BEntry entry;
+
+	// Try simple case; file is in project directory
+	outPath = projPath;
+	if (outPath.Append(name) == B_OK &&
+		entry.SetTo(outPath.Path()) == B_OK &&
+		entry.Exists())
+		return true;
+
+	// Search local includes
+	for (int32 idx = 0; idx < CountLocalIncludes(); idx++) {
+		outPath = LocalIncludeAt(idx).Absolute();
+		if (outPath.Append(name) == B_OK &&
+			entry.SetTo(outPath.Path()) == B_OK &&
+			entry.Exists())
+			return true;
+	}
+
+	return false;
+}
 
 SourceFile *
 Project::FindFile(const char *path)

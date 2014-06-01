@@ -495,7 +495,11 @@ BeIDE2Paladin(const char *path, BString &outpath)
 		
 		if (!proj.HasGroup(file.group.String()))
 			currentGroup = proj.AddGroup(file.group.String());
-		
+
+		BPath newPath;
+		if (proj.LocateFile(srcFile->GetPath().GetFullPath(), newPath))
+			srcFile->SetPath(newPath.Path());
+
 		proj.AddFile(srcFile, currentGroup);
 	}
 	

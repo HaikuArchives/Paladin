@@ -82,7 +82,8 @@ public:
 			DPath		GetPath(void) const { return fPath; }
 			DPath		GetObjectPath(void) const { return fObjectPath; }
 			DPath		GetPathForFile(SourceFile *file);
-			
+			bool		LocateFile(const char *name, BPath& outPath);
+
 			void		AddFile(SourceFile *file, SourceGroup *group, int32 index = -1);
 			void		RemoveFile(SourceFile *file);
 			bool		HasFile(const char *path);

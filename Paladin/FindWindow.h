@@ -45,7 +45,7 @@ private:
 	
 	thread_id		fThreadID;
 	int8			fThreadMode;
-	vint32			fThreadQuitFlag;
+	int32			fThreadQuitFlag;
 	
 	BObjectList<BString>	fFileList;
 	DPath					fWorkingDir;

@@ -45,7 +45,7 @@ void DeregisterWindow(void);
 int32 CountRegisteredWindows(void);
 BWindow *WindowForProject(Project *proj);
 
-extern volatile int32 gQuitOnZeroWindows;
+extern int32 gQuitOnZeroWindows;
 
 #define APP_SIGNATURE "application/x-vnd.dw-Paladin"
 

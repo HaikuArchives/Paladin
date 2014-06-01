@@ -38,7 +38,7 @@ static int sReturnCode = 0;
 
 static int32 sWindowCount = 0;
 static BLocker sWindowLocker;
-volatile int32 gQuitOnZeroWindows = 1;
+int32 gQuitOnZeroWindows = 1;
 
 void
 RegisterWindow(void)

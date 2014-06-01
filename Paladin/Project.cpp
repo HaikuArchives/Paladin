@@ -730,11 +730,17 @@ void
 Project::Link(void)
 {
 	BString linkString;
+	BString targetPath;
 	
+	if (GetTargetName()[0] == '/')
+		targetPath << "/" << GetPath().GetFolder() << GetTargetName();
+	else
+		targetPath << GetTargetName();
+
 	if (TargetType() == TARGET_STATIC_LIB)
 	{
 		linkString = "ar rcs '";
-		linkString << GetPath().GetFolder() << "/" << GetTargetName() << "' ";
+		linkString << targetPath << "' ";
 		for (int32 i = 0; i < CountGroups(); i++)
 		{
 			SourceGroup *group = GroupAt(i);
@@ -751,7 +757,7 @@ Project::Link(void)
 	else
 	{
 		linkString = "gcc -o '";
-		linkString << GetPath().GetFolder() << "/" << GetTargetName() << "' ";
+		linkString << targetPath << "' ";
 			
 		for (int32 i = 0; i < CountGroups(); i++)
 		{

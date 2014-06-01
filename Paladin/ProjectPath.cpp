@@ -68,13 +68,17 @@ void
 ProjectPath::SetPath(const char *path)
 {
 	fPath = path;
-	
-	if (fPath.CountChars() > 0 && fPath.ByteAt(0) == '.')
-		fPath.RemoveFirst(".");
+
+	// Check if path is subpath of fBase
 	if (fPath.FindFirst(fBase) == 0)
+	{
+		// Remove fBase from fPath...
 		fPath.RemoveFirst(fBase);
-	if (fPath.CountChars() > 0 && fPath.ByteAt(0) == '/')
-		fPath.RemoveFirst("/");
+
+		// and make sure path does not start with "/" now
+		if (fPath.FindFirst("/") == 0)
+			fPath.RemoveFirst("/");
+	}
 }
 
 

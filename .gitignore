@@ -26,3 +26,10 @@ libcharlemagne/testlib
 libcharlemagne/libcharlemagne.so
 libcharlemagne/CPPInterface_wrap.cxx
 PDesigner/libcharlemagne
+# Uncrustify build output
+uncrustify/Makefile
+uncrustify/config.status
+uncrustify/man/Makefile
+uncrustify/src/config.h
+uncrustify/src/Makefile
+uncrustify/src/uncrustify

@@ -216,6 +216,8 @@ LibraryWindow::ScanFolder(BPoint location, const char* path, float* maxWidth)
 int32
 LibraryWindow::ScanThread(void* data)
 {
+	// ToDo: convert to using find_paths() once we drop R1/A4 support
+
 	LibraryWindow* window = (LibraryWindow*)data;
 
 	float maxwidth;
@@ -230,8 +232,7 @@ LibraryWindow::ScanThread(void* data)
 
 	r.OffsetBy(0, r.Height() + 10);
 
-	DPath sysPath = GetSystemPath(B_USER_DEVELOP_DIRECTORY);
-	sysPath << "lib/x86";
+	DPath sysPath = GetSystemPath(B_SYSTEM_LIB_DIRECTORY);
 	BRect out = window->ScanFolder(r.LeftTop(), sysPath.GetFullPath(), &maxwidth);
 	if (out != BRect(0, 0, -1, -1)) {
 		r = out;
@@ -239,6 +240,7 @@ LibraryWindow::ScanThread(void* data)
 	}
 
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) {
+		// ToDo: remove this once we drop R1/A4 support
 		BView* commonHeader = window->AddHeader(r.LeftTop(),
 			TR("Common Libraries:"));
 		window->Lock();

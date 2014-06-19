@@ -118,7 +118,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 	SetToolTip(fBackupFolder, TR("Sets the location for project backups"));
 
 	fTabs[0] = BLayoutBuilder::Grid<>(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-		.Add(new BStringView("project folder label", TR("Project folder:")), 0, 0)
+		.Add(new BStringView("projects folder label", TR("Projects folder:")), 0, 0)
 		.Add(fProjectFolder, 1, 0)
 
 		.AddGroup(B_VERTICAL, 0.0f, 1, 1)
@@ -130,7 +130,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 
 		.Add(fAutoSyncModules, 1, 3)
 
-		.Add(new BStringView("backup folder label", TR("Backup folder:")), 0, 4)
+		.Add(new BStringView("backups folder label", TR("Backups folder:")), 0, 4)
 		.Add(fBackupFolder, 1, 4)
 
 		.SetInsets(B_USE_DEFAULT_SPACING)

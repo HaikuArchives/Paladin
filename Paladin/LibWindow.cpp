@@ -65,7 +65,7 @@ LibraryWindow::LibraryWindow(BRect frame, const BMessenger& parent,
 		B_FOLLOW_ALL, 0, false, true);
 	top->AddChild(scrollView);
 
-	fScanThread = spawn_thread(ScanThread, "libscanthread", B_NORMAL_PRIORITY,
+	fScanThread = spawn_thread(ScanThread, "libscanthread", B_LOW_PRIORITY,
 		this);
 	resume_thread(fScanThread);
 

@@ -1,6 +1,6 @@
 NAME=SymbolFinder
 TARGETNAME=SymbolFinder
-PLATFORM=HaikuGCC4
+PLATFORM=Haiku
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=App.cpp
@@ -18,7 +18,6 @@ SYSTEMINCLUDE=/boot/develop/headers/posix
 SYSTEMINCLUDE=/boot/home/config/include
 LIBRARY=/boot/develop/lib/x86/libroot.so
 LIBRARY=/boot/develop/lib/x86/libbe.so
-LIBRARY=/boot/develop/lib/x86/libsupc++.so
 RUNARGS=
 CCDEBUG=no
 CCPROFILE=no

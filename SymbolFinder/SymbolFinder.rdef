@@ -1,5 +1,5 @@
 resource app_signature "application/x-vnd.dw-SymbolFinder";
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
 
 /*--------------------------------------------------------------------
 	Set the version information about your app here.

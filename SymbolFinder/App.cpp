@@ -1,20 +1,33 @@
+/*
+ * Copyright 2001-2009 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "App.h"
 #include "MainWindow.h"
 
 
-App::App(void)
-	:	BApplication("application/x-vnd.dw-SymbolFinder")
+App::App()
+	:
+	BApplication("application/x-vnd.dw-SymbolFinder")
 {
-	MainWindow *mainwin = new MainWindow();
-	mainwin->Show();
+	MainWindow* window = new MainWindow();
+	window->Show();
 }
 
 
 int
-main(void)
+main()
 {
-	App *app = new App();
+	App* app = new App();
 	app->Run();
 	delete app;
+
 	return 0;
 }

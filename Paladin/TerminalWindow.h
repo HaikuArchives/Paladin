@@ -1,23 +1,35 @@
-#ifndef TERMINAL_WINDOW_H
-#define TERMINAL_WINDOW_H
+/*
+ * Copyright 2001-2009 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+#ifndef _TERMINAL_WINDOW_H
+#define _TERMINAL_WINDOW_H
+
 
 #include "DWindow.h"
 
 #include <String.h>
 #include <TextView.h>
 
-class TerminalWindow : public DWindow
-{
+
+class TerminalWindow : public DWindow {
 public:
-			TerminalWindow(const char *commandline);
-			~TerminalWindow(void);
-	void	MessageReceived(BMessage *msg);
-	void	RunCommand(void);
-	void	FrameResized(float w, float h);
-	
+							TerminalWindow(const char* commandLine);
+	virtual					~TerminalWindow(void);
+
+			void			MessageReceived(BMessage* message);
+			void			RunCommand(void);
+			void			FrameResized(float, float);
+
 private:
-	BTextView	*fTextView;
-	BString		fCommand;
+			BTextView*		fTextView;
+			BString			fCommand;
 };
 
-#endif
+
+#endif // _TERMINAL_WINDOW_H

@@ -57,7 +57,7 @@ MainWindow::MainWindow(void)
 
 	fGoButton = new BButton("goButton", "Search", new BMessage(M_SEARCH));
 
-	fStatusView = new BStringView("statusView", "SomeTextHere");
+	fStatusView = new BStringView("statusView", "");
 
 	fResultList = new BListView("resultList");
 	BScrollView* listScroller = new BScrollView("listScroller",
@@ -76,6 +76,7 @@ MainWindow::MainWindow(void)
 
 	fTextBox->MakeFocus();
 	fGoButton->MakeDefault(true);
+	fStatusView->Hide();
 
 	CenterOnScreen();
 }
@@ -125,6 +126,7 @@ MainWindow::DoSearch(const char* text)
 
 	Lock();
 
+	fStatusView->Show();
 	fGoButton->SetEnabled(false);
 	for (int32 i = fResultList->CountItems() - 1; i >= 0; i--) {
 		BStringItem* item = (BStringItem*)fResultList->RemoveItem(i);
@@ -149,6 +151,7 @@ MainWindow::DoSearch(const char* text)
 	Lock();
 
 	fThreadID = -1;
+	fStatusView->Hide();
 	fGoButton->SetEnabled(true);
 
 	Unlock();

@@ -11,6 +11,7 @@
 
 #include "LicenseManager.h"
 
+#include <Box.h>
 #include <Button.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -22,7 +23,6 @@
 #include <Screen.h>
 #include <ScrollView.h>
 #include <Size.h>
-#include <StringView.h>
 #include <TextView.h>
 
 #include "DPath.h"
@@ -40,54 +40,50 @@ enum {
 LicenseManager::LicenseManager(const char* targetPath)
 	:
 	BWindow(BRect(0.0f, 0.0f, 640.0f, 480.0f), TR("Add license to project"),
-		B_TITLED_WINDOW, 0),
+		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fTargetPath(targetPath),
 	fPathList(20, true)
 {
 	AddCommonFilter(new EscapeCancelFilter());
 
 	fLicenseList = new BListView("licenseList");
-	fLicenseList->SetExplicitSize(BSize(fLicenseList->StringWidth("M") * 16,
-		B_SIZE_UNSET));
 	BScrollView* listScrollView = new BScrollView("listScrollView", fLicenseList,
-		B_WILL_DRAW, false, true);
+		0, false, true);
 	fLicenseList->SetSelectionMessage(new BMessage(M_LICENSE_SELECTED));
+	fLicenseList->SetExplicitMinSize(BSize(fLicenseList->StringWidth("M") * 16,
+		B_SIZE_UNSET));
+
+	BBox* listBox = new BBox(B_NO_BORDER, listScrollView);
+	listBox->SetLabel(TR("License:"));
 
 	fLicenseShort = new BTextView("shortLicense");
 	fLicenseShort->MakeEditable(false);
-	fLicenseShort->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNLIMITED));
 	BScrollView* shortScrollView = new BScrollView("shortScrollView",
-		fLicenseShort, B_WILL_DRAW, false, true);
+		fLicenseShort, 0, false, true);
+
+	BBox* shortLicenseBox = new BBox(B_NO_BORDER, shortScrollView);
+	shortLicenseBox->SetLabel(TR("Summary:"));
 
 	fLicenseLong = new BTextView("longLicense");
 	fLicenseLong->MakeEditable(false);
-	fLicenseLong->SetExplicitPreferredSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNLIMITED));
 	BScrollView* longScrollView = new BScrollView("longScrollView",
-		fLicenseLong, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+		fLicenseLong, 0, false, true);
+
+	BBox* longLicenseBox = new BBox(B_NO_BORDER, longScrollView);
+	longLicenseBox->SetLabel(TR("Full Version:"));
 
 	BButton* addButton = new BButton("addButton", TR("Set License"),
 		new BMessage(M_LICENSE_CHOSEN));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.AddGroup(B_HORIZONTAL)
-			.AddGroup(B_VERTICAL, 0.0f)
-				.Add(new BStringView("licenseLabel", TR("License:")))
-				.Add(listScrollView)
-				.End()
-			.AddGroup(B_VERTICAL)
-				.AddGroup(B_VERTICAL, 0)
-					.Add(new BStringView("shortLabel", TR("Summary:")))
-					.Add(shortScrollView)
-					.End()
-				.AddGroup(B_VERTICAL, 0)
-					.Add(new BStringView("longLabel", TR("Full Version:")))
-					.Add(longScrollView)
-					.End()
+		.AddSplit(B_HORIZONTAL)
+			.Add(listBox, 0.3f)
+			.AddSplit(B_VERTICAL, B_USE_DEFAULT_SPACING, 0.7f)
+				.Add(shortLicenseBox, 0.4f)
+				.Add(longLicenseBox, 0.6f)
 				.End()
 			.End()
-		.AddGroup(B_HORIZONTAL, 0)
+		.AddGroup(B_HORIZONTAL, 0.0f)
 			.AddGlue()
 			.Add(addButton)
 			.End()
@@ -96,6 +92,7 @@ LicenseManager::LicenseManager(const char* targetPath)
 
 	addButton->MakeDefault(true);
 	ScanLicenses();
+	fLicenseList->Select(0);
 	CenterOnScreen();
 }
 

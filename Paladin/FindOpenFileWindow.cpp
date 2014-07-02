@@ -2,117 +2,112 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <CheckBox.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
 #include <Path.h>
-#include <Screen.h>
+#include <Size.h>
+#include <View.h>
 
+#include "AutoTextControl.h"
 #include "EscapeCancelFilter.h"
 #include "MsgDefs.h"
 #include "Globals.h"
 #include "PLocale.h"
 #include "Project.h"
 
+
 #define	M_FIND_FILE 'fnfl'
 
 
-FindOpenFileWindow::FindOpenFileWindow(const char *paneltext)
-	:	DWindow(BRect(0,0,500,400),TR("Find and Open File"),B_TITLED_WINDOW,
-				B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
+FindOpenFileWindow::FindOpenFileWindow(const char* panelText)
+	:
+	DWindow(BRect(0, 0, 0, 0), TR("Find and open file"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	AddCommonFilter(new EscapeCancelFilter());
-	
-	BView *top = GetBackgroundView();
-	
-	fNameText = new AutoTextControl(BRect(10,10,11,11),"nametext",TR("Open: "),
-									"", new BMessage, B_FOLLOW_LEFT_RIGHT |
-														B_FOLLOW_TOP);
-	top->AddChild(fNameText);
-	fNameText->ResizeToPreferred();
-	fNameText->ResizeTo(Bounds().Width() - 20,fNameText->Bounds().Height());
-	fNameText->SetDivider(fNameText->StringWidth(TR("Open: ")) + 5);
-	
-	BRect r = fNameText->Frame();
-	r.OffsetBy(0,r.Height() + 10.0);
-	
-	fSystemBox = new BCheckBox(r,"systembox",TR("Search only system folders"),
-								new BMessage);
-	top->AddChild(fSystemBox);
-	fSystemBox->ResizeToPreferred();
-	r = fSystemBox->Frame();
-	fSystemBox->MoveBy(fNameText->Divider(), 0);
-	
-	r.OffsetBy(0,r.Height() + 10.0);
-	BButton *cancel = new BButton(r,"cancel",TR("Cancel"),
-									new BMessage(B_QUIT_REQUESTED));
-	cancel->ResizeToPreferred();
-	top->AddChild(cancel);
-	
-	ResizeTo(300, cancel->Frame().bottom + 10);
-	cancel->MoveTo( (Bounds().Width() - (cancel->Bounds().Width() * 2) - 10) / 2,
-					cancel->Frame().top);
-	
-	r = cancel->Frame();
-	r.OffsetBy(r.Width() + 10,0);
-	BButton *open = new BButton(r,"open",TR("Open"), new BMessage(M_FIND_FILE));
-	top->AddChild(open);
-	
-	r = Frame();
-	BRect screen(BScreen().Frame());
-	MoveTo( (screen.Width() - r.Width()) / 2.0, (screen.Height() - r.Height()) / 2.0);
-	
-	fNameText->MakeFocus(true);
-	
-	BString text = paneltext;
-	if (text.CountChars() > 1)
-	{
-		fNameText->SetText(text.String());
-		int32 pos = text.FindLast(".");
-		if (pos > 0)
-			fNameText->TextView()->Select(0,pos);
+
+	BView* top = GetBackgroundView();
+
+	fNameTextControl = new AutoTextControl("nameText", TR("Open: "), "",
+		new BMessage);
+	fNameTextControl->SetExplicitMinSize(
+		BSize(fNameTextControl->StringWidth("M") * 20, B_SIZE_UNSET));
+	fSystemCheckBox = new BCheckBox("systembox", TR("Search only system folders"),
+		new BMessage);
+
+	BButton* cancel = new BButton("cancel", TR("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
+
+	BButton* open = new BButton("open", TR("Open"), new BMessage(M_FIND_FILE));
+
+	BLayoutBuilder::Group<>(top, B_VERTICAL)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
+			.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fSystemCheckBox, 1, 1)
+			.End()
+		.AddGlue()
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(cancel)
+			.Add(open)
+			.End()
+		.SetInsets(B_USE_WINDOW_INSETS)
+		.End();
+
+	BString text = panelText;
+	if (text.CountChars() > 1) {
+		fNameTextControl->SetText(text.String());
+		int32 position = text.FindLast(".");
+		if (position > 0)
+			fNameTextControl->TextView()->Select(0, position);
 		else
-			fNameText->TextView()->SelectAll();
+			fNameTextControl->TextView()->SelectAll();
+	} else {
+		fNameTextControl->SetText(".h");
+		fNameTextControl->TextView()->GoToLine(0);
 	}
-	else
-	{
-		fNameText->SetText(".h");
-		fNameText->TextView()->GoToLine(0);
-	}
-	
+
 	open->MakeDefault(true);
+
+	fNameTextControl->MakeFocus(true);
+
+	CenterOnScreen();
 }
 
 
 void
-FindOpenFileWindow::MessageReceived(BMessage *msg)
+FindOpenFileWindow::MessageReceived(BMessage* message)
 {
-	switch (msg->what)
-	{
+	switch (message->what) {
 		case M_FIND_FILE:
 		{
-			BMessage findmsg(M_FIND_AND_OPEN_FILE);
-			findmsg.AddString("name",fNameText->Text());
-			
-			if (fSystemBox->Value() == B_CONTROL_OFF)
-				findmsg.AddString("folder",gCurrentProject->GetPath().GetFolder());
-			
-			findmsg.AddString("folder","/boot/develop/headers");
-			
+			BMessage findmessage(M_FIND_AND_OPEN_FILE);
+			findmessage.AddString("name", fNameTextControl->Text());
+
+			if (fSystemCheckBox->Value() == B_CONTROL_OFF)
+				findmessage.AddString("folder", gCurrentProject->GetPath().GetFolder());
+
+			findmessage.AddString("folder","/boot/develop/headers");
+
 			DPath path(B_USER_CONFIG_DIRECTORY);
 			path << "include";
-			findmsg.AddString("folder", path.GetFullPath());
-			
-			if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
-			{
+			findmessage.AddString("folder", path.GetFullPath());
+
+			if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) {
 				path.SetTo(B_USER_NONPACKAGED_DIRECTORY);
 				path << "include";
-				findmsg.AddString("folder", path.GetFullPath());
+				findmessage.AddString("folder", path.GetFullPath());
 			}
-			
-			be_app->PostMessage(&findmsg);
+
+			be_app->PostMessage(&findmessage);
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+
 		default:
-			DWindow::MessageReceived(msg);
+			DWindow::MessageReceived(message);
+			break;
 	}
 }

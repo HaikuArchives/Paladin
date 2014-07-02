@@ -1,20 +1,31 @@
-#ifndef FIND_OPEN_FILE_WIN_H
-#define FIND_OPEN_FILE_WIN_H
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+#ifndef _FIND_OPEN_FILE_WINDOW_H
+#define _FIND_OPEN_FILE_WINDOW_H
 
-#include <CheckBox.h>
+
 #include "DWindow.h"
 
-#include "AutoTextControl.h"
 
-class FindOpenFileWindow : public DWindow
-{
+class AutoTextControl;
+class BCheckBox;
+
+class FindOpenFileWindow : public DWindow {
 public:
-			FindOpenFileWindow(const char *paneltext);
-	void	MessageReceived(BMessage *msg);
+								FindOpenFileWindow(const char* panelText);
+			void				MessageReceived(BMessage* message);
 
 private:
-	AutoTextControl	*fNameText;
-	BCheckBox		*fSystemBox;
+			AutoTextControl*	fNameTextControl;
+			BCheckBox*			fSystemCheckBox;
 };
 
-#endif
+
+#endif // _FIND_OPEN_FILE_WINDOW_H

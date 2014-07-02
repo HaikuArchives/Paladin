@@ -1,5 +1,18 @@
+/*
+ * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
+ * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "DWindow.h"
+
 #include <Deskbar.h>
+#include <GroupLayout.h>
 #include <Screen.h>
 #include <View.h>
 
@@ -7,7 +20,7 @@
 DWindow::DWindow(BRect frame, const char* title, window_type type, uint32 flags,
 	uint32 workspace)
 	:
-	BWindow(frame,title, type, flags | B_ASYNCHRONOUS_CONTROLS, workspace),
+	BWindow(frame,title, type, flags, workspace),
 	fOldLocation(frame.LeftTop()),
  	fScreenFrame(BScreen().Frame()),
  	fCenterOnShow(false)
@@ -19,7 +32,7 @@ DWindow::DWindow(BRect frame, const char* title, window_type type, uint32 flags,
 DWindow::DWindow(BRect frame, const char* title, window_look look, window_feel feel,
 	uint32 flags, uint32 workspace)
 	:
-	BWindow(frame,title, look, feel, flags | B_ASYNCHRONOUS_CONTROLS, workspace),
+	BWindow(frame,title, look, feel, flags, workspace),
 	fOldLocation(frame.LeftTop()),
 	fScreenFrame(BScreen().Frame()),
 	fCenterOnShow(false)
@@ -116,9 +129,10 @@ DWindow::GetBackgroundColor(void) const
 void
 DWindow::DWindowInit(void)
 {
-	fBackgroundView = new BView(Bounds(), "background_view", B_FOLLOW_ALL,
-		B_WILL_DRAW);
-	AddChild(fBackgroundView);
+	BGroupLayout* groupLayout = new BGroupLayout(B_VERTICAL);
+	SetLayout(groupLayout);
+
+	fBackgroundView = groupLayout->View();
 	fBackgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 

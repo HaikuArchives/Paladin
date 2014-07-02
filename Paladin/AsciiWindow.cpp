@@ -16,11 +16,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Deskbar.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <View.h>
 
 #include "ObjectList.h"
 #include "PLocale.h"
@@ -171,15 +173,17 @@ static ascii_info sAsciiTable[128] = {
 
 AsciiWindow::AsciiWindow(void)
 	:
-	BWindow(BRect(0, 0, kWindowWidth, kWindowHeight), TR("ASCII table"),
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	DWindow(BRect(0.0f, 0.0f, kWindowWidth, kWindowHeight),
+		TR("ASCII table"), B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fIsZoomed(false),
 	fLastFrame(Frame())
 {
-	BListView* listView = new BListView("listView", B_SINGLE_SELECTION_LIST,
+	BView* top = GetBackgroundView();
+
+	BListView* listView = new BListView("listView", B_MULTIPLE_SELECTION_LIST,
 		B_WILL_DRAW);
-	BScrollView* scrollView = new BScrollView("scrollView", listView, 0, false,
-		true, B_NO_BORDER);
+	BScrollView* listScrollView = new BScrollView("scrollView", listView, 0,
+		false, true, B_NO_BORDER);
 
 	listView->SetFont(be_fixed_font);
 	listView->AddItem(new BStringItem("  Dec  Hex  Oct  Code  Description"));
@@ -193,8 +197,8 @@ AsciiWindow::AsciiWindow(void)
 		free(row);
 	}
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(scrollView)
+	BLayoutBuilder::Group<>(top, B_VERTICAL)
+		.Add(listScrollView)
 		.SetInsets(-1)
 		.End();
 
@@ -203,14 +207,57 @@ AsciiWindow::AsciiWindow(void)
 
 
 void
-AsciiWindow::Zoom(BPoint origin, float width, float height)
+AsciiWindow::Zoom(BPoint, float, float)
 {
 	if (!fIsZoomed) {
 		fLastFrame = Frame();
+		BDeskbar deskbar;
+		BRect deskbarFrame = deskbar.Frame();
 		BRect screenFrame = (BScreen(this)).Frame();
-		MoveTo(std::max(fLastFrame.left, screenFrame.left + 4.0f), 26.0f);
-		ResizeTo(std::max(fLastFrame.Width(), kWindowWidth),
-			screenFrame.bottom - 30.0f);
+
+		switch (deskbar.Location()) {
+			case B_DESKBAR_TOP:
+				MoveTo(std::max(fLastFrame.left, screenFrame.left + 4.0f),
+					deskbarFrame.bottom + 28.0f);
+				ResizeTo(std::max(fLastFrame.Width(), kWindowWidth),
+					screenFrame.bottom - deskbarFrame.Height() - 33.0f);
+				break;
+
+			case B_DESKBAR_BOTTOM:
+				MoveTo(std::max(fLastFrame.left, screenFrame.left + 4.0f),
+					26.0f);
+				ResizeTo(std::max(fLastFrame.Width(), kWindowWidth),
+					deskbarFrame.top - 33.0f);
+				break;
+
+			case B_DESKBAR_LEFT_TOP:
+			case B_DESKBAR_LEFT_BOTTOM:
+				MoveTo(std::max(fLastFrame.left, deskbarFrame.right + 7.0f),
+					26.0f);
+				ResizeTo(std::max(fLastFrame.Width(), kWindowWidth),
+					screenFrame.bottom - 30.0f);
+				break;
+
+			case B_DESKBAR_RIGHT_TOP:
+			case B_DESKBAR_RIGHT_BOTTOM:
+				ResizeTo(std::max(fLastFrame.Width(), kWindowWidth),
+					screenFrame.bottom - 30.0f);
+				if (fLastFrame.right + 7.0f > deskbarFrame.left) {
+					MoveTo(fLastFrame.left - 7.0f
+						- (fLastFrame.right - deskbarFrame.left), 26.0f);
+				} else {
+					MoveTo(std::max(fLastFrame.left, screenFrame.left + 4.0f),
+						26.0f);
+				}
+				break;
+
+			default:
+				MoveTo(std::max(fLastFrame.left, screenFrame.left + 4.0f),
+					26.0f);
+				ResizeTo(std::max(fLastFrame.Width(), kWindowWidth),
+					screenFrame.bottom - 30.0f);
+				break;
+		}
 	} else {
 		MoveTo(fLastFrame.LeftTop());
 		ResizeTo(fLastFrame.Width(), fLastFrame.Height());

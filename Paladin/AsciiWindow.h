@@ -12,14 +12,15 @@
 
 
 #include <Rect.h>
-#include <Window.h>
+
+#include "DWindow.h"
 
 
-class AsciiWindow : public BWindow {
+class AsciiWindow : public DWindow {
 public:
-							AsciiWindow(void);
+							AsciiWindow();
 
-	virtual	void			Zoom(BPoint origin, float width, float height);
+	virtual	void			Zoom(BPoint, float, float);
 
 private:
 			bool			fIsZoomed;

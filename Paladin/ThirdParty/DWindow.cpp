@@ -91,10 +91,7 @@ DWindow::IsCenteredOnShow(void) const
 void
 DWindow::MoveToCenter(void)
 {
-	BRect rect(Frame());
-
-	MoveTo((fScreenFrame.right - rect.Width()) / 2.0,
-		(fScreenFrame.bottom - rect.Height()) / 2.0);
+	CenterOnScreen();
 }
 
 
@@ -140,45 +137,21 @@ DWindow::DWindowInit(void)
 void
 DWindow::ConstrainToScreen(void)
 {
-	BPoint pt = Frame().LeftTop();
-	if (pt.y < 25) {
-		MoveTo(pt.x,25);
-		pt.y = 25;
-	} else if (pt.y > fScreenFrame.bottom + 1) {
-		MoveTo(pt.x,fScreenFrame.bottom + 1);
-		pt.y = fScreenFrame.bottom + 1;
+	BPoint point = Frame().LeftTop();
+	if (point.y < 25.0f) {
+		MoveTo(point.x, 25.0f);
+		point.y = 25.0f;
+	} else if (point.y > fScreenFrame.bottom + 1.0f) {
+		MoveTo(point.x,fScreenFrame.bottom + 1.0f);
+		point.y = fScreenFrame.bottom + 1.0f;
 	}
 	
-	if (pt.x > fScreenFrame.right - 35)
-		MoveTo(fScreenFrame.right - 35,pt.y);
-	else if (pt.x < 0) {
-		BPoint pt2(pt);
-		pt2.x = pt.x + Frame().Width();
-		if (pt2.x < 25)
-			MoveTo(25 - Frame().Width(),pt2.y);
+	if (point.x > fScreenFrame.right - 35.0f)
+		MoveTo(fScreenFrame.right - 35.0f, point.y);
+	else if (point.x < 0) {
+		BPoint point2(point);
+		point2.x = point.x + Frame().Width();
+		if (point2.x < 25)
+			MoveTo(25.0f - Frame().Width(), point2.y);
 	}
-}
-
-
-void
-DWindow::Zoom(BPoint origin, float width, float height)
-{
-	BWindow::Zoom(origin, width, height);
-#if 0
-	BDeskbar bar;
-	deskbar_location loc = bar.Location();
-	BRect barframe(bar.Frame());
-	
-	switch (loc) {
-		case B_DESKBAR_BOTTOM:
-		{
-			if (origin)
-				;
-			break;
-		}
-
-		default:
-			break;
-	}
-#endif
 }

@@ -31,12 +31,10 @@ public:
 	virtual	void		Show(void);
 			void		ConstrainToScreen(void);
 	
-	virtual	void		Zoom(BPoint origin, float width, float height);
-	
 			void		MakeCenteredOnShow(bool value);
 			bool		IsCenteredOnShow(void) const;
 			void		MoveToCenter(void);
-	
+
 			BView*		GetBackgroundView(void);
 			void		SetBackgroundColor(uint8 r, uint8 g, uint8 b);
 			void		SetBackgroundColor(const rgb_color &color);

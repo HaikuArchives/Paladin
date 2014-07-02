@@ -4,6 +4,6 @@
 # Templates folder.
 export SOURCES=`find ./ -name "*.cpp" -print | grep -v "Templates" | sed 's_\n__'`
 echo $SOURCES
-gcc -pipe -D_ZETA_TS_FIND_DIR_ -o Paladin $SOURCES -I ./BuildSystem -I ./ -I ./ThirdParty -I ./SourceControl -I $(finddir B_USER_HEARDES_DIRECTORY) -L $(finddir B_USER_DEVELOP_DIRECTORY)/lib -lbe -lroot -ltracker -ltranslation -lpcre
+gcc -pipe -D_ZETA_TS_FIND_DIR_ -o Paladin $SOURCES -I ./BuildSystem -I ./ -I ./ThirdParty -I ./SourceControl -lbe -lroot -ltracker -ltranslation -lpcre
 xres -o Paladin Paladin.rsrc
 mimeset -all Paladin

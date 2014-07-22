@@ -260,7 +260,7 @@ ErrorWindow::MessageReceived(BMessage* message)
  				entry_ref ref;
  				BEntry entry(gcc->path.String());
  				entry.GetRef(&ref);
- 				message->what = PALEDIT_OPEN_FILE;
+ 				message->what = EDIT_OPEN_FILE;
  				message->AddRef("refs", &ref);
  				if (gcc->line > 0)
  					message->AddInt32("line", gcc->line);

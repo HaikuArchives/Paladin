@@ -12,8 +12,4 @@ entry_ref			FindProject(entry_ref folder,const char *name);
 
 void				InitFileTypes(void);
 
-void				SendToEditor(BMessage &msg, BMessage *reply = NULL);
-
-#define EDITOR_SIGNATURE "application/x-vnd.dw-PalEdit"
-
 #endif

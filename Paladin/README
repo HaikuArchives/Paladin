@@ -39,16 +39,6 @@ Why another IDE for BeOS?
 Because makefiles and jamfiles stink. One major reason why I am able to write code at all is because of the ease of use provided by BeIDE. It's not the best IDE out there, but it's a good one and if I'd had to learn to use makefile or jamfiles when I started out, I wouldn't have bothered. With Be, Inc. out of the picture, BeIDE isn't redistributable and still in the same state it was in March, 2000 when R5 was released. Paladin, on the other hand, is both and more.
 
 
-Why not just use pe?
-
-Pe is a wonderful text editor. In fact, it is the basis for PalEdit, the bundled editor for Paladin. It is a general-purpose developer tool. The problem is that by being so generalized, it doesn't provide features that a more specialized editor can. Also, by being quite general purpose, it suffers from the Kitchen Sink Syndrome, where everything that *might* be needed is added to a software product, eventually to the point where it becomes a complicated mess. Pe isn't that far gone, but it's going in that direction.
-
-
-What did you do?! You just took Pe, ripped out a few buttons, and called it yours!
-
-In its current state, it could certainly look that way. I make no bones about it: PalEdit right now pretty much is Pe with some changes. Writing a text editor isn't that difficult. Writing a *good* one is. Most of the development efforts so far have gone into Paladin itself i.e. the project manager. Some visual clutter has been removed, some keyboard commands have been added, some of the preferences were changed to more sane defaults, a couple of minor bugs were squashed, and there was a little under-the-hood work, but not much else. Yet.
-
-
 What in the world is this 'license manager'?
 
 For some people, dealing with software licensing is more than an annoyance -- it's a way of life. Few people don't want to have to deal with the chore of slogging through the legalese, either. The license manager allows you to look up a license, get a rough summary of what it really is all about, and also copy it into your project folder if you want to use it for your project. It's not intended to be a major feature, but it does have its uses.

@@ -239,13 +239,8 @@ FindWindow::MessageReceived(BMessage *msg)
 													fResultList->CurrentSelection()));
 			if (item)
 			{
-				LaunchHelper launcher("application/x-vnd.dw-PalEdit");
-				BString arg;
 				DPath path(item->GetRef());
-				
-				arg << "+" << (item->GetLine() + 1);
-				launcher << arg << path.GetFullPath();
-				launcher.Launch();
+				be_roster->Launch(path.GetFullPath());
 			}
 			break;
 		}

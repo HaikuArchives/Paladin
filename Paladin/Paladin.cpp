@@ -393,7 +393,7 @@ App::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		case PALEDIT_OPEN_FILE:
+		case EDIT_OPEN_FILE:
 		{
 			int32 index = 0;
 			entry_ref ref;
@@ -518,28 +518,12 @@ App::OpenFile(entry_ref ref, int32 line)
 	}
 	
 //	BMessage msg(B_REFS_RECEIVED);
-	BMessage msg(PALEDIT_OPEN_FILE);
+	BMessage msg(EDIT_OPEN_FILE);
 	msg.AddRef("refs",&ref);
 	if (line >= 0)
 		msg.AddInt32("line",line);
 	
-	if (be_roster->IsRunning(EDITOR_SIGNATURE))
-	{
-		BMessenger msgr(EDITOR_SIGNATURE);
-		msgr.SendMessage(&msg);
-	}
-	else
-	{
-		DPath path(gAppPath.GetFolder());
-		path.Append("PalEdit");
-		
-		entry_ref launchref;
-		BEntry(path.GetFullPath()).GetRef(&launchref);
-		
-		if (be_roster->Launch(&launchref,&msg) != B_OK &&
-			be_roster->Launch(EDITOR_SIGNATURE,&msg) != B_OK)
-			be_roster->Launch(&ref);
-	}
+	be_roster->Launch(&ref);
 }
 
 

@@ -27,7 +27,7 @@ enum
 	M_REVERT_SELECTION = 'rvsl',
 	M_DIFF_SELECTION = 'dfsl',
 
-	PALEDIT_OPEN_FILE  = 'Cmdl',
+	EDIT_OPEN_FILE  = 'Cmdl',
 	
 	// Scripting messages
 	

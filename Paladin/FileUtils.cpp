@@ -152,23 +152,3 @@ FindProject(entry_ref folder, const char *name)
 		entry.GetRef(&returnRef);
 	return returnRef;
 }
-
-
-void
-SendToEditor(BMessage msg, BMessage *reply)
-{
-	if (!be_roster->IsRunning(EDITOR_SIGNATURE) &&
-		be_roster->Launch(EDITOR_SIGNATURE) != B_OK)
-	{
-		BAlert *alert = new BAlert("Paladin",TR("Couldn't start up the editor"), "OK");
-		alert->Go();
-		return;
-	}
-	
-	BMessenger msgr(EDITOR_SIGNATURE);
-	if (reply)
-		msgr.SendMessage(&msg,reply);
-	else
-		msgr.SendMessage(&msg);
-}
-

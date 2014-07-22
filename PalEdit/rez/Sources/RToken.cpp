@@ -1,6 +1,0 @@
-/*
-	RToken
-*/
-
-#include "RTypes.h"
-

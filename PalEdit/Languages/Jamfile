@@ -1,4 +1,0 @@
-SubDir TOP Languages ;
-
-SubInclude TOP Languages Resources ;
-SubInclude TOP Languages Sources ;

@@ -99,27 +99,16 @@ then
 	exit 1
 fi
 
-# Make sure there's a link to make calling it easier
-#if [ ! -e /boot/home/config/bin/Paladin ]
-#then
-#	ln -s --target-directory=/boot/home/config/bin/ `pwd`"/Paladin"
-#fi
-
-# Paladin usually expects PalEdit (or a link) to be in the same directory
-# The link will be broken for the moment, but will work once the script
-# finishes
-ln -s ../PalEdit/generated/distro/PalEdit
-
 cd ../
 
 # Now attempt ccache
-echo "\nBuilding ccache"
+echo "Building ccache"
 cd ccache
 BuildNoDebug ccache
 cd ..
 
 # fastdep doesn't use a project file to build itself
-echo "\nBuilding fastdep"
+echo "Building fastdep"
 cd fastdep-0.16
 if [ "$MAKECLEAN" -eq 1 ]
 then
@@ -127,25 +116,6 @@ then
 	make clean
 fi
 make
-cd ..
-
-# PalEdit
-cd PalEdit
-# substitute old paths with new ones
-PE_FILES_SED='Jamrules Extensions/Jamfile Sources/Jamfile build/BuildSettings'
-sed -i 's_/boot/home/config/include_'`finddir B_USER_HEADERS_DIRECTORY`'_' $PE_FILES_SED
-sed -i 's_/boot/develop/lib/x86_'`finddir B_SYSTEM_LIB_DIRECTORY`'_' $PE_FILES_SED
-sed -i 's_/boot/home/config/etc_'`finddir B_USER_SETTINGS_DIRECTORY`'_' $PE_FILES_SED
-sed -i 's_/boot/common/include_'`finddir B_SYSTEM_HEADERS_DIRECTORY`'_' $PE_FILES_SED
-sed -i 's_/boot/develop/headers_'`finddir B_SYSTEM_HEADERS_DIRECTORY`'_' $PE_FILES_SED
-sed -i 's_\-L/boot/home/config/lib_-L/boot/home/config/lib -L'`finddir B_USER_DEVELOP_DIRECTORY`'/lib_' $PE_FILES_SED
-sed -i 's|COMMON_FOLDER = /boot/common|COMMON_FOLDER = '`finddir B_USER_CONFIG_DIRECTORY`'|' $PE_FILES_SED
-
-if [ "$MAKECLEAN" == 1 ]
-then
-	jam clean
-fi
-jam -q -j"$CPUCOUNT"
 cd ..
 
 cd SymbolFinder

@@ -285,15 +285,14 @@ Project::Save(const char* path)
 			SourceFile* file = group->filelist.ItemAt(j);
 
 			BString temppath(file->GetPath().GetFullPath());
-			if (temppath.FindFirst(projectPath.String()) == 0) {
-				// Absolute paths which include the project folder are stripped
-				// down into relative paths
-				temppath.RemoveFirst(projectPath.String());
-			}
+			temppath.ReplaceAll(projectPath, "");
 
 			data << "SOURCEFILE=" << temppath << "\n";
-			if (file->GetDependencies() && strlen(file->GetDependencies()) > 0)
-				data << "DEPENDENCY=" << file->GetDependencies() << "\n";
+			if (file->GetDependencies() && strlen(file->GetDependencies()) > 0) {
+				BString deps = file->GetDependencies();
+				deps.ReplaceAll(projectPath, "");
+				data << "DEPENDENCY=" << deps << "\n";
+			}
 		}
 	}
 

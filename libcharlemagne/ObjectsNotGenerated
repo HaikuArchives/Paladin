@@ -1,7 +1,0 @@
-PBitmap - The interface between the object code and the backend is weird because of the way that it must interface with BBitmap
-PNode - Lots of methods which require list data (GetAttrInfo, etc.)
-PDragger - The backend is messy because it requires a BView target in the constructor and will not allow any changes.
-PMessenger - Unlike BMessenger, PMessenger will be reusable. The backend is "disposable" and so it needs to be manually written
-PShelf - Same reason as PShelf
-
-PMenu/PMenuItem - Generated with manual tweaks -- backend definitions need to be in a shared header

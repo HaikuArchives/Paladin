@@ -151,8 +151,3 @@ cd ..
 cd SymbolFinder
 BuildNoDebug SymbolFinder
 cd ..
-
-cd uncrustify
-configure --prefix=`finddir B_USER_CONFIG_DIRECTORY`
-make -j$CPUCOUNT
-cd ..

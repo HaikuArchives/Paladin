@@ -36,9 +36,7 @@ GitSourceControl::NeedsInit(const char *topDir)
 	if (path.InitCheck() != B_OK)
 		return false;
 	
-	path.Append(".git");
-	BEntry entry(path.Path());
-	return !entry.Exists();
+	return !DetectRepository(topDir);
 }
 
 
@@ -82,9 +80,14 @@ GitSourceControl::DetectRepository(const char *path)
 	if (!entry.Exists())
 		return false;
 	
-	BPath repoPath(path);
-	repoPath.Append(".git");
-	entry.SetTo(repoPath.Path());
+	BString command;
+	command << "cd " << path << " && ";
+	command << "git rev-parse --show-toplevel";
+	BString out;
+	RunCommand(command, out);
+	out = out.ReplaceAll("\n", "");
+	
+	entry = BEntry(out.String());
 	return entry.Exists();
 }
 
@@ -319,14 +322,7 @@ GitSourceControl::GetChangeStatus(BString &out)
 status_t
 GitSourceControl::GetCheckinHeader(BString &out)
 {
-	// TODO: XXX: Totally untested. This may not even work, which is likely
-	// considering how weird git can be.
 	GetChangeStatus(out);
-	
-	out.Prepend("GIT: \nAll lines starting with 'GIT:' will be ignored.\n"
-				"----------------------------------------------------\n");
-	out.ReplaceAll("\n", "\nGIT: ");
-	
 	return B_OK;
 }
 

@@ -1,6 +1,7 @@
 #include "SCMOutputWindow.h"
 
 #include <Application.h>
+#include <LayoutBuilder.h>
 #include <ScrollView.h>
 #include <stdio.h>
 #include <String.h>
@@ -16,23 +17,16 @@ SCMOutputWindow::SCMOutputWindow(const char *title)
 	BView *top = GetBackgroundView();
 	
 	fClose = new BButton(BRect(0,0,1,1), "close", "Close",
-						new BMessage(B_QUIT_REQUESTED),
-						B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fClose->ResizeToPreferred();
-	fClose->MoveTo(Bounds().right - 10.0 - fClose->Bounds().Width(),
-					Bounds().bottom - 10.0 - fClose->Bounds().Height());
-	
-	BRect logFrame(10.0, 10.0, Bounds().right - 10.0 - B_V_SCROLL_BAR_WIDTH,
-					fClose->Frame().top - 10.0);
-	fLog = new BTextView(logFrame, "log",
-						logFrame.OffsetToCopy(0.0, 0.0).InsetByCopy(5.0, 5.0),
-						B_FOLLOW_ALL);
-	BScrollView *sv = new BScrollView("scrollview", fLog, B_FOLLOW_ALL, 0,
+						new BMessage(B_QUIT_REQUESTED));
+	fLog = new BTextView("log");
+	BScrollView *sv = new BScrollView("scrollview", fLog, 0,
 									false, true);
-	top->AddChild(sv);
-	top->AddChild(fClose);
+	BLayoutBuilder::Grid<>(top, B_USE_HALF_ITEM_SPACING)
+		/* column, row, columnSpan, rowSpan */
+		.SetInsets(0)
+		.Add(sv, 0, 0, 3, 1)
+		.Add(fClose, 1, 1);
 	fClose->MakeDefault(true);
-	
 }
 
 

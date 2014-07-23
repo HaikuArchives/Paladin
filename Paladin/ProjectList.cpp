@@ -83,10 +83,12 @@ ProjectList::MouseDown(BPoint where)
 	if (!Window()->IsActive())
 		Window()->Activate();
 
+	BOutlineListView::MouseDown(where);
+
 	uint32 buttons;
 	BPoint point;
 	GetMouse(&point,&buttons);
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
 		BMessage* message = Window()->CurrentMessage();
 		int32 clicks;
 		message->FindInt32("clicks", &clicks);
@@ -95,10 +97,8 @@ ProjectList::MouseDown(BPoint where)
 			message->ReplaceInt32("clicks", clicks);
 		}
 	}
-
-	BOutlineListView::MouseDown(where);
 	
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 		ShowContextMenu(point);
 }
 

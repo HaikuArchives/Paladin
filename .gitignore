@@ -1,4 +1,3 @@
-syntax: glob
 (Objects.*
 *.dbg
 *.a
@@ -7,20 +6,10 @@ Paladin/Paladin.new
 Paladin/Paladin.rsrc
 SymbolFinder/SymbolFinder
 *.o
-PSfx/PSfx
-PInstallEngine/PInstallEngine
 *.sfx
 libpaladin.so
 *.nodebug.pld
 .depends-all
-ccache/ccache
-fastdep-0.16/fastdep
-PFind/PFind
 *.log
 *.db
 *.swg
-PDesigner/PDesigner
-libcharlemagne/testlib
-libcharlemagne/libcharlemagne.so
-libcharlemagne/CPPInterface_wrap.cxx
-PDesigner/libcharlemagne

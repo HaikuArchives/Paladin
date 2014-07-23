@@ -1,4 +1,0 @@
-macrodef.o: macrodef.cc \
-	a.h \
-	c.h \
-	d.h

@@ -1,4 +1,0 @@
-commentindefine.o: commentindefine.cc \
-	a.h \
-	c.h \
-	d.h

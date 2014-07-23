@@ -101,23 +101,6 @@ fi
 
 cd ../
 
-# Now attempt ccache
-echo "Building ccache"
-cd ccache
-BuildNoDebug ccache
-cd ..
-
-# fastdep doesn't use a project file to build itself
-echo "Building fastdep"
-cd fastdep-0.16
-if [ "$MAKECLEAN" -eq 1 ]
-then
-	configure
-	make clean
-fi
-make
-cd ..
-
 cd SymbolFinder
 BuildNoDebug SymbolFinder
 cd ..

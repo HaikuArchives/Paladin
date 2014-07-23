@@ -1,6 +1,0 @@
-a.o: a.cc \
-	a.h \
-	c.h \
-	d.h \
-	b.h \
-	e.h

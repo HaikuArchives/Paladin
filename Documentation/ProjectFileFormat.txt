@@ -1,0 +1,109 @@
+Project File Format
+=============================
+The Paladin project is committed to open standards and cooperation with other 
+software projects, hence its source code licensing and open file format, 
+described below. Project files are simply text files with a format similar to 
+.INI files found on Windows, with each line containing a <keyname>=<value> 
+format. Order doesn't matter very much except in the case of project file 
+listings as will be described in detail for the particular keys.
+
+Key					Description
+------------------------------------------
+NAME				(deprecated in v1.1) Name of the project
+TARGETNAME			The name of the final executable
+PLATFORM			The name of the operating system version with which this 	
+					project was last used. This can be R5, Haiku, HaikuGCC4, or 
+					Zeta.
+SCM					The project's source control tool. This can be svn for 
+					Subversion or hg for Mercurial. If omitted, it is assumed 
+					that no source control is used.
+GROUP				Name of a source group. A project file must contain at least 
+					one of these and each entry denotes a new group. SOURCEFILE 
+					entries follow a GROUP line to define what files belong to 
+					the named group.
+EXPANDGROUP			Value is yes or no. If yes, the current group is expanded.
+SOURCEFILE			The path of a source file in the project. If the path begins 
+					with a slash, it is assumed to be an absolute path. If not, 
+					it is assumed to be project relative
+DEPENDENCY			This is an optional field. It is a list of files separated by 
+					pipe symbols (|). It always follows the SOURCEFILE item it 
+					describes.
+LOCALINCLUDE		Include path for headers and libraries. Source files depend 
+					on these to be able to find their headers.
+SYSTEMINCLUDE		System folders which are used for includes. This is typically 
+					for headers in the /boot/develop/headers folder hierarchy
+LIBRARY				A library. Note that this is not limited to shared libraries 
+					in the standard locations, but any library, including static 
+					libraries kept in the project folder or anywhere else.
+RUNARGS				Command-line arguments used when running the app
+CCDEBUG				Value is yes or no. If yes, debugging info is compiled into 
+					the target.
+CCPROFILE			Value is yes or no. If yes, profiling info is compiled into 
+					the target.
+CCOPSIZE			Value is yes or no. If yes, optimization is done for size 
+					over speed.
+CCOPLEVEL			Value is an appropriate number for gcc's -O flag, ranging 
+					from 0 to three.
+CCTARGETTYPE		Value ranges from 0 to 3. 0 = application, 1 = shared 
+					library, 2 = static library, 3 = kernel driver
+CCEXTRA				Extra compiler options
+LDEXTRA				Extra linker options
+
+A sample project file follows:
+
+```
+NAME=Recibe 
+TARGETNAME=Recibe 
+PLATFORM=Haiku
+SCM=hg
+GROUP=Source Files 
+EXPANDGROUP=yes 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/AboutWindow.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/AboutWindow.cpp|/boot/develop/projects/Recipes/Recibe/AboutWindow.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/AddCatWindow.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/AddCatWindow.cpp|/boot/develop/projects/Recipes/Recibe/AddCatWindow.h|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/AutoTextControl.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/AutoTextControl.cpp|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/CatBrowser.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/CatBrowser.cpp|/boot/develop/projects/Recipes/Recibe/CatBrowser.h|/boot/develop/projects/Recipes/Recibe/FindWindow.h|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h|/boot/develop/projects/Recipes/Recibe/RecatWindow.h|/boot/develop/projects/Recipes/Recibe/RecipeEditor.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h|/boot/develop/projects/Recipes/Recibe/ChefView.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/ChefView.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/ChefView.cpp|/boot/develop/projects/Recipes/Recibe/ChefView.h|/boot/develop/projects/Recipes/Recibe/AboutWindow.h|/boot/develop/projects/Recipes/Recibe/DelCatWindow.h|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h|/boot/develop/projects/Recipes/Recibe/FindWindow.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h|/boot/develop/projects/Recipes/Recibe/RecipeEditor.h|/boot/develop/projects/Recipes/Recibe/CatBrowser.h|/boot/develop/projects/Recipes/Recibe/RecatWindow.h|/boot/develop/projects/Recipes/Recibe/AddCatWindow.h|/boot/develop/projects/Recipes/Recibe/TextFile.h|/boot/develop/projects/Recipes/Recibe/SplitterView.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/ChefWindow.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/ChefWindow.cpp|/boot/develop/projects/Recipes/Recibe/ChefWindow.h|/boot/develop/projects/Recipes/Recibe/ChefView.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/CppSQLite3.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/CppSQLite3.cpp|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/DelCatWindow.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/DelCatWindow.cpp|/boot/develop/projects/Recipes/Recibe/DelCatWindow.h|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/FindWindow.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/FindWindow.cpp|/boot/develop/projects/Recipes/Recibe/FindWindow.h|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/RecatWindow.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/RecatWindow.cpp|/boot/develop/projects/Recipes/Recibe/RecatWindow.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/Recibe.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/Recibe.cpp|/boot/develop/projects/Recipes/Recibe/ChefWindow.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/RecipeEditor.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/RecipeEditor.cpp|/boot/develop/projects/Recipes/Recibe/RecipeEditor.h|/boot/develop/projects/Recipes/Recibe/AutoTextControl.h|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/RecipeFuncs.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/RecipeFuncs.cpp|/boot/develop/projects/Recipes/Recibe/RecipeFuncs.h|/boot/develop/projects/Recipes/Recibe/CppSQLite3.h|/boot/develop/projects/Recipes/Recibe/sqlite3.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/SplitterView.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/SplitterView.cpp|/boot/develop/projects/Recipes/Recibe/SplitterView.h 
+SOURCEFILE=/boot/develop/projects/Recipes/Recibe/TextFile.cpp 
+DEPENDENCY=/boot/develop/projects/Recipes/Recibe/TextFile.cpp|/boot/develop/projects/Recipes/Recibe/TextFile.h 
+LOCALINCLUDE=/boot/develop/projects/Recipes/Recibe 
+LOCALINCLUDE=. 
+SYSTEMINCLUDE=/boot/develop/headers/be 
+SYSTEMINCLUDE=/boot/develop/headers/cpp 
+SYSTEMINCLUDE=/boot/develop/headers/posix 
+LIBRARY=/boot/develop/lib/x86/libroot.so 
+LIBRARY=/boot/develop/lib/x86/libbe.so 
+LIBRARY=/boot/develop/lib/x86/libtracker.so 
+LIBRARY=/boot/home/config/lib/libsqlite3.so 
+LIBRARY=/boot/develop/lib/x86/libtranslation.so 
+RUNARGS= 
+CCDEBUG=no 
+CCPROFILE=no 
+CCOPSIZE=no 
+CCOPLEVEL=0 
+CCTARGETTYPE=0 
+CCEXTRA= 
+LDEXTRA= 
+```

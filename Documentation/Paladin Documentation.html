@@ -2,12 +2,12 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-	<title>Paladin 1.3 Documentation</title>
+	<title>Paladin 1.4 Documentation</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body lang="en-US">
 <div id="banner" style="border-bottom: 8px solid #e0e0e0;">
-  <div class="logo"><span class="subtitle" style="left: 230px;">IDE, Version 1.3 Documentation</span></div>
+  <div class="logo"><span class="subtitle" style="left: 230px;">IDE, Version 1.4 Documentation</span></div>
 </div>
 <div id="content" style="text-align: justify;">
 <div style="margin: 0; padding: 0;">
@@ -27,7 +27,6 @@
   &nbsp;&nbsp;&nbsp;&nbsp;<a href="#integrated-source-control">Using the Integrated Source Control</a><br>
   &nbsp;&nbsp;&nbsp;&nbsp;<a href="#scripting">Scripting with Paladin</a><br>
   &nbsp;&nbsp;&nbsp;&nbsp;<a href="#program-settings">Program Settings</a><br>
-  <a href="#paledit">PalEdit, Paladin's Code Editor</a><br>
   <a href="#appendix">Appendix</a><br>
   &nbsp;&nbsp;&nbsp;&nbsp;<a href="#adding-your-own-project-templates">Adding Your Own Project Templates</a><br>
   &nbsp;&nbsp;&nbsp;&nbsp;<a href="#helper-tools">Helper Tools</a><br>
@@ -40,22 +39,18 @@
 
 
 <h1 id="introduction" style="margin-bottom: 10px;">Introduction</h1>
-  Welcome to Paladin, the open source IDE for BeOS and Haiku! BeIDE, the 
+  Welcome to Paladin, the open source IDE for Haiku! BeIDE, the 
   venerated development environment for BeOS, was based on CodeWarrior by 
   Metrowerks. It was a good commercial product distributed with BeOS, but with 
   the loss of Be, Inc. it has not seen further development or changes in its 
   licensing. Until now, there has not been a suitable replacement. Paladin is the 
   spiritual successor to BeIDE, building upon BeIDE's features, doing away with 
-  its quirks, and streamlining C/C++ development as much as possible.<br>
-  <br>
-  As of this writing, primary development efforts have been placed on the 
-  project manager, but Paladin also has an excellent editor, PalEdit. It is 
-  based on the excellent Pe editor written by Maarten Hekkelman. As development 
-  continues, more noticeable differences between the two will be seen.<br>
+  its quirks, and streamlining C/C++ development as much as possible. As of this 
+  writing, primary development efforts have been placed on the 
+  project manager.<br>
   <br>
   Although BeIDE was an excellent development environment for its time, its feature set is sparse for modern developers. Paladin's feature set includes:<br>
   <ul>
-    <li>Full support for BeOS R5, Zeta, and Haiku</li>
     <li>Command-line build support</li>
     <li>Multithreaded builds</li>
     <li>Revision control-friendly project files</li>
@@ -174,8 +169,7 @@
   <b>Tip</b>: While you can certainly add a source file's header to your 
   project, it can be just as easily accessed by clicking on the file and hitting 
   Alt-Tab on the keyboard. This makes header files still easily accessible 
-  without making it harder to find regular source files. Alt-Tab also does this 
-  from within the PalEdit editor.
+  without making it harder to find regular source files.
 
 <h3 id="a-note-about-file-paths" style="margin-top: 20px;">A Note About File Paths</h3>
   Paladin stores the location of your project's files when it adds them to it. 
@@ -224,10 +218,10 @@
   Some, More, and Full. Debugging information dramatically increases the size of 
   the executable, but it also allows the debugger to show the exact location in 
   the original source file when stepping through – a highly valuable tool. 
-  Profiling information is for use with bprof to find out where your program 
-  spends most of its time working and is available for BeOS R5 and Zeta. In 
-  addition to these options, if there are other options you wish to include, 
-  they can be added in the text boxes provided.</p>
+  Profiling information is for use with <code>bprof</code> to find out where 
+  your program spends most of its time working and is available for BeOS R5 and 
+  Zeta. In addition to these options, if there are other options you wish to 
+  include, they can be added in the text boxes provided.</p>
 
 <h2 id="running-your-project" style="margin-top: 20px;">Running Your Project</h2>
   <p>In addition to keyboard shortcuts to build and run your project, Paladin 
@@ -235,9 +229,8 @@
   the debugger at the starting point of your program, running your program while 
   logging any console printing it does, and being able to choose command-line 
   arguments with which your program will be started.</p>
-  <p>While Paladin's target for development is Haiku, it supports Zeta and BeOS 
-  R5, as well. It supports both bdb, the BeOS debugger, and Haiku's gdb. If 
-  debugger information is not already built into the program, it will be enabled 
+  <p>Paladin supports Haiku's gdb. If debugging
+  information is not already built into the program, it will be enabled 
   and your program will be rebuilt before being executed. You will, however, be 
   given the option to not run in the debugger before this is done.</p>
   <p>While it is currently not possible for Paladin to start the Terminal, have 
@@ -276,17 +269,17 @@
   originally designed with many developers in mind, there is little reason for a 
   single developer to not use source control except for perhaps laziness and/or 
   ignorance.</p>
-  <p>Many source control systems exist. The oldest are rcs and CVS. CVS is still 
+  <p>Many source control systems exist. The oldest are RCS and CVS. CVS is still 
   in current use by many projects, but it is not very well loved. Subversion, 
-  abbreviated svn, was written as the proper way to implement CVS and improves 
+  abbreviated svn, was written as "the proper way to implement CVS" and improves 
   upon it considerably. These SCMs are designed with a single central repository 
   from which each developer checks in and checks out changes. More recently, 
-  many other distributed SCMs have come onto the scene. These give each 
-  developer a complete copy of the source tree, enabling a greater amount of 
-  flexibility with which to work. The most popular of these are Darcs, Bazaar, 
-  Git, and Mercurial. As of this writing, Haiku supports CVS, Subversion, 
-  Mercurial, and Git. Paladin currently supports Subversion and Mercurial with 
-  Git support coming in the very near future.</p>
+  distributed SCMs have come onto the scene. These give each developer a 
+  complete copy of the source tree, enabling a greater amount of 
+  flexibility with which to work. The most popular of these are Git and 
+  Mercurial.</p>
+  <p>Both Haiku and Paladin support Subversion, Mercurial, and 
+  Git source control systems.</p>
   <p>Source control in Paladin is as much the same between tools as possible. 
   Project-wide operations, such as checking out and committing changes, can be 
   found in the Source Control submenu of the Project menu. Operations which work 
@@ -297,20 +290,20 @@
   from Paladin, the day-to-day operations needed will work well and will save 
   the unfamiliar from having to learn the command-line methods until they wish 
   to do so.</p>
-  <p>For more information on how to use source control systems in general, an 
-  excellent tutorial can be found <a href="http://mercurial.selenic.com/wiki/Tutorial">at the Mercurial site</a>.</p>
+  <p>An excellent tutorial for Git can be found <a href="https://try.github.io">on GitHub's website</a>.</p>
 
 <h2 id="scripting" style="margin-top: 20px;">Scripting with Paladin</h2>
   Many graphical development environments either attempt to integrate larger 
-  script-based build solutions &mdash; such as make, jam, and others &mdash; 
-  into the environment. Far too often, though, the integration isn't done well 
-  enough to be useful to the developer. Paladin is intended to be able to handle 
-  most projects. In order to support complex build tasks, like multiple targets 
-  and targets depending on other targets, for example, would require Paladin to 
-  sacrifice much of the simplicity it provides. Instead, Paladin does the 
-  reverse: it makes itself work well within these more complex build systems. 
-  This is done with command line arguments for starting Paladin. This means of 
-  starting Paladin can also make reporting bugs in Paladin much easier.
+  script-based build solutions &mdash; such as <code>make</code>,
+  <code>jam</code>, and others &mdash; into the environment. Far too often, 
+  though, the integration isn't done well enough to be useful to the developer. 
+  Paladin is intended to be able to handle most projects. In order to support 
+  complex build tasks, like multiple targets and targets depending on other 
+  targets, for example, would require Paladin to sacrifice much of the 
+  simplicity it provides. Instead, Paladin does the reverse: it makes itself 
+  work well within these more complex build systems. This is done with command 
+  line arguments for starting Paladin. This means of starting Paladin can also 
+  make reporting bugs in Paladin much easier.
 <table style="background-color: #eeeeee; margin-top: 5px; margin-bottom: 15px;">
 	<tr style="background-color: #e0e0e0; text-align: center;">
 		<td style="min-width: 250px;"><b>Command</b></td>
@@ -352,11 +345,6 @@
   rather not use it, you can set your preference here.<br>
   <br>
   <img src="images/PreferencesWindow.png" alt="Preferences window">
-
-<h1 id="paledit" style="margin-top: 20px; margin-bottom: 10px;">PalEdit, Paladin's Code Editor</h1>
-  As of this writing, there isn't much difference between PalEdit and Pe, so the 
-  documentation for Pe should be consulted for questions about its functions and 
-  features. This section will be extended as it is developed further.<br>
 
 <h1 id="appendix" style="margin-bottom: 0;">Appendix</h1>
 <h2 id="adding-your-own-project-templates" style="margin-top: 5px;">Adding Your Own Project Templates</h2>

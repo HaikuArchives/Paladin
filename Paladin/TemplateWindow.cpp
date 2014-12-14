@@ -240,7 +240,7 @@ TemplateWindow::MessageReceived(BMessage* message)
 			int32 scm = scmMenu->IndexOf(scmMenu->FindMarked());
 			projectMessage.AddInt32("scmtype",scm);
 
-			if (!ptemp->ProjectFileName()) {
+			if (strlen(ptemp->ProjectFileName()) == 0) {
 				for (int32 i = 0; i < ptemp->CountFiles(); i++)
 					projectMessage.AddRef("refs", ptemp->FileAt(i));
 

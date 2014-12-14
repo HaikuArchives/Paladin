@@ -113,7 +113,7 @@ compare_source_file_items(const BListItem* item1, const BListItem* item2);
 ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	:
 	BWindow(frame, "Paladin", B_DOCUMENT_WINDOW,
-		B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK),
+		B_NOT_ZOOMABLE),
 	fErrorWindow(NULL),
 	fFilePanel(NULL),
 	fProject(project),
@@ -1438,7 +1438,7 @@ ProjectWindow::CreateMenuBar(void)
 	fProjectMenu->AddItem(new BMenuItem(TR("Add files") B_UTF8_ELLIPSIS,
 		new BMessage(M_SHOW_ADD_PANEL)));
 	fProjectMenu->AddItem(new BMenuItem(TR("Remove selected files"),
-		new BMessage(M_REMOVE_FILES), B_DELETE));
+		new BMessage(M_REMOVE_FILES)));
 	fProjectMenu->AddSeparatorItem();
 	fProjectMenu->AddItem(new BMenuItem(TR("Change system libraries") B_UTF8_ELLIPSIS,
 		new BMessage(M_SHOW_LIBRARIES)));
@@ -1527,7 +1527,6 @@ ProjectWindow::CreateMenuBar(void)
 	fMenuBar->AddItem(fToolsMenu);
 }
 
-
 void
 ProjectWindow::SetMenuLock(bool locked)
 {
@@ -1608,10 +1607,7 @@ ProjectWindow::ShowErrorWindow(ErrorList* list)
 	} else {
 		BRect screen(BScreen().Frame());
 		BRect r(screen);
-
-		r.left = r.right / 4.0f;
-		r.right *= 0.75f;
-		r.top = r.bottom - 200;
+				
 		BDeskbar deskbar;
 		if (deskbar.Location() == B_DESKBAR_BOTTOM)
 			r.OffsetBy(0,-deskbar.Frame().Height());

@@ -217,7 +217,7 @@ Project::Load(const char* path)
 	// whenever I change to Haiku GCC4 or GCC4hybrid from any other platform
 	if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform) {
 		BPath libpath;
-		find_directory(B_USER_DEVELOP_DIRECTORY, &libpath);
+		find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &libpath);
 		libpath.Append("lib/x86/libsupc++.so");
 		AddLibrary(libpath.Path());
 	}
@@ -733,8 +733,8 @@ Project::Link(void)
 	BString linkString;
 	BString targetPath;
 	
-	if (GetTargetName()[0] == '/')
-		targetPath << "/" << GetPath().GetFolder() << GetTargetName();
+	if (GetTargetName()[0] != '/')
+		targetPath << GetPath().GetFolder() << "/" << GetTargetName();
 	else
 		targetPath << GetTargetName();
 
@@ -1517,7 +1517,7 @@ Project::FindLibrary(const char *libname)
 		return outpath;
 	}
 	
-	find_directory(B_USER_LIB_DIRECTORY,&tempPath);
+	find_directory(B_SYSTEM_LIB_DIRECTORY,&tempPath);
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())
 	{

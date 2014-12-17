@@ -84,7 +84,7 @@ rm -f Paladin Paladin.new
 echo "Building Paladin"
 if [ "$PLATFORM" == "Haiku" ]
 then
-	if [ -e /boot/system/lib/libsupc++.so ]
+	if [ $(getarch) = x86 ]
 	then
 		buildhaikugcc4.sh
 	else

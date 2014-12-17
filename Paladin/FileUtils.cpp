@@ -25,7 +25,7 @@ InitFileTypes(void)
 	memcpy(mini_icon.Bits(),kProjectSmallIconBits,256);
 	
 	mime.SetType(PROJECT_MIME_TYPE);
-	mime.SetShortDescription(TR("Paladin Project"));
+	mime.SetShortDescription(TR("Paladin project"));
 	mime.SetLongDescription(TR("File to build a program with Paladin"));
 	mime.SetIcon(&large_icon, B_LARGE_ICON);
 	mime.SetIcon(&mini_icon, B_MINI_ICON);

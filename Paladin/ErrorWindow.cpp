@@ -87,6 +87,7 @@ ErrorItem::DrawItem(BView* owner, BRect frame, bool complete)
 		}
 	}
 
+	owner->SetDrawingMode(B_OP_OVER);
 	owner->FillRect(frame, B_SOLID_LOW);
 	BStringItem::DrawItem(owner, frame, complete);
 }
@@ -97,7 +98,7 @@ ErrorItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	:
-	BWindow(frame, TR("Errors and Warnings"), B_DOCUMENT_WINDOW,
+	BWindow(frame, TR("Errors and warnings"), B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fParent(parent),
 	fErrorCount(0),
@@ -143,7 +144,7 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	fWarningBox->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	fCopyButton = new BButton("copy", TR("Copy to Clipboard"),
+	fCopyButton = new BButton("copy", TR("Copy to clipboard"),
 		new BMessage(M_COPY_ERRORS));
 
 	fErrorList = new DListView("errorlist", B_SINGLE_SELECTION_LIST,
@@ -176,11 +177,11 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	if (list != NULL)
 		RefreshList();
 
-	BRect frame;
+	BRect newframe;
 	BNode node(fParent->GetProject()->GetPath().GetFullPath());
-	if (node.ReadAttr("error_frame", B_RECT_TYPE, 0, &frame, sizeof(frame))) {
-		MoveTo(frame.left, frame.top);
-		ResizeTo(frame.Width(), frame.Height());
+	if (node.ReadAttr("error_frame", B_RECT_TYPE, 0, &newframe, sizeof(newframe))) {
+		MoveTo(newframe.left, newframe.top);
+		ResizeTo(newframe.Width(), newframe.Height());
 	}
 
 	fErrorBox->SetValue(B_CONTROL_ON);

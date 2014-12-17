@@ -141,7 +141,7 @@ RecentProjectsList::MouseDown(BPoint where)
 
 		BPopUpMenu menu("context");
 
-		menu.AddItem(new BMenuItem(TR("Remove from Recent List"),
+		menu.AddItem(new BMenuItem(TR("Remove from recent list"),
 			new BMessage(M_REMOVE_FROM_LIST)));
 		menu.SetTargetForItems(Window());
 		menu.Go(screenPoint, true, false);
@@ -266,13 +266,13 @@ StartWindow::StartWindow(void)
 	entry.GetRef(&ref);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_FILE_NODE, true,
 		new BMessage(M_OPEN_PROJECT));
-	BString titleString(TR("Open Project"));
+	BString titleString(TR("Open project"));
 	titleString.Prepend("Paladin: ");
 	fOpenPanel->Window()->SetTitle(titleString.String());
 
 	fImportPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_DIRECTORY_NODE,
 		true, new BMessage(M_QUICK_IMPORT));
-	titleString = TR("Choose Project Folder");
+	titleString = TR("Choose project folder");
 	titleString.Prepend("Paladin: ");
 	fImportPanel->Window()->SetTitle(titleString.String());
 

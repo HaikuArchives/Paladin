@@ -7,7 +7,7 @@
 #define M_ADD_CLASS 'adcl'
 
 AddClassWindow::AddClassWindow(void)
-	:	BWindow(BRect(100,100,500,400),"Add Class",
+	:	BWindow(BRect(100,100,500,400),"Add class",
 				B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	BRect r(Bounds());
@@ -16,7 +16,7 @@ AddClassWindow::AddClassWindow(void)
 	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(top);
 	
-	BButton *add = new BButton(r,"addbutton","Add…",new BMessage(M_ADD_CLASS),
+	BButton *add = new BButton(r,"addbutton","Add" B_UTF8_ELLIPSIS,new BMessage(M_ADD_CLASS),
 								B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	add->ResizeToPreferred();
 	add->MoveTo(r.right - add->Bounds().Width() - 10.0,

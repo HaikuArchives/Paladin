@@ -414,7 +414,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_PROJECT_SCM_STATUS:
 		{
 			if (fSourceControl) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Project Status"));
+				SCMOutputWindow* window = new SCMOutputWindow(TR("Project status"));
 				BString strstatus;
 				fSourceControl->GetChangeStatus(strstatus);
 				window->GetTextView()->SetText(strstatus.String());
@@ -1042,13 +1042,13 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		case M_UPDATING_RESOURCES:
 		{
-			fStatusBar->SetText(TR("Updating Resources"));
+			fStatusBar->SetText(TR("Updating resources"));
 			break;
 		}
 
 		case M_DOING_POSTBUILD:
 		{
-			fStatusBar->SetText(TR("Performing Post-build tasks"));
+			fStatusBar->SetText(TR("Performing post-build tasks"));
 			break;
 		}
 
@@ -1268,7 +1268,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 
-			window = new SCMOutputWindow(TR("Add to Repository"));
+			window = new SCMOutputWindow(TR("Add to repository"));
 			window->Show();
 			break;
 		}
@@ -1278,7 +1278,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 				
-			window = new SCMOutputWindow(TR("Remove from Repository"));
+			window = new SCMOutputWindow(TR("Remove from repository"));
 			window->Show();
 			break;
 		}
@@ -1298,7 +1298,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 				
-			window = new SCMOutputWindow(TR("Show Differences"));
+			window = new SCMOutputWindow(TR("Show differences"));
 			window->Show();
 			break;
 		}
@@ -1458,14 +1458,14 @@ ProjectWindow::CreateMenuBar(void)
 
 	fProjectMenu->AddSeparatorItem();
 
-	fProjectMenu->AddItem(new BMenuItem(TR("New Group"),
+	fProjectMenu->AddItem(new BMenuItem(TR("New group"),
 		new BMessage(M_NEW_GROUP)));
-	fProjectMenu->AddItem(new BMenuItem(TR("Rename Group"),
+	fProjectMenu->AddItem(new BMenuItem(TR("Rename group"),
 		new BMessage(M_SHOW_RENAME_GROUP)));
-	fProjectMenu->AddItem(new BMenuItem(TR("Sort Group"),
+	fProjectMenu->AddItem(new BMenuItem(TR("Sort group"),
 		new BMessage(M_SORT_GROUP)));
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Show Project Folder") B_UTF8_ELLIPSIS,
+	fProjectMenu->AddItem(new BMenuItem(TR("Show project folder") B_UTF8_ELLIPSIS,
 		new BMessage(M_SHOW_PROJECT_FOLDER)));
 	fMenuBar->AddItem(fProjectMenu);
 
@@ -1482,7 +1482,7 @@ ProjectWindow::CreateMenuBar(void)
 	fBuildMenu->AddItem(new BMenuItem(TR("Debug"), new BMessage(M_DEBUG_PROJECT),
 		'R', B_COMMAND_KEY | B_CONTROL_KEY));
 	fBuildMenu->AddSeparatorItem();
-	fBuildMenu->AddItem(new BMenuItem(TR("Generate Makefile") B_UTF8_ELLIPSIS,
+	fBuildMenu->AddItem(new BMenuItem(TR("Generate makefile") B_UTF8_ELLIPSIS,
 		new BMessage(M_MAKE_MAKE)));
 	fBuildMenu->AddSeparatorItem();
 	fBuildMenu->AddItem(new BMenuItem(TR("Set run arguments") B_UTF8_ELLIPSIS,
@@ -1517,7 +1517,7 @@ ProjectWindow::CreateMenuBar(void)
 
 	BMessage* message = new BMessage(M_RUN_TOOL);
 	message->AddString("signature", "application/x-vnd.dw-SymbolFinder");
-	fToolsMenu->AddItem(new BMenuItem(TR("Symbol Finder") B_UTF8_ELLIPSIS, message));
+	fToolsMenu->AddItem(new BMenuItem(TR("Symbol finder") B_UTF8_ELLIPSIS, message));
 	fToolsMenu->AddSeparatorItem();
 	fToolsMenu->AddItem(new BMenuItem(TR("Make project backup"),
 		new BMessage(M_BACKUP_PROJECT)));
@@ -1563,7 +1563,7 @@ ProjectWindow::MakeGroup(int32 selection)
 	SourceGroupItem* oldgroupitem = (SourceGroupItem*)fProjectList->Superitem(
 		fProjectList->FullListItemAt(selection));
 	SourceGroup* oldgroup = oldgroupitem->GetData();
-	SourceGroup* newgroup = fProject->AddGroup("New Group", newGroupIndex);
+	SourceGroup* newgroup = fProject->AddGroup("New group", newGroupIndex);
 	SourceGroupItem* newGroupItem = new SourceGroupItem(newgroup);
 	fProjectList->AddItem(newGroupItem, selection);
 
@@ -1673,9 +1673,9 @@ ProjectWindow::ToggleDebugMenu(void)
 		fMenuBar->RemoveItem(debugItem);
 	else {
 		BMenu* debug = new BMenu("Debug Paladin");
-		debug->AddItem(new BMenuItem("Dump Dependencies",
+		debug->AddItem(new BMenuItem("Dump dependencies",
 			new BMessage(M_DEBUG_DUMP_DEPENDENCIES)));
-		debug->AddItem(new BMenuItem("Dump Includes",
+		debug->AddItem(new BMenuItem("Dump includes",
 			new BMessage(M_DEBUG_DUMP_INCLUDES)));
 		fMenuBar->AddItem(debug);
 	}
@@ -1955,7 +1955,7 @@ ProjectWindow::SyncThread(void* data)
 	ProjectWindow* parent = (ProjectWindow*)data;
 
 	parent->Lock();
-	parent->fStatusBar->SetText(TR("Updating Modules"));
+	parent->fStatusBar->SetText(TR("Updating modules"));
 	parent->SetMenuLock(true);
 	parent->Unlock();
 

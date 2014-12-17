@@ -176,11 +176,11 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	if (list != NULL)
 		RefreshList();
 
-	BRect frame;
+	BRect newframe;
 	BNode node(fParent->GetProject()->GetPath().GetFullPath());
-	if (node.ReadAttr("error_frame", B_RECT_TYPE, 0, &frame, sizeof(frame))) {
-		MoveTo(frame.left, frame.top);
-		ResizeTo(frame.Width(), frame.Height());
+	if (node.ReadAttr("error_frame", B_RECT_TYPE, 0, &newframe, sizeof(newframe))) {
+		MoveTo(newframe.left, newframe.top);
+		ResizeTo(newframe.Width(), newframe.Height());
 	}
 
 	fErrorBox->SetValue(B_CONTROL_ON);

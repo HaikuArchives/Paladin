@@ -122,7 +122,7 @@ FindWindow::FindWindow(void)
 	r.left = 10.0;
 	r.right = fFindButton->Frame().left - 10.0 - B_V_SCROLL_BAR_WIDTH;
 	r.bottom = r.top + (lineHeight * 2.0) + 10.0 + B_H_SCROLL_BAR_HEIGHT;
-	fFindBox = new DTextView(r, "findbox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fFindBox = new DTextView(r, "findbox", B_FOLLOW_ALL);
 	fFindBox->SetFlags(fFindBox->Flags() | B_NAVIGABLE_JUMP);
 	
 	BScrollView *scroll = fFindBox->MakeScrollView("findscroll", true, true);
@@ -131,7 +131,7 @@ FindWindow::FindWindow(void)
 	top->AddChild(fFindButton);
 	
 	r.OffsetTo(10.0, fFindBox->Parent()->Frame().bottom + 10.0);
-	fReplaceBox = new DTextView(r, "replacebox", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fReplaceBox = new DTextView(r, "replacebox", B_FOLLOW_ALL);
 	fReplaceBox->SetFlags(fFindBox->Flags() | B_NAVIGABLE_JUMP);
 	
 	scroll = fReplaceBox->MakeScrollView("replacescroll", true, true);

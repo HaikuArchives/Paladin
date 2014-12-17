@@ -10,7 +10,7 @@
 
 GroupRenameWindow::GroupRenameWindow(SourceGroup *group, const BMessage &msg,
 									const BMessenger &msgr)
-	:	DWindow(BRect(0,0,300,300),TR("Rename Group"), B_MODAL_WINDOW,
+	:	DWindow(BRect(0,0,300,300),TR("Rename group"), B_MODAL_WINDOW,
 				B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
 		fGroup(group),
 		fMessage(msg),
@@ -20,13 +20,13 @@ GroupRenameWindow::GroupRenameWindow(SourceGroup *group, const BMessage &msg,
 	
 	BView *top = GetBackgroundView();
 	
-	fGroupText = new AutoTextControl(BRect(10,10,11,11),"argtext",TR("New Group Name: "),
+	fGroupText = new AutoTextControl(BRect(10,10,11,11),"argtext",TR("New group name: "),
 									fGroup->name.String(), new BMessage(M_NAME_CHANGED),
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	top->AddChild(fGroupText);
 	fGroupText->ResizeToPreferred();
 	fGroupText->ResizeTo(Bounds().Width() - 20,fGroupText->Bounds().Height());
-	fGroupText->SetDivider(fGroupText->StringWidth(TR("New Group Name: ")) + 5);
+	fGroupText->SetDivider(fGroupText->StringWidth(TR("New group name: ")) + 5);
 	
 	fRename = new BButton(BRect(0,0,1,1),"rename",TR("Rename"),new BMessage(B_QUIT_REQUESTED));
 	fRename->ResizeToPreferred();

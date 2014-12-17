@@ -51,7 +51,7 @@ LibraryWindow::LibraryWindow(BRect frame, const BMessenger& parent,
 
 	BRect r(10, 10, 11, 11);
 	BStringView* label = new BStringView(r, "label",
-		TR("Choose the system libraries for your project."));
+		TR("Choose the system libraries for your project:"));
 	label->ResizeToPreferred();
 	top->AddChild(label);
 	label->SetText(TR("Scanning libraries" B_UTF8_ELLIPSIS));
@@ -223,7 +223,7 @@ LibraryWindow::ScanThread(void* data)
 	float maxwidth;
 	BRect r(5, 5, 105, 20);
 
-	BView* systemHeader = window->AddHeader(r.LeftTop(), TR("System Libraries:"));
+	BView* systemHeader = window->AddHeader(r.LeftTop(), TR("System libraries:"));
 
 	window->Lock();
 	r = systemHeader->Frame();
@@ -242,7 +242,7 @@ LibraryWindow::ScanThread(void* data)
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) {
 		// ToDo: remove this once we drop R1/A4 support
 		BView* commonHeader = window->AddHeader(r.LeftTop(),
-			TR("Common Libraries:"));
+			TR("Common libraries:"));
 		window->Lock();
 		r = commonHeader->Frame();
 		window->Unlock();
@@ -258,7 +258,7 @@ LibraryWindow::ScanThread(void* data)
 		}
 	}
 
-	BView* userHeader = window->AddHeader(r.LeftTop(), TR("User Libraries:"));
+	BView* userHeader = window->AddHeader(r.LeftTop(), TR("User libraries:"));
 	window->Lock();
 	r = userHeader->Frame();
 	window->Unlock();
@@ -288,7 +288,7 @@ LibraryWindow::ScanThread(void* data)
 	gSettings.Unlock();
 
 	BStringView* label = (BStringView*)top->FindView("label");
-	label->SetText(TR("Choose the system libraries for your project."));
+	label->SetText(TR("Choose the system libraries for your project:"));
 	float minw = label->Frame().right + 10;
 	window->SetSizeLimits(minw, 30000, 200, 30000);
 	if (window->Bounds().Width() < minw)

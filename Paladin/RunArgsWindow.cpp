@@ -13,7 +13,7 @@
 
 
 RunArgsWindow::RunArgsWindow(Project *proj)
-	:	DWindow(BRect(0,0,400,300),"Run Arguments",B_TITLED_WINDOW,
+	:	DWindow(BRect(0,0,400,300),"Run arguments",B_TITLED_WINDOW,
 				B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
 		fProject(proj)
 {

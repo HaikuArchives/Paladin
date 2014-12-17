@@ -97,7 +97,7 @@ ErrorItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	:
-	BWindow(frame, TR("Errors and Warnings"), B_DOCUMENT_WINDOW,
+	BWindow(frame, TR("Errors and warnings"), B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fParent(parent),
 	fErrorCount(0),
@@ -143,7 +143,7 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	fWarningBox->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	fCopyButton = new BButton("copy", TR("Copy to Clipboard"),
+	fCopyButton = new BButton("copy", TR("Copy to clipboard"),
 		new BMessage(M_COPY_ERRORS));
 
 	fErrorList = new DListView("errorlist", B_SINGLE_SELECTION_LIST,

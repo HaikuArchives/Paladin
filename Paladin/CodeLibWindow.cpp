@@ -64,7 +64,7 @@ CodeLibWindow::GetInstance(BRect frame)
 
 
 CodeLibWindow::CodeLibWindow(BRect frame)
-	:	DWindow(frame,TR("Code Library"), B_TITLED_WINDOW),
+	:	DWindow(frame,TR("Code library"), B_TITLED_WINDOW),
 		fCurrentModule(NULL),
 		fCurrentProject(NULL),
 		fFilePanel(NULL)
@@ -92,12 +92,12 @@ CodeLibWindow::CodeLibWindow(BRect frame)
 		fProjectMenu = new BMenu(TR("Projects"));
 		fProjectMenu->SetLabelFromMarked(true);
 		
-		BMenuField *field = new BMenuField(r,"projectfield",TR("Selected Project:"),fProjectMenu);
+		BMenuField *field = new BMenuField(r,"projectfield",TR("Selected project:"),fProjectMenu);
 		
 		float pw,ph;
 		field->GetPreferredSize(&pw,&ph);
 		field->ResizeTo(r.Width(),ph);
-		field->SetDivider(field->StringWidth(TR("Selected Project:")) + 10.0);
+		field->SetDivider(field->StringWidth(TR("Selected project:")) + 10.0);
 		fMainView->AddChild(field);
 		
 		gProjectList->Lock();
@@ -217,7 +217,7 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 		}
 		case M_SHOW_CREATE_MODULE:
 		{
-			StringInputWindow *inwin = new StringInputWindow("Create Module",
+			StringInputWindow *inwin = new StringInputWindow("Create module",
 														TR("Choose the name for the new module:"),
 														BMessage(M_CREATE_MODULE),
 														BMessenger(NULL,this));
@@ -403,16 +403,16 @@ void
 CodeLibWindow::SetupMenus(void)
 {
 	BMenu *menu = new BMenu(TR("Actions"));
-	menu->AddItem(new BMenuItem(TR("Create New Module…"),new BMessage(M_SHOW_CREATE_MODULE),'N'));
-	menu->AddItem(new BMenuItem(TR("Delete Current Module"),new BMessage(M_DELETE_MODULE),'D'));
+	menu->AddItem(new BMenuItem(TR("Create new module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_CREATE_MODULE),'N'));
+	menu->AddItem(new BMenuItem(TR("Delete current module"),new BMessage(M_DELETE_MODULE),'D'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Add Files to Module…"),new BMessage(M_SHOW_ADD_FILES),
+	menu->AddItem(new BMenuItem(TR("Add files to Module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_ADD_FILES),
 								'A',B_COMMAND_KEY | B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem(TR("Add Project Files to Module…"),
+	menu->AddItem(new BMenuItem(TR("Add project files to module" B_UTF8_ELLIPSIS),
 								new BMessage(M_SHOW_ADD_PROJECT_FILES),'A'));
-	menu->AddItem(new BMenuItem(TR("Remove Files from Module"),new BMessage(M_REMOVE_FILES)));
+	menu->AddItem(new BMenuItem(TR("Remove files from module"),new BMessage(M_REMOVE_FILES)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Export Module to Project"),new BMessage(M_EXPORT_TO_PROJECT),'E'));
+	menu->AddItem(new BMenuItem(TR("Export module to project"),new BMessage(M_EXPORT_TO_PROJECT),'E'));
 	fBar->AddItem(menu);
 }
 
@@ -421,18 +421,18 @@ void
 CodeLibWindow::SetupContextMenus(void)
 {
 	BPopUpMenu *menu = new BPopUpMenu("Modules",false,false);
-	menu->AddItem(new BMenuItem("Create New Module…",new BMessage(M_SHOW_CREATE_MODULE)));
-	menu->AddItem(new BMenuItem("Delete Current Module",new BMessage(M_DELETE_MODULE)));
+	menu->AddItem(new BMenuItem("Create new module" B_UTF8_ELLIPSIS,new BMessage(M_SHOW_CREATE_MODULE)));
+	menu->AddItem(new BMenuItem("Delete current module",new BMessage(M_DELETE_MODULE)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Export Module to Project",new BMessage(M_EXPORT_TO_PROJECT)));
+	menu->AddItem(new BMenuItem("Export module to project",new BMessage(M_EXPORT_TO_PROJECT)));
 	menu->SetTargetForItems(this);
 	fModList->SetContextMenu(menu);
 	
-	menu = new BPopUpMenu("Module Files",false,false);
-	menu->AddItem(new BMenuItem("Add Files to Module…",new BMessage(M_SHOW_ADD_FILES)));
-	menu->AddItem(new BMenuItem("Add Project Files to Module…",
+	menu = new BPopUpMenu("Module files",false,false);
+	menu->AddItem(new BMenuItem("Add files to module" B_UTF8_ELLIPSIS,new BMessage(M_SHOW_ADD_FILES)));
+	menu->AddItem(new BMenuItem("Add project files to module" B_UTF8_ELLIPSIS,
 								new BMessage(M_SHOW_ADD_PROJECT_FILES)));
-	menu->AddItem(new BMenuItem("Remove Files from Module",new BMessage(M_REMOVE_FILES)));
+	menu->AddItem(new BMenuItem("Remove files from module",new BMessage(M_REMOVE_FILES)));
 	menu->SetTargetForItems(this);
 	fFileList->SetContextMenu(menu);
 }

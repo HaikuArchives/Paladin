@@ -120,7 +120,7 @@ App::App(void)
 	entry.GetRef(&ref);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, true,
 		new BMessage(B_REFS_RECEIVED));
-	fOpenPanel->Window()->SetTitle("Paladin: Open Project");
+	fOpenPanel->Window()->SetTitle("Paladin: Open project");
 }
 
 
@@ -437,7 +437,7 @@ App::MessageReceived(BMessage *msg)
 
 		case M_UPDATING_RESOURCES:
 		{
-			printf(TR("Updating Resources\n"));
+			printf(TR("Updating resources\n"));
 			break;
 		}
 

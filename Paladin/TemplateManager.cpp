@@ -137,10 +137,10 @@ ProjectTemplate::PrintToStream(void)
 			typeString = "Application";
 			break;
 		case TARGET_SHARED_LIB:
-			typeString = "Shared Library / Addon";
+			typeString = "Shared library / addon";
 			break;
 		case TARGET_STATIC_LIB:
-			typeString = "Static Library";
+			typeString = "Static library";
 			break;
 		case TARGET_DRIVER:
 			typeString = "Driver";

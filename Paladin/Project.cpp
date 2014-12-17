@@ -1354,7 +1354,7 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	
 	newproj->AddLibrary("/boot/develop/lib/x86/libroot.so");
 	
-	newproj->AddGroup("Source Files");
+	newproj->AddGroup("Source files");
 	
 	switch (type)
 	{

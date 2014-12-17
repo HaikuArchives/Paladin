@@ -18,20 +18,20 @@
 AddNewFileWindow::AddNewFileWindow(const BMessage &message,
 	const BMessenger &messenger, bool renameMode)
 	:
-	DWindow(BRect(0,0,500,400),TR("Add New File"),B_TITLED_WINDOW,
+	DWindow(BRect(0,0,500,400),TR("Add new file"),B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE), fMessage(message),
 		fMessenger(messenger)
 {
 	BString namelabel;
 	BString checklabel;
 	if (renameMode) {
-		SetTitle("Rename File");
-		namelabel = TR("New Name: ");
+		SetTitle("Rename file");
+		namelabel = TR("New name: ");
 		checklabel = TR("Rename partner file");
 	}
 	else
 	{
-		namelabel = TR("New File Name: ");
+		namelabel = TR("New file name: ");
 		checklabel = TR("Create both a header and source file");
 	}
 	

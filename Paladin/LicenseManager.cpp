@@ -70,9 +70,9 @@ LicenseManager::LicenseManager(const char* targetPath)
 		fLicenseLong, 0, false, true);
 
 	BBox* longLicenseBox = new BBox(B_NO_BORDER, longScrollView);
-	longLicenseBox->SetLabel(TR("Full Version:"));
+	longLicenseBox->SetLabel(TR("Full version:"));
 
-	BButton* addButton = new BButton("addButton", TR("Set License"),
+	BButton* addButton = new BButton("addButton", TR("Set license"),
 		new BMessage(M_LICENSE_CHOSEN));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)

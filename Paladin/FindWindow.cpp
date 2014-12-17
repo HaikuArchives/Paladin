@@ -88,7 +88,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 
 
 FindWindow::FindWindow(void)
-	:	DWindow(BRect(100,100,600,500), "Find in Project", B_TITLED_WINDOW,
+	:	DWindow(BRect(100,100,600,500), "Find in project", B_TITLED_WINDOW,
 				B_CLOSE_ON_ESCAPE),
 		fIsRegEx(false),
 		fIgnoreCase(true),
@@ -107,7 +107,7 @@ FindWindow::FindWindow(void)
 	fMenuBar = new BMenuBar(r, "menubar");
 	top->AddChild(fMenuBar);
 	
-	fFindButton = new BButton(BRect(0,0,1,1), "findbutton", "Replace All",
+	fFindButton = new BButton(BRect(0,0,1,1), "findbutton", "Replace all",
 								new BMessage(M_FIND), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fFindButton->ResizeToPreferred();
 	fFindButton->SetLabel("Find");
@@ -143,7 +143,7 @@ FindWindow::FindWindow(void)
 	top->AddChild(fReplaceButton);
 	fReplaceButton->SetEnabled(false);
 	
-	fReplaceAllButton = new BButton(fReplaceButton->Frame(), "replaceallbutton", "Replace All",
+	fReplaceAllButton = new BButton(fReplaceButton->Frame(), "replaceallbutton", "Replace all",
 								new BMessage(M_REPLACE_ALL), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fReplaceAllButton->MoveBy(0.0, fReplaceAllButton->Frame().Height() + 10.0);
 	top->AddChild(fReplaceAllButton);
@@ -167,17 +167,17 @@ FindWindow::FindWindow(void)
 	menu->AddItem(new BMenuItem("Find", new BMessage(M_FIND), 'F', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Replace", new BMessage(M_REPLACE), 'R', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Replace All", new BMessage(M_REPLACE_ALL), 'R',
+	menu->AddItem(new BMenuItem("Replace all", new BMessage(M_REPLACE_ALL), 'R',
 								B_COMMAND_KEY | B_SHIFT_KEY));
 	fMenuBar->AddItem(menu);
 	
 	menu = new BMenu("Options");
-	menu->AddItem(new BMenuItem("Regular Expression", new BMessage(M_TOGGLE_REGEX)));
-	menu->AddItem(new BMenuItem("Ignore Case", new BMessage(M_TOGGLE_CASE_INSENSITIVE)));
-	menu->AddItem(new BMenuItem("Match Whole Word", new BMessage(M_TOGGLE_MATCH_WORD)));
+	menu->AddItem(new BMenuItem("Regular expression", new BMessage(M_TOGGLE_REGEX)));
+	menu->AddItem(new BMenuItem("Ignore case", new BMessage(M_TOGGLE_CASE_INSENSITIVE)));
+	menu->AddItem(new BMenuItem("Match whole word", new BMessage(M_TOGGLE_MATCH_WORD)));
 	fMenuBar->AddItem(menu);
 	
-	BMenuItem *item = fMenuBar->FindItem("Ignore Case");
+	BMenuItem *item = fMenuBar->FindItem("Ignore case");
 	if (fIgnoreCase)
 		item->SetMarked(true);
 	
@@ -247,21 +247,21 @@ FindWindow::MessageReceived(BMessage *msg)
 		case M_TOGGLE_REGEX:
 		{
 			fIsRegEx = !fIsRegEx;
-			item = fMenuBar->FindItem("Regular Expression");
+			item = fMenuBar->FindItem("Regular expression");
 			item->SetMarked(fIsRegEx);
 			break;
 		}
 		case M_TOGGLE_CASE_INSENSITIVE:
 		{
 			fIgnoreCase = !fIgnoreCase;
-			item = fMenuBar->FindItem("Ignore Case");
+			item = fMenuBar->FindItem("Ignore case");
 			item->SetMarked(fIgnoreCase);
 			break;
 		}
 		case M_TOGGLE_MATCH_WORD:
 		{
 			fMatchWord = !fMatchWord;
-			item = fMenuBar->FindItem("Match Whole Word");
+			item = fMenuBar->FindItem("Match whole word");
 			item->SetMarked(fMatchWord);
 			break;
 		}
@@ -603,7 +603,7 @@ FindWindow::EnableReplace(bool value)
 	BMenuItem *item = fMenuBar->FindItem("Replace");
 	if (item)
 		item->SetEnabled(value);
-	item = fMenuBar->FindItem("Replace All");
+	item = fMenuBar->FindItem("Replace all");
 	if (item)
 		item->SetEnabled(value);
 }

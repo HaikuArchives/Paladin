@@ -87,6 +87,7 @@ ErrorItem::DrawItem(BView* owner, BRect frame, bool complete)
 		}
 	}
 
+	owner->SetDrawingMode(B_OP_OVER);
 	owner->FillRect(frame, B_SOLID_LOW);
 	BStringItem::DrawItem(owner, frame, complete);
 }

@@ -4,7 +4,17 @@
 #include <String.h>
 
 #include "Project.h"
+#include "Makefile.h"
 #include "SourceFile.h"
+
+static BString _SerializeBool(bool val)
+{
+	return val ? "TRUE" : "FALSE";
+}
+//static BString _SerializeStringList(BStringList val)
+//{
+//	return val.Join(" \\\n\t");
+//}
 
 status_t
 MakeMake(Project *proj, DPath outfile)
@@ -12,38 +22,32 @@ MakeMake(Project *proj, DPath outfile)
 	if (!proj || outfile.IsEmpty())
 		return B_ERROR;
 		
-	BString data;
-	data << "NAME= " << proj->GetTargetName() << "\n";
+	BString mkfile(template_makefile);
+
+	mkfile.ReplaceFirst("$@NAME@$", proj->GetTargetName());
 	
-	data << "TYPE= ";
+	BString typeString;
 	switch (proj->TargetType())
 	{
-		case TARGET_SHARED_LIB:
-		{
-			data << "SHARED\n";
-			break;
-		}
-		case TARGET_STATIC_LIB:
-		{
-			data << "STATIC\n";
-			break;
-		}
-		case TARGET_DRIVER:
-		{
-			data << "DRIVER\n";
-			break;
-		}
-		default:
-		{
-			data << "APP\n";
-			break;
-		}
+	case TARGET_SHARED_LIB:
+		typeString = "SHARED";
+	break;
+	case TARGET_STATIC_LIB:
+		typeString = "STATIC";
+	break;
+	case TARGET_DRIVER:
+		typeString = "DRIVER";
+	break;
+	default:
+		typeString = "APP";
+	break;
 	}
+	mkfile.ReplaceFirst("$@TYPE@$", typeString);
 	
 	BString projfolder = proj->GetPath().GetFolder();
 	projfolder << "/";
 	
-	data << "SRCS=";
+	BString srcsString;
 	int32 i,j;
 	for (i = 0; i < proj->CountGroups(); i++)
 	{
@@ -58,13 +62,13 @@ MakeMake(Project *proj, DPath outfile)
 				BString path = file->GetPath().GetFullPath();
 				path.RemoveFirst(projfolder);
 				path.CharacterEscape("' ",'\\');
-				data << " " << path;
+				srcsString << " " << path;
 			}
 		}
 	}
-	data << "\n";
+	mkfile.ReplaceFirst("$@SRCS@$", srcsString);
 	
-	data << "RSRCS=";
+	BString rsrcsString;
 	for (i = 0; i < proj->CountGroups(); i++)
 	{
 		SourceGroup *group = proj->GroupAt(i);
@@ -76,13 +80,13 @@ MakeMake(Project *proj, DPath outfile)
 			{
 				BString path = file->GetPath().GetFullPath();
 				path.RemoveFirst(projfolder);
-				data << " " << path;
+				rsrcsString << " " << path;
 			}
 		}
 	}
-	data << "\n";
+	mkfile.ReplaceFirst("$@RSRCS@$", rsrcsString);
 	
-	data << "LIBS=";
+	BString libsString;
 	for (i = 0; i < proj->CountLibraries(); i++)
 	{
 		SourceFile *file = proj->LibraryAt(i);
@@ -91,100 +95,67 @@ MakeMake(Project *proj, DPath outfile)
 		{
 			BString path = file->GetPath().GetFullPath();
 			path.RemoveFirst(projfolder);
-			data << " " << path;
+			libsString << " " << path;
 		}
 	}
-	data << "\n";
+	mkfile.ReplaceFirst("$@LIBS@$", libsString);
 	
-	data << "LIBPATHS=\n";
-	
-	data << "SYSTEM_INCLUDE_PATHS=";
+	BString inclPaths;
 	for (i = 0; i < proj->CountSystemIncludes(); i++)
 	{
 		BString path = proj->SystemIncludeAt(i);
 		path.CharacterEscape("' ",'\\');
-		data << " " << path;
+		inclPaths << " " << path;
 	}
-	data << "\n";
+	mkfile.ReplaceFirst("$@SYSTEM_INCLUDE_PATHS@$", inclPaths);
 	
-	data << "LOCAL_INCLUDE_PATHS=";
+	inclPaths = "";
 	for (i = 0; i < proj->CountLocalIncludes(); i++)
 	{
 		BString path = proj->LocalIncludeAt(i).Relative();
 		path.CharacterEscape("' ",'\\');
-		data << " " << path;
+		inclPaths << " " << path;
 	}
-	data << "\n";
+	mkfile.ReplaceFirst("$@LOCAL_INCLUDE_PATHS@$", inclPaths);
 	
-	data << "OPTIMIZE=";
+	BString optimizeString;
 	switch (proj->OpLevel())
 	{
-		case 0:
-		{
-			data << "NONE\n";
-			break;
-		}
-		case 1:
-		case 2:
-		{
-			data << "SOME\n";
-			break;
-		}
-		case 3:
-		{
-			data << "FULL\n";
-			break;
-		}
-		default:
-		{
-			data << "\n";
-			break;
-		}
+	case 0:
+		optimizeString = "NONE";
+	break;
+	case 1:
+	case 2:
+		optimizeString = "SOME";
+	break;
+	case 3:
+		optimizeString = "FULL";
+	break;
+	default:
+	break;
 	}
+	mkfile.ReplaceFirst("$@OPTIMIZE@$", optimizeString);
+		
+	mkfile.ReplaceFirst("$@COMPILER_FLAGS@$", proj->ExtraCompilerOptions());
+	mkfile.ReplaceFirst("$@LINKER_FLAGS@$", proj->ExtraLinkerOptions());
 	
-	data << "#	specify any preprocessor symbols to be defined.  The symbols will not\n"
-			"#	have their values set automatically; you must supply the value (if any)\n"
-			"#	to use.  For example, setting DEFINES to \"DEBUG=1\" will cause the\n"
-			"#	compiler option \"-DDEBUG=1\" to be used.  Setting DEFINES to \"DEBUG\"\n"
-			"#	would pass \"-DDEBUG\" on the compiler's command line.\n"
-			"DEFINES=\n";
-	
-	data <<	"#	specify special warning levels\n"
-			"#	if unspecified default warnings will be used\n"
-			"#	NONE = supress all warnings\n"
-			"#	ALL = enable all warnings\n"
-			"WARNINGS =\n";
-	
-	data << "# Build with debugging symbols if set to TRUE\n"
-			"SYMBOLS=\n";
-	
-	data << "COMPILER_FLAGS=";
-	if (strlen(proj->ExtraCompilerOptions()) > 0)
-		data << proj->ExtraCompilerOptions();
-	data << "\n";
-	
-	data << "LINKER_FLAGS=";
-	if (strlen(proj->ExtraLinkerOptions()) > 0)
-		data << proj->ExtraLinkerOptions();
-	data << "\n";
-	
-	if (proj->TargetType() == TARGET_DRIVER)
-	{
-		data << "#	For drivers only. Specify desired location of driver in the /dev\n"
-				"#	hierarchy. Used by the driverinstall rule. E.g., DRIVER_PATH = video/usb will\n"
-				"#	instruct the driverinstall rule to place a symlink to your driver's binary in\n"
-				"#	~/add-ons/kernel/drivers/dev/video/usb, so that your driver will appear at\n"
-				"#	/dev/video/usb when loaded. Default is \"misc\".\n"
-				"DRIVER_PATH =\n";
-	}
-	
-	data << "\n## include the makefile-engine\ninclude $(BUILDHOME)/etc/makefile-engine\n";
+	// Unused stuff
+	mkfile.ReplaceFirst("$@APP_MIME_SIG@$", "");
+	mkfile.ReplaceFirst("$@RDEFS@$", "");
+	mkfile.ReplaceFirst("$@LIBPATHS@$", "");
+	mkfile.ReplaceFirst("$@LOCALES@$", "");
+	mkfile.ReplaceFirst("$@DEFINES@$", "");
+	mkfile.ReplaceFirst("$@WARNINGS@$", "");
+	mkfile.ReplaceFirst("$@SYMBOLS@$", "");
+	mkfile.ReplaceFirst("$@DEBUGGER@$", "");
+	mkfile.ReplaceFirst("$@DRIVER_PATH@$", "");
 	
 	BFile file(outfile.GetFullPath(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() != B_OK)
 		return file.InitCheck();
 	
-	file.Write(data.String(),data.Length());
-	
-	return B_OK;
+	if (file.Write(mkfile.String(), mkfile.Length()) == mkfile.Length())
+		return B_OK;
+	else
+		return B_ERROR;
 }

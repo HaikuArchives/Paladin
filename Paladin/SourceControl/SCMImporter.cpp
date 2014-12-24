@@ -338,7 +338,7 @@ BitbucketImporter::GetImportCommand(bool readOnly)
 bool
 BitbucketImporter::SupportsSCM(const scm_t &scm) const
 {
-	return (scm == SCM_HG);
+	return (scm == SCM_HG) || (scm == SCM_GIT);
 }
 
 

@@ -15,6 +15,7 @@ class DTextView : public BTextView, public BInvoker
 public:
 								DTextView(const BRect &frame, const char *name,
 										const int32 &resize);
+								DTextView(const char *name);
 	
 	virtual	void				FrameResized(float w, float h);
 
@@ -33,6 +34,7 @@ private:
 			void	UpdateTextRect(void);
 			
 			bool	fNotifyChanges;
+			bool	fLayout;
 };
 
 

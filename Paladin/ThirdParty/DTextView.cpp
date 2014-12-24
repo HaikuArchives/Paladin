@@ -2,7 +2,8 @@
 
 DTextView::DTextView(const BRect &frame, const char *name, const int32 &resize)
 	:	BTextView(frame, name, frame, resize),
-		fNotifyChanges(false)
+		fNotifyChanges(false),
+		fLayout(false)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	UpdateTextRect();
@@ -10,11 +11,21 @@ DTextView::DTextView(const BRect &frame, const char *name, const int32 &resize)
 	SetMessage(new BMessage(M_TEXT_CHANGED));
 }
 
+DTextView::DTextView(const char *name)
+	:	BTextView(name),
+		fNotifyChanges(false),
+		fLayout(true)
+{
+	SetFlags(Flags() | B_FRAME_EVENTS);
+	
+	SetMessage(new BMessage(M_TEXT_CHANGED));
+}
 	
 void
 DTextView::FrameResized(float w, float h)
 {
-	UpdateTextRect();
+	if (!fLayout)
+		UpdateTextRect();
 }
 
 
@@ -69,8 +80,11 @@ DTextView::MakeScrollView(const char *name, bool horizontal, bool vertical)
 	if (Parent())
 		RemoveSelf();
 	
-	BScrollView *sv = new BScrollView(name, this, ResizingMode(), 0,
-										horizontal, vertical);
+	BScrollView* sv;
+	if (!fLayout)
+		sv = new BScrollView(name, this, ResizingMode(), 0, horizontal, vertical);
+	else
+		sv = new BScrollView(name, this, 0, horizontal, vertical);
 	sv->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	return sv;

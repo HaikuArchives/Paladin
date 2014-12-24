@@ -79,24 +79,6 @@ public:
 };
 
 
-class BerliosImporter : public SCMProjectImporter
-{
-public:
-							BerliosImporter(void);
-			BString			GetImportCommand(bool readOnly);
-			bool			SupportsSCM(const scm_t &scm) const;
-};
-
-
-class OSDrawerImporter : public SCMProjectImporter
-{
-public:
-							OSDrawerImporter(void);
-			BString			GetImportCommand(bool readOnly);
-			bool			SupportsSCM(const scm_t &scm) const;
-};
-
-
 class BitbucketImporter : public SCMProjectImporter
 {
 public:

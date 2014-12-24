@@ -17,9 +17,6 @@ class StatCache;
 // Define this to enable the code library
 //#define BUILD_CODE_LIBRARY
 
-// Define this to disable support for git across the program
-#define DISABLE_GIT_SUPPORT
-
 // This disables the online import feature, which is a good
 // thing right now.
 //#define DISABLE_ONLINE_IMPORT

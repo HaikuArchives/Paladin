@@ -11,10 +11,7 @@ SCMProjectImporterManager::SCMProjectImporterManager(void)
 	fImporterList.AddItem(new BerliosImporter());
 	fImporterList.AddItem(new OSDrawerImporter());
 	fImporterList.AddItem(new BitbucketImporter());
-	
-	#ifndef DISABLE_GIT_SUPPORT
 	fImporterList.AddItem(new GitoriousImporter());
-	#endif
 }
 
 
@@ -191,13 +188,11 @@ SCMProjectImporter::GetSCMCommand(void)
 			out = "hg";
 			break;
 		}
-		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			out = "git";
 			break;
 		}
-		#endif
 		case SCM_SVN:
 		{
 			out = "svn";
@@ -244,7 +239,6 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
-		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			// Read-only: git://PROJNAME.git.sourceforge.net/gitroot/PROJNAME/REPONAME
@@ -265,7 +259,6 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
-		#endif
 		case SCM_SVN:
 		{
 			// Read-only / developer:
@@ -295,10 +288,7 @@ SourceforgeImporter::SupportsSCM(const scm_t &scm) const
 {
 	switch (scm)
 	{
-		#ifndef DISABLE_GIT_SUPPORT
-		case SCM_GIT:
-		#endif
-		
+		case SCM_GIT:	
 		case SCM_HG:
 		case SCM_SVN:
 			return true;
@@ -336,7 +326,6 @@ BerliosImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
-		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			// Read-only: git://git.berlios.de/PROJNAME
@@ -354,7 +343,6 @@ BerliosImporter::GetImportCommand(bool readOnly)
 				command << " '" << GetPath() << "'";
 			break;
 		}
-		#endif
 		case SCM_SVN:
 		{
 			// Read-only: svn://svn.berlios.de/PROJNAME/REPONAME
@@ -386,10 +374,7 @@ BerliosImporter::SupportsSCM(const scm_t &scm) const
 {
 	switch (scm)
 	{
-		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
-		#endif
-		
 		case SCM_HG:
 		case SCM_SVN:
 			return true;

@@ -9,13 +9,11 @@ GetSCM(const scm_t &type)
 	SourceControl *scm = NULL;
 	switch (type)
 	{
-		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
 		{
 			scm = new GitSourceControl();
 			break;
 		}
-		#endif
 		case SCM_HG:
 		{
 			scm = new HgSourceControl();
@@ -61,9 +59,7 @@ HaveSCM(const scm_t &type)
 {
 	switch (type)
 	{
-		#ifndef DISABLE_GIT_SUPPORT
 		case SCM_GIT:
-		#endif
 		case SCM_HG:
 		case SCM_SVN:
 			return true;

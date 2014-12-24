@@ -99,10 +99,8 @@ InitGlobals(void)
 		if (system("hg > /dev/null 2>&1") == 0)
 			gHgAvailable = true;
 		
-		#ifndef DISABLE_GIT_SUPPORT
 		if (system("git > /dev/null 2>&1") == 1)
 			gGitAvailable = true;
-		#endif
 		
 		gUsePipeHack = true;
 	}

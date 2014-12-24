@@ -154,10 +154,6 @@ PrefsWindow::PrefsWindow(BRect frame)
 	fSCMChooser = new BMenuField("scmchooser", TR("Preferred source control:"),
 		scmMenu);
 
-#ifdef DISABLE_GIT_SUPPORT
-	scmMenu->ItemAt(2)->SetEnabled(false);
-#endif
-
 	BMenuItem* marked = scmMenu->ItemAt(gDefaultSCM);
 	if (marked != NULL)
 		marked->SetMarked(true);

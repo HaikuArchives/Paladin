@@ -12,6 +12,8 @@
 #include "SourceControl.h"
 #include "SVNSourceControl.h"
 
+#include <LayoutBuilder.h>
+
 enum
 {
 	M_USE_PROVIDER = 'uspr',
@@ -22,11 +24,9 @@ enum
 };
 
 SCMImportWindow::SCMImportWindow(void)
-  :	DWindow(BRect(0,0,350,300), "Import from Repository")
+  :	DWindow(BRect(0,0,350,350), "Import from Repository")
 {
 	MakeCenteredOnShow(true);
-	
-	BView *top = GetBackgroundView();
 	
 	BMenu *menu = new BMenu("Providers");
 	
@@ -47,16 +47,7 @@ SCMImportWindow::SCMImportWindow(void)
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(0L)->SetMarked(true);
 	
-	BRect r(Bounds());
-	r.InsetBy(10.0, 10.0);
-	r.bottom = 40.0;
-	fProviderField = new BMenuField(r, "repofield", "Provider: ", menu,
-								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	float pw, ph;
-	fProviderField->GetPreferredSize(&pw, &ph);
-	fProviderField->ResizeTo(r.Width(), ph);
-	top->AddChild(fProviderField);
-	r = fProviderField->Frame();
+	fProviderField = new BMenuField("repofield", "Provider: ", menu);
 	
 	menu = new BMenu("Methods");
 	if (gHgAvailable)
@@ -71,76 +62,50 @@ SCMImportWindow::SCMImportWindow(void)
 	menu->ItemAt(0L)->SetMarked(true);
 	fProvider = fProviderMgr.ImporterAt(0);
 		
-	r.OffsetBy(0.0, r.Height() + 10.0);
-	fSCMField = new BMenuField(r, "scmfield", "Method: ", menu,
-								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fSCMField);
+	fSCMField = new BMenuField("scmfield", "Method: ", menu);
 		
-	r.OffsetBy(0.0, r.Height() + 10.0);
-	fProjectBox = new AutoTextControl(r, "project", "Project: ", "",
-									new BMessage(M_UPDATE_COMMAND),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fProjectBox->GetPreferredSize(&pw, &ph);
-	fProjectBox->ResizeTo(r.Width(), ph);
-	r = fProjectBox->Frame();
-	top->AddChild(fProjectBox);
+	fProjectBox = new AutoTextControl("project", "Project: ", "",
+									new BMessage(M_UPDATE_COMMAND));
 	
-	r.OffsetBy(0.0, r.Height() + 10.0);
-	fAnonymousBox = new BCheckBox(r, "anonymous", "Anonymous check-out",
+	fAnonymousBox = new BCheckBox("anonymous", "Anonymous check-out",
 									new BMessage(M_TOGGLE_ANONYMOUS));
-	top->AddChild(fAnonymousBox);
-	fAnonymousBox->ResizeToPreferred();
 	fAnonymousBox->SetValue(B_CONTROL_ON);
 	
-	r.OffsetBy(0.0, fAnonymousBox->Bounds().Height() + 10.0);
-	fUserNameBox = new AutoTextControl(r, "username", "Username: ", "",
-									new BMessage(M_UPDATE_COMMAND),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	top->AddChild(fUserNameBox);
+	fUserNameBox = new AutoTextControl("username", "Username: ", "",
+									new BMessage(M_UPDATE_COMMAND));
 	fUserNameBox->SetEnabled(false);
 	
-	r.OffsetBy(0.0, r.Height() + 10.0);
-	fRepository = new AutoTextControl(r, "repository", "Repository (opt.): ", "",
-									new BMessage(M_UPDATE_COMMAND),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fRepository->GetPreferredSize(&pw, &ph);
-	fRepository->ResizeTo(r.Width(), ph);
-	r = fRepository->Frame();
-	top->AddChild(fRepository);
+	fRepository = new AutoTextControl("repository", "Repository (opt.): ", "",
+									new BMessage(M_UPDATE_COMMAND));	
 	
-	r.OffsetBy(0.0, r.Height() + 10.0);
-	fCommandLabel = new BStringView(r, "commandlabel", "Command: ",
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fCommandLabel->ResizeToPreferred();
-	top->AddChild(fCommandLabel);
-	
-	r.OffsetBy(0.0, fCommandLabel->Bounds().Height() + 5.0);
-	r.bottom = r.top + 75.0;
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	BRect textRect = r.OffsetToCopy(0.0, 0.0).InsetByCopy(10.0, 10.0);
-	fCommandView = new BTextView(r, "command", textRect, B_FOLLOW_ALL);
+	fCommandLabel = new BStringView("commandlabel", "Command: ");	
+	fCommandView = new BTextView("command");
 	
 	BScrollView *scroll = new BScrollView("scrollview", fCommandView,
-											B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 											0, false, true);
-	top->AddChild(scroll);
 	fCommandView->MakeEditable(false);
 	
-	fOK = new BButton(r, "ok", "Import", new BMessage(M_SCM_IMPORT),
-					B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fOK->ResizeToPreferred();
-	fOK->MoveTo(Bounds().right - 10.0 - fOK->Bounds().Width(),
-				scroll->Frame().bottom + 10.0);
+	fOK = new BButton("ok", "Import", new BMessage(M_SCM_IMPORT));
 	
-	ResizeTo(Bounds().Width(),  fOK->Frame().bottom + 10.0);
-	scroll->SetResizingMode(B_FOLLOW_ALL);
-	
-	top->AddChild(fOK);
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(10)
+		.Add(fProviderField)
+		.Add(fSCMField)
+		.Add(fProjectBox)
+		.Add(fAnonymousBox)
+		.Add(fUserNameBox)
+		.Add(fRepository)
+		.Add(fCommandLabel)
+		.Add(scroll)
+		.Add(fOK)
+	.End();
+		
 	fOK->MakeDefault(true);
 	fOK->SetEnabled(false);
 	
 	UpdateCommand();
 	fProviderField->MakeFocus(true);
+	
 }
 
 

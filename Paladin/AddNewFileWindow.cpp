@@ -40,12 +40,8 @@ AddNewFileWindow::AddNewFileWindow(const BMessage &message,
 
 	MakeCenteredOnShow(true);
 
-	BView *top = new BView("topview", B_WILL_DRAW);
-	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	fNameText = new AutoTextControl(BRect(), "nametext",
-		namelabel.String(), NULL, new BMessage,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fNameText = new AutoTextControl("nametext",
+		namelabel.String(), NULL, new BMessage);
 	fNameText->SetDivider(fNameText->StringWidth(namelabel.String()) + 5);
 	fNameText->DisallowCharacters("/,@\"\\");
 

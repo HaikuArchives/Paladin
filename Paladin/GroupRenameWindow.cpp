@@ -19,16 +19,12 @@ GroupRenameWindow::GroupRenameWindow(SourceGroup *group, const BMessage &msg,
 {
 	AddCommonFilter(new EscapeCancelFilter());
 
-	BView *top = new BView("topview", B_WILL_DRAW);
-	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	fGroupText = new AutoTextControl(BRect(),"argtext",TR("New group name: "),
-									fGroup->name.String(), new BMessage(M_NAME_CHANGED),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fGroupText = new AutoTextControl("argtext",TR("New group name: "),
+									fGroup->name.String(), new BMessage(M_NAME_CHANGED));
 	fGroupText->SetDivider(fGroupText->StringWidth(TR("New group name: ")) + 5);
 
-	fRename = new BButton(BRect(0,0,1,1),"rename",TR("Rename"),new BMessage(B_QUIT_REQUESTED));	
-	BButton *cancel = new BButton(BRect(0,0,1,1),"cancel",TR("Cancel"),new BMessage(B_QUIT_REQUESTED));
+	fRename = new BButton("rename",TR("Rename"),new BMessage(B_QUIT_REQUESTED));	
+	BButton *cancel = new BButton("cancel",TR("Cancel"),new BMessage(B_QUIT_REQUESTED));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(B_VERTICAL)

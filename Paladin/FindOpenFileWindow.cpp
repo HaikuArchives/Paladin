@@ -27,8 +27,6 @@ FindOpenFileWindow::FindOpenFileWindow(const char* panelText)
 {
 	AddCommonFilter(new EscapeCancelFilter());
 
-	BView* top = GetBackgroundView();
-
 	fNameTextControl = new AutoTextControl("nameText", TR("Open: "), "",
 		new BMessage);
 	fNameTextControl->SetExplicitMinSize(
@@ -41,7 +39,7 @@ FindOpenFileWindow::FindOpenFileWindow(const char* panelText)
 
 	BButton* open = new BButton("open", TR("Open"), new BMessage(M_FIND_FILE));
 
-	BLayoutBuilder::Group<>(top, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
 			.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0)

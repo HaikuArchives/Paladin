@@ -178,8 +178,6 @@ AsciiWindow::AsciiWindow(void)
 	fIsZoomed(false),
 	fLastFrame(Frame())
 {
-	BView* top = GetBackgroundView();
-
 	BListView* listView = new BListView("listView", B_MULTIPLE_SELECTION_LIST,
 		B_WILL_DRAW);
 	BScrollView* listScrollView = new BScrollView("scrollView", listView, 0,
@@ -197,7 +195,7 @@ AsciiWindow::AsciiWindow(void)
 		free(row);
 	}
 
-	BLayoutBuilder::Group<>(top, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(listScrollView)
 		.SetInsets(-1)
 		.End();

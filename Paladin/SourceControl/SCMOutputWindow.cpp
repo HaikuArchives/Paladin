@@ -14,14 +14,12 @@ SCMOutputWindow::SCMOutputWindow(const char *title)
 	SetFlags(B_NOT_CLOSABLE);
 	MakeCenteredOnShow(true);
 	
-	BView *top = GetBackgroundView();
-	
-	fClose = new BButton(BRect(0,0,1,1), "close", "Close",
+	fClose = new BButton("close", "Close",
 						new BMessage(B_QUIT_REQUESTED));
 	fLog = new BTextView("log");
 	BScrollView *sv = new BScrollView("scrollview", fLog, 0,
 									false, true);
-	BLayoutBuilder::Grid<>(top, B_USE_HALF_ITEM_SPACING)
+	BLayoutBuilder::Grid<>(this, B_USE_HALF_ITEM_SPACING)
 		/* column, row, columnSpan, rowSpan */
 		.SetInsets(0)
 		.Add(sv, 0, 0, 3, 1)

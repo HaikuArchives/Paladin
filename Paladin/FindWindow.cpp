@@ -102,8 +102,6 @@ FindWindow::FindWindow(void)
 		fProject(NULL)
 {
 	MakeCenteredOnShow(true);
-	BView *top = GetBackgroundView();
-	
 	fMenuBar = new BMenuBar("menubar");
 	
 	fFindButton = new BButton("findbutton", "Replace all",

@@ -20,15 +20,6 @@ else
 	MAKECLEAN=0
 fi
 
-PLATFORM=`uname -o`
-
-# the R5 version of uname lacks a -o switch
-if [ "$?" -ne 0 ]
-then
-	PLATFORM="beos"
-fi
-echo "Platform: $PLATFORM"
-
 # This function creates a temporary project from which we make
 # sure that the target is being built without debugging enabled
 BuildNoDebug ()
@@ -82,23 +73,7 @@ BuildNoDebug ()
 cd Paladin
 rm -f Paladin Paladin.new
 echo "Building Paladin"
-if [ "$PLATFORM" == "Haiku" ]
-then
-	if [ $(getarch) = x86 ]
-	then
-		buildhaikugcc4.sh
-	else
-		buildhaikugcc2.sh
-	fi
-else
-	build.sh
-fi
-if [ ! -e Paladin ]
-then
-	echo "Paladin build failed."
-	exit 1
-fi
-
+make -j$CPUCOUNT
 cd ../
 
 cd SymbolFinder

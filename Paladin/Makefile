@@ -6,6 +6,7 @@
 
 # The name of the binary.
 NAME = Paladin
+TARGET_DIR = .
 
 # The type of binary, must be one of:
 #	APP:	Application

@@ -19,6 +19,8 @@
 #include <String.h>
 #include <StringView.h>
 
+#include <LayoutBuilder.h>
+
 #include "Globals.h"
 #include "PLocale.h"
 #include "Project.h"
@@ -47,27 +49,23 @@ LibraryWindow::LibraryWindow(BRect frame, const BMessenger& parent,
 		SetTitle(title.String());
 	}
 
-	BView* top = GetBackgroundView();
-
-	BRect r(10, 10, 11, 11);
-	BStringView* label = new BStringView(r, "label",
+	BStringView* label = new BStringView("label",
 		TR("Choose the system libraries for your project:"));
-	label->ResizeToPreferred();
-	top->AddChild(label);
 	label->SetText(TR("Scanning libraries" B_UTF8_ELLIPSIS));
 
-	r = Bounds().InsetByCopy(10, 10);
-	r.top = label->Frame().top + 20;
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	fCheckList = new BView(r, "checklist", B_FOLLOW_ALL, B_WILL_DRAW);
+	fCheckList = new BView("checklist", B_WILL_DRAW);
 
 	BScrollView* scrollView = new BScrollView("scrollView", fCheckList,
-		B_FOLLOW_ALL, 0, false, true);
-	top->AddChild(scrollView);
-
+		0, false, true);
+	
 	fScanThread = spawn_thread(ScanThread, "libscanthread", B_LOW_PRIORITY,
 		this);
 	resume_thread(fScanThread);
+	
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(label)
+		.Add(scrollView)
+	.End();
 
 	fCheckList->MakeFocus(true);
 }

@@ -1162,7 +1162,7 @@ void
 ProjectWindow::MenusEnded(void)
 {
 	while (fRecentMenu->ItemAt(0L))
-		delete fRecentMenu->RemoveItem(0L);
+		delete fRecentMenu->RemoveItem((int32)0);
 }
 
 

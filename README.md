@@ -11,13 +11,13 @@ INSTALLING PALADIN
 
 ![Screenshot](2.png)
 
- 3. Click the paladin package and select 'Install'
+ 3.Click the paladin package and select 'Install'
 
 ![Screenshot](3.png)
 
 ![Screenshot](4.png)
 
- 4. Select 'Open Paladin
+ 4. Select 'Open Paladin'
 
 ![Screenshot](5.png)
 

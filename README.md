@@ -35,7 +35,7 @@ FEATURES
  - 1-click project backups
 
 
-SETTING UP PALADIN
+STARTING A PROJECT
 
  - Install Paladin from Haiku Depot
 
@@ -69,19 +69,19 @@ SOME VERY USEFUL FEATURES
 
    DEALING WITH ERRORS
      
-      While warnings will not stop Paladin from continuing to build a project, if an error           occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow. Double-clicking on an error or warning will open up the file containing it in the editor. The Copy to Clipboard button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents.    
+     While warnings will not stop Paladin from continuing to build a project, if an error           occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow. Double-clicking on an error or warning will open up the file containing it in the editor. The Copy to Clipboard button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents.    
 
 ![Screenshot](readme_scrshot/errors.png)
 
    BACKING UP PROJECTS
 
-      Your project can be quickly placed into a compressed archive in a folder of your choosing with your project's name and timestamp for the backup with just a click of this menu item.
+     Your project can be quickly placed into a compressed archive in a folder of your choosing with your project's name and timestamp for the backup with just a click of this menu item.
 
 ![Screenshot](readme_scrshot/backup.png)
 
    HELPER TOOLS
 
-      Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the Tools menu.
+     Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the Tools menu.
 
 ![Screenshot](readme_scrshot/helper.png)           
 

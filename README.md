@@ -47,7 +47,7 @@ STARTING A PROJECT
 
  - Select Project Type from the dropdown menu, give your project a name, a file name    and save destination and click 'Create Project'
 
-![Screenshot](Documentation/images/CreateProjectWindow.png)
+![Screenshot](Documentation/images/CreateProjectWindow.png)
 
  - Select the file you want to code
 

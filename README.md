@@ -5,58 +5,58 @@ PALADIN
 Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. 
 
 INSTALLING PALADIN
- 1. OpenHaikuDepot
+ - OpenHaikuDepot
 
- 2. Enter 'paladin' in the search bar
+ - Enter 'paladin' in the search bar
 
 ![Screenshot](2.png)
 
- 3.Click the paladin package and select 'Install'
+ - Click the paladin package and select 'Install'
 
 ![Screenshot](3.png)
 
 ![Screenshot](4.png)
 
- 4. Select 'Open Paladin
+ - Select 'Open Paladin
 
 ![Screenshot](5.png)
 
 
 SETTING UP PALADIN
 
- 1. Open Paladin
+ - Open Paladin
 
 ![Screenshot](6.png)
 
- 2. Select 'Create New Project'
+ - Select 'Create New Project'
 
 ![Screenshot](7.png)
 
- 3. Select Project Type from the dropdown menu
+ - Select Project Type from the dropdown menu
 
 ![Screenshot](8.png)
 
- 4. Give the Project a name
+ - Give the Project a name
 
 ![Screenshot](9.png)
 
- 5. Give the file a name
+ - Give the file a name
 
 ![Screenshot](10.png)
 
- 6.Select the location where the project is to be saved
+ -Select the location where the project is to be saved
 
 ![Screenshot](11.png)
 
- 7. Click 'Create Project'
+ - Click 'Create Project'
 
 ![Screenshot](12.png)
 
- 8. Select the file to code
+ - Select the file to code
 
 ![Screenshot](13.png) 
 
- 9. Push Alt+R to compile and run your program
+ - Push Alt+R to compile and run your program
 
 ![Screenshot](14.png) 
 

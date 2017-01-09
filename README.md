@@ -17,7 +17,7 @@ INSTALLING PALADIN
 
 ![Screenshot](4.png)
 
- 4. Select 'Open Paladin'
+ 4. Select 'Open Paladin
 
 ![Screenshot](5.png)
 
@@ -44,7 +44,7 @@ SETTING UP PALADIN
 
 ![Screenshot](10.png)
 
- 6. Select the location where the project is to be saved
+ 6.Select the location where the project is to be saved
 
 ![Screenshot](11.png)
 

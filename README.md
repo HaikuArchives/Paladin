@@ -6,9 +6,9 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
 FEATURES
 
- -Command-line build support
+ - Command-line build support
 
- -Multithreaded builds
+ - Multithreaded builds
 
  - Revision control-friendly project files
 
@@ -69,7 +69,7 @@ SOME VERY USEFUL FEATURES
 
    DEALING WITH ERRORS
      
-     While warnings will not stop Paladin from continuing to build a project, if an error           occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow. Double-clicking on an error or warning will open up the file containing it in the editor. The Copy to Clipboard button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents.    
+     While warnings will not stop Paladin from continuing to build a project, if an error occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow. Double-clicking on an error or warning will open up the file containing it in the editor. The Copy to Clipboard button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents.    
 
 ![Screenshot](readme_scrshot/errors.png)
 

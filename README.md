@@ -43,11 +43,11 @@ STARTING A PROJECT
 
  - Select 'Create New Project'
 
-![Screenshot](readme_scrshot/7.png)
+![Screenshot](Documentation/images/StartWindow.png)
 
  - Select Project Type from the dropdown menu, give your project a name, a file name    and save destination and click 'Create Project'
 
-![Screenshot](readme_scrshot/9.png)
+![Screenshot](Documentation/images/CreateProjectWindow.png)
 
  - Select the file you want to code
 
@@ -71,7 +71,7 @@ SOME VERY USEFUL FEATURES
      
      While warnings will not stop Paladin from continuing to build a project, if an error occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow. Double-clicking on an error or warning will open up the file containing it in the editor. The Copy to Clipboard button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents.    
 
-![Screenshot](readme_scrshot/errors.png)
+![Screenshot](Documentation/images/ErrorWindow.png)
 
    BACKING UP PROJECTS
 

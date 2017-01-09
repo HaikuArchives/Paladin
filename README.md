@@ -6,26 +6,26 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
 FEATURES
 
- -Command-line build support
+ - Command-line build support
 
- -More run options for projects
+ - More run options for projects
 
- -Explicit support for debugging with gdb under Haiku
+ - Explicit support for debugging with gdb under Haiku
 
- -Bundled helper tools
+ - Bundled helper tools
 
- -Projects can include notes and other files that aren't source code
+ - Projects can include notes and other files that aren't source code
 
- -Project templates
+  - Project templates
 
- -Integrated source code management
+ - Integrated source code management
 
- -1-click project backups
+ - 1-click project backups
 
 
 SETTING UP PALADIN
 
- -Install Paladin from Haiku Depot
+ - Install Paladin from Haiku Depot
 
  - Open Paladin
 
@@ -35,9 +35,9 @@ SETTING UP PALADIN
 
  - Select Project Type from the dropdown menu, give your project a name, a file name    and save destination and click 'Create Project'
 
-![Screenshot](12.png)
+![Screenshot](9.png)
 
- - Select the file to code
+ - Select the file you want to code
 
 ![Screenshot](13.png) 
 
@@ -45,7 +45,7 @@ SETTING UP PALADIN
 
 ![Screenshot](14.png) 
 
-![Screenshot](15.png)
+
 
 
 

@@ -8,8 +8,6 @@ To build: run `pkgman install devel:libpcre` and then run `./buildsuite.sh`.
 INSTALLING PALADIN
  1. OpenHaikuDepot
 
-![Screenshot](1.png)
-
  2. Enter 'paladin' in the search bar
 
 ![Screenshot](2.png)
@@ -64,19 +62,6 @@ SETTING UP PALADIN
 ![Screenshot](14.png) 
 
 ![Screenshot](15.png)
-
-
-UNINSTALLING PALADIN
-
- 1. OpenHaikuDepot
-
- 2. Enter 'paladin' in the search bar
-
-![Screenshot](16.png)
-
- 3. Click the paladin package and select 'Uninstall'
-
-![Screenshot](17.png)
 
 
 

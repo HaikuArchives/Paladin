@@ -3,6 +3,7 @@ PALADIN
  =========
 
 Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. 
+
 INSTALLING PALADIN
  1. OpenHaikuDepot
 

@@ -36,11 +36,11 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
 2. STARTING A PROJECT
 
-   - Install Paladin from Haiku Depot
+  - Install Paladin from Haiku Depot
 
-   - Open Paladin
+  - Open Paladin
 
-   - Select 'Create New Project'
+  - Select 'Create New Project'
 
 ![Screenshot](Documentation/images/StartWindow.png)
 
@@ -66,7 +66,7 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
 3. SOME VERY USEFUL FEATURES
 
-   - DEALING WITH ERRORS
+  - DEALING WITH ERRORS
      
        While warnings will not stop Paladin from continuing to build a project, if an error occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow. Double-clicking on an error or warning will open up the file containing it in the editor. The Copy to Clipboard button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents.    
 

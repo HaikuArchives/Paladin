@@ -18,29 +18,29 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
    - Bundled helper tools
 
-  - Streamlined project settings
+   - Streamlined project settings
 
    - Out-of-the-box support for Lex and Yacc
 
    - Support for text and binary resource files
 
-  - Projects can include notes and other files that aren't source code
+   - Projects can include notes and other files that aren't source code
 
-  - Project templates
+   - Project templates
 
-  - Out-of-the-box makefile generation
+   - Out-of-the-box makefile generation
 
-  - Integrated source code management
+   - Integrated source code management
 
-  - 1-click project backups
+   - 1-click project backups
 
  STARTING A PROJECT
 
-  - Install Paladin from Haiku Depot
+   - Install Paladin from Haiku Depot
 
-  -  Open Paladin
+   -  Open Paladin
 
-  -  Select 'Create New Project'
+   -  Select 'Create New Project'
 
 
 ![Screenshot](Documentation/images/StartWindow.png)

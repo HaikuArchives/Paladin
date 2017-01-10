@@ -1,7 +1,6 @@
 PALADIN
-
- =========
-
+-------------
+ 
 Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. 
 
  FEATURES

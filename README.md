@@ -3,7 +3,7 @@ PALADIN
  
 Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. It can use fastdep and ccache to speed up builds if you have them installed.
 
-To build: run pkgman install devel:libpcre and then run ./buildsuite.sh.
+To build: `run pkgman install devel:libpcre and then run ./buildsuite.sh.`
 
 
  FEATURES
@@ -43,13 +43,13 @@ STARTING A PROJECT
 
    -  Open Paladin
 
-   -  Select 'Create New Project'
+   -  Select `Create New Project`
 
 
 ![Screenshot](Documentation/images/StartWindow.png)
 
   
-  -  Select Project Type from the dropdown menu, give your project a name, a file name and save destination and click 'Create Project'
+  -  Select Project Type from the dropdown menu, give your project a name, a file name and save destination and click `Create Project`
 
 
 ![Screenshot](Documentation/images/CreateProjectWindow.png)
@@ -65,7 +65,7 @@ STARTING A PROJECT
 
            (Code excerpt from HexVexed) 
  
-  - Push 'Alt+R' to compile and run your program
+  - Push `Alt+R` to compile and run your program
 
 
 SOME VERY USEFUL FEATURES
@@ -88,7 +88,7 @@ SOME VERY USEFUL FEATURES
   
   - HELPER TOOLS
 
-     Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the 'Tools menu'.
+     Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the `Tools menu`.
 
 
 ![Screenshot](readme_scrshot/helper.png)           

@@ -48,7 +48,7 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
 ![Screenshot](Documentation/images/CreateProjectWindow.png)
 
-    - Select the file you want to code
+    -  Select the file you want to code
 
 ![Screenshot](readme_scrshot/13.png)
                    
@@ -60,7 +60,7 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
            (Code excerpt from HexVexed) 
 
-    - Push Alt+R to compile and run your program
+    -  Push Alt+R to compile and run your program
 
 ![Screenshot](readme_scrshot/14.png) 
 
@@ -72,13 +72,13 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
 ![Screenshot](Documentation/images/ErrorWindow.png)
 
-    - BACKING UP PROJECTS
+    -  BACKING UP PROJECTS
 
       Your project can be quickly placed into a compressed archive in a folder of your choosing with your project's name and timestamp for the backup with just a click of this menu item.
 
 ![Screenshot](readme_scrshot/backup.png)
 
-    - HELPER TOOLS
+    -  HELPER TOOLS
 
      Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the Tools menu.
 

@@ -65,7 +65,7 @@ STARTING A PROJECT
 
            (Code excerpt from HexVexed) 
  
-  - Push Alt+R to compile and run your program
+  - Push 'Alt+R' to compile and run your program
 
 
 SOME VERY USEFUL FEATURES
@@ -88,7 +88,7 @@ SOME VERY USEFUL FEATURES
   
   - HELPER TOOLS
 
-     Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the Tools menu.
+     Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. They can be accessed from the 'Tools menu'.
 
 
 ![Screenshot](readme_scrshot/helper.png)           

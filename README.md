@@ -1,7 +1,10 @@
 PALADIN
 -------------
  
-Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. 
+Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. It can use fastdep and ccache to speed up builds if you have them installed.
+
+To build: run pkgman install devel:libpcre and then run ./buildsuite.sh.
+
 
  FEATURES
 -----------------
@@ -54,23 +57,15 @@ STARTING A PROJECT
   
   -  Select the file you want to code
 
-
-![Screenshot](readme_scrshot/13.png)
-                   
-
-              (A blank editor file)
-
  Here's how a coded editor file looks like
+
 
 ![Screenshot](readme_scrshot/hexvexed.png)
 
-           (Code excerpt from HexVexed) 
 
+           (Code excerpt from HexVexed) 
  
   - Push Alt+R to compile and run your program
-
-
-![Screenshot](readme_scrshot/14.png) 
 
 
 SOME VERY USEFUL FEATURES

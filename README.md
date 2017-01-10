@@ -20,9 +20,9 @@ Paladin is an open source integrated development environment (IDE) modeled after
 
   - Streamlined project settings
 
-   -Out-of-the-box support for Lex and Yacc
+   - Out-of-the-box support for Lex and Yacc
 
-   -Support for text and binary resource files
+   - Support for text and binary resource files
 
   - Projects can include notes and other files that aren't source code
 

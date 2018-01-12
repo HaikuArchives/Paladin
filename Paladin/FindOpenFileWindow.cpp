@@ -87,7 +87,7 @@ FindOpenFileWindow::MessageReceived(BMessage* message)
 			if (fSystemCheckBox->Value() == B_CONTROL_OFF)
 				findmessage.AddString("folder", gCurrentProject->GetPath().GetFolder());
 
-			findmessage.AddString("folder","/boot/develop/headers");
+			findmessage.AddString("folder","/boot/system/develop/headers");
 
 			DPath path(B_USER_CONFIG_DIRECTORY);
 			path << "include";

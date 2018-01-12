@@ -88,9 +88,9 @@ FindOpenFileWindow::MessageReceived(BMessage* message)
 				findmessage.AddString("folder", gCurrentProject->GetPath().GetFolder());
 			
 			#ifdef __HAIKU__
-				findmessage.AddString("folder","/boot/system/develop/headers");
+			findmessage.AddString("folder","/boot/system/develop/headers");
 			#else
-				findmessage.AddString("folder","/boot/develop/headers");
+			findmessage.AddString("folder","/boot/develop/headers");
 			#endif
 			
 			DPath path(B_USER_CONFIG_DIRECTORY);

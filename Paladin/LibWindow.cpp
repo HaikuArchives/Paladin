@@ -113,7 +113,7 @@ LibraryWindow::MessageReceived(BMessage* message)
 			}
 
 			// We're not using the ref's path to preserve symlinked folder
-			// names in the /boot/develop hierarchy.
+			// names in the /boot/system/develop hierarchy.
 			// Both Haiku and Zeta do this.
 			BPath path(pathString.String());
 			path.Append(ref.name);

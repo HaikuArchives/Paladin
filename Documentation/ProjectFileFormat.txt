@@ -31,7 +31,7 @@ DEPENDENCY			This is an optional field. It is a list of files separated by
 LOCALINCLUDE		Include path for headers and libraries. Source files depend 
 					on these to be able to find their headers.
 SYSTEMINCLUDE		System folders which are used for includes. This is typically 
-					for headers in the /boot/develop/headers folder hierarchy
+					for headers in the /boot/system/develop/headers folder hierarchy
 LIBRARY				A library. Note that this is not limited to shared libraries 
 					in the standard locations, but any library, including static 
 					libraries kept in the project folder or anywhere else.

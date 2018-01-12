@@ -1347,12 +1347,12 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	newproj->SetTargetType(type);
 	
 	newproj->AddLocalInclude(".");
-	newproj->AddSystemInclude("/boot/develop/headers/be");
-	newproj->AddSystemInclude("/boot/develop/headers/cpp");
-	newproj->AddSystemInclude("/boot/develop/headers/posix");
+	newproj->AddSystemInclude("/boot/system/develop/headers/be");
+	newproj->AddSystemInclude("/boot/system/develop/headers/cpp");
+	newproj->AddSystemInclude("/boot/system/develop/headers/posix");
 	newproj->AddSystemInclude("/boot/home/config/include");
 	
-	newproj->AddLibrary("/boot/develop/lib/x86/libroot.so");
+	newproj->AddLibrary("/boot/system/develop/lib/x86/libroot.so");
 	
 	newproj->AddGroup("Source files");
 	
@@ -1360,11 +1360,11 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	{
 		case PROJECT_GUI:
 		{
-			newproj->AddLibrary("/boot/develop/lib/x86/libbe.so");
+			newproj->AddLibrary("/boot/system/develop/lib/x86/libbe.so");
 			
 			// Having to manually add this one is terribly annoying. :/
 			if (DetectPlatform() == PLATFORM_HAIKU_GCC4)
-				newproj->AddLibrary("/boot/develop/lib/x86/libsupc++.so");
+				newproj->AddLibrary("/boot/system/develop/lib/x86/libsupc++.so");
 			break;
 		}
 		case PROJECT_DRIVER:

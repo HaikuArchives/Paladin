@@ -86,9 +86,13 @@ FindOpenFileWindow::MessageReceived(BMessage* message)
 
 			if (fSystemCheckBox->Value() == B_CONTROL_OFF)
 				findmessage.AddString("folder", gCurrentProject->GetPath().GetFolder());
-
-			findmessage.AddString("folder","/boot/system/develop/headers");
-
+			
+			#ifdef __HAIKU__
+				findmessage.AddString("folder","/boot/system/develop/headers");
+			#else
+				findmessage.AddString("folder","/boot/develop/headers");
+			#endif
+			
 			DPath path(B_USER_CONFIG_DIRECTORY);
 			path << "include";
 			findmessage.AddString("folder", path.GetFullPath());

@@ -1346,23 +1346,22 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	
 	newproj->SetTargetType(type);
 	
+	BPath sysDevPath;
+	find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &sysDevPath, false);
+	char temp[100];
+	strcpy(temp, sysDevPath.Path());
+	
 	newproj->AddLocalInclude(".");
-	#ifdef __HAIKU__
-	newproj->AddSystemInclude("/boot/system/develop/headers/be");
-	newproj->AddSystemInclude("/boot/system/develop/headers/cpp");
-	newproj->AddSystemInclude("/boot/system/develop/headers/posix");
+	newproj->AddSystemInclude(strcat(temp, "/headers/be"));
+	strcpy(temp, sysDevPath.Path());
+	newproj->AddSystemInclude(strcat(temp, "/headers/cpp"));
+	strcpy(temp, sysDevPath.Path());
+	newproj->AddSystemInclude(strcat(temp, "/headers/posix"));
+	strcpy(temp, sysDevPath.Path());
 	// I don't think "/boot/home/config/include" exists in Haiku
 	//newproj->AddSystemInclude("/boot/home/config/include");
 
-	newproj->AddLibrary("/boot/system/develop/lib/x86/libroot.so");
-	#else
-	newproj->AddSystemInclude("/boot/develop/headers/be");
-	newproj->AddSystemInclude("/boot/develop/headers/cpp");
-	newproj->AddSystemInclude("/boot/develop/headers/posix");
-	newproj->AddSystemInclude("/boot/home/config/include");
-
-	newproj->AddLibrary("/boot/develop/lib/x86/libroot.so");
-	#endif
+	newproj->AddLibrary(strcat(temp, "/lib/x86/libroot.so"));
 	newproj->AddGroup("Source files");
 	
 	switch (type)

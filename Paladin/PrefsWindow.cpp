@@ -145,11 +145,10 @@ PrefsWindow::PrefsWindow(BRect frame)
 	// source control
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
-	scmMenu->AddItem(new BMenuItem(TR("None"), NULL));
-	scmMenu->AddSeparatorItem();
-	scmMenu->AddItem(new BMenuItem(TR("Git"), NULL));
 	scmMenu->AddItem(new BMenuItem(TR("Mercurial"), NULL));
+	scmMenu->AddItem(new BMenuItem(TR("Git"), NULL));
 	scmMenu->AddItem(new BMenuItem(TR("Subversion"), NULL));
+	scmMenu->AddItem(new BMenuItem(TR("None"), NULL));
 
 	fSCMChooser = new BMenuField("scmchooser", TR("Preferred source control:"),
 		scmMenu);

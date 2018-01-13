@@ -28,6 +28,7 @@ DPath gLastProjectPath;
 DPath gSVNRepoPath;
 
 bool gBuildMode = false;
+bool gMakeMode = false;
 bool gDontManageHeaders = true;
 bool gSingleThreadedBuild = false;
 bool gShowFolderOnOpen = false;

@@ -10,6 +10,7 @@ SCMProjectImporterManager::SCMProjectImporterManager(void)
 	fImporterList.AddItem(new SourceforgeImporter());
 	fImporterList.AddItem(new BitbucketImporter());
 	fImporterList.AddItem(new GitoriousImporter());
+	fImporterList.AddItem(new GitHubImporter());
 }
 
 
@@ -384,5 +385,64 @@ bool
 GitoriousImporter::SupportsSCM(const scm_t &scm) const
 {
 	return (scm == SCM_GIT);
+}
+
+GitHubImporter::GitHubImporter(void)
+{
+	SetName("GitHub");
+}
+
+
+BString
+GitHubImporter::GetImportCommand(bool readOnly)
+{
+	BString command;
+
+	switch (GetSCM())
+	{
+		case SCM_GIT:
+		{
+			// read-only: https://github.com/OWNERNAME(reponame)/PROJECTNAME.git
+			// developer: https://USER@github.com/OWNERNAME(reponame)/PROJECTNAME.git
+			if(!readOnly) {
+				command << "--no-pager clone https://" << GetUserName()
+						<< "@github.com/" << GetRepository() << "/" << GetProjectName() << ".git";
+			} else {
+				command << "--no-pager clone https://github.com/" << GetRepository() << "/"
+						<< GetProjectName() << ".git";
+			}
+			if (GetPath() && strlen(GetPath()))
+				command << " '" << GetPath() << "'";
+			break;
+		}
+		case SCM_SVN:
+		{
+			// read-only: https://github.com/OWNERNAME(reponame)/PROJECTNAME.git
+			// developer: https://USER@github.com/OWNERNAME(reponame)/PROJECTNAME.git
+			if(!readOnly) {
+				command << "co --non-interactive https://" << GetUserName()
+						<< "@github.com/" << GetRepository() << "/" << GetProjectName() << ".git";
+			} else {
+				command << "co --non-interactive https://github.com/" << GetRepository() << "/"
+						<< GetProjectName() << ".git";
+			}
+			if (GetPath() && strlen(GetPath()))
+				command << " '" << GetPath() << "'";
+			break;
+		}
+		default:
+		{
+			// Do nothing
+			break;
+		}
+	}
+	return command;
+}
+
+
+bool
+GitHubImporter::SupportsSCM(const scm_t &scm) const
+{
+	return (scm == SCM_GIT) || (scm == SCM_SVN);
 }
 

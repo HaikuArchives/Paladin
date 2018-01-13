@@ -96,5 +96,13 @@ public:
 			bool			SupportsSCM(const scm_t &scm) const;
 };
 
+class GitHubImporter : public SCMProjectImporter
+{
+public:
+							GitHubImporter(void);
+			BString			GetImportCommand(bool readOnly);
+			bool			SupportsSCM(const scm_t &scm) const;
+};
+
 
 #endif

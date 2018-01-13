@@ -1360,10 +1360,11 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	strcpy(temp, sysDevPath.Path());
 	sysDevPath.GetParent(&sysDevPath);
 	strcpy(temp, sysDevPath.Path());
-	// I don't think "/boot/home/config/include" exists in Haiku
+	//I don't think "/boot/home/config/include" exists in Haiku
 	//newproj->AddSystemInclude("/boot/home/config/include");
-
-	newproj->AddLibrary(strcat(temp, "/lib/x86/libroot.so"));
+	
+	//The following library messes the build :(
+	//newproj->AddLibrary(strcat(temp, "/lib/x86/libroot.so"));
 	newproj->AddGroup("Source files");
 	
 	switch (type)

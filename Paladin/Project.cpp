@@ -1347,16 +1347,18 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	newproj->SetTargetType(type);
 	
 	BPath sysDevPath;
-	find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &sysDevPath, false);
-	char temp[100];
+	find_directory(B_SYSTEM_HEADERS_DIRECTORY, &sysDevPath, false);
+	char temp[PATH_MAX];
 	strcpy(temp, sysDevPath.Path());
 	
 	newproj->AddLocalInclude(".");
-	newproj->AddSystemInclude(strcat(temp, "/headers/be"));
+	newproj->AddSystemInclude(strcat(temp, "/be"));
 	strcpy(temp, sysDevPath.Path());
-	newproj->AddSystemInclude(strcat(temp, "/headers/cpp"));
+	newproj->AddSystemInclude(strcat(temp, "/cpp"));
 	strcpy(temp, sysDevPath.Path());
-	newproj->AddSystemInclude(strcat(temp, "/headers/posix"));
+	newproj->AddSystemInclude(strcat(temp, "/posix"));
+	strcpy(temp, sysDevPath.Path());
+	sysDevPath.GetParent(&sysDevPath);
 	strcpy(temp, sysDevPath.Path());
 	// I don't think "/boot/home/config/include" exists in Haiku
 	//newproj->AddSystemInclude("/boot/home/config/include");

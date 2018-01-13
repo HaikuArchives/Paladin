@@ -12,7 +12,7 @@
  * 5. Paste it into here.
  */
 
-const char* template_makefile = "## Haiku Generic Makefile ##\n\
+const char* template_makefile = "## Haiku Generic Makefile v2.6 ##\n\
 \n\
 ## Fill in this file to specify the project being created, and the referenced\n\
 ## Makefile-Engine will do all of the hard work for you. This handles any\n\

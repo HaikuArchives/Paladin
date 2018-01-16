@@ -1,11 +1,11 @@
-# PALADIN
+# Paladin
  
 Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. It can use fastdep and ccache to speed up builds if you have them installed.
 
 To build: run `pkgman install devel:libpcre` and then run `./buildsuite.sh.`
 
 
-## FEATURES
+## Features
 
 - Command-line build support
 
@@ -36,7 +36,7 @@ To build: run `pkgman install devel:libpcre` and then run `./buildsuite.sh.`
 - 1-click project backups
 
 
-## STARTING A PROJECT
+## Starting a Project
 - Install Paladin from HaikuDepot.
 
 - Open Paladin.
@@ -62,8 +62,8 @@ Here's how an editor window looks like:
 - Press `Alt+R` to compile and run your program.
 
 
-## SOME VERY USEFUL FEATURES
-### DEALING WITH ERRORS
+## Some Very Useful Features
+### Dealing with Errors
 
 While warnings will not stop Paladin from continuing to build a project, if an error occurs, Paladin will stop the build so that the errors can be corrected. Errors are listed in pink; warnings are listed in yellow.
 Double-clicking on an error or warning will open up the file containing it in the editor. The `Copy to Clipboard` button will copy all visible errors and/or warnings to the system clipboard for pasting into other documents. 
@@ -71,16 +71,16 @@ Double-clicking on an error or warning will open up the file containing it in th
 ![Screenshot](Documentation/images/ErrorWindow.png)
 
   
-### BACKING UP PROJECTS
+### Backing Up Projects
 Your project can be quickly placed into a compressed archive in a folder of your choosing with your project's name and timestamp for the backup with just a click of this menu item.
 
 ![Screenshot](readme_scrshot/backup.png)
 
   
-### HELPER TOOLS
+### Helper Tools
 
 Developers seem to need a wide variety of tools when writing code. Paladin includes a few small accessories to complement the main development environment. An ASCII table, Regular expression tester, Symbol finder and a tool to easily choose a license for your project can be accessed from the `Tools menu`.
 
 
-### LICENSE
+### License
 MIT

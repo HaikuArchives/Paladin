@@ -29,6 +29,7 @@ public:
 
 private:
 	void	BuildProject(const entry_ref &ref);
+	void	GenerateMakefile(const entry_ref &ref);
 	void	LoadProject(const entry_ref &ref);
 	void	UpdateRecentItems(const entry_ref &ref);
 	void	PostToProjectWindow(BMessage *msg, entry_ref *file);

@@ -51,6 +51,7 @@ extern DPath gProjectPath;
 extern DPath gLastProjectPath;
 extern DPath gSVNRepoPath;
 extern bool	gBuildMode;
+extern bool	gMakeMode;
 extern bool gDontManageHeaders;
 extern bool gSingleThreadedBuild;
 extern bool gShowFolderOnOpen;

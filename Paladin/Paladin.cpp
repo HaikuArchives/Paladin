@@ -20,6 +20,7 @@
 #include "FileUtils.h"
 #include "Globals.h"
 #include "LaunchHelper.h"
+#include "Makemake.h"
 #include "MsgDefs.h"
 #include "ObjectList.h"
 #include "PLocale.h"
@@ -86,17 +87,19 @@ void
 PrintUsage(void)
 {
 	#ifdef USE_TRACE_TOOLS
-	printf("Usage: Paladin [-b] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n"
+	printf("Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n"
 			"-b, Build the specified project. Only one file can be specified with this switch.\n"
-			"-r, Completely rebuild the project\n"
-			"-s, Use only one thread for building\n"
-			"-d, Print debugging output\n"
-			"-v, Make debugging mode verbose\n");
+			"-m, Generate a makefile for the specified project.\n"
+			"-r, Completely rebuild the project.\n"
+			"-s, Use only one thread for building.\n"
+			"-d, Print debugging output.\n"
+			"-v, Make debugging mode verbose.\n");
 	#else
-	printf("Usage: Paladin [-b] [-r] [-s] [file1 [file2 ...]]\n"
+	printf("Usage: Paladin [-b] [-m] [-r] [-s] [file1 [file2 ...]]\n"
 			"-b, Build the specified project. Only one file can be specified with this switch.\n"
-			"-r, Completely rebuild the project\n"
-			"-s, Use only one thread for building\n");
+			"-m, Generate a makefile for the specified project.\n"
+			"-r, Completely rebuild the project.\n"
+			"-s, Use only one thread for building.\n");
 	#endif
 }
 
@@ -163,6 +166,11 @@ App::ArgvReceived(int32 argc,char **argv)
 			case 'b':
 			{
 				gBuildMode = true;
+				break;
+			}
+			case 'm':
+			{
+				gMakeMode = true;
 				break;
 			}
 			case 'r':
@@ -259,13 +267,13 @@ App::ArgvReceived(int32 argc,char **argv)
 		refcount++;
 		optind++;
 		
-		if (refcount == 1 && gBuildMode)
+		if (refcount == 1 && (gBuildMode || gMakeMode))
 			break;
 	}
 	
 	if (refcount > 0)
 		RefsReceived(&refmsg);
-	else if (gBuildMode)
+	else if (gBuildMode || gMakeMode)
 		Quit();
 }
 
@@ -282,6 +290,9 @@ App::RefsReceived(BMessage *msg)
 
 		if (gBuildMode && isPaladin)
 			BuildProject(ref);
+		else
+		if (gMakeMode && isPaladin)
+			GenerateMakefile(ref);
 		else
 		if (isPaladin || isBeIDE)
 			LoadProject(ref);
@@ -799,6 +810,52 @@ App::BuildProject(const entry_ref &ref)
 	fBuilder->BuildProject(proj, POSTBUILD_NOTHING);
 }
 
+void
+App::GenerateMakefile(const entry_ref &ref)
+{
+	BPath path(&ref);
+	Project *proj = new Project;
+	
+	if (proj->Load(path.Path()) != B_OK)
+	{
+		BMessage msg(M_BUILD_FAILURE);
+		PostMessage(&msg);
+		
+		delete proj;
+		return;
+	}
+	
+	if (proj->IsReadOnly())
+	{
+		BString err(path.Path());
+		err << TR(" is on a read-only disk. Please copy the project to another disk ")
+			<<	TR("or remount the disk with write support to be able to build it.\n");
+		BMessage msg(M_BUILD_FAILURE);
+		msg.AddString("errstr",err);
+		PostMessage(&msg);
+		
+		delete proj;
+		return;
+	}
+	
+	gProjectList->Lock();
+	gProjectList->AddItem(proj);
+	gProjectList->Unlock();
+	
+	gCurrentProject = proj;
+	DPath out(proj->GetPath().GetFolder());
+	out.Append("Makefile");
+	if (MakeMake(proj, out) == B_OK); {
+		BEntry entry(out.GetFullPath());
+		entry_ref new_ref;
+		if (entry.InitCheck() == B_OK) {
+			entry.GetRef(&new_ref);
+			BMessage refMessage(B_REFS_RECEIVED);
+			refMessage.AddRef("refs",&new_ref);
+			be_app->PostMessage(&refMessage);
+		}
+	}
+}
 
 void
 App::LoadProject(const entry_ref &givenRef)

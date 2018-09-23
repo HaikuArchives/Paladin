@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 
 
@@ -32,6 +34,7 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
+#include <StringList.h>
 #include <TypeConstants.h>
 #include <View.h>
 
@@ -194,6 +197,43 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 					fProjectList->InvalidateItem(fProjectList->IndexOf(fileitem));
 				}
 			}
+
+			// Now add header files
+		STRACE(2,("Adding header files to UI\n"));
+
+		// Also add dependencies (header files)
+		SourceGroupItem* headergroupitem = new SourceGroupItem(group);
+		headergroupitem->SetText("Header files");
+		fProjectList->AddItem(headergroupitem);
+		headergroupitem->SetExpanded(group->expanded);
+
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* file = group->filelist.ItemAt(j);
+			SourceFileItem* fileItem = new SourceFileItem(file,1);
+			BString dependencies = file->GetDependencies();
+			// Split string on comma to get individual files
+			BStringList deplist = BStringList();// = new BStringList();
+			dependencies.Split(",",true,deplist);
+			// Add item for each
+			for (int32 d = 0;d < deplist.CountStrings(); d++) {
+				BString dep = deplist.StringAt(d);
+				BStringItem* depitem = new BStringItem(dep);
+				//fProjectList->AddItem(depitem);
+				bool found = false;
+				for (int32 ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
+					if (((BStringItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->Text() == dep) {
+						found = true;
+					}
+				}
+				if (!found) {
+					fProjectList->AddUnder(depitem,headergroupitem);
+				}
+			}
+		}
+
+
+
+
 		}
 	}
 

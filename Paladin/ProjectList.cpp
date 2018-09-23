@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 
 
@@ -18,7 +20,9 @@
 #include <TranslatorFormats.h>
 #include <TranslationUtils.h>
 #include <Window.h>
+#include <StringList.h>
 
+#include "DebugTools.h"
 #include "MsgDefs.h"
 #include "PLocale.h"
 #include "Project.h"
@@ -48,6 +52,7 @@ ProjectList::ProjectList(Project* project, const char* name, const int32 flags)
 	BOutlineListView(name, B_MULTIPLE_SELECTION_LIST, flags),
 	fProject(project)
 {
+	STRACE(2,("ProjectList constructor\n"));
 }
 
 
@@ -239,6 +244,7 @@ ProjectList::FullListUnderIndexOf(BStringItem* item)
 void
 ProjectList::RefreshList(void)
 {
+	STRACE(2,("ProjectList::RefreshList\n"));
 	if (Window() != NULL)
 		Window()->DisableUpdates();
 
@@ -258,6 +264,8 @@ ProjectList::RefreshList(void)
 			SourceFileItem* fileItem = new SourceFileItem(file,1);
 
 			AddItem(fileItem);
+
+			// Also add dependencies
 			
 			BString abspath = file->GetPath().GetFullPath();
 			if (abspath[0] != '/') {
@@ -276,6 +284,32 @@ ProjectList::RefreshList(void)
 				fileItem->SetDisplayState(SFITEM_MISSING);
 				InvalidateItem(IndexOf(fileItem));
 			}
+		}
+
+		//WARNING: This function doesn't seem to ever get called
+		//WARNING: Final implementation of the below code is in ProjectWindow.cpp
+
+		STRACE(2,("Adding header files to UI\n"));
+
+		// Also add dependencies (header files)
+		SourceGroupItem* headergroupitem = new SourceGroupItem(group);
+		AddItem(headergroupitem);
+		headergroupitem->SetExpanded(group->expanded);
+
+		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+			SourceFile* file = group->filelist.ItemAt(j);
+			SourceFileItem* fileItem = new SourceFileItem(file,1);
+			BString dependencies = file->GetDependencies();
+			// Split string on comma to get individual files
+			BStringList deplist = BStringList();// = new BStringList();
+			dependencies.Split(",",true,deplist);
+			// Add item for each
+			for (int32 d = 0;d < deplist.CountStrings(); d++) {
+				BString dep = deplist.StringAt(d);
+				BStringItem* depitem = new BStringItem(dep);
+				AddItem(depitem,d+1);
+			}
+			// TODO ensure unique
 		}
 	}
 

@@ -203,13 +203,15 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 
 		// Also add dependencies (header files)
 		SourceGroupItem* headergroupitem = new SourceGroupItem(group);
-		headergroupitem->SetText("Header files");
+		BString headergroupname(group->name);
+		headergroupname += " dependencies";
+		headergroupitem->SetText(headergroupname);
 		fProjectList->AddItem(headergroupitem);
 		headergroupitem->SetExpanded(group->expanded);
 
 		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
 			SourceFile* file = group->filelist.ItemAt(j);
-			SourceFileItem* fileItem = new SourceFileItem(file,1);
+			//SourceFileItem* fileItem = new SourceFileItem(file,1);
 			BString dependencies = file->GetDependencies();
 			// Split string on comma to get individual files
 			BStringList deplist = BStringList();// = new BStringList();
@@ -226,7 +228,11 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 					}
 				}
 				if (!found) {
-					fProjectList->AddUnder(depitem,headergroupitem);
+					// create source file item instead of string
+					//fProjectList->AddUnder(depitem,headergroupitem);
+					SourceFile* depfile = new SourceFile(dep);
+					SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
+					fProjectList->AddUnder(depfileitem,headergroupitem);
 				}
 			}
 		}

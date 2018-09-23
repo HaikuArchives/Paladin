@@ -104,6 +104,7 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	fErrorCount(0),
 	fWarningCount(0)
 {
+	SetSizeLimits(400, 30000, 250, 30000);
 	AddShortcut('M', B_COMMAND_KEY, new BMessage(M_MAKE_PROJECT));
 	AddShortcut('R', B_COMMAND_KEY, new BMessage(M_RUN_PROJECT));
 	AddShortcut('R', B_COMMAND_KEY | B_SHIFT_KEY,

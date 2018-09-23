@@ -1590,9 +1590,21 @@ void
 ProjectWindow::ToggleErrorWindow(ErrorList* list)
 {
 	if (fErrorWindow != NULL)
-		fErrorWindow->PostMessage(B_QUIT_REQUESTED);
+	{
+		//fErrorWindow->PostMessage(B_QUIT_REQUESTED);
+		if (fErrorWindow->IsHidden()) 
+		{
+			ShowErrorWindow(list);
+		}
+		else
+		{
+			fErrorWindow->Hide();
+		}
+	}
 	else
+	{
 		ShowErrorWindow(list);
+	}
 }
 
 
@@ -1613,8 +1625,8 @@ ProjectWindow::ShowErrorWindow(ErrorList* list)
 			r.OffsetBy(0,-deskbar.Frame().Height());
 
 		fErrorWindow = new ErrorWindow(r, this, list);
-		fErrorWindow->Show();
 	}
+	fErrorWindow->Show();
 
 	fStatusBar->SetText("");
 }

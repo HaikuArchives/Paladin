@@ -215,23 +215,28 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 			BString dependencies = file->GetDependencies();
 			// Split string on comma to get individual files
 			BStringList deplist = BStringList();// = new BStringList();
-			dependencies.Split(",",true,deplist);
+			dependencies.Split("|",true,deplist);
 			// Add item for each
 			for (int32 d = 0;d < deplist.CountStrings(); d++) {
 				BString dep = deplist.StringAt(d);
 				BStringItem* depitem = new BStringItem(dep);
 				//fProjectList->AddItem(depitem);
 				bool found = false;
-				for (int32 ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
-					if (((BStringItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->Text() == dep) {
+				STRACE(2,("Does dep exist?: %s\n",depitem->Text()));
+				int32 ed;
+				SourceFile* depfile = new SourceFile(dep);
+				SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
+				for (ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
+					STRACE(2,(" - Curitem text: %s\n",((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
+					if (0 == strcmp( 
+							((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath(), depitem->Text() )) {
+						STRACE(2,(" - Found!!!\n"));
 						found = true;
 					}
 				}
 				if (!found) {
 					// create source file item instead of string
 					//fProjectList->AddUnder(depitem,headergroupitem);
-					SourceFile* depfile = new SourceFile(dep);
-					SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
 					fProjectList->AddUnder(depfileitem,headergroupitem);
 				}
 			}

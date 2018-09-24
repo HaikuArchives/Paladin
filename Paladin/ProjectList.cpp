@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 
 
@@ -336,8 +338,10 @@ ProjectList::ShowContextMenu(BPoint where)
 		if (fileItem != NULL)
 			menu.AddSeparatorItem();
 
-		menu.AddItem(new BMenuItem(TR("New group"),
-			new BMessage(M_NEW_GROUP)));
+		if (NULL == groupItem) {
+			menu.AddItem(new BMenuItem(TR("New group"),
+				new BMessage(M_NEW_GROUP)));
+		}
 		menu.AddItem(new BMenuItem(TR("Rename group") B_UTF8_ELLIPSIS,
 			new BMessage(M_SHOW_RENAME_GROUP)));
 		menu.AddItem(new BMenuItem(TR("Sort group"),

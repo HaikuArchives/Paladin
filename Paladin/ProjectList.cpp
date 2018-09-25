@@ -20,7 +20,6 @@
 #include <TranslatorFormats.h>
 #include <TranslationUtils.h>
 #include <Window.h>
-#include <StringList.h>
 
 #include "DebugTools.h"
 #include "MsgDefs.h"
@@ -264,8 +263,6 @@ ProjectList::RefreshList(void)
 			SourceFileItem* fileItem = new SourceFileItem(file,1);
 
 			AddItem(fileItem);
-
-			// Also add dependencies
 			
 			BString abspath = file->GetPath().GetFullPath();
 			if (abspath[0] != '/') {
@@ -285,7 +282,6 @@ ProjectList::RefreshList(void)
 				InvalidateItem(IndexOf(fileItem));
 			}
 		}
-
 	}
 
 	if (Window() != NULL)

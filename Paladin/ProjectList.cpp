@@ -286,31 +286,6 @@ ProjectList::RefreshList(void)
 			}
 		}
 
-		//WARNING: This function doesn't seem to ever get called
-		//WARNING: Final implementation of the below code is in ProjectWindow.cpp
-
-		STRACE(2,("Adding header files to UI\n"));
-
-		// Also add dependencies (header files)
-		SourceGroupItem* headergroupitem = new SourceGroupItem(group);
-		AddItem(headergroupitem);
-		headergroupitem->SetExpanded(group->expanded);
-
-		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
-			SourceFile* file = group->filelist.ItemAt(j);
-			SourceFileItem* fileItem = new SourceFileItem(file,1);
-			BString dependencies = file->GetDependencies();
-			// Split string on comma to get individual files
-			BStringList deplist = BStringList();// = new BStringList();
-			dependencies.Split(",",true,deplist);
-			// Add item for each
-			for (int32 d = 0;d < deplist.CountStrings(); d++) {
-				BString dep = deplist.StringAt(d);
-				BStringItem* depitem = new BStringItem(dep);
-				AddItem(depitem,d+1);
-			}
-			// TODO ensure unique
-		}
 	}
 
 	if (Window() != NULL)

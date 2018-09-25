@@ -58,7 +58,6 @@
 #include "Makemake.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
-#include "PLocale.h"
 #include "PrefsWindow.h"
 #include "ProjectBuilder.h"
 #include "ProjectList.h"
@@ -331,7 +330,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 				"project backup thread", B_NORMAL_PRIORITY, this);
 			if (backupThread >= 0)
 			{
-				fStatusBar->SetText(TR("Backing up project"));
+				fStatusBar->SetText(B_TRANSLATE("Backing up project"));
 				UpdateIfNeeded();
 				
 				SetMenuLock(true);
@@ -354,7 +353,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 			if (out.CountChars() > 1)
 				out.Prepend("\n\n");
 			else {
-				out = TR("Enter the description for the changes in this revision.");
+				out = B_TRANSLATE("Enter the description for the changes in this revision.");
 				select = true;
 			}
 
@@ -372,7 +371,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 			BString commitMessage;
 			if (fSourceControl
 				&& message->FindString("text", &commitMessage) == B_OK) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Commit"));
+				SCMOutputWindow* window = new SCMOutputWindow(B_TRANSLATE("Commit"));
 				window->Show();
 				fSourceControl->Commit(commitMessage.String());
 			}
@@ -385,10 +384,10 @@ ProjectWindow::MessageReceived(BMessage* message)
 				break;
 			
 			int32 result = ShowAlert(
-				TR("This will undo all changes since the last commit. "
-					"Continue?"), TR("Don't revert"), TR("Revert"));
+				B_TRANSLATE("This will undo all changes since the last commit. "
+					"Continue?"), B_TRANSLATE("Don't revert"), B_TRANSLATE("Revert"));
 			if (result == 1) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Revert"));
+				SCMOutputWindow* window = new SCMOutputWindow(B_TRANSLATE("Revert"));
 				window->Show();
 				fSourceControl->Revert(NULL);
 			}
@@ -408,7 +407,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_DIFF_PROJECT:
 		{
 			if (fSourceControl) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Differences"));
+				SCMOutputWindow* window = new SCMOutputWindow(B_TRANSLATE("Differences"));
 				window->Show();
 				fSourceControl->Diff(NULL);
 			}
@@ -418,7 +417,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_PROJECT_SCM_STATUS:
 		{
 			if (fSourceControl) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Project status"));
+				SCMOutputWindow* window = new SCMOutputWindow(B_TRANSLATE("Project status"));
 				BString strstatus;
 				fSourceControl->GetChangeStatus(strstatus);
 				window->GetTextView()->SetText(strstatus.String());
@@ -430,7 +429,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_PUSH_PROJECT:
 		{
 			if (fSourceControl) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Push"));
+				SCMOutputWindow* window = new SCMOutputWindow(B_TRANSLATE("Push"));
 				window->Show();
 				fSourceControl->Push(NULL);
 			}
@@ -440,7 +439,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_PULL_PROJECT:
 		{
 			if (fSourceControl) {
-				SCMOutputWindow* window = new SCMOutputWindow(TR("Pull"));
+				SCMOutputWindow* window = new SCMOutputWindow(B_TRANSLATE("Pull"));
 				window->Show();
 				status = fSourceControl->Pull(NULL);
 
@@ -790,7 +789,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 						refMessage.AddRef("refs",&ref);
 					} else {
 						if (!entry.Exists()) {
-							BString errorMessage = TR("Couldn't find XXXXX. "
+							BString errorMessage = B_TRANSLATE("Couldn't find XXXXX. "
 								"It may have been moved or renamed.");
 							errorMessage.ReplaceFirst("XXXXX", abspath.String());
 							ShowAlert(errorMessage.String());
@@ -842,7 +841,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_SHOW_FIND_IN_PROJECT_FILES:
 		{
 			if (!gLuaAvailable) {
-				ShowAlert(TR("Paladin's multi-file Find window depends on Lua. "
+				ShowAlert(B_TRANSLATE("Paladin's multi-file Find window depends on Lua. "
 					"It will need to be installed if you wish to use "
 					"this feature."), "OK", NULL, NULL, B_STOP_ALERT);
 				break;
@@ -905,7 +904,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 			// We don't do this when forcing a rebuild of the sources because
 			// sometimes it can take quite a while
 			if (gUseCCache && gCCacheAvailable) {
-				fStatusBar->SetText(TR("Emptying build cache"));
+				fStatusBar->SetText(B_TRANSLATE("Emptying build cache"));
 				UpdateIfNeeded();
 				system("ccache -c > /dev/null");
 				fStatusBar->SetText("");
@@ -967,7 +966,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		{
 			if (!fProject->Debug()) {
 				BString errorMessage
-					= TR("Your project does not have debugging information compiled "
+					= B_TRANSLATE("Your project does not have debugging information compiled "
 					"in and will need to be rebuilt to debug. "
 					"Do you wish to rebuild and run the debugger?");
 				int32 result = ShowAlert(
@@ -992,7 +991,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 			SourceFile* file;
 			if (message->FindPointer("file",(void**)&file) == B_OK) {
 				BString out;
-				out << TR("Examining ") << file->GetPath().GetFileName();
+				out << B_TRANSLATE("Examining ") << file->GetPath().GetFileName();
 				fStatusBar->SetText(out.String());
 			}
 			break;
@@ -1017,7 +1016,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 						out << "(" << fBuildingFile << "/" << total << ") ";
 					}
 
-					out << TR("Building ") << item->Text();
+					out << B_TRANSLATE("Building ") << item->Text();
 					fStatusBar->SetText(out.String());
 				}
 			}
@@ -1040,19 +1039,19 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		case M_LINKING_PROJECT:
 		{
-			fStatusBar->SetText(TR("Linking"));
+			fStatusBar->SetText(B_TRANSLATE("Linking"));
 			break;
 		}
 
 		case M_UPDATING_RESOURCES:
 		{
-			fStatusBar->SetText(TR("Updating resources"));
+			fStatusBar->SetText(B_TRANSLATE("Updating resources"));
 			break;
 		}
 
 		case M_DOING_POSTBUILD:
 		{
-			fStatusBar->SetText(TR("Performing post-build tasks"));
+			fStatusBar->SetText(B_TRANSLATE("Performing post-build tasks"));
 			break;
 		}
 
@@ -1272,7 +1271,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 
-			window = new SCMOutputWindow(TR("Add to repository"));
+			window = new SCMOutputWindow(B_TRANSLATE("Add to repository"));
 			window->Show();
 			break;
 		}
@@ -1282,7 +1281,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 				
-			window = new SCMOutputWindow(TR("Remove from repository"));
+			window = new SCMOutputWindow(B_TRANSLATE("Remove from repository"));
 			window->Show();
 			break;
 		}
@@ -1292,7 +1291,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 				
-			window = new SCMOutputWindow(TR("Revert"));
+			window = new SCMOutputWindow(B_TRANSLATE("Revert"));
 			window->Show();
 			break;
 		}
@@ -1302,7 +1301,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 			if (!fSourceControl)
 				return;
 				
-			window = new SCMOutputWindow(TR("Show differences"));
+			window = new SCMOutputWindow(B_TRANSLATE("Show differences"));
 			window->Show();
 			break;
 		}
@@ -1384,76 +1383,96 @@ ProjectWindow::CreateMenuBar(void)
 
 	// File menu
 
-	fFileMenu = new BMenu(TR("File"));
-	fFileMenu->AddItem(new BMenuItem(TR("New project") B_UTF8_ELLIPSIS,
+	fFileMenu = new BMenu(B_TRANSLATE("File"));
+	BString newProjectStr(B_TRANSLATE("New project%ellipsis%"));
+	newProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fFileMenu->AddItem(new BMenuItem(newProjectStr,
 		new BMessage(M_NEW_WINDOW), 'N', B_COMMAND_KEY | B_SHIFT_KEY));
-	fFileMenu->AddItem(new BMenuItem(TR("Open project") B_UTF8_ELLIPSIS,
+	BString openProjectStr(B_TRANSLATE("Open project%ellipsis%"));
+	openProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fFileMenu->AddItem(new BMenuItem(openProjectStr,
 		new BMessage(M_SHOW_OPEN_PROJECT), 'O', B_COMMAND_KEY));
-	fRecentMenu = new BMenu(TR("Open recent project"));
+	fRecentMenu = new BMenu(B_TRANSLATE("Open recent project"));
 	fFileMenu->AddItem(fRecentMenu);
-	fFileMenu->AddItem(new BMenuItem(TR("Find and open file") B_UTF8_ELLIPSIS,
+	BString findAndOpenStr(B_TRANSLATE("Find and open file%ellipsis%"));
+	findAndOpenStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fFileMenu->AddItem(new BMenuItem(findAndOpenStr,
 		new BMessage(M_SHOW_FIND_AND_OPEN_PANEL), 'D', B_COMMAND_KEY));
 	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem(TR("Program settings") B_UTF8_ELLIPSIS,
+	BString programSettingsStr(B_TRANSLATE("Program settings%ellipsis%"));
+	programSettingsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fFileMenu->AddItem(new BMenuItem(programSettingsStr,
 		new BMessage(M_SHOW_PROGRAM_SETTINGS)));
-	fFileMenu->AddItem(new BMenuItem(TR("About Paladin") B_UTF8_ELLIPSIS,
+	BString aboutStr(B_TRANSLATE("About Paladin%ellipsis%"));
+	aboutStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fFileMenu->AddItem(new BMenuItem(aboutStr,
 		new BMessage(B_ABOUT_REQUESTED)));
 	fMenuBar->AddItem(fFileMenu);
 
 	// Source menu
 
-	fSourceMenu = new BMenu(TR("Source control"));
-	fSourceMenu->AddItem(new BMenuItem(TR("Check project in"),
+	fSourceMenu = new BMenu(B_TRANSLATE("Source control"));
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Check project in"),
 		new BMessage(M_GET_CHECK_IN_MSG), 'I',
 		B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
-	fSourceMenu->AddItem(new BMenuItem(TR("Show changed files from last check-in"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Show changed files from last check-in"),
 		new BMessage(M_PROJECT_SCM_STATUS), 'S',
 		B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
-	fSourceMenu->AddItem(new BMenuItem(TR("Show differences from last check-in"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Show differences from last check-in"),
 		new BMessage(M_DIFF_PROJECT), 'D',
 		B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 	fSourceMenu->AddSeparatorItem();
-	fSourceMenu->AddItem(new BMenuItem(TR("Revert project"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert project"),
 		new BMessage(M_REVERT_PROJECT)));
 	fSourceMenu->AddSeparatorItem();
-	fSourceMenu->AddItem(new BMenuItem(TR("Add selected files to repository"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Add selected files to repository"),
 		new BMessage(M_ADD_SELECTION_TO_REPO)));
-	fSourceMenu->AddItem(new BMenuItem(TR("Remove Selected files from repository"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove Selected files from repository"),
 		new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
-	fSourceMenu->AddItem(new BMenuItem(TR("Revert selected files"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert selected files"),
 		new BMessage(M_REVERT_SELECTION)));
 	fSourceMenu->AddSeparatorItem();
-	fSourceMenu->AddItem(new BMenuItem(TR("Push changes to remote repository"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Push changes to remote repository"),
 		new BMessage(M_PUSH_PROJECT), B_UP_ARROW,
 		B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
-	fSourceMenu->AddItem(new BMenuItem(TR("Pull changes from remote repository"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Pull changes from remote repository"),
 		new BMessage(M_PULL_PROJECT), B_DOWN_ARROW,
 		B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY));
 
 	// Project menu
 
-	fProjectMenu = new BMenu(TR("Project"));
+	fProjectMenu = new BMenu(B_TRANSLATE("Project"));
 	
-	fProjectMenu->AddItem(new BMenuItem(TR("Settings") B_UTF8_ELLIPSIS,
+	BString settingsStr(B_TRANSLATE("Settings%ellipsis%"));
+	settingsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fProjectMenu->AddItem(new BMenuItem(settingsStr,
 		new BMessage(M_SHOW_PROJECT_SETTINGS)));
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Add new file") B_UTF8_ELLIPSIS,
+	BString addStr(B_TRANSLATE("Add new file%ellipsis%"));
+	addStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fProjectMenu->AddItem(new BMenuItem(addStr,
 		new BMessage(M_SHOW_ADD_NEW_PANEL), 'N', B_COMMAND_KEY));
-	fProjectMenu->AddItem(new BMenuItem(TR("Add files") B_UTF8_ELLIPSIS,
+	BString addFilesStr(B_TRANSLATE("Add files%ellipsis%"));
+	addFilesStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fProjectMenu->AddItem(new BMenuItem(addFilesStr,
 		new BMessage(M_SHOW_ADD_PANEL)));
-	fProjectMenu->AddItem(new BMenuItem(TR("Remove selected files"),
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove selected files"),
 		new BMessage(M_REMOVE_FILES)));
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Change system libraries") B_UTF8_ELLIPSIS,
+	BString chgLibsStr(B_TRANSLATE("Change system libraries%ellipsis%"));
+	chgLibsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fProjectMenu->AddItem(new BMenuItem(chgLibsStr,
 		new BMessage(M_SHOW_LIBRARIES)));
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Find in project files") B_UTF8_ELLIPSIS,
+	BString findInStr(B_TRANSLATE("Find in project files%ellipsis%"));
+	findInStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fProjectMenu->AddItem(new BMenuItem(findInStr,
 		new BMessage(M_SHOW_FIND_IN_PROJECT_FILES), 'F',
 		B_COMMAND_KEY | B_SHIFT_KEY));
 
 #ifdef BUILD_CODE_LIBRARY
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Synchronize with code library"),
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Synchronize with code library"),
 		new BMessage(M_SYNC_MODULES)));
 #endif
 	fProjectMenu->AddSeparatorItem();
@@ -1462,71 +1481,91 @@ ProjectWindow::CreateMenuBar(void)
 
 	fProjectMenu->AddSeparatorItem();
 
-	fProjectMenu->AddItem(new BMenuItem(TR("New group"),
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("New group"),
 		new BMessage(M_NEW_GROUP)));
-	fProjectMenu->AddItem(new BMenuItem(TR("Rename group"),
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Rename group"),
 		new BMessage(M_SHOW_RENAME_GROUP)));
-	fProjectMenu->AddItem(new BMenuItem(TR("Sort group"),
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 		new BMessage(M_SORT_GROUP)));
 	fProjectMenu->AddSeparatorItem();
-	fProjectMenu->AddItem(new BMenuItem(TR("Show project folder") B_UTF8_ELLIPSIS,
+	BString showProjFolderStr(B_TRANSLATE("Show project folder%ellipsis%"));
+	showProjFolderStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fProjectMenu->AddItem(new BMenuItem(showProjFolderStr,
 		new BMessage(M_SHOW_PROJECT_FOLDER)));
 	fMenuBar->AddItem(fProjectMenu);
 
 	// Build menu
 
-	fBuildMenu = new BMenu(TR("Build"));
+	fBuildMenu = new BMenu(B_TRANSLATE("Build"));
 
-	fBuildMenu->AddItem(new BMenuItem(TR("Make project"),
+	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Make project"),
 		new BMessage(M_BUILD_PROJECT), 'M'));
-	fBuildMenu->AddItem(new BMenuItem(TR("Run"),
+	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Run"),
 		new BMessage(M_RUN_PROJECT), 'R'));
-	fBuildMenu->AddItem(new BMenuItem(TR("Run logged") B_UTF8_ELLIPSIS,
+	BString runLoggedStr(B_TRANSLATE("Run logged%ellipsis%"));
+	runLoggedStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fBuildMenu->AddItem(new BMenuItem(runLoggedStr,
 		new BMessage(M_RUN_IN_TERMINAL), 'R', B_COMMAND_KEY | B_SHIFT_KEY));
-	fBuildMenu->AddItem(new BMenuItem(TR("Debug"), new BMessage(M_DEBUG_PROJECT),
+	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Debug"), new BMessage(M_DEBUG_PROJECT),
 		'R', B_COMMAND_KEY | B_CONTROL_KEY));
 	fBuildMenu->AddSeparatorItem();
-	fBuildMenu->AddItem(new BMenuItem(TR("Generate makefile") B_UTF8_ELLIPSIS,
+	BString genMakefileStr(B_TRANSLATE("Generate makefile%ellipsis%"));
+	genMakefileStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fBuildMenu->AddItem(new BMenuItem(genMakefileStr,
 		new BMessage(M_MAKE_MAKE)));
 	fBuildMenu->AddSeparatorItem();
-	fBuildMenu->AddItem(new BMenuItem(TR("Set run arguments") B_UTF8_ELLIPSIS,
+	BString setArgsStr(B_TRANSLATE("Set run arguments%ellipsis%"));
+	setArgsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fBuildMenu->AddItem(new BMenuItem(setArgsStr,
 		new BMessage(M_SHOW_RUN_ARGS)));
 	fBuildMenu->AddSeparatorItem();
-	fBuildMenu->AddItem(new BMenuItem(TR("Update dependencies"),
+	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Update dependencies"),
 		new BMessage(M_UPDATE_DEPENDENCIES)));
 
-	BMenuItem* item = new BMenuItem(TR("Empty build cache"),
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Empty build cache"),
 		new BMessage(M_EMPTY_CCACHE));
 	fBuildMenu->AddItem(item);
 	item->SetEnabled(gCCacheAvailable);
 
-	fBuildMenu->AddItem(new BMenuItem(TR("Force project to rebuild"),
+	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Force project to rebuild"),
 		new BMessage(M_FORCE_REBUILD), '-'));
 	fMenuBar->AddItem(fBuildMenu);
 
 	// Tools menu
 
-	fToolsMenu = new BMenu(TR("Tools"));
+	fToolsMenu = new BMenu(B_TRANSLATE("Tools"));
 	
 #ifdef BUILD_CODE_LIBRARY
-	fToolsMenu->AddItem(new BMenuItem(TR("Code library") B_UTF8_ELLIPSIS,
+	BString codeLibStr(B_TRANSLATE("Code library%ellipsis%"));
+	codeLibStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fToolsMenu->AddItem(new BMenuItem(codeLibStr,
 		new BMessage(M_SHOW_CODE_LIBRARY), 'L'));
 #endif
-	fToolsMenu->AddItem(new BMenuItem(TR("Error window") B_UTF8_ELLIPSIS,
+	BString errorWindowStr(B_TRANSLATE("Error window%ellipsis%"));
+	errorWindowStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fToolsMenu->AddItem(new BMenuItem(errorWindowStr,
 		new BMessage(M_TOGGLE_ERROR_WINDOW), 'I'));
-	fToolsMenu->AddItem(new BMenuItem(TR("ASCII table") B_UTF8_ELLIPSIS,
+	BString asciiStr(B_TRANSLATE("ASCII table%ellipsis%"));
+	asciiStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fToolsMenu->AddItem(new BMenuItem(asciiStr,
 		new BMessage(M_SHOW_ASCII_TABLE)));
-	fToolsMenu->AddItem(new BMenuItem(TR("Regular expression tester") B_UTF8_ELLIPSIS,
+	BString regexStr(B_TRANSLATE("Regular expression tester%ellipsis%"));
+	regexStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fToolsMenu->AddItem(new BMenuItem(regexStr,
 		new BMessage(M_SHOW_VREGEX)));
 
 	BMessage* message = new BMessage(M_RUN_TOOL);
 	message->AddString("signature", "application/x-vnd.dw-SymbolFinder");
-	fToolsMenu->AddItem(new BMenuItem(TR("Symbol finder") B_UTF8_ELLIPSIS, message));
+	BString symbolStr(B_TRANSLATE("Symbol finder%ellipsis%"));
+	symbolStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fToolsMenu->AddItem(new BMenuItem(symbolStr, message));
 	fToolsMenu->AddSeparatorItem();
-	fToolsMenu->AddItem(new BMenuItem(TR("Make project backup"),
+	fToolsMenu->AddItem(new BMenuItem(B_TRANSLATE("Make project backup"),
 		new BMessage(M_BACKUP_PROJECT)));
 	fToolsMenu->AddSeparatorItem();
-	fToolsMenu->AddItem(new BMenuItem(TR("Set software license") B_UTF8_ELLIPSIS,
+	BString licenseStr(B_TRANSLATE("Set software license%ellipsis%"));
+	licenseStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fToolsMenu->AddItem(new BMenuItem(licenseStr,
 		new BMessage(M_SHOW_LICENSES)));
 	fMenuBar->AddItem(fToolsMenu);
 }
@@ -1711,7 +1750,7 @@ ProjectWindow::DoBuild(int32 postbuild)
 		SourceFileItem* item = dynamic_cast<SourceFileItem*>(
 			fProjectList->ItemAt(i));
 		if (item != NULL && item->GetDisplayState() == SFITEM_MISSING) {
-			ShowAlert(TR("The project cannot be built because some of its "
+			ShowAlert(B_TRANSLATE("The project cannot be built because some of its "
 				"files are missing."));
 			return;
 		}
@@ -1971,7 +2010,7 @@ ProjectWindow::SyncThread(void* data)
 	ProjectWindow* parent = (ProjectWindow*)data;
 
 	parent->Lock();
-	parent->fStatusBar->SetText(TR("Updating modules"));
+	parent->fStatusBar->SetText(B_TRANSLATE("Updating modules"));
 	parent->SetMenuLock(true);
 	parent->Unlock();
 

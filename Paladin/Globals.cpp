@@ -1,9 +1,11 @@
 #include "Globals.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ctype.h>
 #include <Directory.h>
 #include <File.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Roster.h>
 #include <stdio.h>
@@ -13,13 +15,16 @@
 #include "DPath.h"
 #include "FileFactory.h"
 #include "Globals.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "Settings.h"
 #include "SourceTypeLib.h"
 #include "StatCache.h"
 #include <stdlib.h>
 #include "TextFile.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Globals"
 
 DPath gAppPath;
 DPath gBackupPath;
@@ -198,8 +203,8 @@ MakeProjectFile(DPath folder, const char *name, const char *data, const char *ty
 	if (entry.Exists())
 	{
 		BString errstr = path.GetFullPath();
-		errstr << TR(" already exists. Do you want to overwrite it?");
-		int32 result = ShowAlert(errstr.String(),TR("Overwrite"),TR("Cancel"));
+		errstr << B_TRANSLATE(" already exists. Do you want to overwrite it?");
+		int32 result = ShowAlert(errstr.String(),B_TRANSLATE("Overwrite"),B_TRANSLATE("Cancel"));
 		if (result == 1)
 			return ref;
 	}

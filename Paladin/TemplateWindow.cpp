@@ -14,12 +14,14 @@
 #include <algorithm>
 
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <Font.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -33,10 +35,12 @@
 #include "MsgDefs.h"
 #include "Paladin.h"
 #include "PathBox.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "Settings.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TemplateWindow"
 
 enum {
 	M_NAME_CHANGED		= 'nmch',
@@ -50,7 +54,7 @@ enum {
 
 TemplateWindow::TemplateWindow(const BRect& frame)
 	:
-	BWindow(frame, TR("Choose a project type"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE("Choose a project type"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	RegisterWindow();
@@ -58,7 +62,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	CheckTemplates();
 
 	DPath templatePath(gAppPath.GetFolder());
-	templatePath << TR("Templates");
+	templatePath << B_TRANSLATE("Templates");
 	fTempList.ScanFolder(templatePath.GetFullPath());
 
 	// project type
@@ -72,55 +76,55 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	}
 	projectTypeMenu->ItemAt(0L)->SetMarked(true);
 
-	fTemplateField = new BMenuField("templatefield", TR("Project type: "),
+	fTemplateField = new BMenuField("templatefield", B_TRANSLATE("Project type: "),
 		projectTypeMenu);
 	fTemplateField->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// project name
 
-	fNameBox = new AutoTextControl("namebox", TR("Project name:"), "",
+	fNameBox = new AutoTextControl("namebox", B_TRANSLATE("Project name:"), "",
 		new BMessage(M_NAME_CHANGED));
-	SetToolTip(fNameBox, TR("The name of your project. "
+	SetToolTip(fNameBox, B_TRANSLATE("The name of your project. "
 		"It can be the same as the Target name, but it does not have to be."));
 
 	// target name
 
-	fTargetBox = new AutoTextControl("targetbox", TR("Target name:"), "BeApp",
+	fTargetBox = new AutoTextControl("targetbox", B_TRANSLATE("Target name:"), "BeApp",
 		new BMessage(M_TARGET_CHANGED));
-	SetToolTip(fTargetBox, TR("The name of the compiled application or library"));
+	SetToolTip(fTargetBox, B_TRANSLATE("The name of the compiled application or library"));
 
 	// project path
 
 	fPathBox = new PathBox("pathbox", gProjectPath.GetFullPath(), "");
 	fPathBox->SetExplicitMinSize(BSize(be_plain_font->StringWidth("M") * 36,
 		B_SIZE_UNSET)),
-	SetToolTip(fPathBox, TR("Set the location for your project."));
+	SetToolTip(fPathBox, B_TRANSLATE("Set the location for your project."));
 
 	// source control
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
-	scmMenu->AddItem(new BMenuItem(TR("Mercurial"), new BMessage()));
-	scmMenu->AddItem(new BMenuItem(TR("Git"), new BMessage()));
-	scmMenu->AddItem(new BMenuItem(TR("Subversion"), new BMessage()));
-	scmMenu->AddItem(new BMenuItem(TR("None"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), new BMessage()));
 
 	if (!gHgAvailable) {
 		scmMenu->ItemAt(0)->SetEnabled(false);
-		scmMenu->ItemAt(0)->SetLabel(TR("Mercurial unavailable"));
+		scmMenu->ItemAt(0)->SetLabel(B_TRANSLATE("Mercurial unavailable"));
 	}
 	if (!gGitAvailable) {
 		scmMenu->ItemAt(1)->SetEnabled(false);
-		scmMenu->ItemAt(1)->SetLabel(TR("Git unavailable"));
+		scmMenu->ItemAt(1)->SetLabel(B_TRANSLATE("Git unavailable"));
 	}
 	if (!gSvnAvailable) {
 		scmMenu->ItemAt(2)->SetEnabled(false);
-		scmMenu->ItemAt(2)->SetLabel(TR("Subversion unavailable"));
+		scmMenu->ItemAt(2)->SetLabel(B_TRANSLATE("Subversion unavailable"));
 	}
 
-	fSCMChooser = new BMenuField("scmchooser", TR("Source control: "), scmMenu);
+	fSCMChooser = new BMenuField("scmchooser", B_TRANSLATE("Source control: "), scmMenu);
 	fSCMChooser->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetToolTip(fSCMChooser,
-		TR("Choose the source control manager for your project, if any."));
+		B_TRANSLATE("Choose the source control manager for your project, if any."));
 
 	scmMenu->ItemAt(gDefaultSCM)->SetMarked(true);
 
@@ -137,14 +141,16 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 
 	// create folder check box
 
-	fCreateFolder = new BCheckBox(TR("Create project folder"));
+	fCreateFolder = new BCheckBox(B_TRANSLATE("Create project folder"));
 	fCreateFolder->SetValue(B_CONTROL_ON);
-	SetToolTip(fCreateFolder, TR("If checked, a folder for your project will be created "
+	SetToolTip(fCreateFolder, B_TRANSLATE("If checked, a folder for your project will be created "
 		"in the folder in the Location box above."));
 
 	// create project button
 
-	fCreateProjectButton = new BButton("ok", TR("Create project") B_UTF8_ELLIPSIS,
+	BString createStr(B_TRANSLATE("Create project%ellipsis%"));
+	createStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	fCreateProjectButton = new BButton("ok", createStr,
 		new BMessage(M_CREATE_PROJECT));
 	fCreateProjectButton->SetEnabled(false);
 	fCreateProjectButton->MakeDefault(true);
@@ -165,7 +171,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 			.Add(fTargetBox->CreateLabelLayoutItem(), 0, 2)
 			.Add(fTargetBox->CreateTextViewLayoutItem(), 1, 2)
 
-			.Add(new BStringView("location", TR("Location:")), 0, 3)
+			.Add(new BStringView("location", B_TRANSLATE("Location:")), 0, 3)
 			.Add(fPathBox, 1, 3)
 
 			.Add(fSCMChooser->CreateLabelLayoutItem(), 0, 4)

@@ -11,9 +11,11 @@
 
 #include "LibWindow.h"
 
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <Locale.h>
 #include <Path.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -22,10 +24,12 @@
 #include <LayoutBuilder.h>
 
 #include "Globals.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "Settings.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LibWindow"
 
 #define B_USER_DEVELOP_DIRECTORY ((directory_which)3028)
 
@@ -44,14 +48,14 @@ LibraryWindow::LibraryWindow(BRect frame, const BMessenger& parent,
 	fProject(project)
 {
 	if (project != NULL) {
-		BString title(TR("Libraries: "));
+		BString title(B_TRANSLATE("Libraries: "));
 		title << project->GetName();
 		SetTitle(title.String());
 	}
 
 	BStringView* label = new BStringView("label",
-		TR("Choose the system libraries for your project:"));
-	label->SetText(TR("Scanning libraries" B_UTF8_ELLIPSIS));
+		B_TRANSLATE("Choose the system libraries for your project:"));
+	label->SetText(B_TRANSLATE("Scanning libraries" B_UTF8_ELLIPSIS));
 
 	fCheckList = new BView("checklist", B_WILL_DRAW);
 
@@ -221,7 +225,7 @@ LibraryWindow::ScanThread(void* data)
 	float maxwidth;
 	BRect r(5, 5, 105, 20);
 
-	BView* systemHeader = window->AddHeader(r.LeftTop(), TR("System libraries:"));
+	BView* systemHeader = window->AddHeader(r.LeftTop(), B_TRANSLATE("System libraries:"));
 
 	window->Lock();
 	r = systemHeader->Frame();
@@ -240,7 +244,7 @@ LibraryWindow::ScanThread(void* data)
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) {
 		// ToDo: remove this once we drop R1/A4 support
 		BView* commonHeader = window->AddHeader(r.LeftTop(),
-			TR("Common libraries:"));
+			B_TRANSLATE("Common libraries:"));
 		window->Lock();
 		r = commonHeader->Frame();
 		window->Unlock();
@@ -256,7 +260,7 @@ LibraryWindow::ScanThread(void* data)
 		}
 	}
 
-	BView* userHeader = window->AddHeader(r.LeftTop(), TR("User libraries:"));
+	BView* userHeader = window->AddHeader(r.LeftTop(), B_TRANSLATE("User libraries:"));
 	window->Lock();
 	r = userHeader->Frame();
 	window->Unlock();
@@ -286,7 +290,7 @@ LibraryWindow::ScanThread(void* data)
 	gSettings.Unlock();
 
 	BStringView* label = (BStringView*)top->FindView("label");
-	label->SetText(TR("Choose the system libraries for your project:"));
+	label->SetText(B_TRANSLATE("Choose the system libraries for your project:"));
 	float minw = label->Frame().right + 10;
 	window->SetSizeLimits(minw, 30000, 200, 30000);
 	if (window->Bounds().Width() < minw)

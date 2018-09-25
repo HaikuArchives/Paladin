@@ -1,6 +1,8 @@
 #include "Paladin.h"
 
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Locker.h>
 #include <getopt.h>
 #include <Message.h>
@@ -23,7 +25,6 @@
 #include "Makemake.h"
 #include "MsgDefs.h"
 #include "ObjectList.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "ProjectBuilder.h"
 #include "ProjectWindow.h"
@@ -33,6 +34,9 @@
 #include "StartWindow.h"
 #include "TemplateWindow.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Paladin"
 
 BPoint gProjectWindowPoint;
 static int sReturnCode = 0;
@@ -222,9 +226,9 @@ App::ArgvReceived(int32 argc,char **argv)
 	}
 	
 	if (gPrintDebugMode == 1)
-		printf(TR("Printing debug output\n"));
+		printf(B_TRANSLATE("Printing debug output\n"));
 	else if (gPrintDebugMode == 2)
-		printf(TR("Printing debug output with extra detail\n"));
+		printf(B_TRANSLATE("Printing debug output with extra detail\n"));
 	
 	if (gSingleThreadedBuild)
 		STRACE(1,("Disabling multithreaded project building\n"));
@@ -256,7 +260,7 @@ App::ArgvReceived(int32 argc,char **argv)
 			ref = FindProject(projref,projPath.String());
 			if (!ref.name)
 			{
-				printf(TR("Can't find file %s\n"),argv[i]);
+				printf(B_TRANSLATE("Can't find file %s\n"),argv[i]);
 				continue;
 			}
 		}
@@ -434,7 +438,7 @@ App::MessageReceived(BMessage *msg)
 		{
 			SourceFile *file;
 			if (msg->FindPointer("sourcefile",(void**)&file) == B_OK)
-				printf(TR("Building %s\n"),file->GetPath().GetFileName());
+				printf(B_TRANSLATE("Building %s\n"),file->GetPath().GetFileName());
 			else
 				printf("NULL pointer in M_BUILDING_FILE\n");
 			break;
@@ -442,13 +446,13 @@ App::MessageReceived(BMessage *msg)
 
 		case M_LINKING_PROJECT:
 		{
-			printf(TR("Linking\n"));
+			printf(B_TRANSLATE("Linking\n"));
 			break;
 		}
 
 		case M_UPDATING_RESOURCES:
 		{
-			printf(TR("Updating resources\n"));
+			printf(B_TRANSLATE("Updating resources\n"));
 			break;
 		}
 
@@ -478,7 +482,7 @@ App::MessageReceived(BMessage *msg)
 
 		case M_BUILD_SUCCESS:
 		{
-			printf(TR("Success\n"));
+			printf(B_TRANSLATE("Success\n"));
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
@@ -786,8 +790,8 @@ App::BuildProject(const entry_ref &ref)
 	if (proj->IsReadOnly())
 	{
 		BString err(path.Path());
-		err << TR(" is on a read-only disk. Please copy the project to another disk ")
-			<<	TR("or remount the disk with write support to be able to build it.\n");
+		err << B_TRANSLATE(" is on a read-only disk. Please copy the project to another disk ")
+			<<	B_TRANSLATE("or remount the disk with write support to be able to build it.\n");
 		BMessage msg(M_BUILD_FAILURE);
 		msg.AddString("errstr",err);
 		PostMessage(&msg);
@@ -828,8 +832,8 @@ App::GenerateMakefile(const entry_ref &ref)
 	if (proj->IsReadOnly())
 	{
 		BString err(path.Path());
-		err << TR(" is on a read-only disk. Please copy the project to another disk ")
-			<<	TR("or remount the disk with write support to be able to build it.\n");
+		err << B_TRANSLATE(" is on a read-only disk. Please copy the project to another disk ")
+			<<	B_TRANSLATE("or remount the disk with write support to be able to build it.\n");
 		BMessage msg(M_BUILD_FAILURE);
 		msg.AddString("errstr",err);
 		PostMessage(&msg);
@@ -953,9 +957,9 @@ App::LoadProject(const entry_ref &givenRef)
 	if (proj->IsReadOnly())
 	{
 		BString errmsg;
-		errmsg << TR("This project is on a read-only disk. You will not be able ");
-		errmsg << TR("to build it, but you can still view its files and do anything ");
-		errmsg << TR("else that does not require saving to the disk. ");
+		errmsg << B_TRANSLATE("This project is on a read-only disk. You will not be able ");
+		errmsg << B_TRANSLATE("to build it, but you can still view its files and do anything ");
+		errmsg << B_TRANSLATE("else that does not require saving to the disk. ");
 		ShowAlert(errmsg.String());
 	}
 }

@@ -12,10 +12,12 @@
 #include "StartWindow.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <FilePanel.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
@@ -37,6 +39,9 @@
 #include "TemplateWindow.h"
 #include "TypedRefFilter.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "StartWindow"
 
 enum
 {
@@ -154,7 +159,7 @@ RecentProjectsList::MouseDown(BPoint where)
 
 StartWindow::StartWindow(void)
 	:
-	BWindow(BRect(0, 0, -1, -1), "Paladin", B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, -1, -1), B_TRANSLATE_SYSTEM_NAME("Paladin"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	RegisterWindow();

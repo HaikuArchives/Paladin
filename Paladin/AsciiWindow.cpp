@@ -16,16 +16,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <View.h>
 
 #include "ObjectList.h"
-#include "PLocale.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AsciiWindow"
+
 
 
 static const float kWindowWidth = 400.0f;
@@ -174,7 +180,7 @@ static ascii_info sAsciiTable[128] = {
 AsciiWindow::AsciiWindow(void)
 	:
 	DWindow(BRect(0.0f, 0.0f, kWindowWidth, kWindowHeight),
-		TR("ASCII table"), B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
+		B_TRANSLATE("ASCII table"), B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fIsZoomed(false),
 	fLastFrame(Frame())
 {

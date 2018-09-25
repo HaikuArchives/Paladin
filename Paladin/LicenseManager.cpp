@@ -13,12 +13,14 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <LayoutBuilder.h>
 #include <ListItem.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -28,8 +30,10 @@
 #include "DPath.h"
 #include "EscapeCancelFilter.h"
 #include "Globals.h"
-#include "PLocale.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LicenseManager"
 
 enum {
 	M_LICENSE_SELECTED = 'lcsl',
@@ -39,7 +43,7 @@ enum {
 
 LicenseManager::LicenseManager(const char* targetPath)
 	:
-	BWindow(BRect(0.0f, 0.0f, 640.0f, 480.0f), TR("Add license to project"),
+	BWindow(BRect(0.0f, 0.0f, 640.0f, 480.0f), B_TRANSLATE("Add license to project"),
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fTargetPath(targetPath),
 	fPathList(20, true)
@@ -54,7 +58,7 @@ LicenseManager::LicenseManager(const char* targetPath)
 		B_SIZE_UNSET));
 
 	BBox* listBox = new BBox(B_NO_BORDER, listScrollView);
-	listBox->SetLabel(TR("License:"));
+	listBox->SetLabel(B_TRANSLATE("License:"));
 
 	fLicenseShort = new BTextView("shortLicense");
 	fLicenseShort->MakeEditable(false);
@@ -62,7 +66,7 @@ LicenseManager::LicenseManager(const char* targetPath)
 		fLicenseShort, 0, false, true);
 
 	BBox* shortLicenseBox = new BBox(B_NO_BORDER, shortScrollView);
-	shortLicenseBox->SetLabel(TR("Summary:"));
+	shortLicenseBox->SetLabel(B_TRANSLATE("Summary:"));
 
 	fLicenseLong = new BTextView("longLicense");
 	fLicenseLong->MakeEditable(false);
@@ -70,9 +74,9 @@ LicenseManager::LicenseManager(const char* targetPath)
 		fLicenseLong, 0, false, true);
 
 	BBox* longLicenseBox = new BBox(B_NO_BORDER, longScrollView);
-	longLicenseBox->SetLabel(TR("Full version:"));
+	longLicenseBox->SetLabel(B_TRANSLATE("Full version:"));
 
-	BButton* addButton = new BButton("addButton", TR("Set license"),
+	BButton* addButton = new BButton("addButton", B_TRANSLATE("Set license"),
 		new BMessage(M_LICENSE_CHOSEN));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)

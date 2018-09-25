@@ -2,9 +2,11 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Size.h>
 #include <View.h>
@@ -13,31 +15,33 @@
 #include "EscapeCancelFilter.h"
 #include "MsgDefs.h"
 #include "Globals.h"
-#include "PLocale.h"
 #include "Project.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FindOpenFileWindow"
 
 #define	M_FIND_FILE 'fnfl'
 
 
 FindOpenFileWindow::FindOpenFileWindow(const char* panelText)
 	:
-	DWindow(BRect(0, 0, 0, 0), TR("Find and open file"), B_TITLED_WINDOW,
+	DWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Find and open file"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	AddCommonFilter(new EscapeCancelFilter());
 
-	fNameTextControl = new AutoTextControl("nameText", TR("Open: "), "",
+	fNameTextControl = new AutoTextControl("nameText", B_TRANSLATE("Open: "), "",
 		new BMessage);
 	fNameTextControl->SetExplicitMinSize(
 		BSize(fNameTextControl->StringWidth("M") * 20, B_SIZE_UNSET));
-	fSystemCheckBox = new BCheckBox("systembox", TR("Search only system folders"),
+	fSystemCheckBox = new BCheckBox("systembox", B_TRANSLATE("Search only system folders"),
 		new BMessage);
 
-	BButton* cancel = new BButton("cancel", TR("Cancel"),
+	BButton* cancel = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
-	BButton* open = new BButton("open", TR("Open"), new BMessage(M_FIND_FILE));
+	BButton* open = new BButton("open", B_TRANSLATE("Open"), new BMessage(M_FIND_FILE));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)

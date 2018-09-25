@@ -17,12 +17,14 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <Entry.h>
 #include <FilePanel.h>
 #include <Font.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Node.h>
 #include <OS.h>
@@ -69,6 +71,8 @@
 #include "SourceFile.h"
 #include "VRegWindow.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProjectWindow"
 
 enum {
 	M_NEW_WINDOW				= 'nwwn',
@@ -112,7 +116,7 @@ compare_source_file_items(const BListItem* item1, const BListItem* item2);
 
 ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	:
-	BWindow(frame, "Paladin", B_DOCUMENT_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Paladin"), B_DOCUMENT_WINDOW,
 		B_NOT_ZOOMABLE),
 	fErrorWindow(NULL),
 	fFilePanel(NULL),

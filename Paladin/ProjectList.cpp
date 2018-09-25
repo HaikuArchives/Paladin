@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 
 
@@ -21,6 +23,7 @@
 #include <TranslationUtils.h>
 #include <Window.h>
 
+#include "DebugTools.h"
 #include "MsgDefs.h"
 #include "Project.h"
 #include "SourceFile.h"
@@ -53,6 +56,7 @@ ProjectList::ProjectList(Project* project, const char* name, const int32 flags)
 	BOutlineListView(name, B_MULTIPLE_SELECTION_LIST, flags),
 	fProject(project)
 {
+	STRACE(2,("ProjectList constructor\n"));
 }
 
 
@@ -244,6 +248,7 @@ ProjectList::FullListUnderIndexOf(BStringItem* item)
 void
 ProjectList::RefreshList(void)
 {
+	STRACE(2,("ProjectList::RefreshList\n"));
 	if (Window() != NULL)
 		Window()->DisableUpdates();
 
@@ -345,7 +350,7 @@ ProjectList::ShowContextMenu(BPoint where)
 		if (NULL == groupItem) {
 			menu.AddItem(new BMenuItem(B_TRANSLATE("New group"),
 				new BMessage(M_NEW_GROUP)));
-		}
+    }
 		BString renameStr(B_TRANSLATE("Rename group%ellipsis"));
 		renameStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
 		menu.AddItem(new BMenuItem(renameStr,

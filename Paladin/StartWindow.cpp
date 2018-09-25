@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 
 
@@ -37,6 +39,7 @@
 #include "Settings.h"
 #include "TemplateWindow.h"
 #include "TypedRefFilter.h"
+#include "PaladinFileFilter.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -268,8 +271,8 @@ StartWindow::StartWindow(void)
 	BEntry entry(gProjectPath.GetFullPath());
 	entry_ref ref;
 	entry.GetRef(&ref);
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_FILE_NODE, true,
-		new BMessage(M_OPEN_PROJECT));
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_FILE_NODE, false,
+		new BMessage(M_OPEN_PROJECT),new PaladinFileFilter());
 	BString titleString(B_TRANSLATE("Open project"));
 	titleString.Prepend("Paladin: ");
 	fOpenPanel->Window()->SetTitle(titleString.String());

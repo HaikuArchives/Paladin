@@ -33,7 +33,7 @@
 #include "SourceFile.h"
 #include "StartWindow.h"
 #include "TemplateWindow.h"
-
+#include "PaladinFileFilter.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Paladin"
@@ -125,8 +125,8 @@ App::App(void)
 	BEntry entry(gLastProjectPath.GetFullPath());
 	entry_ref ref;
 	entry.GetRef(&ref);
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, true,
-		new BMessage(B_REFS_RECEIVED));
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, false,
+		new BMessage(B_REFS_RECEIVED), new PaladinFileFilter() );
 	fOpenPanel->Window()->SetTitle("Paladin: Open project");
 }
 

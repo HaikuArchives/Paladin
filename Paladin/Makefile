@@ -48,6 +48,7 @@ SRCS = AboutWindow.cpp \
 	LibWindow.cpp \
 	Makemake.cpp \
 	Paladin.cpp \
+	PaladinFileFilter.cpp \
 	PrefsWindow.cpp \
 	Project.cpp \
 	ProjectList.cpp \

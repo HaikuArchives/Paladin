@@ -341,8 +341,10 @@ ProjectList::ShowContextMenu(BPoint where)
 		if (fileItem != NULL)
 			menu.AddSeparatorItem();
 
-		menu.AddItem(new BMenuItem(TR("New group"),
-			new BMessage(M_NEW_GROUP)));
+		if (NULL == groupItem) {
+			menu.AddItem(new BMenuItem(TR("New group"),
+				new BMessage(M_NEW_GROUP)));
+		}
 		menu.AddItem(new BMenuItem(TR("Rename group") B_UTF8_ELLIPSIS,
 			new BMessage(M_SHOW_RENAME_GROUP)));
 		menu.AddItem(new BMenuItem(TR("Sort group"),

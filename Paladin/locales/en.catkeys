@@ -1,0 +1,257 @@
+1	English	application/x-vnd.dw-Paladin	2053311905
+Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
+Rename partner file	AddNewFileWindow		Rename partner file
+Build	PrefsWindow		Build
++	ProjectSettingsWindow		+
+This will undo all changes since the last commit. Continue?	ProjectWindow		This will undo all changes since the last commit. Continue?
+General	ProjectSettingsWindow		General
+Create new module…	CodeLibWindow		Create new module…
+Libraries: 	LibWindow		Libraries: 
+Subversion	PrefsWindow		Subversion
+Sort group	ProjectList		Sort group
+Update dependencies	ProjectWindow		Update dependencies
+Change system libraries%ellipsis%	ProjectWindow		Change system libraries%ellipsis%
+Check this if you want to use your program with gprof or bprof for profiling.	ProjectSettingsWindow		Check this if you want to use your program with gprof or bprof for profiling.
+Rename group%ellipsis	ProjectList		Rename group%ellipsis
+The kind of program you want to build	ProjectSettingsWindow		The kind of program you want to build
+Device driver	ProjectSettingsWindow		Device driver
+Run	ProjectWindow		Run
+None	ProjectSettingsWindow		None
+Add license to project	LicenseManager		Add license to project
+Set software license%ellipsis%	ProjectWindow		Set software license%ellipsis%
+Regular expression tester%ellipsis%	ProjectWindow		Regular expression tester%ellipsis%
+Extra GCC linker flags you wish included when your project is linked.	ProjectSettingsWindow		Extra GCC linker flags you wish included when your project is linked.
+Delete current module	CodeLibWindow		Delete current module
+Target name:	ProjectSettingsWindow		Target name:
+Git	TemplateWindow		Git
+Use single thread	PrefsWindow		Use single thread
+Find in project files%ellipsis%	ProjectWindow		Find in project files%ellipsis%
+Show project folder on open	PrefsWindow		Show project folder on open
+File	ProjectWindow		File
+Project status	ProjectWindow		Project status
+New name: 	AddNewFileWindow		New name: 
+Revert selected files	ProjectWindow		Revert selected files
+Add	CodeLibWindow		Add
+Errors and warnings: 	ErrorWindow		Errors and warnings: 
+Updating resources\n	Paladin		Updating resources\n
+Full version:	LicenseManager		Full version:
+Revert	ProjectWindow		Revert
+Check project in	ProjectWindow		Check project in
+Empty build cache	ProjectWindow		Empty build cache
+Choose the name for the new module:	CodeLibWindow		Choose the name for the new module:
+More	ProjectSettingsWindow		More
+Project type: 	TemplateWindow		Project type: 
+Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWindow		Extra GCC flags you wish included when each file is compiled.
+Create project%ellipsis%	TemplateWindow		Create project%ellipsis%
+Open recent project	ProjectWindow		Open recent project
+Emptying build cache	ProjectWindow		Emptying build cache
+Search only system folders	FindOpenFileWindow		Search only system folders
+Summary:	LicenseManager		Summary:
+Cancel	AddNewFileWindow		Cancel
+Quickly make a project by importing all source files and resource files.\n You can also import a BeIDE project.	StartWindow		Quickly make a project by importing all source files and resource files.\n You can also import a BeIDE project.
+New project%ellipsis%	ProjectWindow		New project%ellipsis%
+Arguments: 	RunArgsWindow		Arguments: 
+Build	ProjectWindow		Build
+Settings%ellipsis%	ProjectWindow		Settings%ellipsis%
+Couldn't find 	FileUtils		Couldn't find 
+Force file rebuild	ProjectList		Force file rebuild
+Differences	ProjectWindow		Differences
+None	TemplateWindow		None
+Add a file to the include path list	ProjectSettingsWindow		Add a file to the include path list
+The project cannot be built because some of its files are missing.	ProjectWindow		The project cannot be built because some of its files are missing.
+Open: 	FindOpenFileWindow		Open: 
+Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.
+Tools	ProjectWindow		Tools
+Push	ProjectWindow		Push
+Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?
+Choose the source control manager for your project, if any.	TemplateWindow		Choose the source control manager for your project, if any.
+Open project	StartWindow		Open project
+Actions	CodeLibWindow		Actions
+Target type	ProjectSettingsWindow		Target type
+Backing up project	ProjectWindow		Backing up project
+Optimization	ProjectSettingsWindow		Optimization
+Open	FindOpenFileWindow		Open
+Mercurial	PrefsWindow		Mercurial
+Program settings	PrefsWindow		Program settings
+Run logged%ellipsis%	ProjectWindow		Run logged%ellipsis%
+Git	PrefsWindow		Git
+Source control	PrefsWindow		Source control
+Remove selected files	ProjectList		Remove selected files
+Symbol finder%ellipsis%	ProjectWindow		Symbol finder%ellipsis%
+−	ProjectSettingsWindow		−
+Add selected files to repository	ProjectWindow		Add selected files to repository
+Extra linker options:	ProjectSettingsWindow		Extra linker options:
+Use fastdep dependency checker	PrefsWindow		Use fastdep dependency checker
+Open the selected project	StartWindow		Open the selected project
+This project is on a read-only disk. You will not be able 	Paladin		This project is on a read-only disk. You will not be able 
+Common libraries:	LibWindow		Common libraries:
+Revert project	ProjectWindow		Revert project
+Show changes in selected files	ProjectList		Show changes in selected files
+Open folder for file%ellipsis%	ProjectList		Open folder for file%ellipsis%
+Remove files from module	CodeLibWindow		Remove files from module
+Create both a header and source file	AddNewFileWindow		Create both a header and source file
+Commit	ProjectWindow		Commit
+Subversion unavailable	TemplateWindow		Subversion unavailable
+else that does not require saving to the disk. 	Paladin		else that does not require saving to the disk. 
+Success\n	Paladin		Success\n
+Open project%ellipsis%	ProjectWindow		Open project%ellipsis%
+Choose the project files you wish to import. 	CodeLibWindow		Choose the project files you wish to import. 
+Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Sets the location for the 'server' side of local Subversion repositories.
+or remount the disk with write support to be able to build it.\n	Paladin		or remount the disk with write support to be able to build it.\n
+Show project folder%ellipsis%	ProjectWindow		Show project folder%ellipsis%
+Couldn't find XXXXX. It may have been moved or renamed.	ProjectWindow		Couldn't find XXXXX. It may have been moved or renamed.
+Paladin project	FileUtils		Paladin project
+Generate makefile%ellipsis%	ProjectWindow		Generate makefile%ellipsis%
+Mercurial unavailable	TemplateWindow		Mercurial unavailable
+Automatically synchronize modules	PrefsWindow		Automatically synchronize modules
+New file name: 	AddNewFileWindow		New file name: 
+Add new file	AddNewFileWindow		Add new file
+Shared library	ProjectSettingsWindow		Shared library
+Target type:	ProjectSettingsWindow		Target type:
+Code Modules:	CodeLibWindow		Code Modules:
+Building 	ProjectWindow		Building 
+Don't revert	ProjectWindow		Don't revert
+Show differences	ProjectWindow		Show differences
+Description:	CodeLibWindow		Description:
+New group name: 	GroupRenameWindow		New group name: 
+The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		The name of your project. It can be the same as the Target name, but it does not have to be.
+ already exists. Do you want to overwrite it?	Globals		 already exists. Do you want to overwrite it?
+Examining 	ProjectWindow		Examining 
+Add files%ellipsis%	ProjectWindow		Add files%ellipsis%
+You can select multiple files by clicking on items while holding the XXXXX.	CodeLibWindow		You can select multiple files by clicking on items while holding the XXXXX.
+Project name:	TemplateWindow		Project name:
+Enter text to search here:	VRegWindow		Enter text to search here:
+Find and open file	FindOpenFileWindow		Find and open file
+Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Automatically synchronize modules in your projects with the those in the code library
+Terminal output	TerminalWindow		Terminal output
+Make project	ProjectWindow		Make project
+The default path for new projects.	PrefsWindow		The default path for new projects.
+Overwrite	Globals		Overwrite
+General	PrefsWindow		General
+System libraries:	LibWindow		System libraries:
+Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.
+Matched text:	VRegWindow		Matched text:
+Application	ProjectSettingsWindow		Application
+Projects	CodeLibWindow		Projects
+Rename	GroupRenameWindow		Rename
+Scanning libraries…	LibWindow		Scanning libraries…
+Project	ProjectWindow		Project
+The name of the compiled application or library	TemplateWindow		The name of the compiled application or library
+Control key.	CodeLibWindow		Control key.
+ is on a read-only disk. Please copy the project to another disk 	Paladin		 is on a read-only disk. Please copy the project to another disk 
+These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		These files (except libraries) will be permanently deleted. Remove them?
+Make project backup	ProjectWindow		Make project backup
+OK	GetTextWindow		OK
+Force project to rebuild	ProjectWindow		Force project to rebuild
+ASCII table	AsciiWindow		ASCII table
+Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler optimization level. Disabled when debugging info is checked.
+Remove Selected files from repository	ProjectWindow		Remove Selected files from repository
+Subversion repository folder:	PrefsWindow		Subversion repository folder:
+Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Open a project in the list on the right. You can also press Command + a number key.
+Add to repository	ProjectWindow		Add to repository
+Delete	CodeLibWindow		Delete
+Sort group	ProjectWindow		Sort group
+Copy list to clipboard	ErrorWindow		Copy list to clipboard
+Cancel	GroupRenameWindow		Cancel
+About Paladin%ellipsis%	ProjectWindow		About Paladin%ellipsis%
+to build it, but you can still view its files and do anything 	Paladin		to build it, but you can still view its files and do anything 
+Cancel	GetTextWindow		Cancel
+Static library	ProjectSettingsWindow		Static library
+Source control: 	TemplateWindow		Source control: 
+Warnings	ErrorWindow		Warnings
+Copy to clipboard	ErrorWindow		Copy to clipboard
+Full	ProjectSettingsWindow		Full
+Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.
+Import a project from an online repository	StartWindow		Import a project from an online repository
+Remove from recent list	StartWindow		Remove from recent list
+Create a new project	StartWindow		Create a new project
+Show differences from last check-in	ProjectWindow		Show differences from last check-in
+Regular expression tester	VRegWindow		Regular expression tester
+Export module to project	CodeLibWindow		Export module to project
+Selected project:	CodeLibWindow		Selected project:
+When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		When checked, a project's folder is shown in Tracker when it is opened.
+Choose project folder	StartWindow		Choose project folder
+Backups folder:	PrefsWindow		Backups folder:
+Use the fastdep dependency checker instead of gcc	PrefsWindow		Use the fastdep dependency checker instead of gcc
+ - Missing	ProjectList		 - Missing
+Paladin's multi-file Find window depends on Lua. It will need to be installed if you wish to use this feature.	ProjectWindow		Paladin's multi-file Find window depends on Lua. It will need to be installed if you wish to use this feature.
+Command key (usually Alt).	CodeLibWindow		Command key (usually Alt).
+Project settings	ProjectSettingsWindow		Project settings
+Program settings%ellipsis%	ProjectWindow		Program settings%ellipsis%
+unavailable	PrefsWindow		unavailable
+Add selected files to repository	ProjectList		Add selected files to repository
+Build debugging information	ProjectSettingsWindow		Build debugging information
+Errors	ErrorWindow		Errors
+Debug	ProjectWindow		Debug
+Show changed files from last check-in	ProjectWindow		Show changed files from last check-in
+New group	ProjectList		New group
+Errors and warnings	ErrorWindow		Errors and warnings
+Add project files to module…	CodeLibWindow		Add project files to module…
+Printing debug output\n	Paladin		Printing debug output\n
+Set run arguments%ellipsis%	ProjectWindow		Set run arguments%ellipsis%
+Shift key	CodeLibWindow		Shift key
+New group	ProjectWindow		New group
+Source control	ProjectWindow		Source control
+None	PrefsWindow		None
+Linking\n	Paladin		Linking\n
+ASCII table%ellipsis%	ProjectWindow		ASCII table%ellipsis%
+Subversion	TemplateWindow		Subversion
+Cancel	Globals		Cancel
+Code library	CodeLibWindow		Code library
+File to build a program with Paladin	FileUtils		File to build a program with Paladin
+Preferred source control:	PrefsWindow		Preferred source control:
+Set license	LicenseManager		Set license
+Printing debug output with extra detail\n	Paladin		Printing debug output with extra detail\n
+Performing post-build tasks	ProjectWindow		Performing post-build tasks
+Location:	TemplateWindow		Location:
+Pull	ProjectWindow		Pull
+Find and open file%ellipsis%	ProjectWindow		Find and open file%ellipsis%
+Choose the system libraries for your project:	LibWindow		Choose the system libraries for your project:
+Include paths:	ProjectSettingsWindow		Include paths:
+This cannot be undone. Delete module?	CodeLibWindow		This cannot be undone. Delete module?
+Create project folder	TemplateWindow		Create project folder
+User libraries:	LibWindow		User libraries:
+Updating resources	ProjectWindow		Updating resources
+Remove selected files	ProjectWindow		Remove selected files
+Remove the selected path	ProjectSettingsWindow		Remove the selected path
+Paladin	System name		Paladin
+Sets the location for project backups	PrefsWindow		Sets the location for project backups
+Set the location for your project.	TemplateWindow		Set the location for your project.
+Add new file%ellipsis%	ProjectWindow		Add new file%ellipsis%
+Cancel	FindOpenFileWindow		Cancel
+Can't find file %s\n	Paladin		Can't find file %s\n
+Some	ProjectSettingsWindow		Some
+Building %s\n	Paladin		Building %s\n
+Use ccache to build faster	PrefsWindow		Use ccache to build faster
+Revert selected files	ProjectList		Revert selected files
+Cancel	CodeLibWindow		Cancel
+Files in Module:	CodeLibWindow		Files in Module:
+Rename group	GroupRenameWindow		Rename group
+If checked, a folder for your project will be created in the folder in the Location box above.	TemplateWindow		If checked, a folder for your project will be created in the folder in the Location box above.
+Target name:	TemplateWindow		Target name:
+Regex:	VRegWindow		Regex:
+Optimize:	ProjectSettingsWindow		Optimize:
+Enter the description for the changes in this revision.	ProjectWindow		Enter the description for the changes in this revision.
+Git unavailable	TemplateWindow		Git unavailable
+Build profiling information	ProjectSettingsWindow		Build profiling information
+Pull changes from remote repository	ProjectWindow		Pull changes from remote repository
+Remove from repository	ProjectWindow		Remove from repository
+Omit header files from projects	PrefsWindow		Omit header files from projects
+Remove selected files from repository	ProjectList		Remove selected files from repository
+If checked, header files are not automatically added to projects.	PrefsWindow		If checked, header files are not automatically added to projects.
+Add files to Module…	CodeLibWindow		Add files to Module…
+Choose a project type	TemplateWindow		Choose a project type
+Templates	TemplateWindow		Templates
+Build with just one thread instead of one thread per processor	PrefsWindow		Build with just one thread instead of one thread per processor
+Rename group	ProjectWindow		Rename group
+Mercurial	TemplateWindow		Mercurial
+Push changes to remote repository	ProjectWindow		Push changes to remote repository
+Recent projects:	StartWindow		Recent projects:
+Create	AddNewFileWindow		Create
+The folders you want Paladin to search for header files	ProjectSettingsWindow		The folders you want Paladin to search for header files
+Optimize for size over speed	ProjectSettingsWindow		Optimize for size over speed
+Projects folder:	PrefsWindow		Projects folder:
+License:	LicenseManager		License:
+Error window%ellipsis%	ProjectWindow		Error window%ellipsis%
+Remove	CodeLibWindow		Remove
+Linking	ProjectWindow		Linking

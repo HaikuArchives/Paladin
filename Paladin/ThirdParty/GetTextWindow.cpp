@@ -1,13 +1,18 @@
 #include "GetTextWindow.h"
 
+#include <Catalog.h>
 #include <Font.h>
+#include <Locale.h>
 #include <Region.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
 
 #include "EscapeCancelFilter.h"
-#include "PLocale.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GetTextWindow"
 
 #define M_TEXT_CHANGED 'txch'
 #define M_SEND_TEXT 'sntx'
@@ -37,13 +42,13 @@ GetTextWindow::GetTextWindow(const char *title, const char *text,
 	BScrollView *sv = new BScrollView("scroll", fText, B_FOLLOW_ALL, 0,
 										false, true);
 	
-	fOK = new BButton(BRect(0,0,1,1),"ok",TR("OK"),new BMessage(M_SEND_TEXT));
+	fOK = new BButton(BRect(0,0,1,1),"ok",B_TRANSLATE("OK"),new BMessage(M_SEND_TEXT));
 	fOK->ResizeToPreferred();
 	
 	fOK->MoveTo(sv->Frame().right - fOK->Bounds().Width(),
 					sv->Frame().bottom + 10);
 	
-	fCancel = new BButton(BRect(0,0,1,1),"fCancel",TR("Cancel"),
+	fCancel = new BButton(BRect(0,0,1,1),"fCancel",B_TRANSLATE("Cancel"),
 						new BMessage(B_QUIT_REQUESTED));
 	fCancel->ResizeToPreferred();
 	

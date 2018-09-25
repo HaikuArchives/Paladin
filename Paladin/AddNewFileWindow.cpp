@@ -1,7 +1,9 @@
 #include "AddNewFileWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -10,8 +12,11 @@
 #include "EscapeCancelFilter.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
-#include "PLocale.h"
 #include "Project.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AddNewFileWindow"
 
 #define	M_ADD_FILE 'adfl'
 
@@ -19,7 +24,7 @@
 AddNewFileWindow::AddNewFileWindow(const BMessage &message,
 	const BMessenger &messenger, bool renameMode)
 	:
-	DWindow(BRect(0,0,400,200),TR("Add new file"),B_TITLED_WINDOW,
+	DWindow(BRect(0,0,400,200),B_TRANSLATE("Add new file"),B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE), fMessage(message),
 		fMessenger(messenger)
 {
@@ -27,13 +32,13 @@ AddNewFileWindow::AddNewFileWindow(const BMessage &message,
 	BString checklabel;
 	if (renameMode) {
 		SetTitle("Rename file");
-		namelabel = TR("New name: ");
-		checklabel = TR("Rename partner file");
+		namelabel = B_TRANSLATE("New name: ");
+		checklabel = B_TRANSLATE("Rename partner file");
 	}
 	else
 	{
-		namelabel = TR("New file name: ");
-		checklabel = TR("Create both a header and source file");
+		namelabel = B_TRANSLATE("New file name: ");
+		checklabel = B_TRANSLATE("Create both a header and source file");
 	}
 
 	AddCommonFilter(new EscapeCancelFilter());
@@ -48,9 +53,9 @@ AddNewFileWindow::AddNewFileWindow(const BMessage &message,
 	fBothBox = new BCheckBox("partnerbox",checklabel.String(),
 		new BMessage);
 
-	BButton* cancel = new BButton("cancel", TR("Cancel"),
+	BButton* cancel = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
-	BButton* open = new BButton("create", TR("Create"), new BMessage(M_ADD_FILE));
+	BButton* open = new BButton("create", B_TRANSLATE("Create"), new BMessage(M_ADD_FILE));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(B_VERTICAL)

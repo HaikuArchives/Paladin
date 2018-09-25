@@ -14,10 +14,12 @@
 #include "StartWindow.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <FilePanel.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
@@ -32,7 +34,6 @@
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "SCMImportWindow.h"
 #include "Settings.h"
@@ -40,6 +41,9 @@
 #include "TypedRefFilter.h"
 #include "PaladinFileFilter.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "StartWindow"
 
 enum
 {
@@ -144,7 +148,7 @@ RecentProjectsList::MouseDown(BPoint where)
 
 		BPopUpMenu menu("context");
 
-		menu.AddItem(new BMenuItem(TR("Remove from recent list"),
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Remove from recent list"),
 			new BMessage(M_REMOVE_FROM_LIST)));
 		menu.SetTargetForItems(Window());
 		menu.Go(screenPoint, true, false);
@@ -157,7 +161,7 @@ RecentProjectsList::MouseDown(BPoint where)
 
 StartWindow::StartWindow(void)
 	:
-	BWindow(BRect(0, 0, -1, -1), "Paladin", B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, -1, -1), B_TRANSLATE_SYSTEM_NAME("Paladin"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	RegisterWindow();
@@ -173,7 +177,7 @@ StartWindow::StartWindow(void)
 	fNewButton = make_button("new", "NewProjectButtonUp.png",
 		"NewProjectButtonDown.png", M_NEW_PROJECT);
 
-	ClickableStringView* newLabel = make_label(fNewButton, TR("Create a new project"));
+	ClickableStringView* newLabel = make_label(fNewButton, B_TRANSLATE("Create a new project"));
 	newLabel->SetMessage(new BMessage(M_NEW_PROJECT));
 
 	// open button and label
@@ -189,11 +193,11 @@ StartWindow::StartWindow(void)
 	fOpenRecentButton = make_button("openrecent", "OpenRecentButtonUp.png",
 		"OpenRecentButtonDown.png", M_OPEN_SELECTION);
 	SetToolTip(fOpenRecentButton,
-		TR("Open a project in the list on the right. You "
+		B_TRANSLATE("Open a project in the list on the right. You "
 		   "can also press Command + a number key."));
 
 	ClickableStringView* openRecentLabel = make_label(fOpenRecentButton,
-		TR("Open the selected project"));
+		B_TRANSLATE("Open the selected project"));
 	openRecentLabel->SetMessage(new BMessage(M_OPEN_SELECTION));
 
 	// quick import button and label
@@ -201,14 +205,14 @@ StartWindow::StartWindow(void)
 	fQuickImportButton = make_button("quickimport", "QuickImportButtonUp.png",
 		"QuickImportButtonDown.png", M_SHOW_IMPORT);
 	SetToolTip(fQuickImportButton,
-		TR("Quickly make a project by importing all source files and resource files.\n"
+		B_TRANSLATE("Quickly make a project by importing all source files and resource files.\n"
 		   "You can also import a BeIDE project."));
 
 	ClickableStringView* quickImportLabel = make_label(fQuickImportButton,
 		"Import an existing project");
 	quickImportLabel->SetMessage(new BMessage(M_SHOW_IMPORT));
 	SetToolTip(quickImportLabel,
-		TR("Quickly make a project by importing all source files "
+		B_TRANSLATE("Quickly make a project by importing all source files "
 		   "and resource files.\n You can also import a BeIDE project."));
 
 	// online import button and label
@@ -216,12 +220,12 @@ StartWindow::StartWindow(void)
 	fOnlineImportButton = make_button("onlineimport", "OnlineImportButtonUp.png",
 		"OnlineImportButtonDown.png", M_ONLINE_IMPORT);
 	SetToolTip(fQuickImportButton,
-		TR("Import a project from an online repository"));
+		B_TRANSLATE("Import a project from an online repository"));
 
 	ClickableStringView* onlineImportLabel = make_label(fOnlineImportButton,
 		"Import a project from online");
 	onlineImportLabel->SetMessage(new BMessage(M_ONLINE_IMPORT));
-	SetToolTip(onlineImportLabel, TR("Import a project from an online repository"));
+	SetToolTip(onlineImportLabel, B_TRANSLATE("Import a project from an online repository"));
 
 	// recent projects list view and scroller
 
@@ -252,7 +256,7 @@ StartWindow::StartWindow(void)
 			.End()
 		.AddStrut(20)
 		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
-			.Add(new BStringView("recentProjectsLabel", TR("Recent projects:")))
+			.Add(new BStringView("recentProjectsLabel", B_TRANSLATE("Recent projects:")))
 			.Add(new BScrollView("recentProjectsScroller", fRecentProjectsListView, 0,
 				false, true))
 			.End()
@@ -269,13 +273,13 @@ StartWindow::StartWindow(void)
 	entry.GetRef(&ref);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_FILE_NODE, false,
 		new BMessage(M_OPEN_PROJECT),new PaladinFileFilter());
-	BString titleString(TR("Open project"));
+	BString titleString(B_TRANSLATE("Open project"));
 	titleString.Prepend("Paladin: ");
 	fOpenPanel->Window()->SetTitle(titleString.String());
 
 	fImportPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_DIRECTORY_NODE,
 		true, new BMessage(M_QUICK_IMPORT));
-	titleString = TR("Choose project folder");
+	titleString = B_TRANSLATE("Choose project folder");
 	titleString.Prepend("Paladin: ");
 	fImportPanel->Window()->SetTitle(titleString.String());
 
@@ -369,7 +373,7 @@ StartWindow::MessageReceived(BMessage* message)
 		case M_ONLINE_IMPORT:
 		{
 			if (!gHgAvailable && !gGitAvailable && !gSvnAvailable) {
-				ShowAlert(TR("Online import requires Mercurial, "
+				ShowAlert(B_TRANSLATE("Online import requires Mercurial, "
 					"Git, and/or Subversion to be installed, "
 					"but Paladin can't find them, sorry."));
 			} else {

@@ -12,9 +12,11 @@
 #include "PrefsWindow.h"
 
 #include <Box.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Font.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -26,9 +28,11 @@
 #include "DPath.h"
 #include "Globals.h"
 #include "PathBox.h"
-#include "PLocale.h"
 #include "Settings.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PrefsWindow"
 
 enum
 {
@@ -40,7 +44,7 @@ enum
 
 PrefsWindow::PrefsWindow(BRect frame)
 	:
-	BWindow(frame, TR("Program settings"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE("Program settings"), B_TITLED_WINDOW,
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	AddShortcut('1', B_COMMAND_KEY, new BMessage(M_SET_TAB_0));
@@ -50,48 +54,48 @@ PrefsWindow::PrefsWindow(BRect frame)
 
 	fProjectFolder = new PathBox("projectfolder", gProjectPath.GetFullPath(), "");
 	fProjectFolder->MakeValidating(true);
-	SetToolTip(fProjectFolder, TR("The default path for new projects."));
+	SetToolTip(fProjectFolder, B_TRANSLATE("The default path for new projects."));
 
 	fShowProjectFolder = new BCheckBox("showfolder",
-		TR("Show project folder on open"), new BMessage);
-	SetToolTip(fShowProjectFolder, TR("When checked, a project's folder is "
+		B_TRANSLATE("Show project folder on open"), new BMessage);
+	SetToolTip(fShowProjectFolder, B_TRANSLATE("When checked, a project's folder is "
 		"shown in Tracker when it is opened."));
 	if (gShowFolderOnOpen)
 		fShowProjectFolder->SetValue(B_CONTROL_ON);
 
 	fDontAddHeaders = new BCheckBox("dontaddheaders",
-		TR("Omit header files from projects"), NULL);
-	SetToolTip(fDontAddHeaders, TR("If checked, header files are not automatically "
+		B_TRANSLATE("Omit header files from projects"), NULL);
+	SetToolTip(fDontAddHeaders, B_TRANSLATE("If checked, header files are not automatically "
 		"added to projects."));
 	if (gDontManageHeaders)
 		fDontAddHeaders->SetValue(B_CONTROL_ON);
 
-	fSlowBuilds = new BCheckBox("slowbuilds", TR("Use single thread"), NULL);
-	SetToolTip(fSlowBuilds, TR("Build with just one thread instead of one thread "
+	fSlowBuilds = new BCheckBox("slowbuilds", B_TRANSLATE("Use single thread"), NULL);
+	SetToolTip(fSlowBuilds, B_TRANSLATE("Build with just one thread instead of one thread "
 		"per processor"));
 	if (gSingleThreadedBuild)
 		fSlowBuilds->SetValue(B_CONTROL_ON);
 
-	fCCache = new BCheckBox("ccache", TR("Use ccache to build faster"), NULL);
-	SetToolTip(fCCache, TR("Compiler caching is another way to speed up builds"));
+	fCCache = new BCheckBox("ccache", B_TRANSLATE("Use ccache to build faster"), NULL);
+	SetToolTip(fCCache, B_TRANSLATE("Compiler caching is another way to speed up builds"));
 	if (gCCacheAvailable) {
 		if (gUseCCache)
 			fCCache->SetValue(B_CONTROL_ON);
 	} else {
 		BString label = fCCache->Label();
-		label << " -- " << TR("unavailable");
+		label << " -- " << B_TRANSLATE("unavailable");
 		fCCache->SetLabel(label.String());
 		fCCache->SetEnabled(false);
 	}
 
-	fFastDep = new BCheckBox("fastdep", TR("Use fastdep dependency checker"), NULL);
-	SetToolTip(fFastDep, TR("Use the fastdep dependency checker instead of gcc"));
+	fFastDep = new BCheckBox("fastdep", B_TRANSLATE("Use fastdep dependency checker"), NULL);
+	SetToolTip(fFastDep, B_TRANSLATE("Use the fastdep dependency checker instead of gcc"));
 	if (gFastDepAvailable) {
 		if (gUseFastDep)
 			fFastDep->SetValue(B_CONTROL_ON);
 	} else {
 		BString label = fFastDep->Label();
-		label << " -- " << TR("unavailable");
+		label << " -- " << B_TRANSLATE("unavailable");
 		fFastDep->SetLabel(label.String());
 		fFastDep->SetEnabled(false);
 	}
@@ -104,21 +108,21 @@ PrefsWindow::PrefsWindow(BRect frame)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
 			.View());
-	buildBox->SetLabel(TR("Build"));
+	buildBox->SetLabel(B_TRANSLATE("Build"));
 
 	fAutoSyncModules = new BCheckBox("autosync",
-		TR("Automatically synchronize modules"), NULL);
-	SetToolTip(fAutoSyncModules, TR("Automatically synchronize modules in your "
+		B_TRANSLATE("Automatically synchronize modules"), NULL);
+	SetToolTip(fAutoSyncModules, B_TRANSLATE("Automatically synchronize modules in your "
 		"projects with the those in the code library"));
 	if (gAutoSyncModules)
 		fAutoSyncModules->SetValue(B_CONTROL_ON);
 
 	fBackupFolder = new PathBox("backupfolder", gBackupPath.GetFullPath(), "");
 	fBackupFolder->MakeValidating(true);
-	SetToolTip(fBackupFolder, TR("Sets the location for project backups"));
+	SetToolTip(fBackupFolder, B_TRANSLATE("Sets the location for project backups"));
 
 	fTabs[0] = BLayoutBuilder::Grid<>(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-		.Add(new BStringView("projects folder label", TR("Projects folder:")), 0, 0)
+		.Add(new BStringView("projects folder label", B_TRANSLATE("Projects folder:")), 0, 0)
 		.Add(fProjectFolder, 1, 0)
 
 		.AddGroup(B_VERTICAL, 0.0f, 1, 1)
@@ -130,12 +134,12 @@ PrefsWindow::PrefsWindow(BRect frame)
 
 		.Add(fAutoSyncModules, 1, 3)
 
-		.Add(new BStringView("backups folder label", TR("Backups folder:")), 0, 4)
+		.Add(new BStringView("backups folder label", B_TRANSLATE("Backups folder:")), 0, 4)
 		.Add(fBackupFolder, 1, 4)
 
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.View();
-	fTabs[0]->SetName(TR("General"));
+	fTabs[0]->SetName(B_TRANSLATE("General"));
 	fTabs[0]->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 #ifndef BUILD_CODE_LIBRARY
@@ -145,12 +149,12 @@ PrefsWindow::PrefsWindow(BRect frame)
 	// source control
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
-	scmMenu->AddItem(new BMenuItem(TR("Mercurial"), NULL));
-	scmMenu->AddItem(new BMenuItem(TR("Git"), NULL));
-	scmMenu->AddItem(new BMenuItem(TR("Subversion"), NULL));
-	scmMenu->AddItem(new BMenuItem(TR("None"), NULL));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), NULL));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), NULL));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), NULL));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), NULL));
 
-	fSCMChooser = new BMenuField("scmchooser", TR("Preferred source control:"),
+	fSCMChooser = new BMenuField("scmchooser", B_TRANSLATE("Preferred source control:"),
 		scmMenu);
 
 	BMenuItem* marked = scmMenu->ItemAt(gDefaultSCM);
@@ -173,7 +177,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 
 	fSVNRepoFolder = new PathBox("svnrepofolder", gSVNRepoPath.GetFullPath(), "");
 	fSVNRepoFolder->MakeValidating(true);
-	SetToolTip(fSVNRepoFolder, TR("Sets the location for the 'server' side of "
+	SetToolTip(fSVNRepoFolder, B_TRANSLATE("Sets the location for the 'server' side of "
 		"local Subversion repositories."));
 
 	fTabs[1] = BLayoutBuilder::Group<>(B_VERTICAL)
@@ -185,13 +189,13 @@ PrefsWindow::PrefsWindow(BRect frame)
 				.End()
 	
 			.Add(new BStringView("svn repo folder label",
-				TR("Subversion repository folder:")), 0, 1)
+				B_TRANSLATE("Subversion repository folder:")), 0, 1)
 			.Add(fSVNRepoFolder, 1, 1)
 			.End()
 		.AddGlue()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.View();
-	fTabs[1]->SetName(TR("Source control"));
+	fTabs[1]->SetName(B_TRANSLATE("Source control"));
 	fTabs[1]->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// tab view

@@ -11,8 +11,10 @@
 
 #include "VRegWindow.h"
 
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TextControl.h>
@@ -20,8 +22,10 @@
 
 #include "AutoTextControl.h"
 #include "CRegex.h"
-#include "PLocale.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "VRegWindow"
 
 enum {
 	M_REGEX_UPDATE = 'rxup'
@@ -30,20 +34,20 @@ enum {
 
 VRegWindow::VRegWindow()
 	:
-	BWindow(BRect(0, 0, 640, 480), TR("Regular expression tester"),
+	BWindow(BRect(0, 0, 640, 480), B_TRANSLATE("Regular expression tester"),
 		B_TITLED_WINDOW, 0)
 {
-	fRegexTextControl = new AutoTextControl("regexTextControl", TR("Regex:"), "",
+	fRegexTextControl = new AutoTextControl("regexTextControl", B_TRANSLATE("Regex:"), "",
 		new BMessage(M_REGEX_UPDATE));
 
 	BStringView* sourceLabel = new BStringView("sourceLabel",
-		TR("Enter text to search here:"));
+		B_TRANSLATE("Enter text to search here:"));
 	fSourceView = new BTextView("sourcetext", B_WILL_DRAW);
 	BScrollView* sourceScroll = new BScrollView("sourceScrollView", fSourceView,
 		B_WILL_DRAW, false, true);
 
 	BStringView* matchLabel = new BStringView("matchLabel",
-		TR("Matched text:"));
+		B_TRANSLATE("Matched text:"));
 	fMatchView = new BTextView("matchtext", B_WILL_DRAW);
 	BScrollView* matchScroll = new BScrollView("matchScrollView", fMatchView,
 		B_WILL_DRAW, false, true);

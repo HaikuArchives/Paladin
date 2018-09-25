@@ -14,6 +14,8 @@
 #include "ProjectList.h"
 
 #include <Bitmap.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <PopUpMenu.h>
@@ -23,9 +25,12 @@
 
 #include "DebugTools.h"
 #include "MsgDefs.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "SourceFile.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProjectList"
 
 #define SET_COLOR(c,r,g,b) { c.red = r; c.green = g; c.blue = b; c.alpha = 255; }
 
@@ -308,23 +313,24 @@ ProjectList::ShowContextMenu(BPoint where)
 
 	if (fileItem != NULL) {
 		message = new BMessage(M_OPEN_PARENT_FOLDER);
-		menu.AddItem(new BMenuItem(TR("Open folder for file") B_UTF8_ELLIPSIS,
-			message));
-		menu.AddItem(new BMenuItem(TR("Force file rebuild"),
+		BString openStr(B_TRANSLATE("Open folder for file%ellipsis%"));
+		openStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+		menu.AddItem(new BMenuItem(openStr, message));
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Force file rebuild"),
 			new BMessage(M_REBUILD_FILE)));
 		menu.AddSeparatorItem();
-		menu.AddItem(new BMenuItem(TR("Remove selected files"),
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Remove selected files"),
 			new BMessage(M_REMOVE_FILES)));
 		menu.AddSeparatorItem();
 
 		BMenu* submenu = new BMenu("Source Control");
-		submenu->AddItem(new BMenuItem(TR("Add selected files to repository"),
+		submenu->AddItem(new BMenuItem(B_TRANSLATE("Add selected files to repository"),
 			new BMessage(M_ADD_SELECTION_TO_REPO)));
-		submenu->AddItem(new BMenuItem(TR("Remove selected files from repository"),
+		submenu->AddItem(new BMenuItem(B_TRANSLATE("Remove selected files from repository"),
 			new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
-		submenu->AddItem(new BMenuItem(TR("Show changes in selected files"),
+		submenu->AddItem(new BMenuItem(B_TRANSLATE("Show changes in selected files"),
 			new BMessage(M_DIFF_SELECTION)));
-		submenu->AddItem(new BMenuItem(TR("Revert selected files"),
+		submenu->AddItem(new BMenuItem(B_TRANSLATE("Revert selected files"),
 			new BMessage(M_REVERT_SELECTION)));
 
 		menu.AddItem(submenu);
@@ -342,12 +348,14 @@ ProjectList::ShowContextMenu(BPoint where)
 			menu.AddSeparatorItem();
 
 		if (NULL == groupItem) {
-			menu.AddItem(new BMenuItem(TR("New group"),
+			menu.AddItem(new BMenuItem(B_TRANSLATE("New group"),
 				new BMessage(M_NEW_GROUP)));
-		}
-		menu.AddItem(new BMenuItem(TR("Rename group") B_UTF8_ELLIPSIS,
+    }
+		BString renameStr(B_TRANSLATE("Rename group%ellipsis"));
+		renameStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+		menu.AddItem(new BMenuItem(renameStr,
 			new BMessage(M_SHOW_RENAME_GROUP)));
-		menu.AddItem(new BMenuItem(TR("Sort group"),
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 			new BMessage(M_SORT_GROUP)));
 
 		menu.SetTargetForItems(Window());
@@ -570,7 +578,7 @@ SourceFileItem::SetData(SourceFile *data)
 			str = "Empty SourceFile item";
 		
 		if (fDisplayState == SFITEM_MISSING)
-			str << TR(" - Missing");
+			str << B_TRANSLATE(" - Missing");
 	}
 	else
 		str = "NULL SourceFile item";

@@ -1,17 +1,22 @@
 #include "GroupRenameWindow.h"
 
+#include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Screen.h>
 
 #include "EscapeCancelFilter.h"
-#include "PLocale.h"
 #include "SourceFile.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "GroupRenameWindow"
 
 #define M_NAME_CHANGED 'nmch'
 
 GroupRenameWindow::GroupRenameWindow(SourceGroup *group, const BMessage &msg,
 									const BMessenger &msgr)
-	:	DWindow(BRect(0,0,300,300),TR("Rename group"), B_MODAL_WINDOW,
+	:	DWindow(BRect(0,0,300,300),B_TRANSLATE("Rename group"), B_MODAL_WINDOW,
 				B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
 		fGroup(group),
 		fMessage(msg),
@@ -19,12 +24,12 @@ GroupRenameWindow::GroupRenameWindow(SourceGroup *group, const BMessage &msg,
 {
 	AddCommonFilter(new EscapeCancelFilter());
 
-	fGroupText = new AutoTextControl("argtext",TR("New group name: "),
+	fGroupText = new AutoTextControl("argtext",B_TRANSLATE("New group name: "),
 									fGroup->name.String(), new BMessage(M_NAME_CHANGED));
-	fGroupText->SetDivider(fGroupText->StringWidth(TR("New group name: ")) + 5);
+	fGroupText->SetDivider(fGroupText->StringWidth(B_TRANSLATE("New group name: ")) + 5);
 
-	fRename = new BButton("rename",TR("Rename"),new BMessage(B_QUIT_REQUESTED));	
-	BButton *cancel = new BButton("cancel",TR("Cancel"),new BMessage(B_QUIT_REQUESTED));
+	fRename = new BButton("rename",B_TRANSLATE("Rename"),new BMessage(B_QUIT_REQUESTED));	
+	BButton *cancel = new BButton("cancel",B_TRANSLATE("Cancel"),new BMessage(B_QUIT_REQUESTED));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(B_VERTICAL)

@@ -1,7 +1,9 @@
 #include "CodeLibWindow.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <OS.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <Path.h>
 #include <Roster.h>
@@ -15,10 +17,12 @@
 #include "Globals.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "SourceFile.h"
 #include "StringInputWindow.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CodeLibWindow"
 
 enum
 {
@@ -64,7 +68,7 @@ CodeLibWindow::GetInstance(BRect frame)
 
 
 CodeLibWindow::CodeLibWindow(BRect frame)
-	:	DWindow(frame,TR("Code library"), B_TITLED_WINDOW),
+	:	DWindow(frame,B_TRANSLATE("Code library"), B_TITLED_WINDOW),
 		fCurrentModule(NULL),
 		fCurrentProject(NULL),
 		fFilePanel(NULL)
@@ -89,15 +93,15 @@ CodeLibWindow::CodeLibWindow(BRect frame)
 	if (gProjectList->CountItems() > 1)
 	{
 		r.right = Bounds().right - 10.0;
-		fProjectMenu = new BMenu(TR("Projects"));
+		fProjectMenu = new BMenu(B_TRANSLATE("Projects"));
 		fProjectMenu->SetLabelFromMarked(true);
 		
-		BMenuField *field = new BMenuField(r,"projectfield",TR("Selected project:"),fProjectMenu);
+		BMenuField *field = new BMenuField(r,"projectfield",B_TRANSLATE("Selected project:"),fProjectMenu);
 		
 		float pw,ph;
 		field->GetPreferredSize(&pw,&ph);
 		field->ResizeTo(r.Width(),ph);
-		field->SetDivider(field->StringWidth(TR("Selected project:")) + 10.0);
+		field->SetDivider(field->StringWidth(B_TRANSLATE("Selected project:")) + 10.0);
 		fMainView->AddChild(field);
 		
 		gProjectList->Lock();
@@ -118,14 +122,14 @@ CodeLibWindow::CodeLibWindow(BRect frame)
 	r.right = r.left + 25.0;
 	
 	
-	BStringView *modLabel = new BStringView(BRect(0,0,1,1),"modlabel",TR("Code Modules:"));
+	BStringView *modLabel = new BStringView(BRect(0,0,1,1),"modlabel",B_TRANSLATE("Code Modules:"));
 	modLabel->SetFont(be_bold_font);
 	modLabel->ResizeToPreferred();
 	modLabel->MoveTo(10.0,r.top);
 	fMainView->AddChild(modLabel);
 	
 	r = Bounds().InsetByCopy(10,10);
-	fDescription = new AutoTextControl(r,"description",TR("Description:"),"",
+	fDescription = new AutoTextControl(r,"description",B_TRANSLATE("Description:"),"",
 										new BMessage(M_DESCRIPTION_CHANGED),
 										B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	float pw, ph;
@@ -159,7 +163,7 @@ CodeLibWindow::CodeLibWindow(BRect frame)
 	sv = fFileList->MakeScrollView("filescroll",false,true);
 	fMainView->AddChild(sv);
 	
-	BStringView *fileLabel = new BStringView(BRect(0,0,1,1),"filelabel",TR("Files in Module:"));
+	BStringView *fileLabel = new BStringView(BRect(0,0,1,1),"filelabel",B_TRANSLATE("Files in Module:"));
 	fileLabel->SetFont(be_bold_font);
 	fileLabel->ResizeToPreferred();
 	fileLabel->MoveTo(r.left,modLabel->Frame().top);
@@ -218,7 +222,7 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 		case M_SHOW_CREATE_MODULE:
 		{
 			StringInputWindow *inwin = new StringInputWindow("Create module",
-														TR("Choose the name for the new module:"),
+														B_TRANSLATE("Choose the name for the new module:"),
 														BMessage(M_CREATE_MODULE),
 														BMessenger(NULL,this));
 			inwin->Show();
@@ -251,8 +255,8 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 			item = (BStringItem*)fModList->ItemAt(sel);
 			if (item)
 			{
-				BString alertmsg = TR("This cannot be undone. Delete module?");
-				if (ShowAlert("ModMan",alertmsg.String(),TR("Cancel"),TR("Delete")))
+				BString alertmsg = B_TRANSLATE("This cannot be undone. Delete module?");
+				if (ShowAlert("ModMan",alertmsg.String(),B_TRANSLATE("Cancel"),B_TRANSLATE("Delete")))
 				{
 					gCodeLib.DeleteModule(item->Text());
 					fCurrentModule = NULL;
@@ -325,8 +329,8 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 			if (!mod)
 				break;
 			
-			int32 result = ShowAlert(TR("These files (except libraries) will be permanently deleted. Remove them?"),
-									TR("Cancel"),TR("Remove"));
+			int32 result = ShowAlert(B_TRANSLATE("These files (except libraries) will be permanently deleted. Remove them?"),
+									B_TRANSLATE("Cancel"),B_TRANSLATE("Remove"));
 			if (!result)
 				break;
 			
@@ -402,17 +406,17 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 void
 CodeLibWindow::SetupMenus(void)
 {
-	BMenu *menu = new BMenu(TR("Actions"));
-	menu->AddItem(new BMenuItem(TR("Create new module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_CREATE_MODULE),'N'));
-	menu->AddItem(new BMenuItem(TR("Delete current module"),new BMessage(M_DELETE_MODULE),'D'));
+	BMenu *menu = new BMenu(B_TRANSLATE("Actions"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Create new module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_CREATE_MODULE),'N'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Delete current module"),new BMessage(M_DELETE_MODULE),'D'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Add files to Module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_ADD_FILES),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Add files to Module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_ADD_FILES),
 								'A',B_COMMAND_KEY | B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem(TR("Add project files to module" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Add project files to module" B_UTF8_ELLIPSIS),
 								new BMessage(M_SHOW_ADD_PROJECT_FILES),'A'));
-	menu->AddItem(new BMenuItem(TR("Remove files from module"),new BMessage(M_REMOVE_FILES)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Remove files from module"),new BMessage(M_REMOVE_FILES)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Export module to project"),new BMessage(M_EXPORT_TO_PROJECT),'E'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Export module to project"),new BMessage(M_EXPORT_TO_PROJECT),'E'));
 	fBar->AddItem(menu);
 }
 
@@ -537,15 +541,15 @@ AddFileView::AddFileView(Project *proj, BRect frame, const char *name, int32 res
 	textView->MakeEditable(false);
 	textView->SetViewColor(ViewColor());
 	
-	BString labelmsg(TR("Choose the project files you wish to import. "));
-	labelmsg << TR("You can select multiple files by clicking on items while holding the XXXXX.");
+	BString labelmsg(B_TRANSLATE("Choose the project files you wish to import. "));
+	labelmsg << B_TRANSLATE("You can select multiple files by clicking on items while holding the XXXXX.");
 	
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
-		labelmsg.ReplaceFirst("XXXXX",TR("Command key (usually Alt)."));
+		labelmsg.ReplaceFirst("XXXXX",B_TRANSLATE("Command key (usually Alt)."));
 	else if (gPlatform == PLATFORM_ZETA)
-		labelmsg.ReplaceFirst("XXXXX",TR("Control key."));
+		labelmsg.ReplaceFirst("XXXXX",B_TRANSLATE("Control key."));
 	else
-		labelmsg.ReplaceFirst("XXXXX",TR("Shift key"));
+		labelmsg.ReplaceFirst("XXXXX",B_TRANSLATE("Shift key"));
 	textView->SetText(labelmsg.String());
 	textView->ResizeTo(r.Width(), 20.0 + textView->TextHeight(0,textView->TextLength()));
 	
@@ -553,10 +557,10 @@ AddFileView::AddFileView(Project *proj, BRect frame, const char *name, int32 res
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	
 	// Init to wrong label so that it gets resized to match the Cancel button
-	fAddButton = new BButton(BRect(0,0,1,1),"addbutton",TR("Cancel"),new BMessage(M_ADD_FILES),
+	fAddButton = new BButton(BRect(0,0,1,1),"addbutton",B_TRANSLATE("Cancel"),new BMessage(M_ADD_FILES),
 								B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fAddButton->ResizeToPreferred();
-	fAddButton->SetLabel(TR("Add"));
+	fAddButton->SetLabel(B_TRANSLATE("Add"));
 	fAddButton->MoveTo(Bounds().right - 10.0 - fAddButton->Frame().Width(),
 				Bounds().bottom - 10.0 - fAddButton->Frame().Height());
 	fAddButton->SetTarget(this);

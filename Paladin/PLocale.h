@@ -10,6 +10,7 @@
 //#include <Locale.h>
 //#define TR_CONTEXT "Paladin"
 	#define TR(x)  x
+	#error Should not use the TR macro. Use B_TRANSLATE instead. Include Catalog and Locale h files
 #endif
 
 #ifdef __ZETA__

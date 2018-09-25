@@ -11,20 +11,23 @@
 
 #include "TerminalWindow.h"
 
+#include <Catalog.h>
 #include <Font.h>
+#include <Locale.h>
 #include <Message.h>
 #include <ScrollView.h>
 #include <stdio.h>
 
-#include "PLocale.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TerminalWindow"
 
 #define M_RUN_COMMAND 'rncm'
 
 
 TerminalWindow::TerminalWindow(const char* commandLine)
 	:
-	DWindow(BRect(0, 0, 400, 300), TR("Terminal output")),
+	DWindow(BRect(0, 0, 400, 300), B_TRANSLATE("Terminal output")),
 	fCommand(commandLine)
 {
 	SetSizeLimits(300, 30000, 200, 30000);

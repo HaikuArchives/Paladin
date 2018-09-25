@@ -13,11 +13,13 @@
 
 #include <Alignment.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Button.h>
 #include <CheckBox.h>
 #include <Clipboard.h>
 #include <Entry.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <StringItem.h>
@@ -25,11 +27,13 @@
 
 #include "DListView.h"
 #include "MsgDefs.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "ProjectBuilder.h"
 #include "ProjectWindow.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ErrorWindow"
 
 enum
 {
@@ -98,7 +102,7 @@ ErrorItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	:
-	BWindow(frame, TR("Errors and warnings"), B_DOCUMENT_WINDOW,
+	BWindow(frame, B_TRANSLATE("Errors and warnings"), B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
 	fParent(parent),
 	fErrorCount(0),
@@ -122,22 +126,22 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 		fErrors = *list;
 
 	if (parent != NULL) {
-		BString text = TR("Errors and warnings: ");
+		BString text = B_TRANSLATE("Errors and warnings: ");
 		text << fParent->GetProject()->GetName();
 		SetTitle(text.String());
 	} else
 		debugger("BUG: Invalid project for error window");
 
-	BString startingLabel(TR("Errors"));
+	BString startingLabel(B_TRANSLATE("Errors"));
 	startingLabel << " (10000)";
 
 	fErrorBox = new BCheckBox("errorbox", startingLabel.String(),
 		new BMessage(M_TOGGLE_ERRORS));
-	fErrorBox->SetLabel(TR("Errors"));
+	fErrorBox->SetLabel(B_TRANSLATE("Errors"));
 	fErrorBox->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	startingLabel = TR("Warnings");
+	startingLabel = B_TRANSLATE("Warnings");
 	startingLabel << " (10000)";
 
 	fWarningBox = new BCheckBox("warningbox", startingLabel.String(),
@@ -146,7 +150,7 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	fWarningBox->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	fCopyButton = new BButton("copy", TR("Copy to clipboard"),
+	fCopyButton = new BButton("copy", B_TRANSLATE("Copy to clipboard"),
 		new BMessage(M_COPY_ERRORS));
 
 	fErrorList = new DListView("errorlist", B_SINGLE_SELECTION_LIST,
@@ -155,7 +159,7 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	errorScrollView->ScrollBar(B_HORIZONTAL)->SetSteps(25, 75);
 
 	BPopUpMenu* contextMenu = new BPopUpMenu("context_menu", false, false);
-	contextMenu->AddItem(new BMenuItem(TR("Copy list to clipboard"),
+	contextMenu->AddItem(new BMenuItem(B_TRANSLATE("Copy list to clipboard"),
 		new BMessage(M_COPY_ERRORS)));
 	contextMenu->SetTargetForItems(this);
 	fErrorList->SetContextMenu(contextMenu);
@@ -347,12 +351,12 @@ ErrorWindow::ErrMsgToItem(error_msg* message)
 		BString boxLabel;
 		if (message->type == ERROR_ERROR) {
 			fErrorCount++;
-			boxLabel = TR("Errors");
+			boxLabel = B_TRANSLATE("Errors");
 			boxLabel << " (" << fErrorCount << ")";
 			fErrorBox->SetLabel(boxLabel.String());
 		} else if (message->type == ERROR_WARNING) {
 			fWarningCount++;
-			boxLabel = TR("Warnings");
+			boxLabel = B_TRANSLATE("Warnings");
 			boxLabel << " (" << fWarningCount << ")";
 			fWarningBox->SetLabel(boxLabel.String());
 		}
@@ -370,10 +374,10 @@ ErrorWindow::EmptyList(void)
 
 	fErrorCount = fWarningCount = 0;
 
-	BString label(TR("Errors"));
+	BString label(B_TRANSLATE("Errors"));
 	label << " (0)";
 	fErrorBox->SetLabel(label.String());
-	label = TR("Warnings");
+	label = B_TRANSLATE("Warnings");
 	label << " (0)";
 	fWarningBox->SetLabel(label.String());
 }

@@ -2,15 +2,20 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <Locale.h>
 #include <Mime.h>
 #include <Path.h>
 #include <Roster.h>
 
 #include "Icons.h"
 #include "Paladin.h"
-#include "PLocale.h"
 #include "Project.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FileUtils"
 
 void
 InitFileTypes(void)
@@ -25,8 +30,8 @@ InitFileTypes(void)
 	memcpy(mini_icon.Bits(),kProjectSmallIconBits,256);
 	
 	mime.SetType(PROJECT_MIME_TYPE);
-	mime.SetShortDescription(TR("Paladin project"));
-	mime.SetLongDescription(TR("File to build a program with Paladin"));
+	mime.SetShortDescription(B_TRANSLATE("Paladin project"));
+	mime.SetLongDescription(B_TRANSLATE("File to build a program with Paladin"));
 	mime.SetIcon(&large_icon, B_LARGE_ICON);
 	mime.SetIcon(&mini_icon, B_MINI_ICON);
 	
@@ -73,7 +78,7 @@ FindAndOpenFile(BMessage *msg)
 			i++;
 		}
 		
-		BString errorstr = TR("Couldn't find ");
+		BString errorstr = B_TRANSLATE("Couldn't find ");
 		errorstr << filename;
 		BAlert *alert = new BAlert("Paladin",errorstr.String(),"OK");
 		alert->Go();

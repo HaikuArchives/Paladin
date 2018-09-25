@@ -1,15 +1,20 @@
 #include "RunArgsWindow.h"
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Screen.h>
 
 #include "EscapeCancelFilter.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
-#include "PLocale.h"
 #include "Project.h"
 
 #include <LayoutBuilder.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RunArgsWindow"
 
 #define	M_FIND_FILE 'fnfl'
 
@@ -21,9 +26,9 @@ RunArgsWindow::RunArgsWindow(Project *proj)
 {
 	AddCommonFilter(new EscapeCancelFilter());
 	
-	fArgText = new AutoTextControl("argtext",TR("Arguments: "),
+	fArgText = new AutoTextControl("argtext",B_TRANSLATE("Arguments: "),
 									fProject->GetRunArgs(), new BMessage);
-	fArgText->SetDivider(fArgText->StringWidth(TR("Arguments: ")) + 5);
+	fArgText->SetDivider(fArgText->StringWidth(B_TRANSLATE("Arguments: ")) + 5);
 	
 	MakeCenteredOnShow(true);
 	

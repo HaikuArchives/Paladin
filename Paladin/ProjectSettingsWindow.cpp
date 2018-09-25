@@ -12,7 +12,9 @@
 #include "ProjectSettingsWindow.h"
 
 #include <Box.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Messenger.h>
@@ -25,10 +27,12 @@
 #include "DListView.h"
 #include "EscapeCancelFilter.h"
 #include "Globals.h"
-#include "PLocale.h"
 #include "Project.h"
 #include "TypedRefFilter.h"
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProjectSettingsWindow"
 
 enum {
 	M_TOGGLE_DEBUG			= 'tgdb',
@@ -90,7 +94,7 @@ IncludeList::RefDropped(entry_ref ref)
 
 ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 	:
-	BWindow(frame, TR("Project settings"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE("Project settings"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fProject(project),
 	fDirty(false)
@@ -110,21 +114,21 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 
 	AddCommonFilter(new EscapeCancelFilter());
 
-	fTargetText = new AutoTextControl("targetname", TR("Target name:"),
+	fTargetText = new AutoTextControl("targetname", B_TRANSLATE("Target name:"),
 		fProject->GetTargetName(), new BMessage(M_TARGET_NAME_CHANGED));
 
-	BPopUpMenu* targetTypeMenu = new BPopUpMenu(TR("Target type"));
-	targetTypeMenu->AddItem(new BMenuItem(TR("Application"),
+	BPopUpMenu* targetTypeMenu = new BPopUpMenu(B_TRANSLATE("Target type"));
+	targetTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("Application"),
 		new BMessage(M_SET_TARGET_TYPE)));
-	targetTypeMenu->AddItem(new BMenuItem(TR("Shared library"),
+	targetTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("Shared library"),
 		new BMessage(M_SET_TARGET_TYPE)));
-	targetTypeMenu->AddItem(new BMenuItem(TR("Static library"),
+	targetTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("Static library"),
 		new BMessage(M_SET_TARGET_TYPE)));
-	targetTypeMenu->AddItem(new BMenuItem(TR("Device driver"),
+	targetTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("Device driver"),
 		new BMessage(M_SET_TARGET_TYPE)));
 
-	fTypeField = new BMenuField("type", TR("Target type:"), targetTypeMenu);
-	SetToolTip(fTypeField, TR("The kind of program you want to build"));
+	fTypeField = new BMenuField("type", B_TRANSLATE("Target type:"), targetTypeMenu);
+	SetToolTip(fTypeField, B_TRANSLATE("The kind of program you want to build"));
 
 	BMenuItem* item = targetTypeMenu->ItemAt(fProject->TargetType());
 	if (item != NULL)
@@ -132,7 +136,7 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 
 	fIncludeList = new IncludeList(fProject->GetPath().GetFolder());
 	SetToolTip(fIncludeList,
-		TR("The folders you want Paladin to search for header files"));
+		B_TRANSLATE("The folders you want Paladin to search for header files"));
 
 	BScrollView* includeScrollView = new BScrollView("includescrollview",
 		fIncludeList, B_WILL_DRAW, true, true);
@@ -148,19 +152,19 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 
 	float buttonWidth = be_plain_font->StringWidth("+") * 2.0f + 3.0f;
 
-	BButton* addButton = new BButton("addbutton", TR("+"),
+	BButton* addButton = new BButton("addbutton", B_TRANSLATE("+"),
 		new BMessage(M_SHOW_ADD_PATH));
 	addButton->SetExplicitSize(BSize(buttonWidth, buttonWidth));
-	addButton->SetToolTip(TR("Add a file to the include path list"));
+	addButton->SetToolTip(B_TRANSLATE("Add a file to the include path list"));
 
-	BButton* removeButton = new BButton("removebutton", TR("−"),
+	BButton* removeButton = new BButton("removebutton", B_TRANSLATE("−"),
 		new BMessage(M_REMOVE_PATH));
 	removeButton->SetExplicitSize(BSize(buttonWidth, buttonWidth));
-	removeButton->SetToolTip(TR("Remove the selected path"));
+	removeButton->SetToolTip(B_TRANSLATE("Remove the selected path"));
 
 	// general tab
 
-	fGeneralView = new BView(TR("General"), B_WILL_DRAW);
+	fGeneralView = new BView(B_TRANSLATE("General"), B_WILL_DRAW);
 	fGeneralView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BLayoutBuilder::Group<>(fGeneralView, B_VERTICAL, 0)
@@ -176,7 +180,7 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 			.End()
 		.AddStrut(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_VERTICAL, 2.0f)
-			.Add(new BStringView("include paths", TR("Include paths:")))
+			.Add(new BStringView("include paths", B_TRANSLATE("Include paths:")))
 			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 				.Add(includeScrollView)
 				.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
@@ -189,25 +193,25 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.End();
 
-	BPopUpMenu* optimizationMenu = new BPopUpMenu(TR("Optimization"));
-	optimizationMenu->AddItem(new BMenuItem(TR("None"),
+	BPopUpMenu* optimizationMenu = new BPopUpMenu(B_TRANSLATE("Optimization"));
+	optimizationMenu->AddItem(new BMenuItem(B_TRANSLATE("None"),
 		new BMessage(M_SET_OP_VALUE)));
-	optimizationMenu->AddItem(new BMenuItem(TR("Some"),
+	optimizationMenu->AddItem(new BMenuItem(B_TRANSLATE("Some"),
 		new BMessage(M_SET_OP_VALUE)));
-	optimizationMenu->AddItem(new BMenuItem(TR("More"),
+	optimizationMenu->AddItem(new BMenuItem(B_TRANSLATE("More"),
 		new BMessage(M_SET_OP_VALUE)));
-	optimizationMenu->AddItem(new BMenuItem(TR("Full"),
+	optimizationMenu->AddItem(new BMenuItem(B_TRANSLATE("Full"),
 		new BMessage(M_SET_OP_VALUE)));
 
-	fOpField = new BMenuField("optimize", TR("Optimize:"), optimizationMenu);
-	SetToolTip(fOpField, TR("Compiler optimization level. "
+	fOpField = new BMenuField("optimize", B_TRANSLATE("Optimize:"), optimizationMenu);
+	SetToolTip(fOpField, B_TRANSLATE("Compiler optimization level. "
 		"Disabled when debugging info is checked."));
 
 	item = optimizationMenu->ItemAt(fProject->OpLevel());
 	if (item != NULL)
 		item->SetMarked(true);
 
-	fOpSizeBox = new BCheckBox("opsizebox", TR("Optimize for size over speed"),
+	fOpSizeBox = new BCheckBox("opsizebox", B_TRANSLATE("Optimize for size over speed"),
 		new BMessage(M_TOGGLE_OPSIZE));
 
 	if (fProject->OpForSize())
@@ -218,20 +222,20 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 		fOpSizeBox->SetEnabled(false);
 	}
 
-	fDebugBox = new BCheckBox("debugbox", TR("Build debugging information"),
+	fDebugBox = new BCheckBox("debugbox", B_TRANSLATE("Build debugging information"),
 		new BMessage(M_TOGGLE_DEBUG));
 	SetToolTip(fDebugBox,
-		TR("Check this if you want to use your program in a debugger "
+		B_TRANSLATE("Check this if you want to use your program in a debugger "
 		   "during development. You'll want to rebuild your project "
 		   "after change this."));
 
 	if (fProject->Debug())
 		fDebugBox->SetValue(B_CONTROL_ON);
 
-	fProfileBox = new BCheckBox("profilebox", TR("Build profiling information"),
+	fProfileBox = new BCheckBox("profilebox", B_TRANSLATE("Build profiling information"),
 		new BMessage(M_TOGGLE_PROFILE));
 	SetToolTip(fProfileBox,
-		TR("Check this if you want to use your program "
+		B_TRANSLATE("Check this if you want to use your program "
 		   "with gprof or bprof for profiling."));
 
 	if (fProject->Profiling())
@@ -240,12 +244,12 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 	fCompileText = new AutoTextControl("extracc", "Extra compiler options:",
 		fProject->ExtraCompilerOptions(), new BMessage(M_CCOPTS_CHANGED));
 	SetToolTip(fCompileText,
-		TR("Extra GCC flags you wish included when each file is compiled."));
+		B_TRANSLATE("Extra GCC flags you wish included when each file is compiled."));
 
-	fLinkText = new AutoTextControl("extrald" ,TR("Extra linker options:"),
+	fLinkText = new AutoTextControl("extrald" ,B_TRANSLATE("Extra linker options:"),
 		fProject->ExtraLinkerOptions(), new BMessage(M_LDOPTS_CHANGED));
 	SetToolTip(fLinkText,
-		TR("Extra GCC linker flags you wish included when your project "
+		B_TRANSLATE("Extra GCC linker flags you wish included when your project "
 		   "is linked."));
 
 	// build tab

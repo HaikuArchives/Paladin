@@ -73,7 +73,8 @@ BuildNoDebug ()
 cd Paladin
 rm -f Paladin Paladin.new
 echo "Building Paladin"
-make -j$CPUCOUNT
+make -j$CPUCOUNT 
+make bindcatalogs
 cd ../
 
 cd SymbolFinder

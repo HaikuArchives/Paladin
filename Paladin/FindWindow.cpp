@@ -101,6 +101,8 @@ FindWindow::FindWindow(void)
 		fFileList(20, true),
 		fProject(NULL)
 {
+	SetSizeLimits(400, 30000, 400, 30000);
+	
 	MakeCenteredOnShow(true);
 	fMenuBar = new BMenuBar("menubar");
 	

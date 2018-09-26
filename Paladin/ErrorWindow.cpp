@@ -186,7 +186,8 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	BRect newframe;
 	BNode node(fParent->GetProject()->GetPath().GetFullPath());
 	if (node.ReadAttr("error_frame", B_RECT_TYPE, 0, &newframe, sizeof(newframe))) {
-		MoveTo(newframe.left, newframe.top);
+		if (newframe.left >= 0 && newframe.top >= 0)
+			MoveTo(newframe.left, newframe.top);
 		ResizeTo(newframe.Width(), newframe.Height());
 	}
 

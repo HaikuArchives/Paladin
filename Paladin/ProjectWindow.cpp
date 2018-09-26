@@ -2036,6 +2036,11 @@ ProjectWindow::BackupThread(void* data)
 	BPath folder(project->GetPath().GetFolder());
 	BPath folderparent;
 	folder.GetParent(&folderparent);
+	
+	STRACE(2,("Creating folder: %s\n", gBackupPath.GetFullPath()));
+	// ensure folder exists first
+	status_t status = create_directory(gBackupPath.GetFullPath(), 0777);
+	STRACE(2,(" - Successful?: %i\n", status));
 
 	BString command = "cd '";
 	command << folderparent.Path() << "'; zip -9 -r -y '"

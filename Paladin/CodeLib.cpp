@@ -14,6 +14,7 @@
 #include "Project.h"
 #include "SourceFile.h"
 #include "TextFile.h"
+#include "DebugTools.h"
 
 using namespace std;
 
@@ -185,10 +186,16 @@ CodeModule::AddFile(entry_ref ref)
 		
 		BString depstr;
 		char buffer[1024];
-		while (fgets(buffer,1024,fd))
-			depstr += buffer;
+		while (fgets(buffer,1024,fd)) {
+			if (!ferror(fd)) {
+				depstr += buffer;
+			}
+		}
 		
-		pclose(fd);
+		int status = pclose(fd);
+		if (0 != status) {
+			STRACE(2,("pclose returned non zero (error) code: %i",status));
+		}
 		
 		int32 lastpos = 0;
 		int32 pos = depstr.FindFirst(": ");
@@ -410,10 +417,16 @@ CodeModule::SyncWithFile(const char *path, bool *updated)
 	
 	BString out;
 	char buffer[1024];
-	while (fgets(buffer,1024,fd))
-		out += buffer;
+	while (fgets(buffer,1024,fd)) {
+		if (!ferror(fd)) {
+			out += buffer;
+		}
+	}
 	
-	pclose(fd);
+	int status = pclose(fd);
+	if (0 != status) {
+		STRACE(2,("pclose returned non zero (error) code: %i",status));
+	}
 	
 	BString srcmd5;
 	srcmd5 = out;

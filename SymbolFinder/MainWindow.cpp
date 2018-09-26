@@ -209,10 +209,16 @@ MainWindow::SearchLibPath(const char* path, const char* text)
 		if (fd != NULL) {
 			BString out;
 			char buffer[32];
-			while (fgets(buffer, 32, fd))
-				out += buffer;
+			while (fgets(buffer, 32, fd)) {
+				if (!ferror(fd)) {
+					out += buffer;
+				}
+			}
 
-			pclose(fd);
+			int status = pclose(fd);
+			if (0 != status) {
+				STRACE(2,("pclose returned non zero (error) code: %i",status));
+			}
 
 			if (out.CountChars() > 0) {
 				char* line = strtok(out.LockBuffer(out.Length()), "\n");

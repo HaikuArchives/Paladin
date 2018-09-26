@@ -18,6 +18,7 @@
 #include <ScrollView.h>
 #include <stdio.h>
 
+#include "DebugTools.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TerminalWindow"
@@ -64,10 +65,16 @@ TerminalWindow::MessageReceived(BMessage* message)
 		if (fd != NULL) {
 			BString data;
 			char buffer[1024];
-			while (fgets(buffer,1024,fd))
-				data += buffer;
+			while (fgets(buffer,1024,fd)) {
+				if (!ferror(fd)) {
+					data += buffer;
+				}
+			}
 
-			pclose(fd);
+			int status = pclose(fd);
+			if (0 != status) {
+				STRACE(2,("popen returned non zero (error) code: %i",status));
+			}
 
 			fTextView->SetText(data.String());
 		}

@@ -423,9 +423,19 @@ RunPipedCommand(const char *cmdstr, BString &out, bool redirectStdErr)
 		
 		char buffer[1024];
 		BString errmsg;
-		while (fgets(buffer,1024,fd))
-			out += buffer;
-		pclose(fd);
+		while (fgets(buffer,1024,fd)) {
+			if (!ferror(fd)) {
+				out += buffer;
+			} else {
+				STRACE(2,("pipe stream has failed"));
+			}
+		}
+		int result = pclose(fd);
+		if (0 == result) {
+			STRACE(2,("pclose returned non zero result: %i",result));
+		} else {
+			STRACE(2,("pclose returned success (0)"));
+		}
 	}
 	
 	return B_OK;

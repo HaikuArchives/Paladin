@@ -1581,10 +1581,16 @@ PipeCommand(const char *command, BString &data)
 		return -1;
 	
 	char buffer[1024];
-	while (fgets(buffer,1024,fd))
-		data += buffer;
-	pclose(fd);
-	return 0;
+	while (fgets(buffer,1024,fd)) {
+		if (!ferror(fd)) {
+			data += buffer;
+		}
+	}
+	int status = pclose(fd);
+	if (0 != status) {
+		STRACE(2,("pclose returned non zero (error) code: %i",status));
+	}
+	return status;
 }
 
 

@@ -279,6 +279,16 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	}
+	
+	// sanity check visibility
+	BRect decRect = DecoratorFrame();
+	int moveX = 0;
+	int moveY = 0;
+	if (decRect.left < 0)
+		moveX = - decRect.left;
+	if (decRect.top < 0)
+		moveY = - decRect.top;
+	MoveBy(moveX,moveY);
 
 	fProjectList->SetTarget(this);
 	fProjectList->MakeFocus(true);

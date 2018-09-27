@@ -217,7 +217,7 @@ MainWindow::SearchLibPath(const char* path, const char* text)
 
 			int status = pclose(fd);
 			if (0 != status) {
-				STRACE(2,("pclose returned non zero (error) code: %i",status));
+				//STRACE(2,("pclose returned non zero (error) code: %i",status));
 			}
 
 			if (out.CountChars() > 0) {

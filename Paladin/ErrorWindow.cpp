@@ -109,7 +109,7 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	fWarningCount(0)
 {
 	SetSizeLimits(400, 30000, 250, 30000);
-	MoveTo(20,200);
+	MoveTo(100,100);
 	AddShortcut('M', B_COMMAND_KEY, new BMessage(M_MAKE_PROJECT));
 	AddShortcut('R', B_COMMAND_KEY, new BMessage(M_RUN_PROJECT));
 	AddShortcut('R', B_COMMAND_KEY | B_SHIFT_KEY,
@@ -186,8 +186,11 @@ ErrorWindow::ErrorWindow(BRect frame, ProjectWindow* parent, ErrorList* list)
 	BRect newframe;
 	BNode node(fParent->GetProject()->GetPath().GetFullPath());
 	if (node.ReadAttr("error_frame", B_RECT_TYPE, 0, &newframe, sizeof(newframe))) {
-		if (newframe.left >= 0 && newframe.top >= 0)
-			MoveTo(newframe.left, newframe.top);
+		if (newframe.left < 100)
+			newframe.left = 100;
+		if (newframe.top < 100)
+			newframe.top = 100;
+		MoveTo(newframe.left, newframe.top);
 		ResizeTo(newframe.Width(), newframe.Height());
 	}
 

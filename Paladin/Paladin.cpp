@@ -704,9 +704,15 @@ App::CreateNewProject(const BMessage &settings)
 	gProjectList->Unlock();
 	
 	BRect r(0,0,200,300);
+	/*
 	r.OffsetTo(gProjectWindowPoint);
 	gProjectWindowPoint.x += 25;
 	gProjectWindowPoint.y += 25;
+	if (gProjectWindowPoint.x < 0)
+		gProjectWindowPoint.x = 0;
+	if (gProjectWindowPoint.y < 0)
+		gProjectWindowPoint.y - 0;
+		*/
 	ProjectWindow *projwin = new ProjectWindow(r,gCurrentProject);
 	projwin->Show();
 	
@@ -948,9 +954,11 @@ App::LoadProject(const entry_ref &givenRef)
 	gProjectList->Unlock();
 	
 	BRect r(0,0,200,300);
+	/*
 	r.OffsetTo(gProjectWindowPoint);
 	gProjectWindowPoint.x += 25;
 	gProjectWindowPoint.y += 25;
+	*/
 	ProjectWindow *projwin = new ProjectWindow(r,gCurrentProject);
 	projwin->Show();
 	

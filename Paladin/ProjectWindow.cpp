@@ -128,9 +128,12 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	fMenusLocked(false),
 	fBuilder(BMessenger(this))
 {
-	AddCommonFilter(new AltTabFilter());
 	SetSizeLimits(200, 30000, 200, 30000);
+	MoveTo(100,100);
+	
+	AddCommonFilter(new AltTabFilter());
 	RegisterWindow();
+	
 
 	// This is for our in-program debug menu which comes in handy now and then.
 	// Paladin -d doesn't always get the job done
@@ -267,6 +270,12 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 		if (frame.Height() < 200)
 			frame.top = frame.bottom + 200;
 
+		if (frame.left < 0) 
+			frame.left = 0;
+		
+		if (frame.top < 0)
+			frame.top = 0;
+			
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	}
@@ -1118,6 +1127,10 @@ ProjectWindow::MessageReceived(BMessage* message)
 				r.left = r.right / 4.0;
 				r.right *= .75;
 				r.top = r.bottom - 200;
+				if (r.top < 100)
+					r.top = 100;
+				if (r.left < 100)
+					r.left = 100;
 
 				BDeskbar deskbar;
 				if (deskbar.Location() == B_DESKBAR_BOTTOM)

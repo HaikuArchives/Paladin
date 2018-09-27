@@ -309,6 +309,7 @@ ParseGCCErrors(const char *string, ErrorList &list)
 		item = strtok(NULL,"\n");
 	}
 	
+	int8 errorPrev = ERROR_UNSET;
 	for (int32 i = 0; i < list.msglist.CountItems(); i++)
 	{
 		error_msg *msg = (error_msg*)list.msglist.ItemAt(i);
@@ -342,22 +343,32 @@ ParseGCCErrors(const char *string, ErrorList &list)
 		
 		// adding 2 instead of one because there is always a space after the final 
 		// colon in the event there is an error message, which is usually
-		if (endpos + 2 < msg->rawdata.CountChars())
+		if (endpos + 2 < msg->rawdata.CountChars()) {
 			msg->error = msg->rawdata.String() + endpos + 2;
+		}
 		
-		if ((msg->line < 0 && msg->error.IFindFirst("error") < 0) ||
-			(msg->error.CountChars() < 1))
-			msg->type = ERROR_MSG;
-		else if (msg->error.IFindFirst("warning:") >= 0)
+		/*if ((msg->line < 0 && msg->error.IFindFirst("error") < 0) ||
+			(msg->error.CountChars() < 1)) {
+			if (-1 != errorPrev) {
+				msg->type = errorPrev;
+			} else {
+				msg->type = ERROR_MSG;
+			}
+		} else*/ if (msg->rawdata.IFindFirst("warning:") >= 0) {
 			msg->type = ERROR_WARNING;
-		else if (msg->error.IFindFirst("note:") >= 0)
-			msg->type = ERROR_NOTE;
-		else if (msg->error.IFindFirst("error:") >= 0)
+		} else if (msg->rawdata.IFindFirst("error:") >= 0) {
 			msg->type = ERROR_ERROR;
-		else if (msg->error.IFindFirst("In file") >= 0)
-			msg->type = ERROR_MSG;
-		else
-			msg->type = ERROR_UNKNOWN;
+		} else {
+			//msg->type = ERROR_UNKNOWN;
+			// if not known, mark as previous or unknown
+			if (ERROR_UNSET != errorPrev) {
+				msg->type = errorPrev;
+			} else {
+				msg->type = ERROR_UNKNOWN;
+			}
+		}
+			
+		errorPrev = msg->type;
 	}
 	
 	delete [] data;
@@ -387,6 +398,7 @@ ParseLDErrors(const char *string, ErrorList &list)
 		item = strtok(NULL,"\n");
 	}
 	
+	int8 errorPrev = ERROR_UNSET;
 	for (int32 i = 0; i < list.msglist.CountItems(); i++)
 	{
 		error_msg *msg = (error_msg*)list.msglist.ItemAt(i);
@@ -405,16 +417,21 @@ ParseLDErrors(const char *string, ErrorList &list)
 		// adding 2 instead of one because there is always a space after the final colon
 		msg->error = msg->rawdata.String() + endpos + 2;
 		
-		if (msg->error.IFindFirst("warning:") >= 0)
+		if (msg->error.IFindFirst("warning:") >= 0) {
 			msg->type = ERROR_WARNING;
-		else if (msg->error.IFindFirst("note:") >= 0)
-			msg->type = ERROR_NOTE;
-		else if (msg->error.IFindFirst("error:") >= 0)
+		} else if (msg->error.IFindFirst("error:") >= 0) {
 			msg->type = ERROR_ERROR;
-		else if (msg->error.IFindFirst("undefined") >= 0)
+		} else if (msg->error.IFindFirst("undefined") >= 0) {
 			msg->type = ERROR_ERROR;
-		else
-			msg->type = ERROR_NOTE;
+		} else {
+			if (ERROR_UNSET != errorPrev) {
+				msg->type = errorPrev;
+			} else {
+				msg->type = ERROR_NOTE;
+			}
+		}
+			
+		errorPrev = msg->type;
 	}
 	delete [] data;
 }

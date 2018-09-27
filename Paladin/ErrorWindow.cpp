@@ -83,6 +83,18 @@ ErrorItem::DrawItem(BView* owner, BRect frame, bool complete)
 			owner->SetLowColor(250, 250, 170);
 			break;
 		}
+		
+		case ERROR_NOTE:
+		{
+			owner->SetLowColor(230, 230, 250);
+			break;
+		}
+		
+		case ERROR_UNKNOWN:
+		{
+			owner->SetLowColor(250, 210, 210);
+			break;
+		}
 
 		default:
 		{
@@ -349,6 +361,8 @@ ErrorWindow::ErrMsgToItem(error_msg* message)
 	
 	if ((message->type == ERROR_ERROR && fErrorBox->Value() == B_CONTROL_ON)
 		|| (message->type == ERROR_WARNING && fWarningBox->Value() == B_CONTROL_ON)
+		|| message->type == ERROR_UNKNOWN
+		|| message->type == ERROR_NOTE
 		|| message->type == ERROR_MSG) {
 		fErrorList->AddItem(new ErrorItem(message));
 

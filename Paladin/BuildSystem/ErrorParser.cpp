@@ -85,6 +85,10 @@ ErrorList::CountWarnings(void)
 		error_msg *msg = (error_msg*)msglist.ItemAt(i);
 		if (msg->type == ERROR_ERROR)
 			continue;
+		if (msg->type == ERROR_NOTE)
+			continue;
+		if (msg->type == ERROR_UNKNOWN)
+			continue;
 		
 		if (msg->type == ERROR_MSG)
 		{
@@ -115,6 +119,10 @@ ErrorList::GetNextWarning(void)
 		error_msg *item = (error_msg*)msglist.ItemAt(i);
 		
 		if (item->type == ERROR_ERROR)
+			continue;
+		if (item->type == ERROR_NOTE)
+			continue;
+		if (item->type == ERROR_UNKNOWN)
 			continue;
 		
 		if (item->type == ERROR_MSG)
@@ -162,6 +170,10 @@ ErrorList::GetNextError(void)
 		error_msg *item = (error_msg*)msglist.ItemAt(i);
 		
 		if (item->type == ERROR_WARNING)
+			continue;
+		if (item->type == ERROR_NOTE)
+			continue;
+		if (item->type == ERROR_UNKNOWN)
 			continue;
 		
 		if (item->type == ERROR_MSG)
@@ -297,6 +309,7 @@ ParseGCCErrors(const char *string, ErrorList &list)
 		item = strtok(NULL,"\n");
 	}
 	
+	int8 errorPrev = ERROR_UNSET;
 	for (int32 i = 0; i < list.msglist.CountItems(); i++)
 	{
 		error_msg *msg = (error_msg*)list.msglist.ItemAt(i);
@@ -330,16 +343,32 @@ ParseGCCErrors(const char *string, ErrorList &list)
 		
 		// adding 2 instead of one because there is always a space after the final 
 		// colon in the event there is an error message, which is usually
-		if (endpos + 2 < msg->rawdata.CountChars())
+		if (endpos + 2 < msg->rawdata.CountChars()) {
 			msg->error = msg->rawdata.String() + endpos + 2;
+		}
 		
-		if ((msg->line < 0 && msg->error.IFindFirst("error") < 0) ||
-			(msg->error.CountChars() < 1))
-			msg->type = ERROR_MSG;
-		else if (msg->error.IFindFirst("warning:") >= 0)
+		/*if ((msg->line < 0 && msg->error.IFindFirst("error") < 0) ||
+			(msg->error.CountChars() < 1)) {
+			if (-1 != errorPrev) {
+				msg->type = errorPrev;
+			} else {
+				msg->type = ERROR_MSG;
+			}
+		} else*/ if (msg->rawdata.IFindFirst("warning:") >= 0) {
 			msg->type = ERROR_WARNING;
-		else
+		} else if (msg->rawdata.IFindFirst("error:") >= 0) {
 			msg->type = ERROR_ERROR;
+		} else {
+			//msg->type = ERROR_UNKNOWN;
+			// if not known, mark as previous or unknown
+			if (ERROR_UNSET != errorPrev) {
+				msg->type = errorPrev;
+			} else {
+				msg->type = ERROR_UNKNOWN;
+			}
+		}
+			
+		errorPrev = msg->type;
 	}
 	
 	delete [] data;
@@ -369,6 +398,7 @@ ParseLDErrors(const char *string, ErrorList &list)
 		item = strtok(NULL,"\n");
 	}
 	
+	int8 errorPrev = ERROR_UNSET;
 	for (int32 i = 0; i < list.msglist.CountItems(); i++)
 	{
 		error_msg *msg = (error_msg*)list.msglist.ItemAt(i);
@@ -387,10 +417,21 @@ ParseLDErrors(const char *string, ErrorList &list)
 		// adding 2 instead of one because there is always a space after the final colon
 		msg->error = msg->rawdata.String() + endpos + 2;
 		
-		if (msg->error.IFindFirst("warning:") >= 0)
+		if (msg->error.IFindFirst("warning:") >= 0) {
 			msg->type = ERROR_WARNING;
-		else
+		} else if (msg->error.IFindFirst("error:") >= 0) {
 			msg->type = ERROR_ERROR;
+		} else if (msg->error.IFindFirst("undefined") >= 0) {
+			msg->type = ERROR_ERROR;
+		} else {
+			if (ERROR_UNSET != errorPrev) {
+				msg->type = errorPrev;
+			} else {
+				msg->type = ERROR_NOTE;
+			}
+		}
+			
+		errorPrev = msg->type;
 	}
 	delete [] data;
 }
@@ -504,8 +545,12 @@ ParseRezErrors(const char *string, ErrorList &list)
 			msg->type = ERROR_MSG;
 		else if (msg->error.IFindFirst("warning:") >= 0)
 			msg->type = ERROR_WARNING;
-		else
+		else if (msg->error.IFindFirst("note:") >= 0)
+			msg->type = ERROR_NOTE;
+		else if (msg->error.IFindFirst("error:") >= 0)
 			msg->type = ERROR_ERROR;
+		else
+			msg->type = ERROR_UNKNOWN;
 	}
 	delete [] data;
 }

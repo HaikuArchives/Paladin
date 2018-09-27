@@ -351,7 +351,7 @@ ProjectList::ShowContextMenu(BPoint where)
 			menu.AddItem(new BMenuItem(B_TRANSLATE("New group"),
 				new BMessage(M_NEW_GROUP)));
     }
-		BString renameStr(B_TRANSLATE("Rename group%ellipsis"));
+		BString renameStr(B_TRANSLATE("Rename group%ellipsis%"));
 		renameStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
 		menu.AddItem(new BMenuItem(renameStr,
 			new BMessage(M_SHOW_RENAME_GROUP)));

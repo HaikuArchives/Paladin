@@ -11,7 +11,9 @@
 enum {
 	ERROR_MSG = 0,
 	ERROR_WARNING = 1,
-	ERROR_ERROR = 2
+	ERROR_ERROR = 2,
+	ERROR_NOTE = 3,
+	ERROR_UNKNOWN = 4
 };
 
 class error_msg

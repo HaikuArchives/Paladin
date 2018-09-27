@@ -85,6 +85,10 @@ ErrorList::CountWarnings(void)
 		error_msg *msg = (error_msg*)msglist.ItemAt(i);
 		if (msg->type == ERROR_ERROR)
 			continue;
+		if (msg->type == ERROR_NOTE)
+			continue;
+		if (msg->type == ERROR_UNKNOWN)
+			continue;
 		
 		if (msg->type == ERROR_MSG)
 		{
@@ -115,6 +119,10 @@ ErrorList::GetNextWarning(void)
 		error_msg *item = (error_msg*)msglist.ItemAt(i);
 		
 		if (item->type == ERROR_ERROR)
+			continue;
+		if (item->type == ERROR_NOTE)
+			continue;
+		if (item->type == ERROR_UNKNOWN)
 			continue;
 		
 		if (item->type == ERROR_MSG)
@@ -162,6 +170,10 @@ ErrorList::GetNextError(void)
 		error_msg *item = (error_msg*)msglist.ItemAt(i);
 		
 		if (item->type == ERROR_WARNING)
+			continue;
+		if (item->type == ERROR_NOTE)
+			continue;
+		if (item->type == ERROR_UNKNOWN)
 			continue;
 		
 		if (item->type == ERROR_MSG)
@@ -338,8 +350,14 @@ ParseGCCErrors(const char *string, ErrorList &list)
 			msg->type = ERROR_MSG;
 		else if (msg->error.IFindFirst("warning:") >= 0)
 			msg->type = ERROR_WARNING;
-		else
+		else if (msg->error.IFindFirst("note:") >= 0)
+			msg->type = ERROR_NOTE;
+		else if (msg->error.IFindFirst("error:") >= 0)
 			msg->type = ERROR_ERROR;
+		else if (msg->error.IFindFirst("In file") >= 0)
+			msg->type = ERROR_MSG;
+		else
+			msg->type = ERROR_UNKNOWN;
 	}
 	
 	delete [] data;
@@ -389,8 +407,14 @@ ParseLDErrors(const char *string, ErrorList &list)
 		
 		if (msg->error.IFindFirst("warning:") >= 0)
 			msg->type = ERROR_WARNING;
-		else
+		else if (msg->error.IFindFirst("note:") >= 0)
+			msg->type = ERROR_NOTE;
+		else if (msg->error.IFindFirst("error:") >= 0)
 			msg->type = ERROR_ERROR;
+		else if (msg->error.IFindFirst("undefined") >= 0)
+			msg->type = ERROR_ERROR;
+		else
+			msg->type = ERROR_NOTE;
 	}
 	delete [] data;
 }
@@ -504,8 +528,12 @@ ParseRezErrors(const char *string, ErrorList &list)
 			msg->type = ERROR_MSG;
 		else if (msg->error.IFindFirst("warning:") >= 0)
 			msg->type = ERROR_WARNING;
-		else
+		else if (msg->error.IFindFirst("note:") >= 0)
+			msg->type = ERROR_NOTE;
+		else if (msg->error.IFindFirst("error:") >= 0)
 			msg->type = ERROR_ERROR;
+		else
+			msg->type = ERROR_UNKNOWN;
 	}
 	delete [] data;
 }

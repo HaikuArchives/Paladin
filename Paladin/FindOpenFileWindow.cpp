@@ -93,7 +93,6 @@ FindOpenFileWindow::MessageReceived(BMessage* message)
 			
 			BPath sysDevPath;
 			find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &sysDevPath, false);
-			//sysDevPath.Append("/headers");
 			findmessage.AddString("folder", sysDevPath.Path());
 			
 			DPath hPath(B_SYSTEM_HEADERS_DIRECTORY);

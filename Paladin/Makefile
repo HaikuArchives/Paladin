@@ -54,6 +54,7 @@ SRCS = AboutWindow.cpp \
 	ProjectList.cpp \
 	ProjectPath.cpp \
 	ProjectSettingsWindow.cpp \
+	ProjectStatus.cpp \
 	ProjectWindow.cpp \
 	RunArgsWindow.cpp \
 	StartWindow.cpp \

@@ -20,12 +20,14 @@
 #include <Window.h>
 
 #include "ProjectBuilder.h"
+#include "ProjectStatus.h"
 
 
 class ErrorWindow;
 class ProjectList;
 class Project;
 class ProjectWindow;
+class ProjectStatus;
 class SourceControl;
 class SourceFile;
 
@@ -54,7 +56,7 @@ public:
 
 private:
 			void				ActOnSelectedFiles(const int32 &command);
-			void				CreateMenuBar(void);
+			void				CreateMenuBar();
 			void				SetMenuLock(bool locked);
 			void				MakeGroup(int32 selection);
 			void				ToggleErrorWindow(ErrorList* list);
@@ -85,7 +87,7 @@ private:
 			BMenu*				fRecentMenu;
 
 			ProjectList*		fProjectList;
-			BStringView*		fStatusBar;
+			ProjectStatus*		fStatusBar;
 			BFilePanel*			fFilePanel;
 			Project*			fProject;
 			SourceControl*		fSourceControl;

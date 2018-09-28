@@ -66,6 +66,7 @@
 #include "ProjectList.h"
 #include "ProjectSettingsWindow.h"
 #include "Project.h"
+#include "ProjectStatus.h"
 #include "RunArgsWindow.h"
 #include "SCMManager.h"
 #include "SCMOutputWindow.h"
@@ -156,19 +157,37 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 		}
 	}
 
+	BGroupLayout* vGroup = new BGroupLayout(B_VERTICAL,0);
+	vGroup->SetInsets(0,0,0,0);
+	SetLayout(vGroup);
+	
 	CreateMenuBar();
+	vGroup->AddView(fMenuBar);
 
+	BGroupLayout* hGroup = new BGroupLayout(B_HORIZONTAL,0);
+	hGroup->SetInsets(0, -1, -1, -1); // hides scroll bar borders
+	BView* hView = new BView("hview",0,hGroup);
+	
 	fProjectList = new ProjectList(fProject, "filelist", B_WILL_DRAW);
 	fProjectList->SetInvocationMessage(new BMessage(M_EDIT_FILE));
+	BLayoutItem* projectListView = hGroup->AddView(fProjectList);
+	projectListView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,B_ALIGN_USE_FULL_HEIGHT));
 
-	BScrollView* fileListScrollView = new BScrollView("filelistscrollview",
-		fProjectList, 0, false, true, B_NO_BORDER);
-
-	fStatusBar = new BStringView("statusbar", NULL);
-	fStatusBar->SetFontSize(10.0f);
-	fStatusBar->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT));
-	fStatusBar->SetExplicitMinSize(BSize(B_H_SCROLL_BAR_HEIGHT + 1, B_SIZE_UNSET));
+	BScrollBar* fileScrollBar = new BScrollBar("filelistscrollbar",
+		fProjectList, 0, 100, B_VERTICAL);
+	fileScrollBar->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	BLayoutItem* liScrollBar = hGroup->AddView(fileScrollBar);
+	liScrollBar->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,B_ALIGN_USE_FULL_HEIGHT));
+	
+	BLayoutItem* hGroupView = vGroup->AddView(hView);
+	hGroupView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,B_ALIGN_USE_FULL_HEIGHT));
+	
+	fStatusBar = new ProjectStatus(Bounds(), "");
+	fStatusBar->SetExplicitMinSize(BSize(B_SIZE_UNSET,B_H_SCROLL_BAR_HEIGHT - 1));
+	fStatusBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET,B_H_SCROLL_BAR_HEIGHT - 1));
+	BLayoutItem* statusLayoutItem = vGroup->AddView(fStatusBar);
+	statusLayoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,B_ALIGN_BOTTOM));
+	
 	SetStatus(B_TRANSLATE("Opening Project..."));
 
 	if (project != NULL) {
@@ -186,7 +205,6 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 				SourceFile* file = group->filelist.ItemAt(j);
 				SourceFileItem* fileitem = new SourceFileItem(file,1);
 
-//				fProjectList->AddUnder(fileitem, groupitem);
 				fProjectList->AddItem(fileitem);
 
 				BString abspath = file->GetPath().GetFullPath();
@@ -208,64 +226,49 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 			}
 
 			// Now add header files
-		STRACE(2,("Adding header files to UI\n"));
+			STRACE(2,("Adding header files to UI\n"));
 
-		// Also add dependencies (header files)
-		SourceGroupItem* headergroupitem = new SourceGroupItem(group);
-		BString headergroupname(group->name);
-		headergroupname += " dependencies";
-		headergroupitem->SetText(headergroupname);
-		fProjectList->AddItem(headergroupitem);
-		headergroupitem->SetExpanded(group->expanded);
+			// Also add dependencies (header files)
+			SourceGroupItem* headergroupitem = new SourceGroupItem(group);
+			BString headergroupname(group->name);
+			headergroupname += " dependencies";
+			headergroupitem->SetText(headergroupname);
+			fProjectList->AddItem(headergroupitem);
+			headergroupitem->SetExpanded(group->expanded);
 
-		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
-			SourceFile* file = group->filelist.ItemAt(j);
-			//SourceFileItem* fileItem = new SourceFileItem(file,1);
-			BString dependencies = file->GetDependencies();
-			// Split string on comma to get individual files
-			BStringList deplist = BStringList();// = new BStringList();
-			dependencies.Split("|",true,deplist);
-			// Add item for each
-			for (int32 d = 0;d < deplist.CountStrings(); d++) {
-				BString dep = deplist.StringAt(d);
-				BStringItem* depitem = new BStringItem(dep);
-				//fProjectList->AddItem(depitem);
-				bool found = false;
-				STRACE(2,("Does dep exist?: %s\n",depitem->Text()));
-				int32 ed;
-				SourceFile* depfile = new SourceFile(dep);
-				SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
-				for (ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
-					STRACE(2,(" - Curitem text: %s\n",((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
-					if (0 == strcmp( 
-							((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath(), depitem->Text() )) {
-						STRACE(2,(" - Found!!!\n"));
-						found = true;
+			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+				SourceFile* file = group->filelist.ItemAt(j);
+				//SourceFileItem* fileItem = new SourceFileItem(file,1);
+				BString dependencies = file->GetDependencies();
+				// Split string on comma to get individual files
+				BStringList deplist = BStringList();// = new BStringList();
+				dependencies.Split("|",true,deplist);
+				// Add item for each
+				for (int32 d = 0;d < deplist.CountStrings(); d++) {
+					BString dep = deplist.StringAt(d);
+					BStringItem* depitem = new BStringItem(dep);
+					bool found = false;
+					STRACE(2,("Does dep exist?: %s\n",depitem->Text()));
+					int32 ed;
+					SourceFile* depfile = new SourceFile(dep);
+					SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
+					for (ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
+						STRACE(2,(" - Curitem text: %s\n",((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
+						if (0 == strcmp( 
+								((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath(), depitem->Text() )) {
+							STRACE(2,(" - Found!!!\n"));
+							found = true;
+						}
 					}
-				}
-				if (!found) {
-					// create source file item instead of string
-					//fProjectList->AddUnder(depitem,headergroupitem);
-					fProjectList->AddUnder(depfileitem,headergroupitem);
+					if (!found) {
+						// create source file item instead of string
+						fProjectList->AddUnder(depfileitem,headergroupitem);
+					}
 				}
 			}
 		}
-
-
-
-
-		}
 	}
-
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.Add(fMenuBar)
-		.Add(fileListScrollView)
-		.Add(fStatusBar)
-		.SetInsets(0, 0, -1, 0)
-			// The above is necessary in order to ensure the scroll bar
-			// does not extend left in to the Project List area of the screen
-		.End();
-
+	
 	BNode node(fProject->GetPath().GetFullPath());
 	if (node.ReadAttr("project_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect))) {
 		if (frame.Width() < 200)
@@ -341,7 +344,7 @@ ProjectWindow::~ProjectWindow()
 void
 ProjectWindow::SetStatus(const char* msg)
 {
-	fStatusBar->SetText(msg);
+	fStatusBar->SetStatus(msg);
 }
 
 
@@ -1470,7 +1473,7 @@ ProjectWindow::ActOnSelectedFiles(const int32& command)
 
 
 void
-ProjectWindow::CreateMenuBar(void)
+ProjectWindow::CreateMenuBar()
 {
 	fMenuBar = new BMenuBar("documentbar");
 

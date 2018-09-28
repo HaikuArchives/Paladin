@@ -71,6 +71,8 @@ private:
 	static	int32				ImportFileThread(void* data);
 	static	int32				BackupThread(void* data);
 	static	int32				SyncThread(void* data);
+	
+			void				SetStatus(const char* msg);
 
 			ErrorWindow*		fErrorWindow;
 

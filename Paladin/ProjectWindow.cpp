@@ -108,7 +108,9 @@ enum {
 
 	M_TOGGLE_DEBUG_MENU			= 'sdbm',
 	M_DEBUG_DUMP_DEPENDENCIES	= 'dbdd',
-	M_DEBUG_DUMP_INCLUDES		= 'dbdi'
+	M_DEBUG_DUMP_INCLUDES		= 'dbdi',
+	
+	M_SET_STATUS				= 'stat'
 };
 
 
@@ -167,6 +169,7 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	fStatusBar->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_1_TINT));
 	fStatusBar->SetExplicitMinSize(BSize(B_H_SCROLL_BAR_HEIGHT + 1, B_SIZE_UNSET));
+	SetStatus(B_TRANSLATE("Opening Project..."));
 
 	if (project != NULL) {
 		BString title("Paladin: ");
@@ -259,7 +262,8 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 		.Add(fileListScrollView)
 		.Add(fStatusBar)
 		.SetInsets(0, 0, -1, 0)
-			// hack to get scroll view frame to line up
+			// The above is necessary in order to ensure the scroll bar
+			// does not extend left in to the Project List area of the screen
 		.End();
 
 	BNode node(fProject->GetPath().GetFullPath());
@@ -311,6 +315,8 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 
 	if (gAutoSyncModules)
 		PostMessage(M_SYNC_MODULES);
+		
+	SetStatus(B_TRANSLATE("Project opened."));
 }
 
 
@@ -330,6 +336,12 @@ ProjectWindow::~ProjectWindow()
 	node.WriteAttr("project_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect));
 
 	delete fFilePanel;
+}
+
+void
+ProjectWindow::SetStatus(const char* msg)
+{
+	fStatusBar->SetText(msg);
 }
 
 
@@ -400,7 +412,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 				"project backup thread", B_NORMAL_PRIORITY, this);
 			if (backupThread >= 0)
 			{
-				fStatusBar->SetText(B_TRANSLATE("Backing up project"));
+				SetStatus(B_TRANSLATE("Backing up project"));
 				UpdateIfNeeded();
 				
 				SetMenuLock(true);
@@ -974,10 +986,9 @@ ProjectWindow::MessageReceived(BMessage* message)
 			// We don't do this when forcing a rebuild of the sources because
 			// sometimes it can take quite a while
 			if (gUseCCache && gCCacheAvailable) {
-				fStatusBar->SetText(B_TRANSLATE("Emptying build cache"));
+				SetStatus(B_TRANSLATE("Emptying build cache"));
 				UpdateIfNeeded();
 				system("ccache -c > /dev/null");
-				fStatusBar->SetText("");
 				UpdateIfNeeded();
 			}
 			break;
@@ -1062,7 +1073,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 			if (message->FindPointer("file",(void**)&file) == B_OK) {
 				BString out;
 				out << B_TRANSLATE("Examining ") << file->GetPath().GetFileName();
-				fStatusBar->SetText(out.String());
+				SetStatus(out.String());
 			}
 			break;
 		}
@@ -1087,7 +1098,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 					}
 
 					out << B_TRANSLATE("Building ") << item->Text();
-					fStatusBar->SetText(out.String());
+					SetStatus(out.String());
 				}
 			}
 			break;
@@ -1109,19 +1120,19 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		case M_LINKING_PROJECT:
 		{
-			fStatusBar->SetText(B_TRANSLATE("Linking"));
+			SetStatus(B_TRANSLATE("Linking"));
 			break;
 		}
 
 		case M_UPDATING_RESOURCES:
 		{
-			fStatusBar->SetText(B_TRANSLATE("Updating resources"));
+			SetStatus(B_TRANSLATE("Updating resources"));
 			break;
 		}
 
 		case M_DOING_POSTBUILD:
 		{
-			fStatusBar->SetText(B_TRANSLATE("Performing post-build tasks"));
+			SetStatus(B_TRANSLATE("Performing post-build tasks"));
 			break;
 		}
 
@@ -1152,7 +1163,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 				if (!fErrorWindow->IsFront())
 					fErrorWindow->Activate();
 			}
-			fStatusBar->SetText("");
+			SetStatus(B_TRANSLATE("Build had errors or warnings."));
 
 			// Should this be an Unflatten or an Append?
 			ErrorList* errorList = fProject->GetErrorList();
@@ -1164,7 +1175,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_BUILD_SUCCESS:
 		{
 			SetMenuLock(false);
-			fStatusBar->SetText("");
+			SetStatus(B_TRANSLATE("Build successful."));
 			break;
 		}
 
@@ -1201,6 +1212,14 @@ ProjectWindow::MessageReceived(BMessage* message)
 		{
 			DumpIncludes(fProject);
 			break;
+		}
+		
+		case M_SET_STATUS:
+		{
+			BString* statustext;
+			if (message->FindPointer("statustext", (void**)&statustext) == B_OK) {
+				SetStatus(*statustext);
+			}
 		}
 
 		default:
@@ -1744,8 +1763,6 @@ ProjectWindow::ShowErrorWindow(ErrorList* list)
 		fErrorWindow = new ErrorWindow(r, this, list);
 	}
 	fErrorWindow->Show();
-
-	fStatusBar->SetText("");
 }
 
 
@@ -1776,7 +1793,7 @@ ProjectWindow::UpdateDependencies(void)
 	if (toggleHack)
 		gUsePipeHack = false;
 	
-	fStatusBar->SetText("Updating dependencies");
+	SetStatus(B_TRANSLATE("Updating dependencies"));
 	SetMenuLock(true);
 	for (int32 i = 0; i < fProjectList->CountItems(); i++) {
 		SourceFileItem* item = dynamic_cast<SourceFileItem*>(
@@ -1787,7 +1804,6 @@ ProjectWindow::UpdateDependencies(void)
 		UpdateIfNeeded();
 	}
 	SetMenuLock(false);
-	fStatusBar->SetText("");
 
 	if (toggleHack)
 		gUsePipeHack = true;
@@ -1830,7 +1846,7 @@ ProjectWindow::DoBuild(int32 postbuild)
 		}
 	}
 
-	fStatusBar->SetText("Examining source files");
+	SetStatus(B_TRANSLATE("Examining source files"));
 	UpdateIfNeeded();
 
 	SetMenuLock(true);
@@ -2074,7 +2090,6 @@ ProjectWindow::BackupThread(void* data)
 	system(command.String());
 
 	parent->Lock();
-	parent->fStatusBar->SetText("");
 	parent->SetMenuLock(false);
 	parent->Unlock();
 
@@ -2089,14 +2104,13 @@ ProjectWindow::SyncThread(void* data)
 	ProjectWindow* parent = (ProjectWindow*)data;
 
 	parent->Lock();
-	parent->fStatusBar->SetText(B_TRANSLATE("Updating modules"));
+	parent->SetStatus(B_TRANSLATE("Updating modules"));
 	parent->SetMenuLock(true);
 	parent->Unlock();
 
 	SyncProjectModules(gCodeLib, parent->fProject);
 
 	parent->Lock();
-	parent->fStatusBar->SetText("");
 	parent->SetMenuLock(false);
 	parent->Unlock();
 #endif

@@ -56,7 +56,7 @@ public:
 
 private:
 			void				ActOnSelectedFiles(const int32 &command);
-			void				CreateMenuBar(void);
+			void				CreateMenuBar();
 			void				SetMenuLock(bool locked);
 			void				MakeGroup(int32 selection);
 			void				ToggleErrorWindow(ErrorList* list);

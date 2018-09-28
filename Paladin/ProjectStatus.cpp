@@ -40,7 +40,7 @@ ProjectStatus::ProjectStatus(BRect frame, const char *txt)
 
 	font_height fh;
 	font.GetHeight(&fh);
-	fBaseline = Bounds().bottom - fh.descent;
+	fBaseline = fh.descent + fh.ascent - 3;
 
 	fOffset = 0;
 	fMsg = txt;	

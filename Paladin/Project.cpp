@@ -1127,8 +1127,8 @@ Project::AddLibrary(const char *path)
 	DPath libpath(path);
 	if (!BEntry(libpath.GetFullPath()).Exists())
 	{
-		libpath = FindLibrary(libpath.GetFileName());
-		if (libpath.IsEmpty())
+		DPath findlibpath = FindLibrary(libpath.GetFileName());
+		if (findlibpath.IsEmpty())
 		{
 			if (gBuildMode)
 			{
@@ -1139,6 +1139,7 @@ Project::AddLibrary(const char *path)
 				BString err;
 				err << path << " seems to be missing. Do you want to remove it from the project?";
 				int32 result = ShowAlert(err.String(),"Remove","Keep");
+				STRACE(2,("Library remove/keep returned result: %i\n",result));
 				if (result == 0)
 					return;
 			}

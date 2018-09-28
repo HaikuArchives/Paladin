@@ -71,7 +71,10 @@ FindAndOpenFile(BMessage *msg)
 				entry_ref fileref = FindFile(folderref,filename.String());
 				if (fileref.name)
 				{
-					be_roster->Launch(&fileref);
+					//be_roster->Launch(&fileref);
+					BMessage refMessage(B_REFS_RECEIVED);
+					refMessage.AddRef("refs",&fileref);
+					be_app->PostMessage(&refMessage);
 					return;
 				}
 			}

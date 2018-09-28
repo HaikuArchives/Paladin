@@ -3,6 +3,7 @@ objects*/
 *.dbg
 *.a
 Paladin/Paladin
+Paladin/.hg
 Paladin/Paladin.new
 Paladin/Paladin.rsrc
 SymbolFinder/SymbolFinder

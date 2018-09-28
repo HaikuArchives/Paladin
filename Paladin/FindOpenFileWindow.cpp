@@ -93,8 +93,26 @@ FindOpenFileWindow::MessageReceived(BMessage* message)
 			
 			BPath sysDevPath;
 			find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &sysDevPath, false);
-			sysDevPath.Append("/headers");
+			//sysDevPath.Append("/headers");
 			findmessage.AddString("folder", sysDevPath.Path());
+			
+			DPath hPath(B_SYSTEM_HEADERS_DIRECTORY);
+			findmessage.AddString("folder",hPath.GetFullPath());
+			
+			hPath = DPath(B_SYSTEM_NONPACKAGED_HEADERS_DIRECTORY );
+			findmessage.AddString("folder",hPath.GetFullPath());
+			
+			hPath = DPath(B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY );
+			findmessage.AddString("folder",hPath.GetFullPath());
+			
+			hPath = DPath(B_USER_HEADERS_DIRECTORY );
+			findmessage.AddString("folder",hPath.GetFullPath());
+			
+			hPath = DPath(B_USER_NONPACKAGED_DEVELOP_DIRECTORY   );
+			findmessage.AddString("folder",hPath.GetFullPath());
+			
+			hPath = DPath(B_USER_DEVELOP_DIRECTORY  );
+			findmessage.AddString("folder",hPath.GetFullPath());
 			
 			DPath path(B_USER_CONFIG_DIRECTORY);
 			path << "include";

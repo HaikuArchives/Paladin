@@ -66,6 +66,7 @@
 #include "ProjectList.h"
 #include "ProjectSettingsWindow.h"
 #include "Project.h"
+#include "ProjectStatus.h"
 #include "RunArgsWindow.h"
 #include "SCMManager.h"
 #include "SCMOutputWindow.h"
@@ -164,11 +165,25 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	BScrollView* fileListScrollView = new BScrollView("filelistscrollview",
 		fProjectList, 0, false, true, B_NO_BORDER);
 
-	fStatusBar = new BStringView("statusbar", NULL);
-	fStatusBar->SetFontSize(10.0f);
-	fStatusBar->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT));
-	fStatusBar->SetExplicitMinSize(BSize(B_H_SCROLL_BAR_HEIGHT + 1, B_SIZE_UNSET));
+	//fStatusBar = new BStringView("statusbar", NULL);
+	//fStatusBar->SetFontSize(10.0f);
+	//fStatusBar->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+	//	B_DARKEN_1_TINT));
+	//fStatusBar->SetExplicitMinSize(BSize(B_H_SCROLL_BAR_HEIGHT, B_SIZE_UNSET));
+	
+	//BRect bounds(fStatusBar->Bounds());
+	//rgb_color highColor = fStatusBar->HighColor();
+	//fStatusBar->SetHighColor(tint_color(fStatusBar->ViewColor(), B_DARKEN_2_TINT));
+	//fStatusBar->StrokeLine(bounds.LeftTop(), bounds.RightTop());
+	
+	BRect b(Bounds()),r;
+	r = b;
+	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT;
+	fStatusBar = new ProjectStatus(r,"");
+	fStatusBar->SetExplicitMinSize(BSize(B_SIZE_UNSET,B_H_SCROLL_BAR_HEIGHT - 1));
+	fStatusBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET,B_H_SCROLL_BAR_HEIGHT - 1));
+	
+	
 	SetStatus(B_TRANSLATE("Opening Project..."));
 
 	if (project != NULL) {
@@ -316,6 +331,7 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	if (gAutoSyncModules)
 		PostMessage(M_SYNC_MODULES);
 		
+		
 	SetStatus(B_TRANSLATE("Project opened."));
 }
 
@@ -341,7 +357,7 @@ ProjectWindow::~ProjectWindow()
 void
 ProjectWindow::SetStatus(const char* msg)
 {
-	fStatusBar->SetText(msg);
+	fStatusBar->SetStatus(msg);
 }
 
 

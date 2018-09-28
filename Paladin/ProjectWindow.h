@@ -20,12 +20,14 @@
 #include <Window.h>
 
 #include "ProjectBuilder.h"
+#include "ProjectStatus.h"
 
 
 class ErrorWindow;
 class ProjectList;
 class Project;
 class ProjectWindow;
+class ProjectStatus;
 class SourceControl;
 class SourceFile;
 
@@ -85,7 +87,7 @@ private:
 			BMenu*				fRecentMenu;
 
 			ProjectList*		fProjectList;
-			BStringView*		fStatusBar;
+			ProjectStatus*		fStatusBar;
 			BFilePanel*			fFilePanel;
 			Project*			fProject;
 			SourceControl*		fSourceControl;

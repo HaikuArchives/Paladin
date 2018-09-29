@@ -12,6 +12,7 @@
 #include "Icons.h"
 #include "Paladin.h"
 #include "Project.h"
+#include "DebugTools.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -71,6 +72,7 @@ FindAndOpenFile(BMessage *msg)
 				entry_ref fileref = FindFile(folderref,filename.String());
 				if (fileref.name)
 				{
+					STRACE(2,("FileUtils open file message"));
 					BMessage refMessage(B_REFS_RECEIVED);
 					refMessage.AddRef("refs",&fileref);
 					be_app->PostMessage(&refMessage);

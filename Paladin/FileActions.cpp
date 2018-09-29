@@ -9,6 +9,7 @@
 #include "DPath.h"
 #include "Globals.h"
 #include "Project.h"
+#include "DebugTools.h"
 
 void
 SpawnFileTypes(DPath path)
@@ -32,6 +33,7 @@ SpawnFileTypes(DPath path)
 	BMessage msg(B_REFS_RECEIVED);
 	msg.AddRef("refs",&ref);
 	
+	STRACE(2,("FileActions Launch"));
 	if (gPlatform == PLATFORM_R5 || gPlatform == PLATFORM_ZETA)
 		be_roster->Launch("application/x-vnd.Be-MIMA",&msg);
 	else

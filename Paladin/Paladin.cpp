@@ -532,13 +532,12 @@ App::OpenFile(entry_ref ref, int32 line)
 		}
 	}
 	
-//	BMessage msg(B_REFS_RECEIVED);
-	BMessage msg(EDIT_OPEN_FILE);
-	msg.AddRef("refs",&ref);
+	BMessage* msg = new BMessage(B_REFS_RECEIVED);
+	msg->AddRef("refs",&ref);
 	if (line >= 0)
-		msg.AddInt32("line",line);
-	
-	be_roster->Launch(&ref);
+		msg->AddInt32("be:line",line);
+	STRACE(2,("Paladin Launching File Ref: $s:%i",ref.name,line));
+	be_roster->Launch(&ref,msg);
 }
 
 

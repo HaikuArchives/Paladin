@@ -90,7 +90,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 }
 
 
-FindWindow::FindWindow(const char* workingDir)
+FindWindow::FindWindow(BString workingDir)
 	:	DWindow(BRect(100,100,600,500), "Find in project", B_TITLED_WINDOW,
 				B_CLOSE_ON_ESCAPE),
 		fIsRegEx(false),
@@ -100,6 +100,7 @@ FindWindow::FindWindow(const char* workingDir)
 		fThreadMode(0),
 		fThreadQuitFlag(0),
 		fFileList(20, true),
+		fWorkingDir(""),
 		fProject(NULL)
 {
 	SetSizeLimits(400, 30000, 400, 30000);
@@ -198,10 +199,10 @@ FindWindow::FindWindow(const char* workingDir)
 
 
 status_t
-FindWindow::SetWorkingDirectory(const char *path)
+FindWindow::SetWorkingDirectory(BString path)
 {
 	fWorkingDir = path;
-	STRACE(2,("Set working directory for find: %s\n",fWorkingDir));
+	STRACE(2,("Set working directory for find: %s\n",fWorkingDir.String()));
 	return B_OK;
 }
 
@@ -381,11 +382,12 @@ FindWindow::FindResults(void)
 	ShellHelper shell;
 	
 	shell << "cd ";
-	shell.AddEscapedArg(fWorkingDir.GetFullPath());
+	shell.AddEscapedArg(fWorkingDir);
 	shell << "; pwd; find . -name ";
 	shell.AddEscapedArg("*.*");
 	shell << "|xargs grep -n -H -s --binary-files=without-match ";
 	// TODO check for PCRE invocation and pass in pcre flag to grep if so
+	// TODO Ensure RE escaping also happens (E.g. open/close paran etc.)
 	shell.AddEscapedArg(fFindBox->Text());
 	
 	/*

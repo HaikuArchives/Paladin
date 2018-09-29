@@ -934,7 +934,16 @@ ProjectWindow::MessageReceived(BMessage* message)
 			}
 			*/
 
-			FindWindow* window = new FindWindow(fProject->GetPath().GetFolder());
+			// GetPath().GetFolder() returns a RELATIVE folder, not absolute (i.e. "")
+			const char* path = fProject->GetPath().GetFullPath();
+			STRACE(2,("Project full path: %s\n",path));
+			BString pathStr(path);
+			STRACE(2,("BString path: %s\n",pathStr.String()));
+			int32 slash = pathStr.FindLast("/");
+			BString dir;
+			pathStr.CopyInto(dir,0,slash);
+			STRACE(2,("Path now %s\n",dir.String()));
+			FindWindow* window = new FindWindow(dir);
 			window->Show();
 			break;
 		}

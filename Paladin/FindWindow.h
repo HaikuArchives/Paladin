@@ -16,7 +16,7 @@ class Project;
 class FindWindow : public DWindow
 {
 public:
-						FindWindow(const char *path);
+						FindWindow(BString path);
 			void		MessageReceived(BMessage *msg);
 
 private:
@@ -29,7 +29,7 @@ private:
 			void		EnableReplace(bool value);
 			void		SetProject(Project *proj);
 			
-			status_t 	SetWorkingDirectory(const char *path);
+			status_t 	SetWorkingDirectory(BString path);
 	
 	DTextView		*fFindBox,
 					*fReplaceBox;
@@ -50,7 +50,7 @@ private:
 	int32			fThreadQuitFlag;
 	
 	BObjectList<BString>	fFileList;
-	DPath					fWorkingDir;
+	BString					fWorkingDir;
 	Project			*fProject;
 };
 

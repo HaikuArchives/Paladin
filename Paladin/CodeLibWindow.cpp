@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <TextView.h>
 
+#include "DebugTools.h"
 #include "DListView.h"
 #include "DPath.h"
 #include "Globals.h"
@@ -367,6 +368,7 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 			{
 				RefListItem *refitem = (RefListItem*)fFileList->ItemAt(sel);
 				entry_ref ref = refitem->GetRef();
+				STRACE(2,("CodeLibWindow Launch"));
 				be_roster->Launch(&ref);
 				sel = fFileList->CurrentSelection(index++);
 			}

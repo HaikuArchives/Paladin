@@ -15,6 +15,7 @@
 #include "DTextView.h"
 #include "Globals.h"
 #include "LaunchHelper.h"
+#include "Paladin.h"
 #include "Project.h"
 #include "SourceFile.h"
 #include "DebugTools.h"
@@ -32,6 +33,7 @@ enum
 	M_TOGGLE_CASE_INSENSITIVE = 'tgci',
 	M_TOGGLE_MATCH_WORD = 'tgmw',
 	M_FIND_CHANGED = 'fnch',
+	M_REPLACE_CHANGED = 'rpch',
 	M_SET_PROJECT = 'stpj'
 };
 
@@ -45,10 +47,13 @@ enum
 class GrepListItem : public RefListItem
 {
 public:
-			GrepListItem(entry_ref ref, int32 line, const char *linestr);
+			GrepListItem(BString fullPath, BString relPath, 
+				entry_ref ref, int32 line, const char *linestr);
 	int32	GetLine(void) const;
 
 private:
+	BString	fFullPath;
+	BString	fRelativePath;
 	int32	fLine;
 	BString	fLineString;
 };
@@ -152,8 +157,6 @@ FindWindow::FindWindow(BString workingDir)
 		.Add(findBoxScroll)
 		.Add(fFindButton)
 		.Add(replaceBoxScroll)
-		//.Add(fReplaceButton)
-		//.Add(fReplaceAllButton)
 		.Add(hView)
 		.Add(resultLabel)
 		.Add(resultsScroll)
@@ -207,6 +210,10 @@ FindWindow::FindWindow(BString workingDir)
 	fFindBox->SetTarget(this);
 	fFindBox->SetChangeNotifications(true);
 	fFindBox->MakeFocus(true);
+	
+	fReplaceBox->SetMessage(new BMessage(M_REPLACE_CHANGED));
+	fReplaceBox->SetTarget(this);
+	fReplaceBox->SetChangeNotifications(true);
 }
 
 
@@ -246,8 +253,11 @@ FindWindow::MessageReceived(BMessage *msg)
 													fResultList->CurrentSelection()));
 			if (item)
 			{
-				DPath path(item->GetRef());
-				be_roster->Launch(path.GetFullPath());
+				BMessage refMessage(B_REFS_RECEIVED);
+				entry_ref fileref = item->GetRef();
+				refMessage.AddRef("refs",&fileref);
+				refMessage.AddInt32("be:line",item->GetLine());
+				be_roster->Launch(&fileref,&refMessage);
 			}
 			break;
 		}
@@ -278,6 +288,14 @@ FindWindow::MessageReceived(BMessage *msg)
 				fFindButton->SetEnabled(true);
 			else
 				fFindButton->SetEnabled(false);
+			break;
+		}
+		case M_REPLACE_CHANGED:
+		{
+			if (fReplaceBox->Text() && strlen(fReplaceBox->Text()) > 0)
+				EnableReplace(true);
+			else
+				EnableReplace(false);
 			break;
 		}
 		case M_SET_PROJECT:
@@ -374,6 +392,7 @@ FindWindow::FindResults(void)
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	Lock();
+	bool canReplace = fReplaceButton->IsEnabled();
 	EnableReplace(false);
 	for (int32 i = fResultList->CountItems() - 1; i >= 0; i--)
 	{
@@ -452,6 +471,9 @@ FindWindow::FindResults(void)
 		if (pos < 0)
 			continue;
 		filename.Truncate(pos);
+		if (filename.StartsWith("./"))
+			filename.Remove(0,2);
+		STRACE(2,("Truncated file name from grep: %s\n",filename.String()));
 		
 		BString lineString;
 		entryString.CopyInto(lineString, pos + 1, entryString.CountChars() - pos);
@@ -464,10 +486,18 @@ FindWindow::FindResults(void)
 		DPath entryPath(fWorkingDir);
 		entryPath << filename;
 		
-		fResultList->AddItem(new GrepListItem(entryPath.GetRef(), atol(lineString.String()),
-											locationString.String()));
+		BString fullPath(fWorkingDir);
+		fullPath << "/" << filename;
+		
+		STRACE(2,("Full path: %s\n",fullPath.String()));
+		
+		DPath relPath(filename);
+		
+		fResultList->AddItem(new GrepListItem(fullPath,filename,
+			entryPath.GetRef(), atol(lineString.String()),
+			locationString.String()));
 	}
-	EnableReplace(fResultList->CountItems() > 0);
+	EnableReplace(canReplace);
 	
 	if (fResultList->CountItems() == 0)
 		fResultList->AddItem(new BStringItem(B_TRANSLATE("No matches found")));
@@ -662,14 +692,20 @@ FindWindow::SetProject(Project *proj)
 }
 
 
-GrepListItem::GrepListItem(entry_ref ref, int32 line, const char *linestr)
+GrepListItem::GrepListItem(BString fullPath,BString relPath,
+	entry_ref ref, int32 line, const char *linestr)
 	:	RefListItem(ref, REFITEM_OTHER),
+		fFullPath(fullPath),
+		fRelativePath(relPath),
 		fLine(line),
 		fLineString(linestr)
 {
 	fLine = line;
-	BString text = ref.name;
-	text << ", Line " << line << ": " << linestr;
+	BString text("");
+	
+	text << relPath;
+	text << ":" << line << ": " << linestr; 
+	// colon doesn't require translation, and thus no complex parsing on click
 	SetText(text.String());
 }
 

@@ -138,7 +138,10 @@ FindWindow::FindWindow(BString workingDir)
 	fReplaceButton = new BButton("replacebutton", B_TRANSLATE("Replace"),
 								new BMessage(M_REPLACE));
 	fReplaceButton->SetEnabled(false);
-	hGroup->AddView(fReplaceButton);
+	//hGroup->AddView(fReplaceButton);
+	// hidden until we decide we need an individual replace in a multi
+	//   file dialog box (doubtful - could click on file and do it from
+	//   within pe)
 	
 	fReplaceAllButton = new BButton("replaceallbutton", B_TRANSLATE("Replace all"),
 								new BMessage(M_REPLACE_ALL));
@@ -293,7 +296,7 @@ FindWindow::MessageReceived(BMessage *msg)
 		case M_REPLACE_CHANGED:
 		{
 			if (fReplaceBox->Text() && strlen(fReplaceBox->Text()) > 0)
-				EnableReplace(true);
+				; // only enabled after Find used
 			else
 				EnableReplace(false);
 			break;
@@ -414,30 +417,11 @@ FindWindow::FindResults(void)
 	
 	shell << "cd ";
 	shell.AddEscapedArg(fWorkingDir);
-	shell << "; pwd; find . -name ";
-	shell.AddEscapedArg("*.*");
+	shell << "; pwd; find . -type f ";
 	shell << "|xargs grep -n -H -s --binary-files=without-match ";
 	// TODO check for PCRE invocation and pass in pcre flag to grep if so
 	// TODO Ensure RE escaping also happens (E.g. open/close paran etc.)
 	shell.AddEscapedArg(fFindBox->Text());
-	
-	/*
-	shell << "cd";
-	shell.AddEscapedArg(fWorkingDir.GetFullPath());
-	
-	shell << ";pwd;" << "../luagrep";
-	
-	if (!fIsRegEx)
-		shell << "-f";
-	
-	shell.AddEscapedArg(fFindBox->Text());
-	
-	for (int32 i = 0; i < fFileList.CountItems(); i++)
-	{
-		BString *item = fFileList.ItemAt(i);
-		shell.AddEscapedArg(item->String());
-	}
-	*/
 	
 	if (fThreadQuitFlag)
 		return;
@@ -497,7 +481,7 @@ FindWindow::FindResults(void)
 			entryPath.GetRef(), atol(lineString.String()),
 			locationString.String()));
 	}
-	EnableReplace(canReplace);
+	EnableReplace(true);
 	
 	if (fResultList->CountItems() == 0)
 		fResultList->AddItem(new BStringItem(B_TRANSLATE("No matches found")));
@@ -507,69 +491,41 @@ FindWindow::FindResults(void)
 }
 
 void
-FindWindow::Replace(void)
+FindWindow::ReplaceAll(void)
 {
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	
-	// Luare really makes things *so* much easier than messing around with sed. :)
-	
-	ShowAlert(B_TRANSLATE("luare based replace has been removed until it can be migrated from Lua"), 
-		"OK", NULL, NULL, B_STOP_ALERT);
-	return;
 	
 	Lock();
 	BString errorLog;
 	
-	int32 i = 0;
-	GrepListItem *gitem = (GrepListItem*)fResultList->ItemAt(fResultList->CurrentSelection(i));
-	i++;
-	while (gitem)
+	BString findText(fFindBox->Text());
+	BString replaceText(fReplaceBox->Text());
+		
+	if (!fIsRegEx)
 	{
-		BString findText(fFindBox->Text()), replaceText(fReplaceBox->Text());
-		
-		if (!fIsRegEx)
-		{
-			findText.CharacterEscape("^$()%.[]*+-?", '%');
-			replaceText.CharacterEscape("%", '%');
-		}
-		
-		findText.CharacterEscape("'", '\\');
-		replaceText.CharacterEscape("'", '\\');
-		
-		BString replaceTerms;
-		replaceTerms << "'" << findText << "' '" << replaceText << "'";
-		
-		DPath file(gitem->GetRef());
-		
-		ShellHelper shell;
-		shell << "luare" << replaceTerms;
-		shell.AddEscapedArg(file.GetFullPath());
-		shell.AddEscapedArg(file.GetFullPath());
-		
-		BString lineArg;
-		lineArg << "+" << (gitem->GetLine());
-		shell.AddArg(lineArg);
-		
-		int32 outvalue = shell.Run();
-		if (outvalue)
-		{
-			// append file name to list of files with error conditions and notify
-			// user of problems at the end so as not to annoy them.
-			errorLog << "\t" << file.GetFileName() << "\n";
-		}
-		
-		// Allow window updates from time to time
-		if (i % 5 == 0)
-		{
-			Unlock();
-			Lock();
-		}
-
-		gitem = (GrepListItem*)fResultList->ItemAt(fResultList->CurrentSelection(i));
-		i++;
+		findText.CharacterEscape("^$()%.[]*+-?", '\\');
 	}
+		
+	BString replaceTerms;
+	replaceTerms << "'" << findText << "' '" << replaceText << "'";
+		
+	ShellHelper shell;
+	shell << "pwd; find ";
+	shell.AddEscapedArg(fWorkingDir);
+	BString sStr("'s/");
+	sStr << findText.String() << "/";
+	sStr << replaceText.String() << "/";
+	sStr << "'";
+	shell << " -type f | xargs sed -i " << sStr.String();
+		
+	STRACE(2,("Shell command: %s\n",shell.AsString().String()));
+		
 	Unlock();
+	BString out;
+	shell.RunInPipe(out,false);
+	STRACE(2,("Command output: %s\n",out.String()));
 	
 	if (errorLog.CountChars() > 0)
 	{
@@ -583,7 +539,7 @@ FindWindow::Replace(void)
 }
 
 void
-FindWindow::ReplaceAll(void)
+FindWindow::Replace(void) // Was REPLACEALL
 {
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.

@@ -925,14 +925,25 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		case M_SHOW_FIND_IN_PROJECT_FILES:
 		{
+			/*
 			if (!gLuaAvailable) {
 				ShowAlert(B_TRANSLATE("Paladin's multi-file Find window depends on Lua. "
 					"It will need to be installed if you wish to use "
 					"this feature."), "OK", NULL, NULL, B_STOP_ALERT);
 				break;
 			}
+			*/
 
-			FindWindow* window = new FindWindow();
+			// GetPath().GetFolder() returns a RELATIVE folder, not absolute (i.e. "")
+			const char* path = fProject->GetPath().GetFullPath();
+			STRACE(2,("Project full path: %s\n",path));
+			BString pathStr(path);
+			STRACE(2,("BString path: %s\n",pathStr.String()));
+			int32 slash = pathStr.FindLast("/");
+			BString dir;
+			pathStr.CopyInto(dir,0,slash);
+			STRACE(2,("Path now %s\n",dir.String()));
+			FindWindow* window = new FindWindow(dir);
 			window->Show();
 			break;
 		}

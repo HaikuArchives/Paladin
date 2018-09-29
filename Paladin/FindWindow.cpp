@@ -15,6 +15,7 @@
 #include "LaunchHelper.h"
 #include "Project.h"
 #include "SourceFile.h"
+#include "DebugTools.h"
 
 enum
 {
@@ -89,7 +90,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 }
 
 
-FindWindow::FindWindow(void)
+FindWindow::FindWindow(const char* workingDir)
 	:	DWindow(BRect(100,100,600,500), "Find in project", B_TITLED_WINDOW,
 				B_CLOSE_ON_ESCAPE),
 		fIsRegEx(false),
@@ -186,11 +187,22 @@ FindWindow::FindWindow(void)
 	
 	EnableReplace(false);
 	
+	SetWorkingDirectory(workingDir);
+	
 	// The search terms box will tell us whenever it has been changed at every keypress
 	fFindBox->SetMessage(new BMessage(M_FIND_CHANGED));
 	fFindBox->SetTarget(this);
 	fFindBox->SetChangeNotifications(true);
 	fFindBox->MakeFocus(true);
+}
+
+
+status_t
+FindWindow::SetWorkingDirectory(const char *path)
+{
+	fWorkingDir = path;
+	STRACE(2,("Set working directory for find: %s\n",fWorkingDir));
+	return B_OK;
 }
 
 
@@ -367,10 +379,21 @@ FindWindow::FindResults(void)
 	Unlock();
 
 	ShellHelper shell;
+	
+	shell << "cd ";
+	shell.AddEscapedArg(fWorkingDir.GetFullPath());
+	shell << "; pwd; find . -name ";
+	shell.AddEscapedArg("*.*");
+	shell << "|xargs grep -n -H -s --binary-files=without-match ";
+	// TODO check for PCRE invocation and pass in pcre flag to grep if so
+	shell.AddEscapedArg(fFindBox->Text());
+	
+	/*
 	shell << "cd";
 	shell.AddEscapedArg(fWorkingDir.GetFullPath());
 	
-	shell << ";" << "luagrep";
+	shell << ";pwd;" << "../luagrep";
+	
 	if (!fIsRegEx)
 		shell << "-f";
 	
@@ -381,6 +404,7 @@ FindWindow::FindResults(void)
 		BString *item = fFileList.ItemAt(i);
 		shell.AddEscapedArg(item->String());
 	}
+	*/
 	
 	if (fThreadQuitFlag)
 		return;

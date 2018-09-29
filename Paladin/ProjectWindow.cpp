@@ -925,14 +925,16 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		case M_SHOW_FIND_IN_PROJECT_FILES:
 		{
+			/*
 			if (!gLuaAvailable) {
 				ShowAlert(B_TRANSLATE("Paladin's multi-file Find window depends on Lua. "
 					"It will need to be installed if you wish to use "
 					"this feature."), "OK", NULL, NULL, B_STOP_ALERT);
 				break;
 			}
+			*/
 
-			FindWindow* window = new FindWindow();
+			FindWindow* window = new FindWindow(fProject->GetPath().GetFolder());
 			window->Show();
 			break;
 		}

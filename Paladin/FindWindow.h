@@ -16,18 +16,20 @@ class Project;
 class FindWindow : public DWindow
 {
 public:
-						FindWindow(void);
+						FindWindow(const char *path);
 			void		MessageReceived(BMessage *msg);
 
 private:
-			void	SpawnThread(int8 findMode);
-			void	AbortThread(void);
-	static	int32	FinderThread(void *data);
-			void	FindResults(void);
-			void	Replace(void);
-			void	ReplaceAll(void);
-			void	EnableReplace(bool value);
-			void	SetProject(Project *proj);
+			void		SpawnThread(int8 findMode);
+			void		AbortThread(void);
+	static	int32		FinderThread(void *data);
+			void		FindResults(void);
+			void		Replace(void);
+			void		ReplaceAll(void);
+			void		EnableReplace(bool value);
+			void		SetProject(Project *proj);
+			
+			status_t 	SetWorkingDirectory(const char *path);
 	
 	DTextView		*fFindBox,
 					*fReplaceBox;

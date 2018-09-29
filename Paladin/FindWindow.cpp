@@ -1,7 +1,9 @@
 #include "FindWindow.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Font.h>
+#include <Locale.h>
 #include <Roster.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +18,9 @@
 #include "Project.h"
 #include "SourceFile.h"
 #include "DebugTools.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "FindWindow"
 
 enum
 {
@@ -91,7 +96,7 @@ TokenizeToList(const char *string, BObjectList<BString> &stringList)
 
 
 FindWindow::FindWindow(BString workingDir)
-	:	DWindow(BRect(100,100,600,500), "Find in project", B_TITLED_WINDOW,
+	:	DWindow(BRect(100,100,600,500), B_TRANSLATE("Find in project"), B_TITLED_WINDOW,
 				B_CLOSE_ON_ESCAPE),
 		fIsRegEx(false),
 		fIgnoreCase(true),
@@ -103,12 +108,12 @@ FindWindow::FindWindow(BString workingDir)
 		fWorkingDir(""),
 		fProject(NULL)
 {
-	SetSizeLimits(400, 30000, 400, 30000);
+	SetSizeLimits(650, 30000, 400, 30000);
 	
 	MakeCenteredOnShow(true);
 	fMenuBar = new BMenuBar("menubar");
 	
-	fFindButton = new BButton("findbutton", "Replace all",
+	fFindButton = new BButton("findbutton", B_TRANSLATE("Replace all"),
 								new BMessage(M_FIND));
 	fFindButton->SetLabel("Find");
 	fFindButton->SetEnabled(false);
@@ -122,18 +127,24 @@ FindWindow::FindWindow(BString workingDir)
 	fReplaceBox->SetFlags(fFindBox->Flags() | B_NAVIGABLE_JUMP);	
 	BScrollView *replaceBoxScroll = fReplaceBox->MakeScrollView("replacescroll", true, true);
 	
-	fReplaceButton = new BButton("replacebutton", "Replace",
+	BGroupLayout* hGroup = new BGroupLayout(B_HORIZONTAL,0);
+	BView* hView = new BView("hview",0,hGroup);
+	
+	fReplaceButton = new BButton("replacebutton", B_TRANSLATE("Replace"),
 								new BMessage(M_REPLACE));
 	fReplaceButton->SetEnabled(false);
+	hGroup->AddView(fReplaceButton);
 	
-	fReplaceAllButton = new BButton("replaceallbutton", "Replace all",
+	fReplaceAllButton = new BButton("replaceallbutton", B_TRANSLATE("Replace all"),
 								new BMessage(M_REPLACE_ALL));
 	fReplaceAllButton->SetEnabled(false);
+	hGroup->AddView(fReplaceAllButton);
 	
-	BStringView *resultLabel = new BStringView("resultlabel", "Results:");
+	BStringView *resultLabel = new BStringView("resultlabel", B_TRANSLATE("Results:"));
 	
 	fResultList = new DListView("resultlist", B_MULTIPLE_SELECTION_LIST);
 	BScrollView* resultsScroll = fResultList->MakeScrollView("resultscroll", true, true);
+	resultsScroll->SetExplicitMinSize(BSize(650,150));
 	fResultList->SetInvocationMessage(new BMessage(M_SHOW_RESULT));
 	
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -141,31 +152,32 @@ FindWindow::FindWindow(BString workingDir)
 		.Add(findBoxScroll)
 		.Add(fFindButton)
 		.Add(replaceBoxScroll)
-		.Add(fReplaceButton)
-		.Add(fReplaceAllButton)
+		//.Add(fReplaceButton)
+		//.Add(fReplaceAllButton)
+		.Add(hView)
 		.Add(resultLabel)
 		.Add(resultsScroll)
 	.End();
 	
-	BMenu *menu = new BMenu("Search");
-	menu->AddItem(new BMenuItem("Find", new BMessage(M_FIND), 'F', B_COMMAND_KEY));
+	BMenu *menu = new BMenu(B_TRANSLATE("Search"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find"), new BMessage(M_FIND), 'F', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Replace", new BMessage(M_REPLACE), 'R', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Replace all", new BMessage(M_REPLACE_ALL), 'R',
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Replace"), new BMessage(M_REPLACE), 'R', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Replace all"), new BMessage(M_REPLACE_ALL), 'R',
 								B_COMMAND_KEY | B_SHIFT_KEY));
 	fMenuBar->AddItem(menu);
 	
-	menu = new BMenu("Options");
-	menu->AddItem(new BMenuItem("Regular expression", new BMessage(M_TOGGLE_REGEX)));
-	menu->AddItem(new BMenuItem("Ignore case", new BMessage(M_TOGGLE_CASE_INSENSITIVE)));
-	menu->AddItem(new BMenuItem("Match whole word", new BMessage(M_TOGGLE_MATCH_WORD)));
+	menu = new BMenu(B_TRANSLATE("Options"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Regular expression"), new BMessage(M_TOGGLE_REGEX)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Ignore case"), new BMessage(M_TOGGLE_CASE_INSENSITIVE)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Match whole word"), new BMessage(M_TOGGLE_MATCH_WORD)));
 	fMenuBar->AddItem(menu);
 	
-	BMenuItem *item = fMenuBar->FindItem("Ignore case");
+	BMenuItem *item = fMenuBar->FindItem(B_TRANSLATE("Ignore case"));
 	if (fIgnoreCase)
 		item->SetMarked(true);
 	
-	menu = new BMenu("Project");
+	menu = new BMenu(B_TRANSLATE("Project"));
 	menu->SetRadioMode(true);
 	gProjectList->Lock();
 	for (int32 i = 0; i < gProjectList->CountItems(); i++)
@@ -242,21 +254,21 @@ FindWindow::MessageReceived(BMessage *msg)
 		case M_TOGGLE_REGEX:
 		{
 			fIsRegEx = !fIsRegEx;
-			item = fMenuBar->FindItem("Regular expression");
+			item = fMenuBar->FindItem(B_TRANSLATE("Regular expression"));
 			item->SetMarked(fIsRegEx);
 			break;
 		}
 		case M_TOGGLE_CASE_INSENSITIVE:
 		{
 			fIgnoreCase = !fIgnoreCase;
-			item = fMenuBar->FindItem("Ignore case");
+			item = fMenuBar->FindItem(B_TRANSLATE("Ignore case"));
 			item->SetMarked(fIgnoreCase);
 			break;
 		}
 		case M_TOGGLE_MATCH_WORD:
 		{
 			fMatchWord = !fMatchWord;
-			item = fMenuBar->FindItem("Match whole word");
+			item = fMenuBar->FindItem(B_TRANSLATE("Match whole word"));
 			item->SetMarked(fMatchWord);
 			break;
 		}
@@ -458,7 +470,7 @@ FindWindow::FindResults(void)
 	EnableReplace(fResultList->CountItems() > 0);
 	
 	if (fResultList->CountItems() == 0)
-		fResultList->AddItem(new BStringItem("No matches found"));
+		fResultList->AddItem(new BStringItem(B_TRANSLATE("No matches found")));
 	
 	Unlock();
 	
@@ -471,6 +483,10 @@ FindWindow::Replace(void)
 	// required when accessing any member variables.
 	
 	// Luare really makes things *so* much easier than messing around with sed. :)
+	
+	ShowAlert(B_TRANSLATE("luare based replace has been removed until it can be migrated from Lua"), 
+		"OK", NULL, NULL, B_STOP_ALERT);
+	return;
 	
 	Lock();
 	BString errorLog;
@@ -527,7 +543,7 @@ FindWindow::Replace(void)
 	
 	if (errorLog.CountChars() > 0)
 	{
-		BString errorString = "The following files had problems replacing the search terms:\n";
+		BString errorString = B_TRANSLATE("The following files had problems replacing the search terms:\n");
 		errorString << errorLog;
 		
 		ShowAlert(errorString.String());
@@ -545,6 +561,9 @@ FindWindow::ReplaceAll(void)
 	// Just make sure you escape single quotes and underscores before constructing
 	// the sed command
 	
+	ShowAlert(B_TRANSLATE("luare based replace all has been removed until it can be migrated from Lua"), 
+		"OK", NULL, NULL, B_STOP_ALERT);
+	return;
 	
 	Lock();
 	BString errorLog;
@@ -592,10 +611,10 @@ printf("replace command: %s\n", shell.AsString().String());
 	
 	if (errorLog.CountChars() > 0)
 	{
-		BString errorString = "The following files had problems replacing the search terms:\n";
+		BString errorString = B_TRANSLATE("The following files had problems replacing the search terms:\n");
 		errorString << errorLog;
 		
-		BAlert *alert = new BAlert("Paladin", errorString.String(), "OK");
+		BAlert *alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Paladin"), errorString.String(), "OK");
 		alert->Go();
 	}
 	
@@ -608,10 +627,10 @@ FindWindow::EnableReplace(bool value)
 {
 	fReplaceButton->SetEnabled(value);
 	fReplaceAllButton->SetEnabled(value);
-	BMenuItem *item = fMenuBar->FindItem("Replace");
+	BMenuItem *item = fMenuBar->FindItem(B_TRANSLATE("Replace"));
 	if (item)
 		item->SetEnabled(value);
-	item = fMenuBar->FindItem("Replace all");
+	item = fMenuBar->FindItem(B_TRANSLATE("Replace all"));
 	if (item)
 		item->SetEnabled(value);
 }

@@ -60,8 +60,6 @@ void
 ProjectStatus::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
-	// Blank out the previous text by redrawing the background
-	Invalidate();
 
 	rgb_color highColor = HighColor();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));

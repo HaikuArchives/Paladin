@@ -319,55 +319,64 @@ ParseGCCErrors(const char *string, ErrorList &list)
 		
 		int32 startpos = 0;
 		int32 endpos = msg->rawdata.FindFirst(":");
-		msg->rawdata.CopyInto(msg->path,startpos,endpos);
-		
-		// Now we have to do a little fancy guesswork
-		if (isdigit(msg->rawdata[endpos + 1]))
+		if (B_ERROR != endpos) 
 		{
-			startpos = endpos;
-			
-			BString temp;
-			int32 numberIndex = startpos + 1;
-			while (isdigit(msg->rawdata[numberIndex]))
+			msg->rawdata.CopyInto(msg->path, startpos, endpos);
+		
+			// Now we have to do a little fancy guesswork
+			if (isdigit(msg->rawdata[endpos + 1]))
 			{
-				temp += msg->rawdata[numberIndex];
-				numberIndex++;
-				if (numberIndex >= msg->rawdata.CountChars())
-					break;
+				startpos = endpos;
+				
+				BString temp;
+				int32 numberIndex = startpos + 1;
+				while (isdigit(msg->rawdata[numberIndex]))
+				{
+					temp += msg->rawdata[numberIndex];
+					numberIndex++;
+					if (numberIndex >= msg->rawdata.CountChars())
+						break;
+				}
+				msg->line = atol(temp.String());
+				endpos += temp.CountChars();
 			}
-			msg->line = atol(temp.String());
-			endpos += temp.CountChars();
-		}
-		else
-			msg->line = -1;
-		
-		// adding 2 instead of one because there is always a space after the final 
-		// colon in the event there is an error message, which is usually
-		if (endpos + 2 < msg->rawdata.CountChars()) {
-			msg->error = msg->rawdata.String() + endpos + 2;
-		}
-		
-		/*if ((msg->line < 0 && msg->error.IFindFirst("error") < 0) ||
-			(msg->error.CountChars() < 1)) {
-			if (-1 != errorPrev) {
-				msg->type = errorPrev;
-			} else {
-				msg->type = ERROR_MSG;
-			}
-		} else*/ if (msg->rawdata.IFindFirst("warning:") >= 0) {
-			msg->type = ERROR_WARNING;
-		} else if (msg->rawdata.IFindFirst("error:") >= 0) {
-			msg->type = ERROR_ERROR;
-		} else {
-			//msg->type = ERROR_UNKNOWN;
-			// if not known, mark as previous or unknown
-			if (ERROR_UNSET != errorPrev) {
-				msg->type = errorPrev;
-			} else {
-				msg->type = ERROR_UNKNOWN;
-			}
-		}
+			else
+				msg->line = -1;
 			
+			// adding 2 instead of one because there is always a space after the final 
+			// colon in the event there is an error message, which is usually
+			if (endpos + 2 < msg->rawdata.CountChars()) {
+				msg->error = msg->rawdata.String() + endpos + 2;
+			}
+		
+			if ((msg->line < 0 && msg->error.IFindFirst("error") < 0) ||
+				(msg->error.CountChars() < 1)) {
+				// first line
+				if (-1 != errorPrev) {
+					msg->type = errorPrev;
+				} else {
+					msg->type = ERROR_NOTE;
+				}
+			} else if (msg->rawdata.IFindFirst("warning:") >= 0) {
+				msg->type = ERROR_WARNING;
+			} else if (msg->rawdata.IFindFirst("error:") >= 0) {
+				msg->type = ERROR_ERROR;
+			} else if (msg->rawdata.IFindFirst("note:") >= 0 &&
+					   msg->rawdata.IFindFirst("In ") >= 0) {
+				if (-1 != errorPrev) {
+					msg->type = errorPrev;
+				} else {
+					msg->type = ERROR_NOTE;
+				}
+			} else {
+				// if not known, mark as previous or unknown
+				if (ERROR_UNSET != errorPrev) {
+					msg->type = errorPrev;
+				} else {
+					msg->type = ERROR_UNKNOWN;
+				}
+			}
+		} // end null endpos if	
 		errorPrev = msg->type;
 	}
 	

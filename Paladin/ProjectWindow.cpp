@@ -356,6 +356,7 @@ void
 ProjectWindow::SetStatus(const char* msg)
 {
 	fStatusBar->SetStatus(msg);
+	fStatusBar->Invalidate();
 }
 
 

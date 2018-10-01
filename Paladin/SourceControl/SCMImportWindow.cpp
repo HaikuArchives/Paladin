@@ -257,17 +257,17 @@ SCMImportWindow::UpdateCommand(void)
 	if (strcmp("Mercurial", item->Label()) == 0)
 	{
 		scm = SCM_HG;
-		command = "hg ";
+		//command = "hg ";
 	}
 	else if (strcmp("Git", item->Label()) == 0)
 	{
 		scm = SCM_GIT;
-		command = "git ";
+		//command = "git ";
 	}
 	else if (strcmp("Subversion", item->Label()) == 0)
 	{
 		scm = SCM_SVN;
-		command = "svn ";
+		//command = "svn ";
 	}
 	else
 	{
@@ -276,7 +276,8 @@ SCMImportWindow::UpdateCommand(void)
 	}
 	fProvider->SetSCM(scm);
 	
-	
+	// The following also provides the command, as they may need
+	//   to set env variables before the command (E.g. git)
 	command << fProvider->GetImportCommand(fAnonymousBox->Value() == B_CONTROL_ON);
 	command << " '" << gProjectPath.GetFullPath();
 	

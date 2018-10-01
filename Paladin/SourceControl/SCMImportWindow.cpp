@@ -75,7 +75,7 @@ SCMImportWindow::SCMImportWindow(void)
 									new BMessage(M_UPDATE_COMMAND));
 	fUserNameBox->SetEnabled(false);
 	
-	fRepository = new AutoTextControl("repository", "Repository (opt.): ", "",
+	fRepository = new AutoTextControl("repository", "Repository Owner: ", "",
 									new BMessage(M_UPDATE_COMMAND));	
 	
 	fCommandLabel = new BStringView("commandlabel", "Command: ");	
@@ -91,10 +91,10 @@ SCMImportWindow::SCMImportWindow(void)
 		.SetInsets(10)
 		.Add(fProviderField)
 		.Add(fSCMField)
+		.Add(fRepository)
 		.Add(fProjectBox)
 		.Add(fAnonymousBox)
 		.Add(fUserNameBox)
-		.Add(fRepository)
 		.Add(fCommandLabel)
 		.Add(scroll)
 		.Add(fOK)

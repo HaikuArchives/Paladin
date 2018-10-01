@@ -365,16 +365,7 @@ App::MessageReceived(BMessage *msg)
 
 		case M_SHOW_OPEN_PROJECT:
 		{
-			if (NULL == fOpenPanel)
-			{
-				BMessenger msgr(this);
-				BEntry entry(gLastProjectPath.GetFullPath());
-				entry_ref ref;
-				entry.GetRef(&ref);
-				fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, false,
-					new BMessage(B_REFS_RECEIVED), new PaladinFileFilter() );
-				fOpenPanel->Window()->SetTitle("Paladin: Open project");
-			}
+			CheckCreateOpenPanel();
 			fOpenPanel->Show();
 			break;
 		}
@@ -429,13 +420,10 @@ App::MessageReceived(BMessage *msg)
 				index++;
 			}
 			
+			CheckCreateOpenPanel();
 			fOpenPanel->GetPanelDirectory(&ref);
 			gLastProjectPath.SetTo(ref);
 			BWindow* openWindow = fOpenPanel->Window();
-			if (NULL != openWindow)
-				delete(openWindow);
-			if (NULL != fOpenPanel)
-				delete(fOpenPanel);
 			break;
 		}
 
@@ -503,6 +491,20 @@ App::MessageReceived(BMessage *msg)
 	}
 }
 
+void
+App::CheckCreateOpenPanel()
+{
+	if (NULL == fOpenPanel)
+	{
+		BMessenger msgr(this);
+		BEntry entry(gLastProjectPath.GetFullPath());
+		entry_ref ref;
+		entry.GetRef(&ref);
+		fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, false,
+			new BMessage(B_REFS_RECEIVED), new PaladinFileFilter() );
+		fOpenPanel->Window()->SetTitle("Paladin: Open project");
+	}
+}
 
 void
 App::OpenFile(entry_ref ref, int32 line)

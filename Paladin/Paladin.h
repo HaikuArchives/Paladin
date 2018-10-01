@@ -33,6 +33,7 @@ private:
 	void	LoadProject(const entry_ref &ref);
 	void	UpdateRecentItems(const entry_ref &ref);
 	void	PostToProjectWindow(BMessage *msg, entry_ref *file);
+	void	CheckCreateOpenPanel(void);
 	
 	bool			fBuildCleanMode;
 	ProjectBuilder	*fBuilder;

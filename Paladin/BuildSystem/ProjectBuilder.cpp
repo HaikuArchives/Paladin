@@ -213,38 +213,53 @@ ProjectBuilder::DoPostBuild(void)
 		}
 		case POSTBUILD_DEBUG:
 		{
-			// Can't check the Haiku version by using B_BEOS_VERSION, so
-			// we have to depend on a small hack. R5 and Zeta don't have gdb,
-			// so this shouldn't break unless someone changes this in Haiku
-			if (BEntry("/boot/system/bin/gdb").Exists())
+			BEntry haikuDebugger("/boot/system/apps/Debugger");
+			if (haikuDebugger.Exists()) 
 			{
-				launcher.SetRef("/boot/system/apps/Terminal");
-				launcher.AddArg("gdb");
+				entry_ref debuggerref;
+				haikuDebugger.GetRef(&debuggerref);
+				
+				BString targetPath(fProject->GetPath().GetFolder());
+				targetPath << "/" << fProject->GetTargetName();
+				
+				const char* argv[] = {targetPath.String()};
+				be_roster->Launch(&debuggerref,1,argv);
 			}
 			else
 			{
-				if (BEntry("/boot/develop/tools/experimental/debugger/bdb").Exists())
-					launcher.SetRef("/boot/develop/tools/experimental/debugger/bdb");
+				// Can't check the Haiku version by using B_BEOS_VERSION, so
+				// we have to depend on a small hack. R5 and Zeta don't have gdb,
+				// so this shouldn't break unless someone changes this in Haiku
+				if (BEntry("/boot/system/bin/gdb").Exists())
+				{
+					launcher.SetRef("/boot/system/apps/Terminal");
+					launcher.AddArg("gdb");
+				}
 				else
 				{
-					// Stupid Zeta reorganization. Meh.
-					if (BEntry("/boot/apps/Development/bdb/bdb").Exists())
-						launcher.SetRef("/boot/apps/Development/bdb/bdb");
+					if (BEntry("/boot/develop/tools/experimental/debugger/bdb").Exists())
+						launcher.SetRef("/boot/develop/tools/experimental/debugger/bdb");
 					else
 					{
-						ShowAlert("Paladin can't seem to find the debugger. Sorry.");
-						break;
+						// Stupid Zeta reorganization. Meh.
+						if (BEntry("/boot/apps/Development/bdb/bdb").Exists())
+							launcher.SetRef("/boot/apps/Development/bdb/bdb");
+						else
+						{
+							ShowAlert("Paladin can't seem to find the debugger. Sorry.");
+							break;
+						}
 					}
 				}
-			}
 			
-			BString targetPath(fProject->GetPath().GetFolder());
-			targetPath << "/" << fProject->GetTargetName();
-			launcher.AddArg(targetPath.String());
-			launcher.ParseToArgs(fProject->GetRunArgs());
-			STRACE(1,("Debugger command: %s\n",launcher.AsString().String()));
-			launcher.Launch();
-			break;
+				BString targetPath(fProject->GetPath().GetFolder());
+				targetPath << "/" << fProject->GetTargetName();
+				launcher.AddArg(targetPath.String());
+				launcher.ParseToArgs(fProject->GetRunArgs());
+				STRACE(1,("Debugger command: %s\n",launcher.AsString().String()));
+				launcher.Launch();
+				break;
+			}
 		}
 		default:
 		{

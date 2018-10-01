@@ -1989,13 +1989,13 @@ ProjectWindow::AddFolder(entry_ref folderRef)
 			// a drop onto the group item to reuse the code path by finding
 			// the group and getting its position in the list.
 			DPath filepath(ref);
-			if (filepath.GetExtension()
-				&& !(strcmp(filepath.GetExtension(),"cpp") == 0
+			if (!filepath.GetExtension() // likely to be a compiled binary
+				|| !(strcmp(filepath.GetExtension(),"cpp") == 0
 					|| strcmp(filepath.GetExtension(),"c") == 0
 					|| strcmp(filepath.GetExtension(),"cc") == 0
 					|| strcmp(filepath.GetExtension(),"cxx") == 0
 					|| strcmp(filepath.GetExtension(),"rdef") == 0
-					|| strcmp(filepath.GetExtension(),"rsrc") == 0)) {
+					|| strcmp(filepath.GetExtension(),"rsrc") == 0) ) {
 				continue;
 			}
 

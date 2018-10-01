@@ -161,7 +161,7 @@ RecentProjectsList::MouseDown(BPoint where)
 
 StartWindow::StartWindow(void)
 	:
-	BWindow(BRect(0, 0, -1, -1), B_TRANSLATE_SYSTEM_NAME("Paladin"), B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, -1, -1), B_TRANSLATE("Paladin: Start"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	RegisterWindow();
@@ -177,7 +177,8 @@ StartWindow::StartWindow(void)
 	fNewButton = make_button("new", "NewProjectButtonUp.png",
 		"NewProjectButtonDown.png", M_NEW_PROJECT);
 
-	ClickableStringView* newLabel = make_label(fNewButton, B_TRANSLATE("Create a new project"));
+	ClickableStringView* newLabel = make_label(fNewButton, 
+		B_TRANSLATE("Create a new project"));
 	newLabel->SetMessage(new BMessage(M_NEW_PROJECT));
 
 	// open button and label
@@ -205,8 +206,9 @@ StartWindow::StartWindow(void)
 	fQuickImportButton = make_button("quickimport", "QuickImportButtonUp.png",
 		"QuickImportButtonDown.png", M_SHOW_IMPORT);
 	SetToolTip(fQuickImportButton,
-		B_TRANSLATE("Quickly make a project by importing all source files and resource files.\n"
-		   "You can also import a BeIDE project."));
+		B_TRANSLATE("Quickly make a project by importing all source "
+			"files and resource files.\n"
+			"You can also import a BeIDE project."));
 
 	ClickableStringView* quickImportLabel = make_label(fQuickImportButton,
 		"Import an existing project");

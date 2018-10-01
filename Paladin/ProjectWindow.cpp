@@ -121,7 +121,7 @@ compare_source_file_items(const BListItem* item1, const BListItem* item2);
 
 ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Paladin"), B_DOCUMENT_WINDOW,
+	BWindow(frame, B_TRANSLATE("Paladin: Project"), B_DOCUMENT_WINDOW,
 		B_NOT_ZOOMABLE),
 	fErrorWindow(NULL),
 	fFilePanel(NULL),
@@ -157,36 +157,42 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 		}
 	}
 
-	BGroupLayout* vGroup = new BGroupLayout(B_VERTICAL,0);
-	vGroup->SetInsets(0,0,0,0);
+	BGroupLayout* vGroup = new BGroupLayout(B_VERTICAL, 0);
+	vGroup->SetInsets(0, 0, 0, 0);
 	SetLayout(vGroup);
 	
 	CreateMenuBar();
 	vGroup->AddView(fMenuBar);
 
-	BGroupLayout* hGroup = new BGroupLayout(B_HORIZONTAL,0);
+	BGroupLayout* hGroup = new BGroupLayout(B_HORIZONTAL, 0);
 	hGroup->SetInsets(0, -1, -1, -1); // hides scroll bar borders
-	BView* hView = new BView("hview",0,hGroup);
+	BView* hView = new BView("hview", 0, hGroup);
 	
 	fProjectList = new ProjectList(fProject, "filelist", B_WILL_DRAW);
 	fProjectList->SetInvocationMessage(new BMessage(M_EDIT_FILE));
 	BLayoutItem* projectListView = hGroup->AddView(fProjectList);
-	projectListView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,B_ALIGN_USE_FULL_HEIGHT));
+	projectListView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, 
+		B_ALIGN_USE_FULL_HEIGHT));
 
 	BScrollBar* fileScrollBar = new BScrollBar("filelistscrollbar",
 		fProjectList, 0, 100, B_VERTICAL);
 	fileScrollBar->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	BLayoutItem* liScrollBar = hGroup->AddView(fileScrollBar);
-	liScrollBar->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,B_ALIGN_USE_FULL_HEIGHT));
+	liScrollBar->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, 
+		B_ALIGN_USE_FULL_HEIGHT));
 	
 	BLayoutItem* hGroupView = vGroup->AddView(hView);
-	hGroupView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,B_ALIGN_USE_FULL_HEIGHT));
+	hGroupView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, 
+		B_ALIGN_USE_FULL_HEIGHT));
 	
 	fStatusBar = new ProjectStatus(Bounds(), "");
-	fStatusBar->SetExplicitMinSize(BSize(B_SIZE_UNSET,B_H_SCROLL_BAR_HEIGHT - 1));
-	fStatusBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET,B_H_SCROLL_BAR_HEIGHT - 1));
+	fStatusBar->SetExplicitMinSize(BSize(B_SIZE_UNSET, 
+		B_H_SCROLL_BAR_HEIGHT - 1));
+	fStatusBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 
+		B_H_SCROLL_BAR_HEIGHT - 1));
 	BLayoutItem* statusLayoutItem = vGroup->AddView(fStatusBar);
-	statusLayoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,B_ALIGN_BOTTOM));
+	statusLayoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, 
+		B_ALIGN_BOTTOM));
 	
 	SetStatus(B_TRANSLATE("Opening Project..."));
 
@@ -238,7 +244,6 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 
 			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
 				SourceFile* file = group->filelist.ItemAt(j);
-				//SourceFileItem* fileItem = new SourceFileItem(file,1);
 				BString dependencies = file->GetDependencies();
 				// Split string on comma to get individual files
 				BStringList deplist = BStringList();// = new BStringList();
@@ -248,15 +253,21 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 					BString dep = deplist.StringAt(d);
 					BStringItem* depitem = new BStringItem(dep);
 					bool found = false;
-					STRACE(2,("Does dep exist?: %s\n",depitem->Text()));
+					STRACE(3,("Does dep exist?: %s\n", depitem->Text()));
 					int32 ed;
 					SourceFile* depfile = new SourceFile(dep);
 					SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
 					for (ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
-						STRACE(2,(" - Curitem text: %s\n",((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
+						STRACE(3,(" - Curitem text: %s\n", 
+							((SourceFileItem*)fProjectList->ItemUnderAt(
+							headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
 						if (0 == strcmp( 
-								((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem,true,ed))->GetData()->GetPath().GetFullPath(), depitem->Text() )) {
-							STRACE(2,(" - Found!!!\n"));
+								((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem, 
+								true, ed))->GetData()->GetPath().GetFullPath(), 
+								depitem->Text() )
+							) 
+						{
+							STRACE(3,(" - Found!!!\n"));
 							found = true;
 						}
 					}
@@ -295,7 +306,7 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 		moveX = - decRect.left;
 	if (decRect.top < 0)
 		moveY = - decRect.top;
-	MoveBy(moveX,moveY);
+	MoveBy(moveX, moveY);
 
 	fProjectList->SetTarget(this);
 	fProjectList->MakeFocus(true);
@@ -380,6 +391,8 @@ void
 ProjectWindow::MessageReceived(BMessage* message)
 {
 	status_t status;
+	
+	STRACE(2,("ProjectWindow::MessageReceived!\n"));
 
 	if ((message->WasDropped() && message->what == B_SIMPLE_DATA)
 		|| message->what == M_ADD_FILES) {
@@ -442,7 +455,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 				select = true;
 			}
 
-			GetTextWindow* getTextWindow = new GetTextWindow("Paladin", out.String(),
+			GetTextWindow* getTextWindow = new GetTextWindow(B_TRANSLATE("Paladin: Change description"), out.String(),
 				BMessage(M_CHECK_IN_PROJECT), BMessenger(this));
 			if (!select)
 				getTextWindow->GetTextView()->Select(0, 0);
@@ -1230,6 +1243,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		
 		case M_SET_STATUS:
 		{
+			STRACE(2,("Set Status message received"));
 			BString* statustext;
 			if (message->FindPointer("statustext", (void**)&statustext) == B_OK) {
 				SetStatus(*statustext);
@@ -1495,7 +1509,7 @@ ProjectWindow::CreateMenuBar()
 	newProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
 	fFileMenu->AddItem(new BMenuItem(newProjectStr,
 		new BMessage(M_NEW_WINDOW), 'N', B_COMMAND_KEY | B_SHIFT_KEY));
-	BString openProjectStr(B_TRANSLATE("Open project%ellipsis%"));
+	BString openProjectStr(B_TRANSLATE("%ellipsis%"));
 	openProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
 	fFileMenu->AddItem(new BMenuItem(openProjectStr,
 		new BMessage(M_SHOW_OPEN_PROJECT), 'O', B_COMMAND_KEY));

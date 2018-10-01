@@ -1510,7 +1510,7 @@ ProjectWindow::CreateMenuBar()
 	newProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
 	fFileMenu->AddItem(new BMenuItem(newProjectStr,
 		new BMessage(M_NEW_WINDOW), 'N', B_COMMAND_KEY | B_SHIFT_KEY));
-	BString openProjectStr(B_TRANSLATE("%ellipsis%"));
+	BString openProjectStr(B_TRANSLATE("Open project%ellipsis%"));
 	openProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
 	fFileMenu->AddItem(new BMenuItem(openProjectStr,
 		new BMessage(M_SHOW_OPEN_PROJECT), 'O', B_COMMAND_KEY));

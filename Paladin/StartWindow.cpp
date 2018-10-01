@@ -280,7 +280,7 @@ StartWindow::StartWindow(void)
 	fOpenPanel->Window()->SetTitle(titleString.String());
 
 	fImportPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_DIRECTORY_NODE,
-		true, new BMessage(M_QUICK_IMPORT));
+		false, new BMessage(M_QUICK_IMPORT));
 	titleString = B_TRANSLATE("Choose project folder");
 	titleString.Prepend("Paladin: ");
 	fImportPanel->Window()->SetTitle(titleString.String());

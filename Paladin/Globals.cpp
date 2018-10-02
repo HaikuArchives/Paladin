@@ -202,8 +202,8 @@ MakeProjectFile(DPath folder, const char *name, const char *data, const char *ty
 	BEntry entry(path.GetFullPath());
 	if (entry.Exists())
 	{
-		BString errstr = path.GetFullPath();
-		errstr << B_TRANSLATE(" already exists. Do you want to overwrite it?");
+		BString errstr = B_TRANSLATE("%filepath% already exists. Do you want to overwrite it?");
+		errstr.ReplaceFirst("%filepath%", path.GetFullPath());
 		int32 result = ShowAlert(errstr.String(),B_TRANSLATE("Overwrite"),B_TRANSLATE("Cancel"));
 		if (result == 1)
 			return ref;

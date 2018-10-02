@@ -211,11 +211,11 @@ StartWindow::StartWindow(void)
 			"You can also import a BeIDE project."));
 
 	ClickableStringView* quickImportLabel = make_label(fQuickImportButton,
-		"Import an existing project");
+		B_TRANSLATE("Import an existing project"));
 	quickImportLabel->SetMessage(new BMessage(M_SHOW_IMPORT));
 	SetToolTip(quickImportLabel,
 		B_TRANSLATE("Quickly make a project by importing all source files "
-		   "and resource files.\n You can also import a BeIDE project."));
+		   "and resource files.\nYou can also import a BeIDE project."));
 
 	// online import button and label
 
@@ -225,7 +225,7 @@ StartWindow::StartWindow(void)
 		B_TRANSLATE("Import a project from an online repository"));
 
 	ClickableStringView* onlineImportLabel = make_label(fOnlineImportButton,
-		"Import a project from online");
+		B_TRANSLATE("Import a project from online"));
 	onlineImportLabel->SetMessage(new BMessage(M_ONLINE_IMPORT));
 	SetToolTip(onlineImportLabel, B_TRANSLATE("Import a project from an online repository"));
 

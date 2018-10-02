@@ -144,7 +144,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	fCreateFolder = new BCheckBox(B_TRANSLATE("Create project folder"));
 	fCreateFolder->SetValue(B_CONTROL_ON);
 	SetToolTip(fCreateFolder, B_TRANSLATE("If checked, a folder for your project will be created "
-		"in the folder in the Location box above."));
+		"in the location entered above."));
 
 	// create project button
 

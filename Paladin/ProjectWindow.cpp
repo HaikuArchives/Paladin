@@ -1099,8 +1099,8 @@ ProjectWindow::MessageReceived(BMessage* message)
 		{
 			SourceFile* file;
 			if (message->FindPointer("file",(void**)&file) == B_OK) {
-				BString out;
-				out << B_TRANSLATE("Examining ") << file->GetPath().GetFileName();
+				BString out = B_TRANSLATE("Examining %file%");
+				out.ReplaceFirst("%file%",file->GetPath().GetFileName());
 				SetStatus(out.String());
 			}
 			break;
@@ -1549,7 +1549,7 @@ ProjectWindow::CreateMenuBar()
 	fSourceMenu->AddSeparatorItem();
 	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Add selected files to repository"),
 		new BMessage(M_ADD_SELECTION_TO_REPO)));
-	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove Selected files from repository"),
+	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove selected files from repository"),
 		new BMessage(M_REMOVE_SELECTION_FROM_REPO)));
 	fSourceMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert selected files"),
 		new BMessage(M_REVERT_SELECTION)));

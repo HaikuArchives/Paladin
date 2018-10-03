@@ -9,6 +9,7 @@
 
 #include <Alert.h>
 #include <Alignment.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -17,6 +18,8 @@
 #include <String.h>
 #include <Window.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PathBox"
 
 enum {
 	M_PATHBOX_CHANGED = 'pbch',
@@ -163,7 +166,7 @@ PathBox::PathBox(const BRect &frame, const char* name, const char* path,
 		new BMessage(M_PATHBOX_CHANGED), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
 	fBrowseButton = new BButton(BRect(0, 0, 1, 1), "browse",
-		"Browse" B_UTF8_ELLIPSIS, new BMessage(M_SHOW_FILEPANEL));
+		B_TRANSLATE("Browse" B_UTF8_ELLIPSIS), new BMessage(M_SHOW_FILEPANEL));
 	fBrowseButton->ResizeToPreferred();
 
 	float buttonLeft = frame.right - fBrowseButton->Bounds().Width();

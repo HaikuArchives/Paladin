@@ -807,9 +807,10 @@ App::BuildProject(const entry_ref &ref)
 	
 	if (proj->IsReadOnly())
 	{
-		BString err(path.Path());
-		err << B_TRANSLATE(" is on a read-only disk. Please copy the project to another disk ")
-			<<	B_TRANSLATE("or remount the disk with write support to be able to build it.\n");
+		BString err = B_TRANSLATE(
+			"%path% is on a read-only disk. Please copy the project to another disk "
+			"or remount the disk with write support to be able to build it.\n");
+		err.ReplaceFirst("%path", path.Path());
 		BMessage msg(M_BUILD_FAILURE);
 		msg.AddString("errstr",err);
 		PostMessage(&msg);
@@ -849,9 +850,10 @@ App::GenerateMakefile(const entry_ref &ref)
 	
 	if (proj->IsReadOnly())
 	{
-		BString err(path.Path());
-		err << B_TRANSLATE(" is on a read-only disk. Please copy the project to another disk ")
-			<<	B_TRANSLATE("or remount the disk with write support to be able to build it.\n");
+		BString err = B_TRANSLATE(
+			"%path% is on a read-only disk. Please copy the project to another disk "
+			"or remount the disk with write support to be able to build it.\n");
+		err.ReplaceFirst("%path%", path.Path());
 		BMessage msg(M_BUILD_FAILURE);
 		msg.AddString("errstr",err);
 		PostMessage(&msg);
@@ -976,10 +978,10 @@ App::LoadProject(const entry_ref &givenRef)
 	
 	if (proj->IsReadOnly())
 	{
-		BString errmsg;
-		errmsg << B_TRANSLATE("This project is on a read-only disk. You will not be able ");
-		errmsg << B_TRANSLATE("to build it, but you can still view its files and do anything ");
-		errmsg << B_TRANSLATE("else that does not require saving to the disk. ");
+		BString errmsg = B_TRANSLATE(
+			"This project is on a read-only disk. You will not be able "
+			"to build it, but you can still view its files and do anything "
+			"else that does not require saving to the disk.");
 		ShowAlert(errmsg.String());
 	}
 }

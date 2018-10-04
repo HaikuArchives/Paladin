@@ -313,8 +313,7 @@ ProjectList::ShowContextMenu(BPoint where)
 
 	if (fileItem != NULL) {
 		message = new BMessage(M_OPEN_PARENT_FOLDER);
-		BString openStr(B_TRANSLATE("Open folder for file%ellipsis%"));
-		openStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+		BString openStr(B_TRANSLATE("Open folder for file" B_UTF8_ELLIPSIS));
 		menu.AddItem(new BMenuItem(openStr, message));
 		menu.AddItem(new BMenuItem(B_TRANSLATE("Force file rebuild"),
 			new BMessage(M_REBUILD_FILE)));
@@ -351,8 +350,7 @@ ProjectList::ShowContextMenu(BPoint where)
 			menu.AddItem(new BMenuItem(B_TRANSLATE("New group"),
 				new BMessage(M_NEW_GROUP)));
     }
-		BString renameStr(B_TRANSLATE("Rename group%ellipsis%"));
-		renameStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+		BString renameStr(B_TRANSLATE("Rename group" B_UTF8_ELLIPSIS));
 		menu.AddItem(new BMenuItem(renameStr,
 			new BMessage(M_SHOW_RENAME_GROUP)));
 		menu.AddItem(new BMenuItem(B_TRANSLATE("Sort group"),

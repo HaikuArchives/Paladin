@@ -148,8 +148,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 
 	// create project button
 
-	BString createStr(B_TRANSLATE("Create project%ellipsis%"));
-	createStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString createStr(B_TRANSLATE("Create project" B_UTF8_ELLIPSIS));
 	fCreateProjectButton = new BButton("ok", createStr,
 		new BMessage(M_CREATE_PROJECT));
 	fCreateProjectButton->SetEnabled(false);

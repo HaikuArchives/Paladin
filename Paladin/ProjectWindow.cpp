@@ -1506,27 +1506,22 @@ ProjectWindow::CreateMenuBar()
 	// File menu
 
 	fFileMenu = new BMenu(B_TRANSLATE("File"));
-	BString newProjectStr(B_TRANSLATE("New project%ellipsis%"));
-	newProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString newProjectStr(B_TRANSLATE("New project" B_UTF8_ELLIPSIS));
 	fFileMenu->AddItem(new BMenuItem(newProjectStr,
 		new BMessage(M_NEW_WINDOW), 'N', B_COMMAND_KEY | B_SHIFT_KEY));
-	BString openProjectStr(B_TRANSLATE("Open project%ellipsis%"));
-	openProjectStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString openProjectStr(B_TRANSLATE("Open project" B_UTF8_ELLIPSIS));
 	fFileMenu->AddItem(new BMenuItem(openProjectStr,
 		new BMessage(M_SHOW_OPEN_PROJECT), 'O', B_COMMAND_KEY));
 	fRecentMenu = new BMenu(B_TRANSLATE("Open recent project"));
 	fFileMenu->AddItem(fRecentMenu);
-	BString findAndOpenStr(B_TRANSLATE("Find and open file%ellipsis%"));
-	findAndOpenStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString findAndOpenStr(B_TRANSLATE("Find and open file" B_UTF8_ELLIPSIS));
 	fFileMenu->AddItem(new BMenuItem(findAndOpenStr,
 		new BMessage(M_SHOW_FIND_AND_OPEN_PANEL), 'D', B_COMMAND_KEY));
 	fFileMenu->AddSeparatorItem();
-	BString programSettingsStr(B_TRANSLATE("Program settings%ellipsis%"));
-	programSettingsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString programSettingsStr(B_TRANSLATE("Program settings" B_UTF8_ELLIPSIS));
 	fFileMenu->AddItem(new BMenuItem(programSettingsStr,
 		new BMessage(M_SHOW_PROGRAM_SETTINGS)));
-	BString aboutStr(B_TRANSLATE("About Paladin%ellipsis%"));
-	aboutStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString aboutStr(B_TRANSLATE("About Paladin"));
 	fFileMenu->AddItem(new BMenuItem(aboutStr,
 		new BMessage(B_ABOUT_REQUESTED)));
 	fMenuBar->AddItem(fFileMenu);
@@ -1565,29 +1560,24 @@ ProjectWindow::CreateMenuBar()
 
 	fProjectMenu = new BMenu(B_TRANSLATE("Project"));
 	
-	BString settingsStr(B_TRANSLATE("Settings%ellipsis%"));
-	settingsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString settingsStr(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS));
 	fProjectMenu->AddItem(new BMenuItem(settingsStr,
 		new BMessage(M_SHOW_PROJECT_SETTINGS)));
 	fProjectMenu->AddSeparatorItem();
-	BString addStr(B_TRANSLATE("Add new file%ellipsis%"));
-	addStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString addStr(B_TRANSLATE("Add new file" B_UTF8_ELLIPSIS));
 	fProjectMenu->AddItem(new BMenuItem(addStr,
 		new BMessage(M_SHOW_ADD_NEW_PANEL), 'N', B_COMMAND_KEY));
-	BString addFilesStr(B_TRANSLATE("Add files%ellipsis%"));
-	addFilesStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString addFilesStr(B_TRANSLATE("Add files" B_UTF8_ELLIPSIS));
 	fProjectMenu->AddItem(new BMenuItem(addFilesStr,
 		new BMessage(M_SHOW_ADD_PANEL)));
 	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove selected files"),
 		new BMessage(M_REMOVE_FILES)));
 	fProjectMenu->AddSeparatorItem();
-	BString chgLibsStr(B_TRANSLATE("Change system libraries%ellipsis%"));
-	chgLibsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString chgLibsStr(B_TRANSLATE("Change system libraries" B_UTF8_ELLIPSIS));
 	fProjectMenu->AddItem(new BMenuItem(chgLibsStr,
 		new BMessage(M_SHOW_LIBRARIES)));
 	fProjectMenu->AddSeparatorItem();
-	BString findInStr(B_TRANSLATE("Find in project files%ellipsis%"));
-	findInStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString findInStr(B_TRANSLATE("Find in project files" B_UTF8_ELLIPSIS));
 	fProjectMenu->AddItem(new BMenuItem(findInStr,
 		new BMessage(M_SHOW_FIND_IN_PROJECT_FILES), 'F',
 		B_COMMAND_KEY | B_SHIFT_KEY));
@@ -1610,8 +1600,7 @@ ProjectWindow::CreateMenuBar()
 	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 		new BMessage(M_SORT_GROUP)));
 	fProjectMenu->AddSeparatorItem();
-	BString showProjFolderStr(B_TRANSLATE("Show project folder%ellipsis%"));
-	showProjFolderStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString showProjFolderStr(B_TRANSLATE("Show project folder" B_UTF8_ELLIPSIS));
 	fProjectMenu->AddItem(new BMenuItem(showProjFolderStr,
 		new BMessage(M_SHOW_PROJECT_FOLDER)));
 	fMenuBar->AddItem(fProjectMenu);
@@ -1624,20 +1613,17 @@ ProjectWindow::CreateMenuBar()
 		new BMessage(M_BUILD_PROJECT), 'M'));
 	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Run"),
 		new BMessage(M_RUN_PROJECT), 'R'));
-	BString runLoggedStr(B_TRANSLATE("Run logged%ellipsis%"));
-	runLoggedStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString runLoggedStr(B_TRANSLATE("Run logged" B_UTF8_ELLIPSIS));
 	fBuildMenu->AddItem(new BMenuItem(runLoggedStr,
 		new BMessage(M_RUN_IN_TERMINAL), 'R', B_COMMAND_KEY | B_SHIFT_KEY));
 	fBuildMenu->AddItem(new BMenuItem(B_TRANSLATE("Debug"), new BMessage(M_DEBUG_PROJECT),
 		'R', B_COMMAND_KEY | B_CONTROL_KEY));
 	fBuildMenu->AddSeparatorItem();
-	BString genMakefileStr(B_TRANSLATE("Generate makefile%ellipsis%"));
-	genMakefileStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString genMakefileStr(B_TRANSLATE("Generate makefile" B_UTF8_ELLIPSIS));
 	fBuildMenu->AddItem(new BMenuItem(genMakefileStr,
 		new BMessage(M_MAKE_MAKE)));
 	fBuildMenu->AddSeparatorItem();
-	BString setArgsStr(B_TRANSLATE("Set run arguments%ellipsis%"));
-	setArgsStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString setArgsStr(B_TRANSLATE("Set run arguments" B_UTF8_ELLIPSIS));
 	fBuildMenu->AddItem(new BMenuItem(setArgsStr,
 		new BMessage(M_SHOW_RUN_ARGS)));
 	fBuildMenu->AddSeparatorItem();
@@ -1658,35 +1644,29 @@ ProjectWindow::CreateMenuBar()
 	fToolsMenu = new BMenu(B_TRANSLATE("Tools"));
 	
 #ifdef BUILD_CODE_LIBRARY
-	BString codeLibStr(B_TRANSLATE("Code library%ellipsis%"));
-	codeLibStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString codeLibStr(B_TRANSLATE("Code library" B_UTF8_ELLIPSIS));
 	fToolsMenu->AddItem(new BMenuItem(codeLibStr,
 		new BMessage(M_SHOW_CODE_LIBRARY), 'L'));
 #endif
-	BString errorWindowStr(B_TRANSLATE("Error window%ellipsis%"));
-	errorWindowStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString errorWindowStr(B_TRANSLATE("Error window" B_UTF8_ELLIPSIS));
 	fToolsMenu->AddItem(new BMenuItem(errorWindowStr,
 		new BMessage(M_TOGGLE_ERROR_WINDOW), 'I'));
-	BString asciiStr(B_TRANSLATE("ASCII table%ellipsis%"));
-	asciiStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString asciiStr(B_TRANSLATE("ASCII table" B_UTF8_ELLIPSIS));
 	fToolsMenu->AddItem(new BMenuItem(asciiStr,
 		new BMessage(M_SHOW_ASCII_TABLE)));
-	BString regexStr(B_TRANSLATE("Regular expression tester%ellipsis%"));
-	regexStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString regexStr(B_TRANSLATE("Regular expression tester" B_UTF8_ELLIPSIS));
 	fToolsMenu->AddItem(new BMenuItem(regexStr,
 		new BMessage(M_SHOW_VREGEX)));
 
 	BMessage* message = new BMessage(M_RUN_TOOL);
 	message->AddString("signature", "application/x-vnd.dw-SymbolFinder");
-	BString symbolStr(B_TRANSLATE("Symbol finder%ellipsis%"));
-	symbolStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString symbolStr(B_TRANSLATE("Symbol finder" B_UTF8_ELLIPSIS));
 	fToolsMenu->AddItem(new BMenuItem(symbolStr, message));
 	fToolsMenu->AddSeparatorItem();
 	fToolsMenu->AddItem(new BMenuItem(B_TRANSLATE("Make project backup"),
 		new BMessage(M_BACKUP_PROJECT)));
 	fToolsMenu->AddSeparatorItem();
-	BString licenseStr(B_TRANSLATE("Set software license%ellipsis%"));
-	licenseStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString licenseStr(B_TRANSLATE("Set software license" B_UTF8_ELLIPSIS));
 	fToolsMenu->AddItem(new BMenuItem(licenseStr,
 		new BMessage(M_SHOW_LICENSES)));
 	fMenuBar->AddItem(fToolsMenu);

@@ -44,7 +44,7 @@ enum
 
 PrefsWindow::PrefsWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE("Program settings"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE("Paladin settings"), B_TITLED_WINDOW,
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	AddShortcut('1', B_COMMAND_KEY, new BMessage(M_SET_TAB_0));

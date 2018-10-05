@@ -194,7 +194,7 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	statusLayoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, 
 		B_ALIGN_BOTTOM));
 	
-	SetStatus(B_TRANSLATE("Opening Project..."));
+	SetStatus(B_TRANSLATE("Opening project..."));
 
 	if (project != NULL) {
 		BString title("Paladin: ");
@@ -543,9 +543,10 @@ ProjectWindow::MessageReceived(BMessage* message)
 				status = fSourceControl->Pull(NULL);
 
 				if (status != B_OK) {
-					ShowAlert("Unable to pull from the remote repository. If it "
-						"uses a secure connection, please set up the appropriate "
-						"SSH keys on the remote server.", "OK");
+					ShowAlert(B_TRANSLATE("Unable to pull from the remote "
+						"repository. If it uses a secure connection, please "
+						"set up the appropriate SSH keys on the remote "
+						"server."), B_TRANSLATE("OK"));
 				}
 			}
 			break;
@@ -888,9 +889,9 @@ ProjectWindow::MessageReceived(BMessage* message)
 						refMessage.AddRef("refs",&ref);
 					} else {
 						if (!entry.Exists()) {
-							BString errorMessage = B_TRANSLATE("Couldn't find XXXXX. "
+							BString errorMessage = B_TRANSLATE("Couldn't find %filename%. "
 								"It may have been moved or renamed.");
-							errorMessage.ReplaceFirst("XXXXX", abspath.String());
+							errorMessage.ReplaceFirst("%filename%", abspath.String());
 							ShowAlert(errorMessage.String());
 						}
 					}
@@ -1078,11 +1079,12 @@ ProjectWindow::MessageReceived(BMessage* message)
 					= B_TRANSLATE("Your project does not have debugging information compiled "
 					"in and will need to be rebuilt to debug. "
 					"Do you wish to rebuild and run the debugger?");
-				int32 result = ShowAlert(
+				int32 result = ShowAlert(B_TRANSLATE(
 					"Debugging information needs to compiled into "
 					"your project. This may take some time for large "
 					"projects. Do you wish to rebuild and run "
-					"the debugger?", "Rebuild", "Cancel");
+					"the debugger?"),
+					B_TRANSLATE("Rebuild"), B_TRANSLATE("Cancel"));
 				if (result == 1)
 					break;
 
@@ -1663,7 +1665,7 @@ ProjectWindow::CreateMenuBar()
 	BString symbolStr(B_TRANSLATE("Symbol finder"));
 	fToolsMenu->AddItem(new BMenuItem(symbolStr, message));
 	fToolsMenu->AddSeparatorItem();
-	fToolsMenu->AddItem(new BMenuItem(B_TRANSLATE("Make project backup"),
+	fToolsMenu->AddItem(new BMenuItem(B_TRANSLATE("Backup project"),
 		new BMessage(M_BACKUP_PROJECT)));
 	fToolsMenu->AddSeparatorItem();
 	BString licenseStr(B_TRANSLATE("Set software license" B_UTF8_ELLIPSIS));

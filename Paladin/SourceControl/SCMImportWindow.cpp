@@ -1,5 +1,6 @@
 #include "SCMImportWindow.h"
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -14,6 +15,10 @@
 
 #include <LayoutBuilder.h>
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SCMImportWindow"
+
 enum
 {
 	M_USE_PROVIDER = 'uspr',
@@ -24,11 +29,11 @@ enum
 };
 
 SCMImportWindow::SCMImportWindow(void)
-  :	DWindow(BRect(0,0,350,350), "Import from Repository")
+  :	DWindow(BRect(0,0,350,350), B_TRANSLATE("Import from repository"))
 {
 	MakeCenteredOnShow(true);
 	
-	BMenu *menu = new BMenu("Providers");
+	BMenu *menu = new BMenu(B_TRANSLATE("Providers"));
 	
 	for (int32 i = 0; i < fProviderMgr.CountImporters(); i++)
 	{
@@ -47,9 +52,9 @@ SCMImportWindow::SCMImportWindow(void)
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(0L)->SetMarked(true);
 	
-	fProviderField = new BMenuField("repofield", "Provider: ", menu);
+	fProviderField = new BMenuField("repofield", B_TRANSLATE("Provider:"), menu);
 	
-	menu = new BMenu("Methods");
+	menu = new BMenu(B_TRANSLATE("Methods"));
 	if (gHgAvailable)
 		menu->AddItem(new BMenuItem("Mercurial", new BMessage(M_UPDATE_COMMAND)));
 	
@@ -62,30 +67,30 @@ SCMImportWindow::SCMImportWindow(void)
 	menu->ItemAt(0L)->SetMarked(true);
 	fProvider = fProviderMgr.ImporterAt(0);
 		
-	fSCMField = new BMenuField("scmfield", "Method: ", menu);
+	fSCMField = new BMenuField("scmfield", B_TRANSLATE("Method:"), menu);
 		
-	fProjectBox = new AutoTextControl("project", "Project: ", "",
+	fProjectBox = new AutoTextControl("project", B_TRANSLATE("Project:"), "",
 									new BMessage(M_UPDATE_COMMAND));
 	
-	fAnonymousBox = new BCheckBox("anonymous", "Anonymous check-out",
+	fAnonymousBox = new BCheckBox("anonymous", B_TRANSLATE("Anonymous check-out"),
 									new BMessage(M_TOGGLE_ANONYMOUS));
 	fAnonymousBox->SetValue(B_CONTROL_ON);
 	
-	fUserNameBox = new AutoTextControl("username", "Username: ", "",
+	fUserNameBox = new AutoTextControl("username", B_TRANSLATE("Username:"), "",
 									new BMessage(M_UPDATE_COMMAND));
 	fUserNameBox->SetEnabled(false);
 	
-	fRepository = new AutoTextControl("repository", "Repository Owner: ", "",
+	fRepository = new AutoTextControl("repository", B_TRANSLATE("Repository owner:"), "",
 									new BMessage(M_UPDATE_COMMAND));	
 	
-	fCommandLabel = new BStringView("commandlabel", "Command: ");	
+	fCommandLabel = new BStringView("commandlabel", B_TRANSLATE("Command:"));	
 	fCommandView = new BTextView("command");
 	
 	BScrollView *scroll = new BScrollView("scrollview", fCommandView,
 											0, false, true);
 	fCommandView->MakeEditable(false);
 	
-	fOK = new BButton("ok", "Import", new BMessage(M_SCM_IMPORT));
+	fOK = new BButton("ok", B_TRANSLATE("Import"), new BMessage(M_SCM_IMPORT));
 	
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(10)
@@ -319,7 +324,7 @@ SCMImportWindow::DoImport(void)
 	scm->SetDebugMode(true);
 	scm->SetUpdateCallback(SCMOutputCallback);
 	
-	SCMOutputWindow *win = new SCMOutputWindow("Import from Online");
+	SCMOutputWindow *win = new SCMOutputWindow(B_TRANSLATE("Import from online"));
 	win->Show();
 	
 	DPath checkoutdir(gProjectPath.GetFullPath());

@@ -91,19 +91,19 @@ void
 PrintUsage(void)
 {
 	#ifdef USE_TRACE_TOOLS
-	printf("Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n"
+	printf(B_TRANSLATE("Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n"
 			"-b, Build the specified project. Only one file can be specified with this switch.\n"
 			"-m, Generate a makefile for the specified project.\n"
 			"-r, Completely rebuild the project.\n"
 			"-s, Use only one thread for building.\n"
 			"-d, Print debugging output.\n"
-			"-v, Make debugging mode verbose.\n");
+			"-v, Make debugging mode verbose.\n"));
 	#else
-	printf("Usage: Paladin [-b] [-m] [-r] [-s] [file1 [file2 ...]]\n"
+	printf(B_TRANSLATE("Usage: Paladin [-b] [-m] [-r] [-s] [file1 [file2 ...]]\n"
 			"-b, Build the specified project. Only one file can be specified with this switch.\n"
 			"-m, Generate a makefile for the specified project.\n"
 			"-r, Completely rebuild the project.\n"
-			"-s, Use only one thread for building.\n");
+			"-s, Use only one thread for building.\n"));
 	#endif
 }
 
@@ -244,7 +244,7 @@ App::ArgvReceived(int32 argc,char **argv)
 		if (projPath.FindLast(".pld") != projPath.CountChars() - 4)
 		{
 			projPath << ".pld";
-			printf("Attempting to open %s\n", projPath.String());
+			printf(B_TRANSLATE("Attempting to open %s\n"), projPath.String());
 		}
 		
 		BEntry entry(projPath.String());
@@ -439,7 +439,7 @@ App::MessageReceived(BMessage *msg)
 			if (msg->FindPointer("sourcefile",(void**)&file) == B_OK)
 				printf(B_TRANSLATE("Building %s\n"),file->GetPath().GetFileName());
 			else
-				printf("NULL pointer in M_BUILDING_FILE\n");
+				printf(B_TRANSLATE("NULL pointer in M_BUILDING_FILE\n"));
 			break;
 		}
 
@@ -464,7 +464,7 @@ App::MessageReceived(BMessage *msg)
 			{
 				ErrorList errors;
 				errors.Unflatten(*msg);
-				printf("Build failure\n%s", errors.AsString().String());
+				printf(B_TRANSLATE("Build failure\n%s"), errors.AsString().String());
 			}
 			sReturnCode = -1;
 			PostMessage(B_QUIT_REQUESTED);
@@ -502,7 +502,7 @@ App::CheckCreateOpenPanel()
 		entry.GetRef(&ref);
 		fOpenPanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_FILE_NODE, false,
 			new BMessage(B_REFS_RECEIVED), new PaladinFileFilter() );
-		fOpenPanel->Window()->SetTitle("Paladin: Open project");
+		fOpenPanel->Window()->SetTitle(B_TRANSLATE("Paladin: Open project"));
 	}
 }
 
@@ -566,9 +566,10 @@ App::OpenPartner(entry_ref ref)
 		return;
 	}
 	
-	BString errmsg;
-	errmsg	<< "Couldn't find a partner file for " << ref.name
-			<< " in " << refpath.GetFolder() << "/ .";
+	BString errmsg = B_TRANSLATE(
+		"Couldn't find a partner file for %refname% in %reffolder%/.");
+	errmsg.ReplaceFirst("%refname%", ref.name);
+	errmsg.ReplaceFirst("%reffolder%", refpath.GetFolder());
 	ShowAlert(errmsg.String());
 }
 
@@ -661,10 +662,12 @@ App::CreateNewProject(const BMessage &settings)
 				// createProjFile is false here only if there is a .pld file with the
 				// user's chosen project name. If that is the case, we keep both files and
 				// let the user sort it out.
-				BString errMsg;
-				errMsg << "Project file '" << projectName << ".pld' already exists. The "
-					"original file for this template is '" << pldName << "'. You'll need "
-					"to open the project folder and figure out which one you wish to keep.";
+				BString errMsg = B_TRANSLATE(
+					"Project file '%projectname%.pld' already exists. The "
+					"original file for this template is '%pldname%'. You'll need "
+					"to open the project folder and figure out which one you wish to keep.");
+				errMsg.ReplaceFirst("%projectname%", projectName);
+				errMsg.ReplaceFirst("%pldname%", pldName);
 				ShowAlert(errMsg);
 				populateProject = createProjFile = false;
 				
@@ -950,11 +953,12 @@ App::LoadProject(const entry_ref &givenRef)
 		scm_t scm = DetectSCM(proj->GetPath().GetFolder());
 		if (scm == SCM_NONE && gDefaultSCM != SCM_NONE)
 		{
-			BString scmMsg;
-			scmMsg << "This project is not under source control. Would you "
-					<< "like to use " << SCM2LongName(gDefaultSCM)
-					<< " for this project?\nYou will only be asked this one time.";
-			int32 result = ShowAlert(scmMsg.String(), "No", "Yes");
+			BString scmMsg = B_TRANSLATE(
+				"This project is not under source control. Would you "
+				"like to use %sourcecontrol% for this project?\n"
+				"You will only be asked this one time.");
+			scmMsg.ReplaceFirst("%sourcecontrol%", SCM2LongName(gDefaultSCM));
+			int32 result = ShowAlert(scmMsg.String(), B_TRANSLATE("No"), B_TRANSLATE("Yes"));
 			if (result == 1)
 				proj->SetSourceControl(gDefaultSCM);
 		}

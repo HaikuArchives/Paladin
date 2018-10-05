@@ -313,7 +313,7 @@ ProjectList::ShowContextMenu(BPoint where)
 
 	if (fileItem != NULL) {
 		message = new BMessage(M_OPEN_PARENT_FOLDER);
-		BString openStr(B_TRANSLATE("Open folder for file" B_UTF8_ELLIPSIS));
+		BString openStr(B_TRANSLATE("Open parent folder"));
 		menu.AddItem(new BMenuItem(openStr, message));
 		menu.AddItem(new BMenuItem(B_TRANSLATE("Force file rebuild"),
 			new BMessage(M_REBUILD_FILE)));
@@ -322,7 +322,7 @@ ProjectList::ShowContextMenu(BPoint where)
 			new BMessage(M_REMOVE_FILES)));
 		menu.AddSeparatorItem();
 
-		BMenu* submenu = new BMenu("Source Control");
+		BMenu* submenu = new BMenu(B_TRANSLATE("Source Control"));
 		submenu->AddItem(new BMenuItem(B_TRANSLATE("Add selected files to repository"),
 			new BMessage(M_ADD_SELECTION_TO_REPO)));
 		submenu->AddItem(new BMenuItem(B_TRANSLATE("Remove selected files from repository"),

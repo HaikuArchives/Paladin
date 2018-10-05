@@ -123,7 +123,7 @@ CodeLibWindow::CodeLibWindow(BRect frame)
 	r.right = r.left + 25.0;
 	
 	
-	BStringView *modLabel = new BStringView(BRect(0,0,1,1),"modlabel",B_TRANSLATE("Code Modules:"));
+	BStringView *modLabel = new BStringView(BRect(0,0,1,1),"modlabel",B_TRANSLATE("Code modules:"));
 	modLabel->SetFont(be_bold_font);
 	modLabel->ResizeToPreferred();
 	modLabel->MoveTo(10.0,r.top);
@@ -164,7 +164,7 @@ CodeLibWindow::CodeLibWindow(BRect frame)
 	sv = fFileList->MakeScrollView("filescroll",false,true);
 	fMainView->AddChild(sv);
 	
-	BStringView *fileLabel = new BStringView(BRect(0,0,1,1),"filelabel",B_TRANSLATE("Files in Module:"));
+	BStringView *fileLabel = new BStringView(BRect(0,0,1,1),"filelabel",B_TRANSLATE("Files in module:"));
 	fileLabel->SetFont(be_bold_font);
 	fileLabel->ResizeToPreferred();
 	fileLabel->MoveTo(r.left,modLabel->Frame().top);
@@ -412,7 +412,7 @@ CodeLibWindow::SetupMenus(void)
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Create new module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_CREATE_MODULE),'N'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Delete current module"),new BMessage(M_DELETE_MODULE),'D'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Add files to Module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_ADD_FILES),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Add files to module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_ADD_FILES),
 								'A',B_COMMAND_KEY | B_SHIFT_KEY));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Add project files to module" B_UTF8_ELLIPSIS),
 								new BMessage(M_SHOW_ADD_PROJECT_FILES),'A'));
@@ -426,19 +426,19 @@ CodeLibWindow::SetupMenus(void)
 void
 CodeLibWindow::SetupContextMenus(void)
 {
-	BPopUpMenu *menu = new BPopUpMenu("Modules",false,false);
-	menu->AddItem(new BMenuItem("Create new module" B_UTF8_ELLIPSIS,new BMessage(M_SHOW_CREATE_MODULE)));
-	menu->AddItem(new BMenuItem("Delete current module",new BMessage(M_DELETE_MODULE)));
+	BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Modules"),false,false);
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Create new module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_CREATE_MODULE)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Delete current module"),new BMessage(M_DELETE_MODULE)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Export module to project",new BMessage(M_EXPORT_TO_PROJECT)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Export module to project"),new BMessage(M_EXPORT_TO_PROJECT)));
 	menu->SetTargetForItems(this);
 	fModList->SetContextMenu(menu);
 	
-	menu = new BPopUpMenu("Module files",false,false);
-	menu->AddItem(new BMenuItem("Add files to module" B_UTF8_ELLIPSIS,new BMessage(M_SHOW_ADD_FILES)));
-	menu->AddItem(new BMenuItem("Add project files to module" B_UTF8_ELLIPSIS,
+	menu = new BPopUpMenu(B_TRANSLATE("Module files"),false,false);
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Add files to module" B_UTF8_ELLIPSIS),new BMessage(M_SHOW_ADD_FILES)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Add project files to module" B_UTF8_ELLIPSIS),
 								new BMessage(M_SHOW_ADD_PROJECT_FILES)));
-	menu->AddItem(new BMenuItem("Remove files from module",new BMessage(M_REMOVE_FILES)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Remove files from module"),new BMessage(M_REMOVE_FILES)));
 	menu->SetTargetForItems(this);
 	fFileList->SetContextMenu(menu);
 }
@@ -543,15 +543,9 @@ AddFileView::AddFileView(Project *proj, BRect frame, const char *name, int32 res
 	textView->MakeEditable(false);
 	textView->SetViewColor(ViewColor());
 	
-	BString labelmsg(B_TRANSLATE("Choose the project files you wish to import. "));
-	labelmsg << B_TRANSLATE("You can select multiple files by clicking on items while holding the XXXXX.");
-	
-	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
-		labelmsg.ReplaceFirst("XXXXX",B_TRANSLATE("Command key (usually Alt)."));
-	else if (gPlatform == PLATFORM_ZETA)
-		labelmsg.ReplaceFirst("XXXXX",B_TRANSLATE("Control key."));
-	else
-		labelmsg.ReplaceFirst("XXXXX",B_TRANSLATE("Shift key"));
+	BString labelmsg(B_TRANSLATE(
+		"Choose the project files you wish to import. You can select multiple "
+		"files by clicking on items while holding the Command key (usually ALT)."));
 	textView->SetText(labelmsg.String());
 	textView->ResizeTo(r.Width(), 20.0 + textView->TextHeight(0,textView->TextLength()));
 	
@@ -567,7 +561,7 @@ AddFileView::AddFileView(Project *proj, BRect frame, const char *name, int32 res
 				Bounds().bottom - 10.0 - fAddButton->Frame().Height());
 	fAddButton->SetTarget(this);
 	
-	BButton *cancel = new BButton(BRect(0,0,1,1),"cancelbutton","Cancel",
+	BButton *cancel = new BButton(BRect(0,0,1,1),"cancelbutton",B_TRANSLATE("Cancel"),
 								new BMessage(M_HIDE_ADD_FILES),
 								B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	cancel->ResizeToPreferred();

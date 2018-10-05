@@ -174,7 +174,7 @@ LicenseManager::LoadLicense(const char* mainPath)
 	path << ".summary";
 	file.SetTo(path.String(),B_READ_ONLY);
 	if (file.InitCheck() != B_OK) {
-		fLicenseShort->SetText("A summary of this license is not available.");
+		fLicenseShort->SetText(B_TRANSLATE("A summary of this license is not available."));
 		return;
 	}
 

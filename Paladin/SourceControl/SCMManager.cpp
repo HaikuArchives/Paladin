@@ -3,6 +3,12 @@
 #include "HgSourceControl.h"
 #include "SVNSourceControl.h"
 
+#include <Catalog.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SCMManager"
+
 SourceControl *
 GetSCM(const scm_t &type)
 {
@@ -84,10 +90,10 @@ SCM2LongName(const scm_t &type)
 			return BString("Subversion");
 		
 		case SCM_NONE:
-			return BString("None");
+			return BString(B_TRANSLATE("None"));
 		
 		default:
-			return BString("Unknown");
+			return BString(B_TRANSLATE("Unknown"));
 	}
 }
 

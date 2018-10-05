@@ -658,9 +658,9 @@ ShowAlert(const char *message, const char *button1, const char *button2,
 	}
 	else
 	{
-		BString label1 = button1 ? button1 : "OK";
-		BAlert *alert = new BAlert("Paladin", message, label1.String(),
-									button2, button3, B_WIDTH_AS_USUAL, type);
+		BString label1 = button1 ? button1 : B_TRANSLATE("OK");
+		BAlert *alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Paladin"),
+			message, label1.String(), button2, button3, B_WIDTH_AS_USUAL, type);
 		result = alert->Go();
 	}
 	return result;

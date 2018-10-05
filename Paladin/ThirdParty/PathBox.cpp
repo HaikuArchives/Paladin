@@ -200,7 +200,7 @@ PathBox::PathBox(const char* name, const char* path, const char* label,
 	fPathControl->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	fBrowseButton = new BButton("browse", "Browse" B_UTF8_ELLIPSIS,
+	fBrowseButton = new BButton("browse", B_TRANSLATE("Browse" B_UTF8_ELLIPSIS),
 		new BMessage(M_SHOW_FILEPANEL));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
@@ -354,10 +354,11 @@ PathBox::MessageReceived(BMessage *message)
 				BEntry entry(fPathControl->Text());
 				if (entry.InitCheck() != B_OK
 					|| !entry.Exists()) {
-					BAlert *alert = new BAlert("", "The location entered does not exist."
-												" Please check to make sure you have"
-												" entered it correctly.",
-												"OK");
+					BAlert *alert = new BAlert("", B_TRANSLATE(
+						"The location entered does not exist.\n"
+						"Please check to make sure you have "
+						"entered it correctly."),
+						B_TRANSLATE("OK"));
 					alert->Go();
 					fPathControl->MakeFocus();
 				}

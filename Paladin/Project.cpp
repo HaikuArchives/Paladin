@@ -18,6 +18,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -36,6 +37,9 @@
 #include "SCMManager.h"
 #include "SourceFile.h"
 #include "TextFile.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Project"
 
 #define B_USER_DEVELOP_DIRECTORY ((directory_which)3028)
 
@@ -1132,13 +1136,16 @@ Project::AddLibrary(const char *path)
 		{
 			if (gBuildMode)
 			{
-				printf("%s seems to be missing\n", path);
+				printf(B_TRANSLATE("%s seems to be missing\n"), path);
 			}
 			else
 			{
-				BString err;
-				err << path << " seems to be missing. Do you want to remove it from the project?";
-				int32 result = ShowAlert(err.String(),"Remove","Keep");
+				BString err = B_TRANSLATE(
+					"%path% seems to be missing. Do you want to remove it "
+					"from the project?");
+				err.ReplaceFirst("%path%", path);
+				int32 result = ShowAlert(err.String(), B_TRANSLATE("Remove"),
+					B_TRANSLATE("Keep"));
 				STRACE(2,("Library remove/keep returned result: %i\n",result));
 				if (result == 0)
 					return;
@@ -1513,19 +1520,22 @@ Project::FindLibrary(const char *libname)
 		name.FindLast(".o") == B_ERROR)
 		return outpath;
 	
-	BString alertmsg;
-	alertmsg << libname << " couldn't be found in the same place as it was under "
-		<< sPlatformArray[fPlatform] << ". ";
-	
+	BString alertmsg = B_TRANSLATE(
+		"%library% couldn't be found in the same place as it was under "
+		"%platform%.");
+	alertmsg.ReplaceFirst("%library%", libname);
+	alertmsg.ReplaceFirst("%platform%", sPlatformArray[fPlatform]);
+	alertmsg << " ";
 	BPath tempPath;
 	
 	find_directory(B_USER_LIB_DIRECTORY,&tempPath);
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())
 	{
-		alertmsg << "Replacing it with " << tempPath.Path();
+		alertmsg << B_TRANSLATE("Replacing it with %path%.");
+		alertmsg.ReplaceFirst("%path%", tempPath.Path());
 		if (!gBuildMode)
-			ShowAlert(alertmsg.String(),"OK");
+			ShowAlert(alertmsg.String(),B_TRANSLATE("OK"));
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1535,9 +1545,10 @@ Project::FindLibrary(const char *libname)
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())
 	{
-		alertmsg << "Replacing it with " << tempPath.Path();
+		alertmsg << B_TRANSLATE("Replacing it with %path%.");
+		alertmsg.ReplaceFirst("%path%", tempPath.Path());
 		if (!gBuildMode)
-			ShowAlert(alertmsg.String(),"OK");
+			ShowAlert(alertmsg.String(),B_TRANSLATE("OK"));
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1547,9 +1558,10 @@ Project::FindLibrary(const char *libname)
 	tempPath.Append("lib/x86/");
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists()) {
-		alertmsg << "Replacing it with " << tempPath.Path();
+		alertmsg << B_TRANSLATE("Replacing it with %path%.");
+		alertmsg.ReplaceFirst("%path%", tempPath.Path());
 		if (!gBuildMode)
-			ShowAlert(alertmsg.String(),"OK");
+			ShowAlert(alertmsg.String(),B_TRANSLATE("OK"));
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1559,9 +1571,10 @@ Project::FindLibrary(const char *libname)
 	tempPath.Append(libname);
 	if (BEntry(tempPath.Path()).Exists())
 	{
-		alertmsg << "Replacing it with " << tempPath.Path();
+		alertmsg << B_TRANSLATE("Replacing it with %path%.");
+		alertmsg.ReplaceFirst("%path%", tempPath.Path());
 		if (!gBuildMode)
-			ShowAlert(alertmsg.String(),"OK");
+			ShowAlert(alertmsg.String(),B_TRANSLATE("OK"));
 		
 		outpath = tempPath.Path();
 		return outpath;
@@ -1644,7 +1657,7 @@ DetectPlatform(void)
 	else if (osname.FindFirst("Zeta\n") == 0)
 		type = PLATFORM_ZETA;
 	else
-		printf("Detected platform from uname: %s\n", osname.String());
+		printf(B_TRANSLATE("Detected platform from uname: %s\n"), osname.String());
 	
 	return type;
 }

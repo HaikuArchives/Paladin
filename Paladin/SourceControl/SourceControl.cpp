@@ -2,6 +2,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <Catalog.h>
+#include <Locale.h>
+
+#include "../DebugTools.h"
+#include "../Globals.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SourceControl"
 
 SourceControl::SourceControl(void)
   :	fFlags(0),
@@ -299,39 +308,67 @@ int
 SourceControl::RunCommand(BString in, BString &out)
 {
 	if (fDebug)
-		printf("Command: %s: %s\n", fShortName.String(), in.String());
+		STRACE(2,("Command: %s: %s\n", fShortName.String(), in.String()));
 	
 	if (in.CountChars() < 1)
 		return -1;
 	
-	in << "\necho \"Source control command return value: $?\"";
-	
+	//in << "\necho \"Source control command return value: $?\"";
+	/*
 	FILE *fd = popen(in.String(),"r");
 	
 	if (!fd)
 		return -2;
+	*/
 	
 	out = "";
+	
+	/*
 	char buffer[1024];
 	while (fgets(buffer,1024,fd))
 	{
-		if (fCallback)
-			fCallback(buffer);
-		out += buffer;
+		if (!ferror(fd)) {
+			if (fCallback)
+				fCallback(buffer);
+			out += buffer;
+		} else {
+			STRACE(2,("Command response buffer in error for SCM command"));
+		}
 	}
 	
-	pclose(fd);
+	int result = pclose(fd);
+	*/
+	BString cmd(in);
+	//cmd << "sh -c \"" << in << "\"";
+	STRACE(2,("SourceControl::RunCommand:Command: %s\n",cmd.String()));
+	status_t retval = RunPipedCommand(cmd.String(),out,true);
+	STRACE(2,("Command complete\n"));
+	int result = 0;
+	if (B_OK != retval) 
+		result = -1;
 	
 	if (fDebug)
-		printf("%s: out:\n------------\n%s------------\n",
-				GetShortName(), out.String());
+		STRACE(1,("%s: out:\n------------\n%s------------\n",
+				GetShortName(), out.String()));
 	
 	// Grab the return value of the command
-	int32 pos = out.FindLast("Source control command return value");
+	//int32 pos = out.FindLast("Source control command return value");
 	
-	int returnValue = atoi(out.String() + pos + strlen("Source control command return value: "));
-	out.Truncate(pos);
+	//int returnValue = atoi(out.String() + pos + strlen("Source control command return value: "));
+	//out.Truncate(pos);
+	out << "----------\n";
+	if (-1 == result) {
+		out << B_TRANSLATE("Command resulted in an error.\n");
+	} else {
+		out << 	B_TRANSLATE("Command succeeded. Use 'Import existing Project' "
+				"function in the main window "
+				"to load the project from the local filesystem\n");
+	}
+	out << "----------\n";
 	
-	return returnValue;
+	if (fCallback)
+		fCallback(out);
+	
+	return result;
 }
 

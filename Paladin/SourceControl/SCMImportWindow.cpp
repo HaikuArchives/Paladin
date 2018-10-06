@@ -327,20 +327,24 @@ SCMImportWindow::DoImport(void)
 	SCMOutputWindow *win = new SCMOutputWindow(B_TRANSLATE("Import from online"));
 	win->Show();
 	
+	scm->SetDebugMode(true);
+	scm->SetUpdateCallback(SCMOutputCallback);
+	
 	DPath checkoutdir(gProjectPath.GetFullPath());
 	checkoutdir << fProvider->GetProjectName();
 	BDirectory dir(checkoutdir.GetFullPath());
 	if (dir.InitCheck() != B_OK)
 		create_directory(checkoutdir.GetFullPath(), 0777);
 	
-	BString command;
+	BString command("");
 	command << fProvider->GetImportCommand(fAnonymousBox->Value() == B_CONTROL_ON);
 	command << " '" << gProjectPath.GetFullPath();
 	
 	if (fProjectBox->Text())
 		command << "/" << fProjectBox->Text();
 	
-	command << "' 2>&1";
+	command << "'";
+	//command << " 2>&1";
 	scm->RunCustomCommand(command.String());
 	
 }

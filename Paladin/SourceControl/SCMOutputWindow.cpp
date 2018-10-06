@@ -94,7 +94,7 @@ SCMOutputCallback(const char *text)
 	
 	printf("%s",out.String());
 	
-	if (!win)
+	if (NULL == win)
 		return;
 	
 	BMessage logmsg(M_APPEND_TO_LOG);

@@ -322,8 +322,10 @@ ProjectSettingsWindow::MessageReceived(BMessage* message)
 		case M_DROP_PATH:
 		{
 			BString path;
-			if (message->FindString("path",&path) == B_OK)
+			if (message->FindString("path",&path) == B_OK) {
 				fProject->AddLocalInclude(path.String());
+				fDirty = true;
+			}
 			break;
 		}
 
@@ -439,6 +441,9 @@ ProjectSettingsWindow::MessageReceived(BMessage* message)
 		default:
 			BWindow::MessageReceived(message);
 	}
+	
+	if (fDirty)
+		fProject->Save();
 }
 
 

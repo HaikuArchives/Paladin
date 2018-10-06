@@ -38,7 +38,16 @@ enum
 {
 	M_SET_SCM	= 'sscm',
 	M_SET_TAB_0	= 'stb0',
-	M_SET_TAB_1	= 'stb1'
+	M_SET_TAB_1	= 'stb1',
+	M_SET_PROJECT_FOLDER = 'sprf',
+	M_SET_SHOW_PROJECT_FOLDER = 'sspf',
+	M_SET_DONT_ADD_HEADERS = 'sdah',
+	M_SET_SLOW_BUILDS = 'ssbl',
+	M_SET_CCACHE = 'scac',
+	M_SET_FASTDEP = 'sfsd',
+	M_SET_AUTOSYNC = 'saus',
+	M_SET_BACKUP_FOLDER = 'sbuf',
+	M_SET_REPO_FOLDER = 'sref'
 };
 
 
@@ -52,31 +61,35 @@ PrefsWindow::PrefsWindow(BRect frame)
 
 	// general
 
-	fProjectFolder = new PathBox("projectfolder", gProjectPath.GetFullPath(), "");
+	fProjectFolder = new PathBox("projectfolder", gProjectPath.GetFullPath(), 
+		new BMessage(M_SET_PROJECT_FOLDER));
 	fProjectFolder->MakeValidating(true);
 	SetToolTip(fProjectFolder, B_TRANSLATE("The default path for new projects."));
 
 	fShowProjectFolder = new BCheckBox("showfolder",
-		B_TRANSLATE("Show project folder on open"), new BMessage);
+		B_TRANSLATE("Show project folder on open"), new BMessage(M_SET_SHOW_PROJECT_FOLDER));
 	SetToolTip(fShowProjectFolder, B_TRANSLATE("When checked, a project's folder is "
 		"shown in Tracker when it is opened."));
 	if (gShowFolderOnOpen)
 		fShowProjectFolder->SetValue(B_CONTROL_ON);
 
 	fDontAddHeaders = new BCheckBox("dontaddheaders",
-		B_TRANSLATE("Omit header files from projects"), NULL);
+		B_TRANSLATE("Omit header files from projects"), 
+		new BMessage(M_SET_DONT_ADD_HEADERS));
 	SetToolTip(fDontAddHeaders, B_TRANSLATE("If checked, header files are not automatically "
 		"added to projects."));
 	if (gDontManageHeaders)
 		fDontAddHeaders->SetValue(B_CONTROL_ON);
 
-	fSlowBuilds = new BCheckBox("slowbuilds", B_TRANSLATE("Use single thread"), NULL);
+	fSlowBuilds = new BCheckBox("slowbuilds", B_TRANSLATE("Use single thread"),
+		new BMessage(M_SET_SLOW_BUILDS));
 	SetToolTip(fSlowBuilds, B_TRANSLATE("Build with just one thread instead of one thread "
 		"per processor"));
 	if (gSingleThreadedBuild)
 		fSlowBuilds->SetValue(B_CONTROL_ON);
 
-	fCCache = new BCheckBox("ccache", B_TRANSLATE("Use ccache to build faster"), NULL);
+	fCCache = new BCheckBox("ccache", B_TRANSLATE("Use ccache to build faster"),
+		new BMessage(M_SET_CCACHE));
 	SetToolTip(fCCache, B_TRANSLATE("Compiler caching is another way to speed up builds"));
 	if (gCCacheAvailable) {
 		if (gUseCCache)
@@ -88,7 +101,8 @@ PrefsWindow::PrefsWindow(BRect frame)
 		fCCache->SetEnabled(false);
 	}
 
-	fFastDep = new BCheckBox("fastdep", B_TRANSLATE("Use fastdep dependency checker"), NULL);
+	fFastDep = new BCheckBox("fastdep", B_TRANSLATE("Use fastdep dependency checker"),
+		new BMessage(M_SET_FASTDEP));
 	SetToolTip(fFastDep, B_TRANSLATE("Use the fastdep dependency checker instead of gcc"));
 	if (gFastDepAvailable) {
 		if (gUseFastDep)
@@ -111,13 +125,15 @@ PrefsWindow::PrefsWindow(BRect frame)
 	buildBox->SetLabel(B_TRANSLATE("Build"));
 
 	fAutoSyncModules = new BCheckBox("autosync",
-		B_TRANSLATE("Automatically synchronize modules"), NULL);
+		B_TRANSLATE("Automatically synchronize modules"),
+		new BMessage(M_SET_AUTOSYNC));
 	SetToolTip(fAutoSyncModules, B_TRANSLATE("Automatically synchronize modules in your "
 		"projects with the those in the code library"));
 	if (gAutoSyncModules)
 		fAutoSyncModules->SetValue(B_CONTROL_ON);
 
-	fBackupFolder = new PathBox("backupfolder", gBackupPath.GetFullPath(), "");
+	fBackupFolder = new PathBox("backupfolder", gBackupPath.GetFullPath(), 
+		new BMessage(M_SET_BACKUP_FOLDER));
 	fBackupFolder->MakeValidating(true);
 	SetToolTip(fBackupFolder, B_TRANSLATE("Sets the location for project backups"));
 
@@ -149,10 +165,11 @@ PrefsWindow::PrefsWindow(BRect frame)
 	// source control
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), NULL));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), NULL));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), NULL));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), NULL));
+	BMessage* setScmMessage = new BMessage(M_SET_SCM);
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), setScmMessage));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), setScmMessage));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), setScmMessage));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), setScmMessage));
 
 	fSCMChooser = new BMenuField("scmchooser", B_TRANSLATE("Preferred source control:"),
 		scmMenu);
@@ -175,7 +192,8 @@ PrefsWindow::PrefsWindow(BRect frame)
 		}
 	}
 
-	fSVNRepoFolder = new PathBox("svnrepofolder", gSVNRepoPath.GetFullPath(), "");
+	fSVNRepoFolder = new PathBox("svnrepofolder", gSVNRepoPath.GetFullPath(), 
+		new BMessage(M_SET_REPO_FOLDER));
 	fSVNRepoFolder->MakeValidating(true);
 	SetToolTip(fSVNRepoFolder, B_TRANSLATE("Sets the location for the 'server' side of "
 		"local Subversion repositories."));
@@ -189,7 +207,7 @@ PrefsWindow::PrefsWindow(BRect frame)
 				.End()
 	
 			.Add(new BStringView("svn repo folder label",
-				B_TRANSLATE("Subversion repository folder:")), 0, 1)
+				B_TRANSLATE("Source control repository folder:")), 0, 1)
 			.Add(fSVNRepoFolder, 1, 1)
 			.End()
 		.AddGlue()
@@ -220,38 +238,6 @@ PrefsWindow::PrefsWindow(BRect frame)
 bool
 PrefsWindow::QuitRequested(void)
 {
-	gProjectPath = fProjectFolder->Path();
-	gSettings.SetString("projectpath", fProjectFolder->Path());
-
-	gBackupPath = fBackupFolder->Path();
-	gSettings.SetString("backuppath", fBackupFolder->Path());
-
-	gSVNRepoPath = fSVNRepoFolder->Path();
-	gSettings.SetString("svnrepopath", fSVNRepoFolder->Path());
-
-	gShowFolderOnOpen = (fShowProjectFolder->Value() == B_CONTROL_ON);
-	gSettings.SetBool("showfolderonopen", gShowFolderOnOpen);
-
-	gDontManageHeaders = (fDontAddHeaders->Value() == B_CONTROL_ON);
-	gSettings.SetBool("dontmanageheaders", gDontManageHeaders);
-
-	gSingleThreadedBuild = (fSlowBuilds->Value() == B_CONTROL_ON);
-	gSettings.SetBool("singlethreaded", gSingleThreadedBuild);
-
-	gUseCCache = (fCCache->Value() == B_CONTROL_ON);
-	gSettings.SetBool("ccache", gUseCCache);
-
-	gUseFastDep = (fFastDep->Value() == B_CONTROL_ON);
-	gSettings.SetBool("fastdep", gUseFastDep);
-
-#ifdef BUILD_CODE_LIBRARY
-	gAutoSyncModules = (fAutoSyncModules->Value() == B_CONTROL_ON);
-	gSettings.SetBool("autosyncmodules", gAutoSyncModules);
-#endif
-
-	gDefaultSCM = (scm_t)fSCMChooser->Menu()->IndexOf(fSCMChooser->Menu()->FindMarked());
-	gSettings.SetInt32("defaultSCM", gDefaultSCM);
-
 	return true;
 }
 
@@ -269,6 +255,78 @@ PrefsWindow::MessageReceived(BMessage* message)
 		case M_SET_TAB_1:
 		{
 			fTabView->Select(1L);
+			break;
+		}
+		case M_SET_PROJECT_FOLDER:
+		{
+			gProjectPath = fProjectFolder->Path();
+			gSettings.SetString("projectpath", fProjectFolder->Path());
+			gSettings.Save();
+			break;
+		}
+		case M_SET_SHOW_PROJECT_FOLDER:
+		{
+			gShowFolderOnOpen = (fShowProjectFolder->Value() == B_CONTROL_ON);
+			gSettings.SetBool("showfolderonopen", gShowFolderOnOpen);
+			gSettings.Save();
+			break;
+		}
+		case M_SET_DONT_ADD_HEADERS:
+		{
+			gDontManageHeaders = (fDontAddHeaders->Value() == B_CONTROL_ON);
+			gSettings.SetBool("dontmanageheaders", gDontManageHeaders);
+			gSettings.Save();
+			break;
+		}
+		case M_SET_SLOW_BUILDS:
+		{
+			gSingleThreadedBuild = (fSlowBuilds->Value() == B_CONTROL_ON);
+			gSettings.SetBool("singlethreaded", gSingleThreadedBuild);
+			gSettings.Save();
+			break;
+		}
+		case M_SET_CCACHE:
+		{
+			gUseCCache = (fCCache->Value() == B_CONTROL_ON);
+			gSettings.SetBool("ccache", gUseCCache);
+			gSettings.Save();
+			break;
+		}
+		case M_SET_FASTDEP:
+		{
+			gUseFastDep = (fFastDep->Value() == B_CONTROL_ON);
+			gSettings.SetBool("fastdep", gUseFastDep);
+			gSettings.Save();
+			break;
+		}
+		case M_SET_AUTOSYNC:
+		{
+#ifdef BUILD_CODE_LIBRARY
+			gAutoSyncModules = (fAutoSyncModules->Value() == B_CONTROL_ON);
+			gSettings.SetBool("autosyncmodules", gAutoSyncModules);
+			gSettings.Save();
+#endif
+			break;
+		}
+		case M_SET_BACKUP_FOLDER:
+		{
+			gBackupPath = fBackupFolder->Path();
+			gSettings.SetString("backuppath", fBackupFolder->Path());
+			gSettings.Save();
+			break;
+		}
+		case M_SET_SCM:
+		{
+			gDefaultSCM = (scm_t)fSCMChooser->Menu()->IndexOf(fSCMChooser->Menu()->FindMarked());
+			gSettings.SetInt32("defaultSCM", gDefaultSCM);
+			gSettings.Save();
+			break;
+		}
+		case M_SET_REPO_FOLDER:
+		{
+			gSVNRepoPath = fSVNRepoFolder->Path();
+			gSettings.SetString("svnrepopath", fSVNRepoFolder->Path());
+			gSettings.Save();
 			break;
 		}
 

@@ -28,6 +28,9 @@ public:
 									const char* path = NULL,
 									const char* label = NULL,
 									const int32& flags = B_WILL_DRAW);
+							PathBox(const char* name,
+									const char* path = NULL,
+									BMessage* updateMessage = NULL);
 							PathBox(BMessage* data);
 	virtual					~PathBox(void);
 
@@ -78,6 +81,7 @@ private:
 			DropControl*	fPathControl;
 			BButton*		fBrowseButton;
 			bool			fValidate;
+			BMessage*		fUpdateMessage;
 };
 
 #endif

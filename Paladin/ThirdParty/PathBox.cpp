@@ -158,7 +158,8 @@ PathBox::PathBox(const BRect &frame, const char* name, const char* path,
 	fFilePanel(NULL),
 	fPathControl(NULL),
 	fBrowseButton(NULL),
- 	fValidate(false)
+ 	fValidate(false),
+ 	fUpdateMessage(NULL)
 {
 	_Init(path);
 
@@ -191,11 +192,38 @@ PathBox::PathBox(const char* name, const char* path, const char* label,
 	fFilePanel(NULL),
 	fPathControl(NULL),
 	fBrowseButton(NULL),
- 	fValidate(false)
+ 	fValidate(false),
+ 	fUpdateMessage(NULL)
 {
 	_Init(path);
 
 	fPathControl = new DropControl("path", label, path,
+		new BMessage(M_PATHBOX_CHANGED));
+	fPathControl->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_CENTER));
+
+	fBrowseButton = new BButton("browse", B_TRANSLATE("Browse" B_UTF8_ELLIPSIS),
+		new BMessage(M_SHOW_FILEPANEL));
+
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
+		.Add(fPathControl)
+		.Add(fBrowseButton)
+		.End();
+}
+
+PathBox::PathBox(const char* name, const char* path,
+	BMessage* updateMessage)
+	:
+	BView(name,B_WILL_DRAW),
+	fFilePanel(NULL),
+	fPathControl(NULL),
+	fBrowseButton(NULL),
+ 	fValidate(false),
+ 	fUpdateMessage(updateMessage)
+{
+	_Init(path);
+
+	fPathControl = new DropControl("path", "", path,
 		new BMessage(M_PATHBOX_CHANGED));
 	fPathControl->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
@@ -363,6 +391,11 @@ PathBox::MessageReceived(BMessage *message)
 					fPathControl->MakeFocus();
 				}
 			}
+			if (NULL != fUpdateMessage) {
+				BMessenger messenger(Parent());
+				messenger.SendMessage(fUpdateMessage);
+			}
+				
 			break;
 		}
 		case B_SET_PROPERTY:

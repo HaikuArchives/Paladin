@@ -243,7 +243,7 @@ SourceforgeImporter::GetImportCommand(bool readOnly)
 		{
 			// Read-only: git://PROJNAME.git.sourceforge.net/gitroot/PROJNAME/REPONAME
 			// Developer: ssh://USERNAME@PROJNAME.git.sourceforge.net/gitroot/PROJNAME/REPONAME
-			command << "GIT_TERMINAL_PROMPT=0 git --progress ";
+			command << "git --progress ";
 			if (!readOnly)
 				command << "clone ssh://" << GetUserName() << "@"
 						<< GetProjectName() << ".git.sourceforge.net/gitroot/"
@@ -364,7 +364,7 @@ GitoriousImporter::GetImportCommand(bool readOnly)
 		{
 			// read-only: http://git.gitorious.org/PROJNAME/REPONAME.git
 			// developer: git://git.gitorious.org/PROJNAME/REPONAME.git
-			command << "GIT_TERMINAL_PROMPT=0 git --progress ";
+			command << "git --progress ";
 			if (!readOnly)
 				command << "--no-pager clone git://git.gitorious.org/" << GetProjectName()
 						<< "/" << GetProjectName() << ".git";
@@ -407,7 +407,7 @@ GitHubImporter::GetImportCommand(bool readOnly)
 	{
 		case SCM_GIT:
 		{
-			command << "GIT_TERMINAL_PROMPT=0 git ";
+			command << " git ";
 			// read-only: https://github.com/OWNERNAME(reponame)/PROJECTNAME.git
 			// developer: https://USER@github.com/OWNERNAME(reponame)/PROJECTNAME.git
 			if(!readOnly) {

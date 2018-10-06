@@ -82,9 +82,9 @@ FindAndOpenFile(BMessage *msg)
 			i++;
 		}
 		
-		BString errorstr = B_TRANSLATE("Couldn't find ");
-		errorstr << filename;
-		BAlert *alert = new BAlert("Paladin",errorstr.String(),"OK");
+		BString errorstr = B_TRANSLATE("Couldn't find %file%.");
+		errorstr.ReplaceFirst("%file%",filename);
+		BAlert *alert = new BAlert("Paladin", errorstr.String(), B_TRANSLATE("OK"));
 		alert->Go();
 	}
 }

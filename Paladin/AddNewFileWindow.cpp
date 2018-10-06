@@ -31,13 +31,13 @@ AddNewFileWindow::AddNewFileWindow(const BMessage &message,
 	BString namelabel;
 	BString checklabel;
 	if (renameMode) {
-		SetTitle("Rename file");
-		namelabel = B_TRANSLATE("New name: ");
+		SetTitle(B_TRANSLATE("Rename file"));
+		namelabel = B_TRANSLATE("New name:");
 		checklabel = B_TRANSLATE("Rename partner file");
 	}
 	else
 	{
-		namelabel = B_TRANSLATE("New file name: ");
+		namelabel = B_TRANSLATE("New file name:");
 		checklabel = B_TRANSLATE("Create both a header and source file");
 	}
 

@@ -2,6 +2,7 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
@@ -16,6 +17,9 @@
 #include "SourceFile.h"
 #include "StatCache.h"
 #include "TerminalWindow.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ProjectBuilder"
 
 //#define BUILD_THREAD_TRACING
 
@@ -246,7 +250,7 @@ ProjectBuilder::DoPostBuild(void)
 							launcher.SetRef("/boot/apps/Development/bdb/bdb");
 						else
 						{
-							ShowAlert("Paladin can't seem to find the debugger. Sorry.");
+							ShowAlert(B_TRANSLATE("Paladin can't seem to find the debugger. Sorry."));
 							break;
 						}
 					}

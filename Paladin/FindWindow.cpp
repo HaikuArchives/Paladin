@@ -120,7 +120,7 @@ FindWindow::FindWindow(BString workingDir)
 	
 	fFindButton = new BButton("findbutton", B_TRANSLATE("Replace all"),
 								new BMessage(M_FIND));
-	fFindButton->SetLabel("Find");
+	fFindButton->SetLabel(B_TRANSLATE("Find"));
 	fFindButton->SetEnabled(false);
 	
 	fFindBox = new DTextView("findbox");
@@ -600,7 +600,7 @@ printf("replace command: %s\n", shell.AsString().String());
 		BString errorString = B_TRANSLATE("The following files had problems replacing the search terms:\n");
 		errorString << errorLog;
 		
-		BAlert *alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Paladin"), errorString.String(), "OK");
+		BAlert *alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Paladin"), errorString.String(), B_TRANSLATE("OK"));
 		alert->Go();
 	}
 	

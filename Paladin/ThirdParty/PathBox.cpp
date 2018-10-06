@@ -9,6 +9,7 @@
 
 #include <Alert.h>
 #include <Alignment.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -17,6 +18,8 @@
 #include <String.h>
 #include <Window.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PathBox"
 
 enum {
 	M_PATHBOX_CHANGED = 'pbch',
@@ -163,7 +166,7 @@ PathBox::PathBox(const BRect &frame, const char* name, const char* path,
 		new BMessage(M_PATHBOX_CHANGED), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
 	fBrowseButton = new BButton(BRect(0, 0, 1, 1), "browse",
-		"Browse" B_UTF8_ELLIPSIS, new BMessage(M_SHOW_FILEPANEL));
+		B_TRANSLATE("Browse" B_UTF8_ELLIPSIS), new BMessage(M_SHOW_FILEPANEL));
 	fBrowseButton->ResizeToPreferred();
 
 	float buttonLeft = frame.right - fBrowseButton->Bounds().Width();
@@ -197,7 +200,7 @@ PathBox::PathBox(const char* name, const char* path, const char* label,
 	fPathControl->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
 
-	fBrowseButton = new BButton("browse", "Browse" B_UTF8_ELLIPSIS,
+	fBrowseButton = new BButton("browse", B_TRANSLATE("Browse" B_UTF8_ELLIPSIS),
 		new BMessage(M_SHOW_FILEPANEL));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
@@ -351,10 +354,11 @@ PathBox::MessageReceived(BMessage *message)
 				BEntry entry(fPathControl->Text());
 				if (entry.InitCheck() != B_OK
 					|| !entry.Exists()) {
-					BAlert *alert = new BAlert("", "The location entered does not exist."
-												" Please check to make sure you have"
-												" entered it correctly.",
-												"OK");
+					BAlert *alert = new BAlert("", B_TRANSLATE(
+						"The location entered does not exist.\n"
+						"Please check to make sure you have "
+						"entered it correctly."),
+						B_TRANSLATE("OK"));
 					alert->Go();
 					fPathControl->MakeFocus();
 				}

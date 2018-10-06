@@ -1,10 +1,15 @@
 #include "SCMOutputWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
 #include <stdio.h>
 #include <String.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SCMOutputWindow"
 
 #define M_APPEND_TO_LOG 'matl'
 
@@ -14,7 +19,7 @@ SCMOutputWindow::SCMOutputWindow(const char *title)
 	SetFlags(B_NOT_CLOSABLE);
 	MakeCenteredOnShow(true);
 	
-	fClose = new BButton("close", "Close",
+	fClose = new BButton("close", B_TRANSLATE("Close"),
 						new BMessage(B_QUIT_REQUESTED));
 	fLog = new BTextView("log");
 	BScrollView *sv = new BScrollView("scrollview", fLog, 0,

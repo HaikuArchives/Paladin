@@ -202,8 +202,8 @@ MakeProjectFile(DPath folder, const char *name, const char *data, const char *ty
 	BEntry entry(path.GetFullPath());
 	if (entry.Exists())
 	{
-		BString errstr = path.GetFullPath();
-		errstr << B_TRANSLATE(" already exists. Do you want to overwrite it?");
+		BString errstr = B_TRANSLATE("%filepath% already exists. Do you want to overwrite it?");
+		errstr.ReplaceFirst("%filepath%", path.GetFullPath());
 		int32 result = ShowAlert(errstr.String(),B_TRANSLATE("Overwrite"),B_TRANSLATE("Cancel"));
 		if (result == 1)
 			return ref;
@@ -658,9 +658,9 @@ ShowAlert(const char *message, const char *button1, const char *button2,
 	}
 	else
 	{
-		BString label1 = button1 ? button1 : "OK";
-		BAlert *alert = new BAlert("Paladin", message, label1.String(),
-									button2, button3, B_WIDTH_AS_USUAL, type);
+		BString label1 = button1 ? button1 : B_TRANSLATE("OK");
+		BAlert *alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Paladin"),
+			message, label1.String(), button2, button3, B_WIDTH_AS_USUAL, type);
 		result = alert->Go();
 	}
 	return result;

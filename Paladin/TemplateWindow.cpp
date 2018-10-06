@@ -76,7 +76,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	}
 	projectTypeMenu->ItemAt(0L)->SetMarked(true);
 
-	fTemplateField = new BMenuField("templatefield", B_TRANSLATE("Project type: "),
+	fTemplateField = new BMenuField("templatefield", B_TRANSLATE("Project type:"),
 		projectTypeMenu);
 	fTemplateField->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -103,9 +103,9 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	// source control
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), new BMessage()));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), new BMessage()));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem("Mercurial", new BMessage()));
+	scmMenu->AddItem(new BMenuItem("Git", new BMessage()));
+	scmMenu->AddItem(new BMenuItem("Subversion", new BMessage()));
 	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), new BMessage()));
 
 	if (!gHgAvailable) {
@@ -121,7 +121,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 		scmMenu->ItemAt(2)->SetLabel(B_TRANSLATE("Subversion unavailable"));
 	}
 
-	fSCMChooser = new BMenuField("scmchooser", B_TRANSLATE("Source control: "), scmMenu);
+	fSCMChooser = new BMenuField("scmchooser", B_TRANSLATE("Source control:"), scmMenu);
 	fSCMChooser->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetToolTip(fSCMChooser,
 		B_TRANSLATE("Choose the source control manager for your project, if any."));
@@ -144,12 +144,11 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	fCreateFolder = new BCheckBox(B_TRANSLATE("Create project folder"));
 	fCreateFolder->SetValue(B_CONTROL_ON);
 	SetToolTip(fCreateFolder, B_TRANSLATE("If checked, a folder for your project will be created "
-		"in the folder in the Location box above."));
+		"in the location entered above."));
 
 	// create project button
 
-	BString createStr(B_TRANSLATE("Create project%ellipsis%"));
-	createStr.ReplaceAll("%ellipsis%",B_UTF8_ELLIPSIS);
+	BString createStr(B_TRANSLATE("Create project" B_UTF8_ELLIPSIS));
 	fCreateProjectButton = new BButton("ok", createStr,
 		new BMessage(M_CREATE_PROJECT));
 	fCreateProjectButton->SetEnabled(false);

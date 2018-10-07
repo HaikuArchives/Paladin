@@ -1373,7 +1373,7 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	
 	//The following library messes the build :(
 	//newproj->AddLibrary(strcat(temp, "/lib/x86/libroot.so"));
-	//newproj->AddGroup("Source files");
+	newproj->AddGroup("Source files");
 	// Don't create the Source files group, as it makes import look messy
 	
 	switch (type)

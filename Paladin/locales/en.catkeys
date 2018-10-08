@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	441631227
+1	English	application/x-vnd.dw-Paladin	3829376274
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Rename partner file	AddNewFileWindow		Rename partner file
 A summary of this license is not available.	LicenseManager		A summary of this license is not available.
@@ -229,6 +229,7 @@ Create a new project	StartWindow		Create a new project
 Show differences from last check-in	ProjectWindow		Show differences from last check-in
 Regular expression tester	VRegWindow		Regular expression tester
 Export module to project	CodeLibWindow		Export module to project
+Open a project	StartWindow		Open a project
 Selected project:	CodeLibWindow		Selected project:
 When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		When checked, a project's folder is shown in Tracker when it is opened.
 Choose project folder	StartWindow		Choose project folder

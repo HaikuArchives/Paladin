@@ -13,6 +13,7 @@ SYSTEMINCLUDE=/boot/home/config/include
 LIBRARY=/boot/system/develop/lib/x86/libroot.so
 LIBRARY=/boot/system/develop/lib/x86/libbe.so
 LIBRARY=/boot/system/develop/lib/x86/libsupc++.so
+LIBRARY=/boot/system/develop/lib/x86/libtracker.so
 RUNARGS=
 CCDEBUG=no
 CCPROFILE=no

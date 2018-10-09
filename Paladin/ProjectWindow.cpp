@@ -1337,6 +1337,7 @@ ProjectWindow::AddFile(const entry_ref& ref, BPoint* where)
 		} else {
 			// No selection, so we'll add it to the last group available unless
 			// there isn't one, which shouldn't ever be.
+			// TODO add sanity check here to create a Source files group if one doesn't exist
 			if (fProject->CountGroups()) {
 				groupItem = fProjectList->ItemForGroup(
 					fProject->GroupAt(fProject->CountGroups() - 1));
@@ -1354,6 +1355,7 @@ ProjectWindow::AddFile(const entry_ref& ref, BPoint* where)
 			}
 		}
 	}
+	fProject->Save();
 
 	if (file->UsesBuild())
 		item->SetDisplayState(SFITEM_NEEDS_BUILD);

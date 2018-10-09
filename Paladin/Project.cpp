@@ -161,11 +161,40 @@ Project::Load(const char* path)
 				if (srcfile)
 					srcfile->fDependencies = value;
 			} else if (entry == "LOCALINCLUDE") {
+				if (value.FindFirst("B_FIND_PATH_DEVELOP_HEADERS_DIRECTORY") == 0)
+					value.ReplaceFirst("B_FIND_PATH_DEVELOP_HEADERS_DIRECTORY",
+						BString("/boot/system/develop/headers"));
 				ProjectPath include(fPath.GetFolder(), value.String());
 				AddLocalInclude(include.Absolute().String());
-			} else if (entry == "SYSTEMINCLUDE")
+			} else if (entry == "SYSTEMINCLUDE") {
+				if (value.FindFirst("B_FIND_PATH_DEVELOP_HEADERS_DIRECTORY") == 0)
+					value.ReplaceFirst("B_FIND_PATH_DEVELOP_HEADERS_DIRECTORY",
+						BString("/boot/system/develop/headers"));
 				AddSystemInclude(value.String());
-			else if (entry == "LIBRARY") {
+			} else if (entry == "LIBRARY") {
+				if (value.FindFirst("B_FIND_PATH_DEVELOP_LIB_DIRECTORY") == 0) {
+					if (actualPlatform == PLATFORM_HAIKU_GCC4) {
+						value.ReplaceFirst("B_FIND_PATH_DEVELOP_LIB_DIRECTORY",
+							BString("/boot/system/develop/lib"));
+					} else if (actualPlatform == PLATFORM_HAIKU) {
+						value.ReplaceFirst("B_FIND_PATH_DEVELOP_LIB_DIRECTORY",
+							BString("/boot/system/develop/lib/x86"));
+					} else {
+						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n",actualPlatform));
+					}
+				}
+				if (value.FindFirst("B_FIND_PATH_LIB_DIRECTORY") == 0) {
+					if (actualPlatform == PLATFORM_HAIKU_GCC4) {
+						value.ReplaceFirst("B_FIND_PATH_LIB_DIRECTORY",
+							BString("/boot/system/lib"));
+					} else if (actualPlatform == PLATFORM_HAIKU) {
+						value.ReplaceFirst("B_FIND_PATH_LIB_DIRECTORY",
+							BString("/boot/system/lib/x86"));
+					} else {
+						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n",actualPlatform));
+					}
+				}
+					
 				if (actualPlatform == fPlatform)
 					AddLibrary(value.String());
 				else
@@ -308,10 +337,44 @@ Project::Save(const char* path)
 		BString include = *string;
 		if (include[0] == '/')
 			include.RemoveFirst(projectPath.String());
+			
+
+		BString replacePath("/boot/system/develop/headers/x86");
+		if (include.FindFirst(replacePath) == 0)
+			include.ReplaceFirst(replacePath,"B_FIND_PATH_DEVELOP_HEADERS_DIRECTORY");
+		replacePath = "/boot/system/develop/headers";
+		if (include.FindFirst(replacePath) == 0)
+			include.ReplaceFirst(replacePath,"B_FIND_PATH_DEVELOP_HEADERS_DIRECTORY");
 
 		data << "SYSTEMINCLUDE=" << include << "\n";
 	}
 
+	char* pathBuffer = new char[255]; // TODO validate this won't overflow, or be too short
+	status_t findStatus = find_path_for_path("/", B_FIND_PATH_DEVELOP_LIB_DIRECTORY, NULL, 
+		pathBuffer,sizeof(pathBuffer));
+	STRACE(2,("Path to B_FIND_PATH_DEVELOP_LIB_DIRECTORY: %s\n",pathBuffer));
+	switch(findStatus) {
+		case B_OK:
+		{
+			STRACE(2,("Entry found\n"));
+			break;
+		}
+		case B_BUFFER_OVERFLOW:
+		{
+			STRACE(2,("Buffer Overflow\n"));
+			break;
+		}
+		case B_ENTRY_NOT_FOUND:
+		{
+			STRACE(2,("Entry not found\n"));
+			break;
+		}
+		default:
+		{
+			STRACE(2,("Unknown find Status: %i\n",findStatus));
+		}
+	}
+		
 	for (int32 i = 0; i < fLibraryList.CountItems(); i++) {
 		SourceFile* file = (SourceFile*)fLibraryList.ItemAt(i);
 		if (file == NULL)
@@ -327,6 +390,23 @@ Project::Save(const char* path)
 
 		if (strpath.FindFirst(projectPath.String()) == 0)
 			strpath.RemoveFirst(projectPath.String());
+		
+		//if (strpath.FindFirst(pathBuffer) == 0)
+		//	strpath.ReplaceFirst(pathBuffer, "B_FIND_PATH_DEVELOP_LIB_DIRECTORY");
+
+		BString replacePath("/boot/system/develop/lib/x86");
+		if (strpath.FindFirst(replacePath) == 0)
+			strpath.ReplaceFirst(replacePath,"B_FIND_PATH_DEVELOP_LIB_DIRECTORY");
+		replacePath = "/boot/system/develop/lib";
+		if (strpath.FindFirst(replacePath) == 0)
+			strpath.ReplaceFirst(replacePath,"B_FIND_PATH_DEVELOP_LIB_DIRECTORY");
+
+		replacePath = "/boot/system/lib/x86";
+		if (strpath.FindFirst(replacePath) == 0)
+			strpath.ReplaceFirst(replacePath,"B_FIND_PATH_LIB_DIRECTORY");
+		replacePath = "/boot/system/lib";
+		if (strpath.FindFirst(replacePath) == 0)
+			strpath.ReplaceFirst(replacePath,"B_FIND_PATH_LIB_DIRECTORY");
 
 		data << "LIBRARY=" << strpath.String() << "\n";
 	}
@@ -1381,9 +1461,12 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 		case PROJECT_GUI:
 		{
 			// Having to manually add this one is terribly annoying. :/
-			if (DetectPlatform() == PLATFORM_HAIKU_GCC4){
+			if (DetectPlatform() == PLATFORM_HAIKU){
 				newproj->AddLibrary("/boot/system/develop/lib/x86/libbe.so");
-				newproj->AddLibrary("/boot/system/develop/lib/x86/libsupc++.so");
+				newproj->AddLibrary("/boot/system/lib/x86/libsupc++.so");
+			} else if (DetectPlatform() == PLATFORM_HAIKU_GCC4){
+				newproj->AddLibrary("/boot/system/develop/lib/libbe.so");
+				newproj->AddLibrary("/boot/system/lib/libsupc++.so");
 			}
 			else newproj->AddLibrary("/boot/develop/lib/x86/libbe.so");
 			break;

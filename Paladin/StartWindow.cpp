@@ -186,7 +186,7 @@ StartWindow::StartWindow(void)
 	fOpenButton = make_button("open", "OpenProjectButtonUp.png",
 		"OpenProjectButtonDown.png", M_SHOW_OPEN_PROJECT);
 
-	ClickableStringView* openLabel = make_label(fOpenButton, "Open a project");
+	ClickableStringView* openLabel = make_label(fOpenButton, B_TRANSLATE("Open a project"));
 	openLabel->SetMessage(new BMessage(M_SHOW_OPEN_PROJECT));
 
 	// open recent button and label

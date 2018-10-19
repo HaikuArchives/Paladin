@@ -360,7 +360,7 @@ SourceControl::RunCommand(BString in, BString &out)
 	if (-1 == result) {
 		out << B_TRANSLATE("Command resulted in an error.\n");
 	} else {
-		out << 	B_TRANSLATE("Command succeeded. Use 'Import existing Project' "
+		out << 	B_TRANSLATE("Command succeeded. Use 'Import existing project' "
 				"function in the main window "
 				"to load the project from the local filesystem\n");
 	}

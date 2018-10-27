@@ -173,7 +173,7 @@ CodeModule::AddFile(entry_ref ref)
 	{
 		// Get the header dependencies for the file. Note that these are just local headers
 		BString command;
-		command << "gcc -MM '" << dpath.GetFullPath() << "' 2>&1"; 
+		command << "g++ -MM '" << dpath.GetFullPath() << "' 2>&1"; 
 		
 		FILE *fd = popen(command.String(),"r");
 		

@@ -141,7 +141,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	if (gUseFastDep && gFastDepAvailable)
 		command << "fastdep " << info.includeString << " '" << abspath.String() << "'";
 	else
-		command << "gcc -MM " << info.includeString << " '" << abspath.String() << "'";
+		command << "g++ -MM " << info.includeString << " '" << abspath.String() << "'";
 	
 	BString depstr;
 	RunPipedCommand(command.String(), depstr, true);
@@ -350,7 +350,7 @@ SourceFileC::Compile(BuildInfo &info, const char *options)
 		abspath.Prepend(info.projectFolder.GetFullPath());
 	}
 	
-	BString compileString = "gcc -c ";
+	BString compileString = "g++ -c ";
 	
 	// This will make sure that we can still build if ccache is borked
 	if (gUseCCache && gCCacheAvailable)

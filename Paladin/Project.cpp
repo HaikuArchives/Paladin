@@ -838,7 +838,7 @@ Project::Link(void)
 			}
 		}
 	} else {
-		linkString = "gcc -o '";
+		linkString = "g++ -o '";
 		linkString << targetPath << "' ";
 			
 		for (int32 i = 0; i < CountGroups(); i++)

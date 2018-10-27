@@ -610,7 +610,7 @@ App::CreateNewProject(const BMessage &settings)
 		if (createFolder)
 		{
 			destPath << projectName;
-			create_directory(destPath.GetFullPath(), 0777);
+			create_directory(destPath.GetFullPath(), 0700);
 		}
 		
 		BString wildcard("'");

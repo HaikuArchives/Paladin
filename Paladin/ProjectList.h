@@ -86,6 +86,7 @@ public:
 				int32		UnderIndexOf(BStringItem* item);
 				int32		FullListUnderIndexOf(BStringItem* item);
 
+				void		Clear(void);
 				void		RefreshList(void);
 
 private:

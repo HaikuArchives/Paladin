@@ -244,6 +244,14 @@ ProjectList::FullListUnderIndexOf(BStringItem* item)
 	return -1;
 }
 
+void
+ProjectList::Clear(void)
+{
+	for (int32 i = FullListCountItems(); i >= 0; i--) {
+		BStringItem* item = (BStringItem*)RemoveItem(i);
+		delete item;
+	}
+}
 
 void
 ProjectList::RefreshList(void)
@@ -252,10 +260,7 @@ ProjectList::RefreshList(void)
 	if (Window() != NULL)
 		Window()->DisableUpdates();
 
-	for (int32 i = FullListCountItems(); i >= 0; i--) {
-		BStringItem* item = (BStringItem*)RemoveItem(i);
-		delete item;
-	}
+	Clear();
 
 	for (int32 i = 0; i < fProject->CountGroups(); i++) {
 		SourceGroup* group = fProject->GroupAt(i);

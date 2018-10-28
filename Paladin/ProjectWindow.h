@@ -62,6 +62,8 @@ private:
 			void				ToggleErrorWindow(ErrorList* list);
 			void				ShowErrorWindow(ErrorList* list);
 			void				CullEmptyGroups(void);
+			void				SortGroup(int32 selection);
+			void				UpdateProjectList(void);
 			void				UpdateDependencies(void);
 			void				ToggleDebugMenu(void);
 

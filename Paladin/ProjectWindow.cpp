@@ -196,88 +196,12 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	
 	SetStatus(B_TRANSLATE("Opening project..."));
 
-	if (project != NULL) {
+	if (fProject != NULL) {
 		BString title("Paladin: ");
-		title << project->GetName();
+		title << fProject->GetName();
 		SetTitle(title.String());
 
-		for (int32 i = 0; i < project->CountGroups(); i++) {
-			SourceGroup* group = project->GroupAt(i);
-			SourceGroupItem* groupitem = new SourceGroupItem(group);
-			fProjectList->AddItem(groupitem);
-			groupitem->SetExpanded(group->expanded);
-
-			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
-				SourceFile* file = group->filelist.ItemAt(j);
-				SourceFileItem* fileitem = new SourceFileItem(file,1);
-
-				fProjectList->AddItem(fileitem);
-
-				BString abspath = file->GetPath().GetFullPath();
-				if (abspath[0] != '/') {
-					abspath.Prepend("/");
-					abspath.Prepend(project->GetPath().GetFolder());
-				}
-				BEntry entry(abspath.String());
-				if (entry.Exists()) {
-					if (project->CheckNeedsBuild(file,false)) {
-						fileitem->SetDisplayState(SFITEM_NEEDS_BUILD);
-						fProjectList->InvalidateItem(fProjectList->IndexOf(fileitem));
-					} else
-						file->SetBuildFlag(BUILD_NO);
-				} else {
-					fileitem->SetDisplayState(SFITEM_MISSING);
-					fProjectList->InvalidateItem(fProjectList->IndexOf(fileitem));
-				}
-			}
-
-			// Now add header files
-			STRACE(2,("Adding header files to UI\n"));
-
-			// Also add dependencies (header files)
-			SourceGroupItem* headergroupitem = new SourceGroupItem(group);
-			BString headergroupname(group->name);
-			headergroupname += " dependencies";
-			headergroupitem->SetText(headergroupname);
-			fProjectList->AddItem(headergroupitem);
-			headergroupitem->SetExpanded(group->expanded);
-
-			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
-				SourceFile* file = group->filelist.ItemAt(j);
-				BString dependencies = file->GetDependencies();
-				// Split string on comma to get individual files
-				BStringList deplist = BStringList();// = new BStringList();
-				dependencies.Split("|",true,deplist);
-				// Add item for each
-				for (int32 d = 0;d < deplist.CountStrings(); d++) {
-					BString dep = deplist.StringAt(d);
-					BStringItem* depitem = new BStringItem(dep);
-					bool found = false;
-					STRACE(3,("Does dep exist?: %s\n", depitem->Text()));
-					int32 ed;
-					SourceFile* depfile = new SourceFile(dep);
-					SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
-					for (ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
-						STRACE(3,(" - Curitem text: %s\n", 
-							((SourceFileItem*)fProjectList->ItemUnderAt(
-							headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
-						if (0 == strcmp( 
-								((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem, 
-								true, ed))->GetData()->GetPath().GetFullPath(), 
-								depitem->Text() )
-							) 
-						{
-							STRACE(3,(" - Found!!!\n"));
-							found = true;
-						}
-					}
-					if (!found) {
-						// create source file item instead of string
-						fProjectList->AddUnder(depfileitem,headergroupitem);
-					}
-				}
-			}
-		}
+		UpdateProjectList();
 	}
 	
 	BNode node(fProject->GetPath().GetFullPath());
@@ -350,6 +274,89 @@ ProjectWindow::~ProjectWindow()
 	node.WriteAttr("project_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect));
 
 	delete fFilePanel;
+}
+
+void
+ProjectWindow::UpdateProjectList(void) {
+	fProjectList->Clear();
+
+		for (int32 i = 0; i < fProject->CountGroups(); i++) {
+			SourceGroup* group = fProject->GroupAt(i);
+			SourceGroupItem* groupitem = new SourceGroupItem(group);
+			fProjectList->AddItem(groupitem);
+			groupitem->SetExpanded(group->expanded);
+
+			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+				SourceFile* file = group->filelist.ItemAt(j);
+				SourceFileItem* fileitem = new SourceFileItem(file,1);
+
+				fProjectList->AddItem(fileitem);
+
+				BString abspath = file->GetPath().GetFullPath();
+				if (abspath[0] != '/') {
+					abspath.Prepend("/");
+					abspath.Prepend(fProject->GetPath().GetFolder());
+				}
+				BEntry entry(abspath.String());
+				if (entry.Exists()) {
+					if (fProject->CheckNeedsBuild(file,false)) {
+						fileitem->SetDisplayState(SFITEM_NEEDS_BUILD);
+						fProjectList->InvalidateItem(fProjectList->IndexOf(fileitem));
+					} else
+						file->SetBuildFlag(BUILD_NO);
+				} else {
+					fileitem->SetDisplayState(SFITEM_MISSING);
+					fProjectList->InvalidateItem(fProjectList->IndexOf(fileitem));
+				}
+			}
+
+			// Now add header files
+			STRACE(2,("Adding header files to UI\n"));
+
+			// Also add dependencies (header files)
+			SourceGroupItem* headergroupitem = new SourceGroupItem(group);
+			BString headergroupname(group->name);
+			headergroupname += " dependencies";
+			headergroupitem->SetText(headergroupname);
+			fProjectList->AddItem(headergroupitem);
+			headergroupitem->SetExpanded(group->expanded);
+
+			for (int32 j = 0; j < group->filelist.CountItems(); j++) {
+				SourceFile* file = group->filelist.ItemAt(j);
+				BString dependencies = file->GetDependencies();
+				// Split string on comma to get individual files
+				BStringList deplist = BStringList();// = new BStringList();
+				dependencies.Split("|",true,deplist);
+				// Add item for each
+				for (int32 d = 0;d < deplist.CountStrings(); d++) {
+					BString dep = deplist.StringAt(d);
+					BStringItem* depitem = new BStringItem(dep);
+					bool found = false;
+					STRACE(3,("Does dep exist?: %s\n", depitem->Text()));
+					int32 ed;
+					SourceFile* depfile = new SourceFile(dep);
+					SourceFileItem* depfileitem = new SourceFileItem(depfile,1);
+					for (ed = 0;!found && ed < fProjectList->CountItemsUnder(headergroupitem,true);ed++) {
+						STRACE(3,(" - Curitem text: %s\n", 
+							((SourceFileItem*)fProjectList->ItemUnderAt(
+							headergroupitem,true,ed))->GetData()->GetPath().GetFullPath() ));
+						if (0 == strcmp( 
+								((SourceFileItem*)fProjectList->ItemUnderAt(headergroupitem, 
+								true, ed))->GetData()->GetPath().GetFullPath(), 
+								depitem->Text() )
+							) 
+						{
+							STRACE(3,(" - Found!!!\n"));
+							found = true;
+						}
+					}
+					if (!found) {
+						// create source file item instead of string
+						fProjectList->AddUnder(depfileitem,headergroupitem);
+					}
+				}
+			}
+		}
 }
 
 void
@@ -656,7 +663,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		{
 			DPath out(fProject->GetPath().GetFolder());
 			out.Append("Makefile");
-			if (MakeMake(fProject, out) == B_OK); {
+			if (MakeMake(fProject, out) == B_OK) {
 				BEntry entry(out.GetFullPath());
 				entry_ref ref;
 				if (entry.InitCheck() == B_OK) {
@@ -752,22 +759,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_SORT_GROUP:
 		{
 			int32 selection = fProjectList->FullListCurrentSelection();
-			
-			SourceGroupItem* groupItem = NULL;
-			if (selection < 0) {
-				// Don't need a selection if there is only one group in the project
-				if (fProject->CountGroups() == 1)
-					groupItem = fProjectList->ItemForGroup(fProject->GroupAt(0));
-			} else {
-				BStringItem* stringItem
-					= (BStringItem*)fProjectList->FullListItemAt(selection);
-				groupItem = fProjectList->GroupForItem(stringItem);
-			}
-			if (groupItem == NULL)
-				break;
-
-			fProjectList->SortItemsUnder(groupItem, true, compare_source_file_items);
-			groupItem->GetData()->Sort();
+			SortGroup(selection);
 			fProject->Save();
 
 			break;
@@ -1003,7 +995,9 @@ ProjectWindow::MessageReceived(BMessage* message)
 					i--;
 				}
 			}
-			CullEmptyGroups();
+			// Not doing this as it would potentially confuse users in small projects
+			// Leaving here for documentation
+			// CullEmptyGroups();
 			if (save)
 				fProject->Save();
 
@@ -1205,6 +1199,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_BUILD_SUCCESS:
 		{
 			SetMenuLock(false);
+			UpdateDependencies();
 			SetStatus(B_TRANSLATE("Build successful."));
 			break;
 		}
@@ -1256,6 +1251,26 @@ ProjectWindow::MessageReceived(BMessage* message)
 		default:
 			BWindow::MessageReceived(message);
 	}
+}
+
+void
+ProjectWindow::SortGroup(int32 selection)
+{
+	SourceGroupItem* groupItem = NULL;
+	if (selection < 0) {
+		// Don't need a selection if there is only one group in the project
+		if (fProject->CountGroups() == 1)
+			groupItem = fProjectList->ItemForGroup(fProject->GroupAt(0));
+	} else {
+		BStringItem* stringItem
+			= (BStringItem*)fProjectList->FullListItemAt(selection);
+		groupItem = fProjectList->GroupForItem(stringItem);
+	}
+	if (groupItem == NULL)
+		return;
+
+	fProjectList->SortItemsUnder(groupItem, true, compare_source_file_items);
+	groupItem->GetData()->Sort();
 }
 
 
@@ -1820,6 +1835,8 @@ ProjectWindow::UpdateDependencies(void)
 
 	if (toggleHack)
 		gUsePipeHack = true;
+		
+	UpdateProjectList();
 }
 
 

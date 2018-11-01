@@ -14,9 +14,11 @@
 #include "StartWindow.h"
 
 #include <Alert.h>
+#include <Bitmap.h>
 #include <Catalog.h>
 #include <Entry.h>
 #include <FilePanel.h>
+#include <IconUtils.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
@@ -28,10 +30,10 @@
 #include <StringView.h>
 #include <TranslationUtils.h>
 
-#include "BitmapButton.h"
 #include "ClickableStringView.h"
 #include "EscapeCancelFilter.h"
 #include "Globals.h"
+#include "Icons.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
 #include "Project.h"
@@ -81,22 +83,21 @@ public:
 };
 
 
-static BitmapButton*
-make_button(const char* name, const char* up, const char* down,
+static BButton*
+make_button(const char* name, const unsigned char* iconData, size_t size,
 	int32 command)
 {
-	BBitmap* upBitmap = BTranslationUtils::GetBitmap('PNG ', up);
-	BBitmap* downBitmap = BTranslationUtils::GetBitmap('PNG ', down);
-	BitmapButton* button = new BitmapButton(name, upBitmap, downBitmap,
-		new BMessage(command));
-	button->SetExplicitSize(BSize(31, 31));
+	BBitmap icon(BRect(0, 0, 23, 23), 0, B_RGBA32);
+	BIconUtils::GetVectorIcon(iconData, size, &icon);
+	BButton* button = new BButton(name, "", new BMessage(command));
+	button->SetIcon(&icon);
 
 	return button;
 }
 
 
 static ClickableStringView*
-make_label(BitmapButton* button, const char* label)
+make_label(BButton* button, const char* label)
 {
 	if (button == NULL)
 		return NULL;
@@ -174,8 +175,8 @@ StartWindow::StartWindow(void)
 
 	// new button and label
 
-	fNewButton = make_button("new", "NewProjectButtonUp.png",
-		"NewProjectButtonDown.png", M_NEW_PROJECT);
+	fNewButton = make_button("new", kNewProjectIcon, sizeof(kNewProjectIcon),
+		M_NEW_PROJECT);
 
 	ClickableStringView* newLabel = make_label(fNewButton, 
 		B_TRANSLATE("Create a new project"));
@@ -183,16 +184,16 @@ StartWindow::StartWindow(void)
 
 	// open button and label
 
-	fOpenButton = make_button("open", "OpenProjectButtonUp.png",
-		"OpenProjectButtonDown.png", M_SHOW_OPEN_PROJECT);
+	fOpenButton = make_button("open", kOpenProjectIcon,
+		sizeof(kOpenProjectIcon), M_SHOW_OPEN_PROJECT);
 
 	ClickableStringView* openLabel = make_label(fOpenButton, B_TRANSLATE("Open a project"));
 	openLabel->SetMessage(new BMessage(M_SHOW_OPEN_PROJECT));
 
 	// open recent button and label
 
-	fOpenRecentButton = make_button("openrecent", "OpenRecentButtonUp.png",
-		"OpenRecentButtonDown.png", M_OPEN_SELECTION);
+	fOpenRecentButton = make_button("openrecent", kOpenSelectedIcon,
+		sizeof(kOpenSelectedIcon), M_OPEN_SELECTION);
 	SetToolTip(fOpenRecentButton,
 		B_TRANSLATE("Open a project in the list on the right. You "
 		   "can also press Command + a number key."));
@@ -203,8 +204,8 @@ StartWindow::StartWindow(void)
 
 	// quick import button and label
 
-	fQuickImportButton = make_button("quickimport", "QuickImportButtonUp.png",
-		"QuickImportButtonDown.png", M_SHOW_IMPORT);
+	fQuickImportButton = make_button("quickimport", kImportFromDiskIcon,
+		sizeof(kImportFromDiskIcon), M_SHOW_IMPORT);
 	SetToolTip(fQuickImportButton,
 		B_TRANSLATE("Quickly make a project by importing all source "
 			"files and resource files.\n"
@@ -219,8 +220,8 @@ StartWindow::StartWindow(void)
 
 	// online import button and label
 
-	fOnlineImportButton = make_button("onlineimport", "OnlineImportButtonUp.png",
-		"OnlineImportButtonDown.png", M_ONLINE_IMPORT);
+	fOnlineImportButton = make_button("onlineimport", kImportFromOnlineIcon,
+		sizeof(kImportFromOnlineIcon), M_ONLINE_IMPORT);
 	SetToolTip(fQuickImportButton,
 		B_TRANSLATE("Import a project from an online repository"));
 

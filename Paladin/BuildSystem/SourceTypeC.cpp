@@ -226,7 +226,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	BStringList components;
 	fDependencies.Split("|",true,components);
 	for (int32 si = components.CountStrings() - 1;si >=0;si--) {
-		if (!components.StringAt(si).EndsWith(".h"))
+		if (!components.StringAt(si).EndsWith(".h") || components.StringAt(si).StartsWith("/boot/system/"))
 			components.Remove(si);
 	}
 	/*

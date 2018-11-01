@@ -14,7 +14,7 @@
 #include <Window.h>
 
 
-class BitmapButton;
+class BButton;
 class BFilePanel;
 class BListView;
 class TypedRefFilter;
@@ -28,11 +28,11 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			BitmapButton*		fNewButton;
-			BitmapButton*		fOpenButton;
-			BitmapButton*		fOpenRecentButton;
-			BitmapButton*		fQuickImportButton;
-			BitmapButton*		fOnlineImportButton;
+			BButton*			fNewButton;
+			BButton*			fOpenButton;
+			BButton*			fOpenRecentButton;
+			BButton*			fQuickImportButton;
+			BButton*			fOnlineImportButton;
 
 			BListView*			fRecentProjectsListView;
 			BFilePanel*			fOpenPanel;

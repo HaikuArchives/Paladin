@@ -25,6 +25,7 @@ public:
 	
 	BString path;
 	int32	line;
+	int32 	column;
 	BString	error;
 	int8	type;
 	BString	rawdata;

@@ -7,6 +7,7 @@
 
 error_msg::error_msg(void)
 	:	line(-1),
+		column(-1),
 		type(-1)
 {
 }
@@ -27,6 +28,9 @@ error_msg::PrintToStream(void)
 	
 	if (line >= 0)
 		out << line << ": ";
+		
+	if (column >= 0)
+		out << column << ": ";
 	
 	out << error << "\n";
 	
@@ -221,6 +225,7 @@ ErrorList::Flatten(BMessage &msg)
 		error_msg *error = (error_msg*)msglist.ItemAt(i);
 		msg.AddString("path",error->path);
 		msg.AddInt32("line",error->line);
+		msg.AddInt32("column",error->column);
 		msg.AddString("error",error->error);
 		msg.AddInt8("type",error->type);
 		msg.AddString("rawdata",error->rawdata);
@@ -257,6 +262,9 @@ ErrorList::Unflatten(BMessage &msg)
 		
 		if (msg.FindInt32("line",i,&error->line) != B_OK)
 			error->line = -1;
+			
+		if (msg.FindInt32("column",i,&error->column) != B_OK)
+			error->column = -1;
 		
 		if (msg.FindString("error",i,&error->error) != B_OK)
 			error->error = "";
@@ -339,6 +347,32 @@ ParseGCCErrors(const char *string, ErrorList &list)
 				}
 				msg->line = atol(temp.String());
 				endpos += temp.CountChars();
+				
+				// now check for column number too
+				startpos = endpos;
+				endpos = msg->rawdata.FindFirst(":",startpos);
+				if (B_ERROR != endpos)
+				{
+					// Now we have to do a little fancy guesswork
+					if (isdigit(msg->rawdata[endpos + 1]))
+					{
+						int32 startposcol = endpos;
+				
+						temp = "";
+						numberIndex = startposcol + 1;
+						while (isdigit(msg->rawdata[numberIndex]))
+						{
+							temp += msg->rawdata[numberIndex];
+							numberIndex++;
+							if (numberIndex >= msg->rawdata.CountChars())
+								break;
+						}
+						msg->column = atol(temp.String());
+						endpos += temp.CountChars();
+					}
+					else
+						msg->column = -1;
+				}
 			}
 			else
 				msg->line = -1;
@@ -422,6 +456,7 @@ ParseLDErrors(const char *string, ErrorList &list)
 		
 		// The linker doesn't use line numbers
 		msg->line = -1;
+		msg->column = -1;
 		
 		// adding 2 instead of one because there is always a space after the final colon
 		msg->error = msg->rawdata.String() + endpos + 2;
@@ -527,6 +562,8 @@ ParseRezErrors(const char *string, ErrorList &list)
 		
 		int32 startpos = 0;
 		int32 endpos = 0;
+		
+		msg->column = -1;
 		
 		if (msg->rawdata.FindFirst("File \"") == 0)
 		{

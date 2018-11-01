@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../DebugTools.h"
+
 #define HAIKU_PIPE_HACK
 
 ArgList::ArgList(void)
@@ -345,6 +347,7 @@ LaunchHelper::Launch(void)
 	team_id *team = fTeamID > 0 ? &fTeamID : NULL;
 	
 	status_t status;
+	STRACE(2,("be_roster Launch called by LaunchHelper:Launch for ref %s\n",fRef.name));
 	if (fRef.name)
 		status = be_roster->Launch(&fRef,CountArgs(),args,team);
 	else

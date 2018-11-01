@@ -26,6 +26,7 @@
 #include <TypeConstants.h>
 
 #include "DListView.h"
+#include "DebugTools.h"
 #include "MsgDefs.h"
 #include "Project.h"
 #include "ProjectBuilder.h"
@@ -272,10 +273,13 @@ ErrorWindow::MessageReceived(BMessage* message)
 
  		case M_JUMP_TO_MSG:
  		{
+			STRACE(2,("M_JUMP_TO_MSG called\n"));
  			int32 selection = fErrorList->CurrentSelection();
  			if (selection >= 0) {
  				ErrorItem* item = (ErrorItem*)fErrorList->ItemAt(selection);
  				error_msg* gcc = item->GetMessage();
+				STRACE(2,("gcc message info: line: %i\n",gcc->line));
+				STRACE(2,("gcc message info: column: %i\n",gcc->column));
 
  				if (gcc->path.Length() < 1)
  					break;
@@ -285,8 +289,10 @@ ErrorWindow::MessageReceived(BMessage* message)
  				entry.GetRef(&ref);
  				message->what = EDIT_OPEN_FILE;
  				message->AddRef("refs", &ref);
- 				if (gcc->line > 0)
+ 				if (gcc->line >= 0)
  					message->AddInt32("line", gcc->line);
+				if (gcc->column >= 0)
+					message->AddInt32("column", gcc->column);
 
  				be_app->PostMessage(message);
  			}

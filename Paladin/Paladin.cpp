@@ -414,8 +414,11 @@ App::MessageReceived(BMessage *msg)
 				int32 line;
 				if (msg->FindInt32("line",index,&line) != B_OK)
 					line = -1;
+				int32 column;
+				if (msg->FindInt32("column",index,&column) != B_OK)
+					column = -1;
 				
-				OpenFile(ref,line);
+				OpenFile(ref,line,column);
 				
 				index++;
 			}
@@ -507,7 +510,7 @@ App::CheckCreateOpenPanel()
 }
 
 void
-App::OpenFile(entry_ref ref, int32 line)
+App::OpenFile(entry_ref ref, int32 line, int32 column)
 {
 	if (!ref.name)
 		return;
@@ -524,6 +527,7 @@ App::OpenFile(entry_ref ref, int32 line)
 	{
 		if (type == PROJECT_MIME_TYPE || type.FindFirst("text/") != 0)
 		{
+			STRACE(2,("Launching text or project file in roster...\n"));
 			be_roster->Launch(&ref);
 			return;
 		}
@@ -545,12 +549,36 @@ App::OpenFile(entry_ref ref, int32 line)
 		}
 	}
 	
+	
 	BMessage* msg = new BMessage(B_REFS_RECEIVED);
 	msg->AddRef("refs",&ref);
 	if (line >= 0)
 		msg->AddInt32("be:line",line);
-	STRACE(2,("Paladin Launching File Ref: $s:%i",ref.name,line));
+	if (column >= 0)
+		msg->AddInt32("be:column",column);
+	STRACE(2,("Paladin Launching File Ref: %s:%i:%i\n",ref.name,line,column));
+	
+	/*
+	  ANTI-PATTERN - this code left here for future developers' reference
+	  Using the below method launches the app, and then be_roster sends
+	  ANOTHER B_REFS_REVEIVED of its own, causing the file to be opened twice,
+	  or once at the wrong location (i.e. without a line number).
 	be_roster->Launch(&ref,msg);
+	*/
+	
+	/*
+	entry_ref appRef;
+	be_roster->FindApp(&ref,&appRef);
+	app_info appInfo;
+	be_roster->GetAppInfo(&appRef,&appInfo);
+	BMessenger messenger(appInfo.signature);
+	messenger.SendMessage(msg,(BHandler*)NULL,B_INFINITE_TIMEOUT);
+	// The above results in nothing happening unless the app is ALREADY running
+	*/
+	
+	// Final effort - use the text_search tracker messenger mechanism
+	BMessenger target("application/x-vnd.Be-TRAK");
+	target.SendMessage(msg);
 }
 
 

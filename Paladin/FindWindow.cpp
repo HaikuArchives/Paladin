@@ -259,7 +259,10 @@ FindWindow::MessageReceived(BMessage *msg)
 				BMessage refMessage(B_REFS_RECEIVED);
 				entry_ref fileref = item->GetRef();
 				refMessage.AddRef("refs",&fileref);
-				refMessage.AddInt32("be:line",item->GetLine());
+				int32 line = item->GetLine();
+				if (line >= 0)
+					refMessage.AddInt32("be:line",line);
+				STRACE(2,("Paladin FindWindow Launching File Ref: %s:%i",fileref.name,line));
 				be_roster->Launch(&fileref,&refMessage);
 			}
 			break;

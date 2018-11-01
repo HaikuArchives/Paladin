@@ -1326,10 +1326,13 @@ ProjectWindow::AddFile(const entry_ref& ref, BPoint* where)
 		selection = fProjectList->IndexOf(*where);
 	else
 		selection = fProjectList->FullListCurrentSelection();
+		
+	STRACE(2,("Adding file at selection location: %i\n",selection));
 
 	SourceGroupItem* groupItem = dynamic_cast<SourceGroupItem*>(
 		fProjectList->FullListItemAt(selection));
 	if (groupItem != NULL) {
+		STRACE(2,("Found group item as selection\n"));
 		if (!groupItem->IsExpanded())
 			fProjectList->Expand(groupItem);
 
@@ -1923,6 +1926,7 @@ ProjectWindow::AddNewFile(BString name, bool createPair)
 int32
 ProjectWindow::AddFileThread(void* data)
 {
+	STRACE(2,("ProjectWindow::AddFileThread called\n"));
 	add_file_struct* addFileStruct = (add_file_struct*)data;
 
 	int32 i = 0;
@@ -1953,7 +1957,7 @@ ProjectWindow::AddFileThread(void* data)
 	}
 
 	addFileStruct->parent->Lock();
-	addFileStruct->parent->CullEmptyGroups();
+	//addFileStruct->parent->CullEmptyGroups(); // may create groups first, then populate
 	addFileStruct->parent->fProject->Save();
 	addFileStruct->parent->Unlock();
 

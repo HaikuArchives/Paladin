@@ -2,6 +2,7 @@
 #include <Entry.h>
 #include <stdio.h>
 #include <Node.h>
+#include <StringList.h>
 
 #include "BuildInfo.h"
 #include "DebugTools.h"
@@ -221,6 +222,43 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 		if (fDependencies[0] == ' ')
 			fDependencies.RemoveFirst(" ");
 	}
+	// now we have a pipe delimited string, split and filter for this source type (headers only left)
+	BStringList components;
+	fDependencies.Split("|",true,components);
+	for (int32 si = components.CountStrings() - 1;si >=0;si--) {
+		if (!components.StringAt(si).EndsWith(".h"))
+			components.Remove(si);
+	}
+	/*
+	auto it = components.end();
+	while (it > components.begin()) {
+		if (!(*it).EndsWith(".h"))
+			it = components.erase(it);
+	}
+	*/
+	/*
+	for (uint32 si = components.Length();si >= 0;si--)
+	{
+		if (!components.At(si).endsWith(".h")) {
+		components.Remove(si);
+	}
+	*/
+	//fDependencies = "";
+	/*
+	auto it2 = components.begin();
+	bool first = true;
+	while (it2 < components.end()) {
+		if (first) {
+			first = false;
+		} else {
+			fDependencies += "|";
+		}
+		fDependencies += *it;
+		it++;
+	}
+	*/
+	fDependencies = components.Join("|");
+	STRACE(2,("fDependencies now: %s\n",fDependencies.String()));
 }
 
 

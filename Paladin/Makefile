@@ -78,7 +78,6 @@ SRCS = AboutWindow.cpp \
 	BuildSystem/StatCache.cpp \
 	ThirdParty/AutoTextControl.cpp \
 	ThirdParty/BeIDEProject.cpp \
-	ThirdParty/BitmapButton.cpp \
 	ThirdParty/CRegex.cpp \
 	ThirdParty/ClickableStringView.cpp \
 	ThirdParty/DListView.cpp \

@@ -1710,45 +1710,60 @@ ProjectWindow::SetMenuLock(bool locked)
 void
 ProjectWindow::MakeGroup(int32 selection)
 {
-	if (selection < 1
-		|| dynamic_cast<SourceGroupItem*>(
-			fProjectList->FullListItemAt(selection))
-		|| dynamic_cast<SourceGroupItem*>(
-			fProjectList->FullListItemAt(selection - 1))) {
+	if (selection < 0) {
 		return;
 	}
 
 	int32 newGroupIndex = -1;
-	if (fProject->CountGroups() > 1) {
-		int32 groupcount = 0;
-		for (int32 i = selection - 1; i > 0; i--) {
-			if (dynamic_cast<SourceGroupItem*>(fProjectList->FullListItemAt(i)))
-				groupcount++;
+	
+	bool groupSelected = dynamic_cast<SourceGroupItem*>(
+			fProjectList->FullListItemAt(selection))
+		|| dynamic_cast<SourceGroupItem*>(
+			fProjectList->FullListItemAt(selection - 1));
+	
+	if (groupSelected)
+	{
+		STRACE(2,("Group selected for make group\n"));
+		newGroupIndex = fProject->CountGroups() + 1;
+	} else {
+		STRACE(2,("Item in middle of list selected for make group\n"));
+		if (fProject->CountGroups() > 1) {
+			int32 groupcount = 0;
+			for (int32 i = selection - 1; i > 0; i--) {
+				if (dynamic_cast<SourceGroupItem*>(fProjectList->FullListItemAt(i)))
+					groupcount++;
+			}
 		}
 	}
 
-	SourceGroupItem* oldgroupitem = (SourceGroupItem*)fProjectList->Superitem(
-		fProjectList->FullListItemAt(selection));
-	SourceGroup* oldgroup = oldgroupitem->GetData();
 	SourceGroup* newgroup = fProject->AddGroup("New group", newGroupIndex);
 	SourceGroupItem* newGroupItem = new SourceGroupItem(newgroup);
-	fProjectList->AddItem(newGroupItem, selection);
+	
+	if (!groupSelected) {
+		SourceGroupItem* oldgroupitem = (SourceGroupItem*)fProjectList->Superitem(
+			fProjectList->FullListItemAt(selection));
+		SourceGroup* oldgroup = oldgroupitem->GetData();
+		fProjectList->AddItem(newGroupItem, selection);
 
-	int32 index = selection + 1;
-	SourceFileItem* fileitem = dynamic_cast<SourceFileItem*>(
-		fProjectList->FullListItemAt(index));
-	while (fileitem != NULL) {
-		fProjectList->RemoveItem(fileitem);
-		fProjectList->AddItem(fileitem, index);
-		oldgroup->filelist.RemoveItem(fileitem->GetData(), false);
-		newgroup->filelist.AddItem(fileitem->GetData());
+		int32 index = selection + 1;
+		SourceFileItem* fileitem = dynamic_cast<SourceFileItem*>(
+			fProjectList->FullListItemAt(index));
+		while (fileitem != NULL) {
+			fProjectList->RemoveItem(fileitem);
+			fProjectList->AddItem(fileitem, index);
+			oldgroup->filelist.RemoveItem(fileitem->GetData(), false);
+			newgroup->filelist.AddItem(fileitem->GetData());
 
-		index++;
-		fileitem = dynamic_cast<SourceFileItem*>(fProjectList->FullListItemAt(index));
+			index++;
+			fileitem = dynamic_cast<SourceFileItem*>(fProjectList->FullListItemAt(index));
+		}
+		fProjectList->InvalidateItem(selection);
+	} else {
+		fProjectList->AddItem(newGroupItem);
+		fProjectList->Select(fProjectList->CountItems() - 1);
 	}
 
 	fProjectList->Expand(newGroupItem);
-	fProjectList->InvalidateItem(selection);
 	fProject->Save();
 }
 

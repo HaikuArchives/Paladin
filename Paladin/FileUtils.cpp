@@ -49,7 +49,6 @@ InitFileTypes(void)
 	mime.SetFileExtensions(&ext);
 }
 
-
 void
 FindAndOpenFile(BMessage *msg)
 {
@@ -88,7 +87,6 @@ FindAndOpenFile(BMessage *msg)
 		alert->Go();
 	}
 }
-
 
 entry_ref
 FindFile(entry_ref folder, const char *name)

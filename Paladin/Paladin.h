@@ -22,7 +22,7 @@ public:
 	bool	QuitRequested(void);
 	void	ReadyToRun(void);
 	void	MessageReceived(BMessage *msg);
-	void	OpenFile(entry_ref ref, int32 line = -1);
+	void	OpenFile(entry_ref ref, int32 line = -1, int32 column = -1);
 	void	OpenPartner(entry_ref ref);
 	Project *CreateNewProject(const BMessage &settings);
 	bool	QuickImportProject(DPath folder);

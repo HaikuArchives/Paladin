@@ -1846,8 +1846,6 @@ ProjectWindow::UpdateDependencies(void)
 			fProjectList->FullListItemAt(i));
 		if (item != NULL)
 			item->GetData()->UpdateDependencies(*fProject->GetBuildInfo());
-
-		UpdateIfNeeded();
 	}
 	SetMenuLock(false);
 

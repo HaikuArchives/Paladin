@@ -3,8 +3,8 @@ resource app_signature "application/x-vnd.dw-Paladin";
 resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version {
-	major  = 1,
-	middle = 5,
+	major  = 2,
+	middle = 0,
 	minor  = 0,
 
 	variety = B_APPV_DEVELOPMENT,

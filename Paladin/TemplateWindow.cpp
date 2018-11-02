@@ -1,14 +1,14 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
-
-
 #include "TemplateWindow.h"
 
 #include <algorithm>
@@ -67,7 +67,7 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 
 	// project type
 
-	BPopUpMenu* projectTypeMenu = new BPopUpMenu("Project type");
+	BPopUpMenu* projectTypeMenu = new BPopUpMenu(B_TRANSLATE("Project type"));
 	for (int32 i = 0; i < fTempList.CountTemplates(); i++) {
 		ProjectTemplate* ptemp = fTempList.TemplateAt(i);
 		entry_ref ref = ptemp->GetRef();
@@ -103,9 +103,9 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	// source control
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
-	scmMenu->AddItem(new BMenuItem("Mercurial", new BMessage()));
-	scmMenu->AddItem(new BMenuItem("Git", new BMessage()));
-	scmMenu->AddItem(new BMenuItem("Subversion", new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), new BMessage()));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), new BMessage()));
 	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), new BMessage()));
 
 	if (!gHgAvailable) {

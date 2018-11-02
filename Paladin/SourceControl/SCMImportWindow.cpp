@@ -1,3 +1,10 @@
+/*
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ */
 #include "SCMImportWindow.h"
 
 #include <Catalog.h>
@@ -56,13 +63,13 @@ SCMImportWindow::SCMImportWindow(void)
 	
 	menu = new BMenu(B_TRANSLATE("Methods"));
 	if (gHgAvailable)
-		menu->AddItem(new BMenuItem("Mercurial", new BMessage(M_UPDATE_COMMAND)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), new BMessage(M_UPDATE_COMMAND)));
 	
 	if (gGitAvailable)
-		menu->AddItem(new BMenuItem("Git", new BMessage(M_UPDATE_COMMAND)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Git"), new BMessage(M_UPDATE_COMMAND)));
 	
 	if (gSvnAvailable)
-		menu->AddItem(new BMenuItem("Subversion", new BMessage(M_UPDATE_COMMAND)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), new BMessage(M_UPDATE_COMMAND)));
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(0L)->SetMarked(true);
 	fProvider = fProviderMgr.ImporterAt(0);
@@ -202,15 +209,15 @@ SCMImportWindow::SetProvider(SCMProjectImporter *importer)
 		BMenu *menu = fSCMField->Menu();
 		BMenuItem *item;
 		
-		item = menu->FindItem("Mercurial");
+		item = menu->FindItem(B_TRANSLATE("Mercurial"));
 		if (item)
 			item->SetEnabled(fProvider->SupportsSCM(SCM_HG));
 			
-		item = menu->FindItem("Git");
+		item = menu->FindItem(B_TRANSLATE("Git"));
 		if (item)
 			item->SetEnabled(fProvider->SupportsSCM(SCM_GIT));
 		
-		item = menu->FindItem("Subversion");
+		item = menu->FindItem(B_TRANSLATE("Subversion"));
 		if (item)
 			item->SetEnabled(fProvider->SupportsSCM(SCM_SVN));
 		
@@ -259,17 +266,17 @@ SCMImportWindow::UpdateCommand(void)
 	
 	BString command;
 	scm_t scm = SCM_NONE;
-	if (strcmp("Mercurial", item->Label()) == 0)
+	if (strcmp(B_TRANSLATE("Mercurial"), item->Label()) == 0)
 	{
 		scm = SCM_HG;
 		//command = "hg ";
 	}
-	else if (strcmp("Git", item->Label()) == 0)
+	else if (strcmp(B_TRANSLATE("Git"), item->Label()) == 0)
 	{
 		scm = SCM_GIT;
 		//command = "git ";
 	}
-	else if (strcmp("Subversion", item->Label()) == 0)
+	else if (strcmp(B_TRANSLATE("Subversion"), item->Label()) == 0)
 	{
 		scm = SCM_SVN;
 		//command = "svn ";

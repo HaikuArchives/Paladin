@@ -238,7 +238,7 @@ StartWindow::StartWindow(void)
 	fRecentProjectsListView->SetExplicitMinSize(BSize(minWidth, B_SIZE_UNSET));
 	fRecentProjectsListView->SetInvocationMessage(new BMessage(M_OPEN_SELECTION));
 	SetToolTip(fRecentProjectsListView,
-		"Open a recent project. You can also press Command + a number key.");
+		B_TRANSLATE("Open a recent project. You can also press Command + a number key."));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
@@ -277,13 +277,13 @@ StartWindow::StartWindow(void)
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_FILE_NODE, false,
 		new BMessage(M_OPEN_PROJECT),new PaladinFileFilter());
 	BString titleString(B_TRANSLATE("Open project"));
-	titleString.Prepend("Paladin: ");
+	titleString.Prepend(B_TRANSLATE("Paladin: "));
 	fOpenPanel->Window()->SetTitle(titleString.String());
 
 	fImportPanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref, B_DIRECTORY_NODE,
 		false, new BMessage(M_QUICK_IMPORT));
 	titleString = B_TRANSLATE("Choose project folder");
-	titleString.Prepend("Paladin: ");
+	titleString.Prepend(B_TRANSLATE("Paladin: "));
 	fImportPanel->Window()->SetTitle(titleString.String());
 
 	gSettings.Lock();

@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	3829376274
+1	English	application/x-vnd.dw-Paladin	2226395208
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Rename partner file	AddNewFileWindow		Rename partner file
 A summary of this license is not available.	LicenseManager		A summary of this license is not available.
@@ -8,6 +8,7 @@ This will undo all changes since the last commit. Continue?	ProjectWindow		This 
 Regular expression	FindWindow		Regular expression
 New project…	ProjectWindow		New project…
 General	ProjectSettingsWindow		General
+Extra compiler options:	ProjectSettingsWindow		Extra compiler options:
 This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.
 Create new module…	CodeLibWindow		Create new module…
 No	Paladin		No
@@ -34,6 +35,7 @@ Delete current module	CodeLibWindow		Delete current module
 Unit separator	AsciiWindow	ASCII table description	Unit separator
 Target name:	ProjectSettingsWindow		Target name:
 Settings…	ProjectWindow		Settings…
+Git	TemplateWindow		Git
 Examining source files	ProjectWindow		Examining source files
 Use single thread	PrefsWindow		Use single thread
 Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Couldn't find %filename%. It may have been moved or renamed.
@@ -56,6 +58,7 @@ Full version:	LicenseManager		Full version:
 Revert	ProjectWindow		Revert
 Check project in	ProjectWindow		Check project in
 Modules	CodeLibWindow		Modules
+Create module	CodeLibWindow		Create module
 Empty build cache	ProjectWindow		Empty build cache
 If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
 Choose the name for the new module:	CodeLibWindow		Choose the name for the new module:
@@ -87,6 +90,7 @@ Add a file to the include path list	ProjectSettingsWindow		Add a file to the inc
 This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.
 The project cannot be built because some of its files are missing.	ProjectWindow		The project cannot be built because some of its files are missing.
 Open: 	FindOpenFileWindow		Open: 
+Git	SCMImportWindow		Git
 Bell	AsciiWindow	ASCII table description	Bell
 Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.
 Form feed	AsciiWindow	ASCII table description	Form feed
@@ -97,6 +101,7 @@ Regular expression tester	ProjectWindow		Regular expression tester
 Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.
 Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?
 Choose the source control manager for your project, if any.	TemplateWindow		Choose the source control manager for your project, if any.
+Open a recent project. You can also press Command + a number key.	StartWindow		Open a recent project. You can also press Command + a number key.
 Open project	StartWindow		Open project
 Actions	CodeLibWindow		Actions
 %library% couldn't be found in the same place as it was under %platform%.	Project		%library% couldn't be found in the same place as it was under %platform%.
@@ -120,6 +125,7 @@ Substitute	AsciiWindow	ASCII table description	Substitute
 Remove	Project		Remove
 Anonymous check-out	SCMImportWindow		Anonymous check-out
 Generate makefile	ProjectWindow		Generate makefile
+Project type	TemplateWindow		Project type
 Source control	PrefsWindow		Source control
 Search	FindWindow		Search
 Remove selected files	ProjectList		Remove selected files
@@ -129,6 +135,7 @@ Extra linker options:	ProjectSettingsWindow		Extra linker options:
 Use fastdep dependency checker	PrefsWindow		Use fastdep dependency checker
 Open the selected project	StartWindow		Open the selected project
 Common libraries:	LibWindow		Common libraries:
+Run arguments	RunArgsWindow		Run arguments
 Revert project	ProjectWindow		Revert project
 Opening project...	ProjectWindow		Opening project...
 Show changes in selected files	ProjectList		Show changes in selected files
@@ -153,7 +160,9 @@ New line	AsciiWindow	ASCII table description	New line
 Program settings…	ProjectWindow		Program settings…
 Paladin project	FileUtils		Paladin project
 Mercurial unavailable	TemplateWindow		Mercurial unavailable
+Mercurial	SCMImportWindow		Mercurial
 Automatically synchronize modules	PrefsWindow		Automatically synchronize modules
+Subversion	SCMManager		Subversion
 Add new file	AddNewFileWindow		Add new file
 Shared library	ProjectSettingsWindow		Shared library
 Target type:	ProjectSettingsWindow		Target type:
@@ -172,6 +181,7 @@ Find and open file	FindOpenFileWindow		Find and open file
 Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Automatically synchronize modules in your projects with the those in the code library
 Terminal output	TerminalWindow		Terminal output
 Source Control	ProjectList		Source Control
+Subversion	SCMImportWindow		Subversion
 Make project	ProjectWindow		Make project
 Yes	Paladin		Yes
 Command resulted in an error.\n	SourceControl		Command resulted in an error.\n
@@ -189,6 +199,7 @@ Vertical tab	AsciiWindow	ASCII table description	Vertical tab
 Scanning libraries…	LibWindow		Scanning libraries…
 Project	ProjectWindow		Project
 Open project…	ProjectWindow		Open project…
+Git	SCMManager		Git
 The name of the compiled application or library	TemplateWindow		The name of the compiled application or library
 Escape	AsciiWindow	ASCII table description	Escape
 Project type:	TemplateWindow		Project type:
@@ -267,6 +278,7 @@ Source control	ProjectWindow		Source control
 None	PrefsWindow		None
 Replace	FindWindow		Replace
 Linking\n	Paladin		Linking\n
+Subversion	TemplateWindow		Subversion
 Cancel	Globals		Cancel
 Code library	CodeLibWindow		Code library
 Methods	SCMImportWindow		Methods
@@ -325,6 +337,7 @@ Git unavailable	TemplateWindow		Git unavailable
 Build profiling information	ProjectSettingsWindow		Build profiling information
 Pull changes from remote repository	ProjectWindow		Pull changes from remote repository
 Build failure\n%s	Paladin		Build failure\n%s
+Mercurial	SCMManager		Mercurial
 Remove from repository	ProjectWindow		Remove from repository
 Omit header files from projects	PrefsWindow		Omit header files from projects
 Detected platform from uname: %s\n	Project		Detected platform from uname: %s\n
@@ -337,6 +350,7 @@ Build with just one thread instead of one thread per processor	PrefsWindow		Buil
 Rename group	ProjectWindow		Rename group
 Delete	AsciiWindow	ASCII table description	Delete
 Carriage return	AsciiWindow	ASCII table description	Carriage return
+Mercurial	TemplateWindow		Mercurial
 Push changes to remote repository	ProjectWindow		Push changes to remote repository
 Keep	Project		Keep
 Recent projects:	StartWindow		Recent projects:
@@ -348,6 +362,7 @@ License:	LicenseManager		License:
 Import a project from online	StartWindow		Import a project from online
 Cancel	AsciiWindow	ASCII table description	Cancel
 Browse…	PathBox		Browse…
+Paladin: 	StartWindow		Paladin: 
 Remove	CodeLibWindow		Remove
 Rename file	AddNewFileWindow		Rename file
 OK	FileUtils		OK

@@ -1,14 +1,14 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
-
-
 #include "ProjectSettingsWindow.h"
 
 #include <Box.h>
@@ -241,7 +241,7 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 	if (fProject->Profiling())
 		fProfileBox->SetValue(B_CONTROL_ON);
 
-	fCompileText = new AutoTextControl("extracc", "Extra compiler options:",
+	fCompileText = new AutoTextControl("extracc", B_TRANSLATE("Extra compiler options:"),
 		fProject->ExtraCompilerOptions(), new BMessage(M_CCOPTS_CHANGED));
 	SetToolTip(fCompileText,
 		B_TRANSLATE("Extra GCC flags you wish included when each file is compiled."));

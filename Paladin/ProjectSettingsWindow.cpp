@@ -304,8 +304,10 @@ ProjectSettingsWindow::ProjectSettingsWindow(BRect frame, Project* project)
 
 ProjectSettingsWindow::~ProjectSettingsWindow(void)
 {
-	delete fFilePanel;
-	delete fRefFilter;
+	if (NULL != fFilePanel)
+		delete fFilePanel;
+	if (NULL != fRefFilter)
+		delete fRefFilter;
 }
 
 
@@ -450,12 +452,15 @@ ProjectSettingsWindow::MessageReceived(BMessage* message)
 bool
 ProjectSettingsWindow::QuitRequested(void)
 {
+	Hide();
+	
 	if (fDirty)
 		fProject->Save();
 	
-	delete fAutolock;
+	//if (NULL != fAutolock)
+	//	delete fAutolock;
 
-	return true;
+	return false; // Window is reused on hide
 }
 
 

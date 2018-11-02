@@ -127,9 +127,11 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	fFilePanel(NULL),
 	fProject(project),
 	fSourceControl(NULL),
+	fProjectSettingsWindow(NULL),
 	fShowingLibs(false),
 	fMenusLocked(false),
-	fBuilder(BMessenger(this))
+	fBuilder(BMessenger(this)),
+	fPrefsWindow(NULL)
 {
 	SetSizeLimits(200, 30000, 200, 30000);
 	MoveTo(100,100);
@@ -272,8 +274,6 @@ ProjectWindow::~ProjectWindow()
 	BNode node(fProject->GetPath().GetFullPath());
 	BRect frame(Frame());
 	node.WriteAttr("project_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect));
-
-	delete fFilePanel;
 }
 
 void
@@ -785,9 +785,10 @@ ProjectWindow::MessageReceived(BMessage* message)
 			r.OffsetTo((screen.Width() - r.Width()) / 2.0,
 				(screen.Height() - r.Height()) / 2.0);
 			
-			ProjectSettingsWindow* window
-				= new ProjectSettingsWindow(r, fProject);
-			window->Show();
+			if (NULL == fProjectSettingsWindow)
+				fProjectSettingsWindow = new ProjectSettingsWindow(r, fProject);
+				
+			fProjectSettingsWindow->Show();
 			break;
 		}
 
@@ -828,8 +829,9 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		case M_SHOW_PROGRAM_SETTINGS:
 		{
-			PrefsWindow* window = new PrefsWindow(BRect(0, 0, 500, 400));
-			window->Show();
+			if (NULL == fPrefsWindow)
+				fPrefsWindow = new PrefsWindow(BRect(0, 0, 500, 400));
+			fPrefsWindow->Show();
 			break;
 		}
 

@@ -256,9 +256,8 @@ PathBox::PathBox(BMessage* data)
 
 PathBox::~PathBox(void)
 {
-	delete fFilePanel;
-	delete fPathControl;
-	delete fBrowseButton;
+	if (NULL != fFilePanel)
+		delete fFilePanel;
 }
 
 
@@ -564,12 +563,12 @@ PathBox::_Init(const char* path)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BMessenger messager(this);
+	BMessenger messenger(this);
 	BEntry entry(path);
 	entry_ref ref;
 	entry.GetRef(&ref);
 
-	fFilePanel = new BFilePanel(B_OPEN_PANEL, &messager, &ref,
+	fFilePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
 		B_DIRECTORY_NODE | B_SYMLINK_NODE, false,
 		new BMessage(M_ENTRY_CHOSEN));
 	fFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");

@@ -21,7 +21,7 @@
 
 #include "ProjectBuilder.h"
 #include "ProjectStatus.h"
-
+#include "ProjectSettingsWindow.h"
 
 class ErrorWindow;
 class ProjectList;
@@ -30,6 +30,7 @@ class ProjectWindow;
 class ProjectStatus;
 class SourceControl;
 class SourceFile;
+class PrefsWindow;
 
 
 typedef struct {
@@ -93,6 +94,7 @@ private:
 			BFilePanel*			fFilePanel;
 			Project*			fProject;
 			SourceControl*		fSourceControl;
+			ProjectSettingsWindow*	fProjectSettingsWindow;
 
 			bool				fShowingLibs;
 			bool				fMenusLocked;
@@ -101,6 +103,8 @@ private:
 			add_file_struct		fImportStruct;
 			ProjectBuilder		fBuilder;
 			int32				fBuildingFile;
+			
+			PrefsWindow*		fPrefsWindow;
 };
 
 

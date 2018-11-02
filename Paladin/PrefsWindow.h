@@ -24,6 +24,7 @@ class PathBox;
 class PrefsWindow : public BWindow {
 public:
 								PrefsWindow(BRect frame);
+	virtual						~PrefsWindow();
 
 	virtual	bool				QuitRequested(void);
 	virtual	void				MessageReceived(BMessage* message);

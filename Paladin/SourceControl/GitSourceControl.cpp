@@ -278,7 +278,10 @@ GitSourceControl::Diff(const char *filename, const char *revision)
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; git ";
 	
-	command << "diff --cached '" << filename << "' ";
+	//command << "diff --cached '" << filename << "' ";
+	command << "diff ";
+	if (filename)
+		command << "'" << filename << "' ";
 	
 	if (revision)
 		command << revision;

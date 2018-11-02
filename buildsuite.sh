@@ -74,6 +74,7 @@ cd Paladin
 rm -f Paladin Paladin.new
 echo "Building Paladin"
 make -j$CPUCOUNT 
+make catkeys
 make bindcatalogs
 cd ../
 

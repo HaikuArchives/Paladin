@@ -1,3 +1,10 @@
+/*
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ */
 #include "CodeLibWindow.h"
 
 #include <Alert.h>
@@ -222,7 +229,7 @@ CodeLibWindow::MessageReceived(BMessage *msg)
 		}
 		case M_SHOW_CREATE_MODULE:
 		{
-			StringInputWindow *inwin = new StringInputWindow("Create module",
+			StringInputWindow *inwin = new StringInputWindow(B_TRANSLATE("Create module"),
 														B_TRANSLATE("Choose the name for the new module:"),
 														BMessage(M_CREATE_MODULE),
 														BMessenger(NULL,this));

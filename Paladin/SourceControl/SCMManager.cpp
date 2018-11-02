@@ -1,3 +1,10 @@
+/*
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ */
 #include "SCMManager.h"
 #include "GitSourceControl.h"
 #include "HgSourceControl.h"
@@ -81,13 +88,13 @@ SCM2LongName(const scm_t &type)
 	switch (type)
 	{
 		case SCM_GIT:
-			return BString("Git");
+			return BString(B_TRANSLATE("Git"));
 		
 		case SCM_HG:
-			return BString("Mercurial");
+			return BString(B_TRANSLATE("Mercurial"));
 			
 		case SCM_SVN:
-			return BString("Subversion");
+			return BString(B_TRANSLATE("Subversion"));
 		
 		case SCM_NONE:
 			return BString(B_TRANSLATE("None"));

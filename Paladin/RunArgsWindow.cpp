@@ -1,3 +1,10 @@
+/*
+ * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ */
 #include "RunArgsWindow.h"
 
 #include <Catalog.h>
@@ -20,7 +27,7 @@
 
 
 RunArgsWindow::RunArgsWindow(Project *proj)
-	:	DWindow(BRect(0,0,400,35),"Run arguments",B_TITLED_WINDOW,
+	:	DWindow(BRect(0,0,400,35),B_TRANSLATE("Run arguments"),B_TITLED_WINDOW,
 				B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
 		fProject(proj)
 {

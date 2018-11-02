@@ -3,6 +3,8 @@
 #include <Path.h>
 #include <stdio.h>
 
+#include "../DebugTools.h"
+
 GitSourceControl::GitSourceControl(void)
 {
 	SetShortName("git");
@@ -81,13 +83,23 @@ GitSourceControl::DetectRepository(const char *path)
 		return false;
 	
 	BString command;
-	command << "cd " << path << " && ";
+	command << "cd " << path << " ; ";
 	command << "git rev-parse --show-toplevel";
 	BString out;
 	RunCommand(command, out);
+	// extract first line only, which is the path
+	int32 pos = out.FindFirst("\n");
+	if (-1 != pos)
+		out = out.TruncateChars(pos);
 	out = out.ReplaceAll("\n", "");
 	
+	STRACE(2,("Git home folder: %s\n",out.String()));
+	
 	entry = BEntry(out.String());
+	entry_ref ref;
+	entry.GetRef(&ref);
+	if (entry.Exists())
+		SetWorkingDirectory(ref);
 	return entry.Exists();
 }
 
@@ -266,7 +278,10 @@ GitSourceControl::Diff(const char *filename, const char *revision)
 	BString command;
 	command << "cd '" << GetWorkingDirectory() << "'; git ";
 	
-	command << "diff --cached '" << filename << "' ";
+	//command << "diff --cached '" << filename << "' ";
+	command << "diff ";
+	if (filename)
+		command << "'" << filename << "' ";
 	
 	if (revision)
 		command << revision;

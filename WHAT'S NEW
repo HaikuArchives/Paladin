@@ -1,3 +1,19 @@
+Changes in Paladin 2.0 
+
+New Features
+
+- Dependencies (Header files) automatically calculated and shown in Project List
+- Abstracted platform specific library paths (x86 vs x64) from Project file, henace a major release as these new project files won't open in older versions of Paladin (older project files can be opened by this version)
+- 13 enhancements in total, many minor in this release around UI/UX
+
+Bug fixes
+
+- This is the main focus of this release - extensive locating of bugs and fixing has occurred
+- 45 bug fixes in total: https://github.com/adamfowleruk/Paladin/milestone/1?closed=1 
+
+
+----
+
 Changes in Paladin 1.3
 
 New Features

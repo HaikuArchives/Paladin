@@ -54,7 +54,18 @@ enum
 PrefsWindow::PrefsWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE("Paladin settings"), B_TITLED_WINDOW,
-		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fProjectFolder(NULL),
+	fShowProjectFolder(NULL),
+	fDontAddHeaders(NULL),
+	fSlowBuilds(NULL),
+	fCCache(NULL),
+	fFastDep(NULL),
+	fAutoSyncModules(NULL),
+	fBackupFolder(NULL),
+	fSCMChooser(NULL),
+	fSVNRepoFolder(NULL),
+	fTabView(NULL)
 {
 	AddShortcut('1', B_COMMAND_KEY, new BMessage(M_SET_TAB_0));
 	AddShortcut('2', B_COMMAND_KEY, new BMessage(M_SET_TAB_1));
@@ -166,10 +177,13 @@ PrefsWindow::PrefsWindow(BRect frame)
 
 	BPopUpMenu* scmMenu = new BPopUpMenu("SCM Chooser");
 	BMessage* setScmMessage = new BMessage(M_SET_SCM);
+	BMessage* setScmMessage2 = new BMessage(M_SET_SCM);
+	BMessage* setScmMessage3 = new BMessage(M_SET_SCM);
+	BMessage* setScmMessage4 = new BMessage(M_SET_SCM);
 	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Mercurial"), setScmMessage));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), setScmMessage));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), setScmMessage));
-	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), setScmMessage));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Git"), setScmMessage2));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("Subversion"), setScmMessage3));
+	scmMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), setScmMessage4));
 
 	fSCMChooser = new BMenuField("scmchooser", B_TRANSLATE("Preferred source control:"),
 		scmMenu);
@@ -235,10 +249,16 @@ PrefsWindow::PrefsWindow(BRect frame)
 }
 
 
+PrefsWindow::~PrefsWindow()
+{
+}
+
+
 bool
 PrefsWindow::QuitRequested(void)
 {
-	return true;
+	Hide();
+	return false;
 }
 
 

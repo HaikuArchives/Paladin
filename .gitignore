@@ -15,3 +15,4 @@ libpaladin.so
 *.log
 *.db
 *.swg
+*.archimate.bak

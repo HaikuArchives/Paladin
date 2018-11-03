@@ -30,7 +30,6 @@
 #include <StringView.h>
 #include <TranslationUtils.h>
 
-#include "ClickableStringView.h"
 #include "EscapeCancelFilter.h"
 #include "Globals.h"
 #include "Icons.h"
@@ -84,28 +83,16 @@ public:
 
 
 static BButton*
-make_button(const char* name, const unsigned char* iconData, size_t size,
-	int32 command)
+make_button(const char* name, const char* label, const unsigned char* iconData,
+	size_t size, int32 command)
 {
 	BBitmap icon(BRect(0, 0, 23, 23), 0, B_RGBA32);
 	BIconUtils::GetVectorIcon(iconData, size, &icon);
-	BButton* button = new BButton(name, "", new BMessage(command));
+	BButton* button = new BButton(name, label, new BMessage(command));
 	button->SetIcon(&icon);
+	button->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	return button;
-}
-
-
-static ClickableStringView*
-make_label(BButton* button, const char* label)
-{
-	if (button == NULL)
-		return NULL;
-	
-	BString labelName = button->Name();
-	labelName << " label";
-
-	return new ClickableStringView(labelName.String(), label);
 }
 
 
@@ -173,62 +160,31 @@ StartWindow::StartWindow(void)
 
 	AddCommonFilter(new EscapeCancelFilter());
 
-	// new button and label
+	fNewButton = make_button("new", B_TRANSLATE("Create a new project"),
+		kNewProjectIcon, sizeof(kNewProjectIcon), M_NEW_PROJECT);
 
-	fNewButton = make_button("new", kNewProjectIcon, sizeof(kNewProjectIcon),
-		M_NEW_PROJECT);
+	fOpenButton = make_button("open", B_TRANSLATE("Open a project"),
+		kOpenProjectIcon, sizeof(kOpenProjectIcon), M_SHOW_OPEN_PROJECT);
 
-	ClickableStringView* newLabel = make_label(fNewButton, 
-		B_TRANSLATE("Create a new project"));
-	newLabel->SetMessage(new BMessage(M_NEW_PROJECT));
-
-	// open button and label
-
-	fOpenButton = make_button("open", kOpenProjectIcon,
-		sizeof(kOpenProjectIcon), M_SHOW_OPEN_PROJECT);
-
-	ClickableStringView* openLabel = make_label(fOpenButton, B_TRANSLATE("Open a project"));
-	openLabel->SetMessage(new BMessage(M_SHOW_OPEN_PROJECT));
-
-	// open recent button and label
-
-	fOpenRecentButton = make_button("openrecent", kOpenSelectedIcon,
+	fOpenRecentButton = make_button("openrecent",
+		B_TRANSLATE("Open the selected project"), kOpenSelectedIcon,
 		sizeof(kOpenSelectedIcon), M_OPEN_SELECTION);
 	SetToolTip(fOpenRecentButton,
 		B_TRANSLATE("Open a project in the list on the right. You "
-		   "can also press Command + a number key."));
+			"can also press Command + a number key."));
 
-	ClickableStringView* openRecentLabel = make_label(fOpenRecentButton,
-		B_TRANSLATE("Open the selected project"));
-	openRecentLabel->SetMessage(new BMessage(M_OPEN_SELECTION));
-
-	// quick import button and label
-
-	fQuickImportButton = make_button("quickimport", kImportFromDiskIcon,
+	fQuickImportButton = make_button("quickimport",
+		B_TRANSLATE("Import an existing project"), kImportFromDiskIcon,
 		sizeof(kImportFromDiskIcon), M_SHOW_IMPORT);
 	SetToolTip(fQuickImportButton,
-		B_TRANSLATE("Quickly make a project by importing all source "
-			"files and resource files.\n"
-			"You can also import a BeIDE project."));
+		B_TRANSLATE("Quickly make a project by importing all source files and "
+			"resource files.\nYou can also import a BeIDE project."));
 
-	ClickableStringView* quickImportLabel = make_label(fQuickImportButton,
-		B_TRANSLATE("Import an existing project"));
-	quickImportLabel->SetMessage(new BMessage(M_SHOW_IMPORT));
-	SetToolTip(quickImportLabel,
-		B_TRANSLATE("Quickly make a project by importing all source files "
-		   "and resource files.\nYou can also import a BeIDE project."));
-
-	// online import button and label
-
-	fOnlineImportButton = make_button("onlineimport", kImportFromOnlineIcon,
+	fOnlineImportButton = make_button("onlineimport",
+		B_TRANSLATE("Import a project from online"), kImportFromOnlineIcon,
 		sizeof(kImportFromOnlineIcon), M_ONLINE_IMPORT);
 	SetToolTip(fQuickImportButton,
 		B_TRANSLATE("Import a project from an online repository"));
-
-	ClickableStringView* onlineImportLabel = make_label(fOnlineImportButton,
-		B_TRANSLATE("Import a project from online"));
-	onlineImportLabel->SetMessage(new BMessage(M_ONLINE_IMPORT));
-	SetToolTip(onlineImportLabel, B_TRANSLATE("Import a project from an online repository"));
 
 	// recent projects list view and scroller
 
@@ -238,33 +194,31 @@ StartWindow::StartWindow(void)
 	fRecentProjectsListView->SetExplicitMinSize(BSize(minWidth, B_SIZE_UNSET));
 	fRecentProjectsListView->SetInvocationMessage(new BMessage(M_OPEN_SELECTION));
 	SetToolTip(fRecentProjectsListView,
-		B_TRANSLATE("Open a recent project. You can also press Command + a number key."));
+		"Open a recent project. You can also press Command + a number key.");
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-			.Add(fNewButton, 0, 0)
-			.Add(newLabel, 1, 0)
-
-			.Add(fOpenButton, 0, 1)
-			.Add(openLabel, 1, 1)
-
-			.Add(fOpenRecentButton, 0, 2)
-			.Add(openRecentLabel, 1, 2)
-
-			.Add(fQuickImportButton, 0, 3)
-			.Add(quickImportLabel, 1, 3)
-
-			.Add(fOnlineImportButton, 0, 4)
-			.Add(onlineImportLabel, 1, 4)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.Add(fNewButton)
+			.Add(fQuickImportButton)
+			.Add(fOnlineImportButton)
+			.Add(fOpenButton)
 			.End()
-		.AddStrut(20)
 		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 			.Add(new BStringView("recentProjectsLabel", B_TRANSLATE("Recent projects:")))
 			.Add(new BScrollView("recentProjectsScroller", fRecentProjectsListView, 0,
 				false, true))
+			.Add(fOpenRecentButton)
 			.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.End();
+	BSize column1Size = GetLayout()->ItemAt(0)->PreferredSize();
+	BSize column2Size = GetLayout()->ItemAt(1)->PreferredSize();
+	// equalize the sizes
+	if(column1Size.Width() > column2Size.Width()) {
+		GetLayout()->ItemAt(1)->SetExplicitMinSize(column1Size);
+	} else {
+		GetLayout()->ItemAt(0)->SetExplicitMinSize(column2Size);
+	}
 
 #ifdef DISABLE_ONLINE_IMPORT
 	fOnlineImportButton->Hide();

@@ -79,7 +79,6 @@ SRCS = AboutWindow.cpp \
 	ThirdParty/AutoTextControl.cpp \
 	ThirdParty/BeIDEProject.cpp \
 	ThirdParty/CRegex.cpp \
-	ThirdParty/ClickableStringView.cpp \
 	ThirdParty/DListView.cpp \
 	ThirdParty/DNode.cpp \
 	ThirdParty/DPath.cpp \

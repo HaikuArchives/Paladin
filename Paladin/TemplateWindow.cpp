@@ -58,15 +58,21 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	RegisterWindow();
-
+	
 	CheckTemplates();
-
+	
 	DPath templatePath(gAppPath.GetFolder());
 	templatePath << B_TRANSLATE("Templates");
 	fTempList.ScanFolder(templatePath.GetFullPath());
+	
+	// Reuse default english folder if no translated folder is found
+	if(fTempList.CountTemplates()==0){
+		templatePath = gAppPath.GetFolder();
+		templatePath<<"Templates";
+		fTempList.ScanFolder(templatePath.GetFullPath());
+	}
 
 	// project type
-
 	BPopUpMenu* projectTypeMenu = new BPopUpMenu(B_TRANSLATE("Project type"));
 	for (int32 i = 0; i < fTempList.CountTemplates(); i++) {
 		ProjectTemplate* ptemp = fTempList.TemplateAt(i);

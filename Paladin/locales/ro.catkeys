@@ -1,0 +1,373 @@
+1	Romanian	application/x-vnd.dw-Paladin	2226395208
+Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
+Build	PrefsWindow		Generare
+Subversion	PrefsWindow		Subversion
+Use single thread	PrefsWindow		Use single thread
+Show project folder on open	PrefsWindow		Arată dosarul proiectului la deschidere
+Mercurial	PrefsWindow		Mercurial
+Git	PrefsWindow		Git
+Source control	PrefsWindow		Controlul sursei
+Use fastdep dependency checker	PrefsWindow		Use fastdep dependency checker
+Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Stabilește locația pentru partea „server” a depozitelor Subversion locale.
+Automatically synchronize modules	PrefsWindow		Sincronizează modulele automat
+Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Sincronizați automat modulele din proiecte cu acelea din biblioteca de cod
+The default path for new projects.	PrefsWindow		Calea implicită pentru proiectele noi.
+General	PrefsWindow		General
+When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		Când este bifat, dosarul unui proiect este arătat în Tracker când este deschis.
+Backups folder:	PrefsWindow		Dosarul copiilor de rezervă:
+Use the fastdep dependency checker instead of gcc	PrefsWindow		Use the fastdep dependency checker instead of gcc
+unavailable	PrefsWindow		nedisponibil
+None	PrefsWindow		Nimic
+Preferred source control:	PrefsWindow		Controlul de sursă preferat:
+Sets the location for project backups	PrefsWindow		Stabilește locația pentru copiile de rezervă a proiectului
+Use ccache to build faster	PrefsWindow		Utilizează ccache pentru a genera mai rapid
+Omit header files from projects	PrefsWindow		Omite fișierele antet din proiecte
+If checked, header files are not automatically added to projects.	PrefsWindow		Dacă este bifat, fișierele antet nu sunt adăugate automat la proiecte.
+Build with just one thread instead of one thread per processor	PrefsWindow		Build with just one thread instead of one thread per processor
+Projects folder:	PrefsWindow		Dosarul de proiecte:
+Paladin settings	PrefsWindow		Configurări Paladin
+Source control repository folder:	PrefsWindow		Dosarul depozitului pentru controlul sursei:
+Rename partner file	AddNewFileWindow		Redenumește fișierul partener
+New name: 	AddNewFileWindow		Nume nou:
+Cancel	AddNewFileWindow		Anulează
+Create both a header and source file	AddNewFileWindow		Creează atât un fișier sursă cât și unul antet
+New file name: 	AddNewFileWindow		Nume de fișier nou:
+Add new file	AddNewFileWindow		Adaugă un fișier nou
+Create	AddNewFileWindow		Creează
+Rename file	AddNewFileWindow		Redenumește fișierul
++	ProjectSettingsWindow		+
+General	ProjectSettingsWindow		General
+Check this if you want to use your program with gprof or bprof for profiling.	ProjectSettingsWindow		Check this if you want to use your program with gprof or bprof for profiling.
+The kind of program you want to build	ProjectSettingsWindow		Tipul de program pe care doriți să-l construiți
+Device driver	ProjectSettingsWindow		Driver de dispozitiv
+None	ProjectSettingsWindow		Nimic
+Extra GCC linker flags you wish included when your project is linked.	ProjectSettingsWindow		Extra GCC linker flags you wish included when your project is linked.
+Target name:	ProjectSettingsWindow		Numele țintei:
+More	ProjectSettingsWindow		Mai mult
+Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWindow		Extra GCC flags you wish included when each file is compiled.
+Add a file to the include path list	ProjectSettingsWindow		Adaugă un fișier la lista căii include
+Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.
+Target type	ProjectSettingsWindow		Tipul țintei
+Optimization	ProjectSettingsWindow		Optimizare
+−	ProjectSettingsWindow		−
+Extra linker options:	ProjectSettingsWindow		Opțiuni linkeditor extra:
+Shared library	ProjectSettingsWindow		Bibliotecă partajată
+Target type:	ProjectSettingsWindow		Tipul țintei:
+Application	ProjectSettingsWindow		Aplicație
+Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler optimization level. Disabled when debugging info is checked.
+Static library	ProjectSettingsWindow		Bibliotecă statică
+Full	ProjectSettingsWindow		Complet
+Project settings	ProjectSettingsWindow		Configurările proiectului
+Build debugging information	ProjectSettingsWindow		Generează informațiile de depanare
+Include paths:	ProjectSettingsWindow		Include căile:
+Remove the selected path	ProjectSettingsWindow		Elimină calea selectată
+Some	ProjectSettingsWindow		Unele
+Optimize:	ProjectSettingsWindow		Optimizează:
+Build profiling information	ProjectSettingsWindow		Generează informațiile de profilare
+The folders you want Paladin to search for header files	ProjectSettingsWindow		Dosarele în care doriți ca Paladin să caute după fișiere antet
+Optimize for size over speed	ProjectSettingsWindow		Optimizează pentru dimensiune peste viteză
+Extra compiler options:	ProjectSettingsWindow		Opțiuni compilator extra:
+This will undo all changes since the last commit. Continue?	ProjectWindow		Această acțiune va anula toate modificările de la ultima comitere. Continuați?
+Update dependencies	ProjectWindow		Update dependencies
+Run	ProjectWindow		Rulează
+File	ProjectWindow		Fișier
+Project status	ProjectWindow		Stare proiect
+Revert selected files	ProjectWindow		Revert selected files
+Revert	ProjectWindow		Revert
+Check project in	ProjectWindow		Înregistrează proiectul
+Empty build cache	ProjectWindow		Golește cache-ul de generare
+Open recent project	ProjectWindow		Deschide un proiect recent
+Emptying build cache	ProjectWindow		Se golește cache-ul de generare
+Build	ProjectWindow		Generează
+Differences	ProjectWindow		Diferențe
+The project cannot be built because some of its files are missing.	ProjectWindow		Proiectul nu poate fi generat întrucât lipsesc unele dintre fișierele acestuia.
+Tools	ProjectWindow		Unelte
+Push	ProjectWindow		Adaugă
+Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?
+Backing up project	ProjectWindow		Se copiază de rezervă proiectul
+Add selected files to repository	ProjectWindow		Adaugă fișierele selectate la depozit
+Revert project	ProjectWindow		Revert project
+Commit	ProjectWindow		Comite
+Building 	ProjectWindow		Se generează
+Don't revert	ProjectWindow		Nu reveni
+Show differences	ProjectWindow		Arată diferențele
+Make project	ProjectWindow		Generează proiectul
+Project	ProjectWindow		Proiect
+Force project to rebuild	ProjectWindow		Forțează proiectul să se regenereze
+Remove Selected files from repository	ProjectWindow		Elimină fișierele selectate din depozit
+Add to repository	ProjectWindow		Adaugă la depozit
+Sort group	ProjectWindow		Sortează grupul
+Show differences from last check-in	ProjectWindow		Arată diferențele de la ultimul check-in
+Debug	ProjectWindow		Depanare
+Show changed files from last check-in	ProjectWindow		Arată fișierele modificate de la ultimul check-in
+New group	ProjectWindow		Grup nou
+Source control	ProjectWindow		Controlul sursei
+Performing post-build tasks	ProjectWindow		Se execută sarcinile post-generare
+Pull	ProjectWindow		Trage
+Updating resources	ProjectWindow		Updating resources
+Remove selected files	ProjectWindow		Elimină fișierele selectate
+Enter the description for the changes in this revision.	ProjectWindow		Introduceți descrierea modificărilor din această revizie.
+Pull changes from remote repository	ProjectWindow		Trage modificările de la depozitul de la distanță
+Remove from repository	ProjectWindow		Elimină din depozit
+Rename group	ProjectWindow		Redenumește grupul
+Push changes to remote repository	ProjectWindow		Adaugă modificările în depozitul de la distanță
+Linking	ProjectWindow		Se linkeditează
+New project…	ProjectWindow		Proiect nou…
+Paladin: Project	ProjectWindow		Paladin: proiect
+Add files…	ProjectWindow		Adaugă fișiere…
+Build successful.	ProjectWindow		Generare cu succes.
+Settings…	ProjectWindow		Configurări…
+Examining source files	ProjectWindow		Se examinează fișierele sursă
+Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Nu s-a putut găsi %filename%. Este posibil să fi fost mutat sau redenumit.
+Set software license…	ProjectWindow		Stabilește licența programului…
+OK	ProjectWindow		OK
+Examining %file%	ProjectWindow		Se examinează %file%
+Cancel	ProjectWindow		Anulează
+Regular expression tester	ProjectWindow		Examinator de expresii regulate
+Show project folder	ProjectWindow		Arată dosarul proiectului
+Build had errors or warnings.	ProjectWindow		Generarea a avut erori sau avertismente.
+Generate makefile	ProjectWindow		Generează makefile
+Opening project...	ProjectWindow		Se deschide proiectul…
+Program settings…	ProjectWindow		Configurări de program…
+Set run arguments…	ProjectWindow		Stabilește argumentele de rulare…
+Find in project files…	ProjectWindow		Caută în fișierele de proiect…
+Paladin: Change description	ProjectWindow		Paladin: modifică descrierea
+Open project…	ProjectWindow		Deschide un proiect…
+Change system libraries…	ProjectWindow		Modifică bibliotecile de sistem…
+Updating dependencies	ProjectWindow		Updating dependencies
+Find and open file…	ProjectWindow		Caută și deschide un fișier…
+Add new file…	ProjectWindow		Adaugă un fișier nou…
+Error window	ProjectWindow		Fereastră de eroare
+Symbol finder	ProjectWindow		Symbol finder
+Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.	ProjectWindow		Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.
+Run logged	ProjectWindow		Rulează jurnalizat
+Project opened.	ProjectWindow		Proiect deschis.
+About Paladin	ProjectWindow		Despre Paladin
+Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?	ProjectWindow		Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?
+ASCII table	ProjectWindow		Tabel ASCII
+Backup project	ProjectWindow		Copiază de rezervă proiectul
+Rebuild	ProjectWindow		Regenerează
+Create new module…	CodeLibWindow		Creează un modul nou…
+Delete current module	CodeLibWindow		Șterge modulul curent
+Add	CodeLibWindow		Adaugă
+Choose the name for the new module:	CodeLibWindow		Alegeți numele pentru noul modul:
+Actions	CodeLibWindow		Acțiuni
+Remove files from module	CodeLibWindow		Elimină fișiere din modul
+Code Modules:	CodeLibWindow		Module de cod:
+Description:	CodeLibWindow		Descriere:
+Projects	CodeLibWindow		Proiecte
+These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		Aceste fișiere (cu excepția bibliotecilor) vor fi șterse permanent. Doriți să le eliminați?
+Delete	CodeLibWindow		Șterge
+Export module to project	CodeLibWindow		Exportă modulul la proiect
+Selected project:	CodeLibWindow		Proiectul selectat:
+Add project files to module…	CodeLibWindow		Adaugă fișiere de proiect la modulul…
+Code library	CodeLibWindow		Bibliotecă de cod
+This cannot be undone. Delete module?	CodeLibWindow		Această acțiune nu poate fi refăcută. Ștergeți modulul?
+Cancel	CodeLibWindow		Anulează
+Files in Module:	CodeLibWindow		Fișiere în modul:
+Add files to Module…	CodeLibWindow		Adaugă fișiere la modulul…
+Remove	CodeLibWindow		Elimină
+Modules	CodeLibWindow		Module
+Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).	CodeLibWindow		Alegeți fișierele de proiect pe care doriți să le importați. Puteți selecta fișiere multiple dând clic pe elemente în timp ce mențineți apăsată tasta Command (de obicei ALT).
+Module files	CodeLibWindow		Fișiere de modul
+Create module	CodeLibWindow		Creează modulul
+Libraries: 	LibWindow		Biblioteci:
+Common libraries:	LibWindow		Biblioteci uzuale:
+System libraries:	LibWindow		Biblioteci de sistem:
+Scanning libraries…	LibWindow		Se scanează bibliotecile…
+Choose the system libraries for your project:	LibWindow		Alegeți bibliotecile de sistem pentru proiect:
+User libraries:	LibWindow		Biblioteci de utilizator:
+Sort group	ProjectList		Sortează grupul
+Force file rebuild	ProjectList		Forțează regenerarea fișierului
+Remove selected files	ProjectList		Elimină fișierele selectate
+Show changes in selected files	ProjectList		Arată modificările în fișierele selectate
+ - Missing	ProjectList		- Lipsește
+Add selected files to repository	ProjectList		Adaugă fișierele selectate la depozit
+New group	ProjectList		Grup nou
+Revert selected files	ProjectList		Refă fișierele selectate
+Remove selected files from repository	ProjectList		Elimină fișierele selectate din depozit
+Open parent folder	ProjectList		Deschide dosarul superior
+Source Control	ProjectList		Controlul sursei
+Rename group…	ProjectList		Redenumește grupul…
+Add license to project	LicenseManager		Adaugă o licență la proiect
+Full version:	LicenseManager		Versiune completă:
+Summary:	LicenseManager		Rezumat:
+Set license	LicenseManager		Stabilește licența
+License:	LicenseManager		Licență:
+A summary of this license is not available.	LicenseManager		Nu este disponibil un rezumat al acestei licențe.
+Errors and warnings: 	ErrorWindow		Erori și avertismente
+Copy list to clipboard	ErrorWindow		Copiază lista la clipboard
+Warnings	ErrorWindow		Avertismente
+Copy to clipboard	ErrorWindow		Copiază la clipboard
+Errors	ErrorWindow		Erori
+Errors and warnings	ErrorWindow		Erori și avertismente
+Updating resources\n	Paladin		Resurse de actualizare\n
+Success\n	Paladin		Succes\n
+Printing debug output\n	Paladin		Printing debug output\n
+Linking\n	Paladin		Linkeditare\n
+Printing debug output with extra detail\n	Paladin		Printing debug output with extra detail\n
+Can't find file %s\n	Paladin		Nu se poate găsi fișierul %s\n
+Building %s\n	Paladin		Se generează %s\n
+This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.
+No	Paladin		Nu
+%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n
+This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.
+Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.
+Paladin: Open project	Paladin		Paladin: deschide un proiect
+Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n
+Yes	Paladin		Da
+NULL pointer in M_BUILDING_FILE\n	Paladin		NULL pointer in M_BUILDING_FILE\n
+Attempting to open %s\n	Paladin		Se încearcă deschiderea %s\n
+Build failure\n%s	Paladin		Eroare de generare\n%s
+Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Nu s-a putut găsi un fișier partener pentru %refname% în %reffolder%/.
+Project type: 	TemplateWindow		Project type: 
+None	TemplateWindow		None
+Choose the source control manager for your project, if any.	TemplateWindow		Choose the source control manager for your project, if any.
+Subversion unavailable	TemplateWindow		Subversion unavailable
+Mercurial unavailable	TemplateWindow		Mercurial unavailable
+The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		The name of your project. It can be the same as the Target name, but it does not have to be.
+Project name:	TemplateWindow		Project name:
+The name of the compiled application or library	TemplateWindow		The name of the compiled application or library
+Source control: 	TemplateWindow		Source control: 
+Location:	TemplateWindow		Location:
+Create project folder	TemplateWindow		Create project folder
+Set the location for your project.	TemplateWindow		Set the location for your project.
+Target name:	TemplateWindow		Target name:
+Git unavailable	TemplateWindow		Git unavailable
+Choose a project type	TemplateWindow		Choose a project type
+Templates	TemplateWindow		Templates
+If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
+Create project…	TemplateWindow		Create project…
+Git	TemplateWindow		Git
+Project type	TemplateWindow		Project type
+Subversion	TemplateWindow		Subversion
+Mercurial	TemplateWindow		Mercurial
+Search only system folders	FindOpenFileWindow		Caută doar dosarele de sistem
+Open: 	FindOpenFileWindow		Deschide:
+Open	FindOpenFileWindow		Deschide
+Find and open file	FindOpenFileWindow		Caută și deschide un fișier
+Cancel	FindOpenFileWindow		Anulează
+Arguments: 	RunArgsWindow		Arguments: 
+Run arguments	RunArgsWindow		Run arguments
+Open project	StartWindow		Open project
+Open the selected project	StartWindow		Open the selected project
+Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.
+Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Open a project in the list on the right. You can also press Command + a number key.
+Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.
+Import a project from an online repository	StartWindow		Import a project from an online repository
+Remove from recent list	StartWindow		Remove from recent list
+Create a new project	StartWindow		Create a new project
+Choose project folder	StartWindow		Choose project folder
+Recent projects:	StartWindow		Recent projects:
+Paladin: Start	StartWindow		Paladin: Start
+Import an existing project	StartWindow		Import an existing project
+Open a project	StartWindow		Open a project
+Import a project from online	StartWindow		Import a project from online
+Open a recent project. You can also press Command + a number key.	StartWindow		Open a recent project. You can also press Command + a number key.
+Paladin: 	StartWindow		Paladin: 
+Paladin project	FileUtils		Proiect Paladin
+File to build a program with Paladin	FileUtils		Fișierul pentru generarea unui program cu Paladin
+Couldn't find %file%.	FileUtils		Nu s-a putut găsi %file%.
+OK	FileUtils		OK
+New group name: 	GroupRenameWindow		Nume de grup nou:
+Rename	GroupRenameWindow		Redenumește
+Cancel	GroupRenameWindow		Anulează
+Rename group	GroupRenameWindow		Redenumește grupul
+Enter text to search here:	VRegWindow		Enter text to search here:
+Matched text:	VRegWindow		Matched text:
+Regular expression tester	VRegWindow		Regular expression tester
+Regex:	VRegWindow		Regex:
+Terminal output	TerminalWindow		Terminal output
+Overwrite	Globals		Suprascrie
+Cancel	Globals		Anulează
+OK	Globals		OK
+%filepath% already exists. Do you want to overwrite it?	Globals		%filepath% există deja. Doriți să o suprascrieți?
+OK	GetTextWindow		OK
+Cancel	GetTextWindow		Anulează
+ASCII table	AsciiWindow		Tabel ASCII
+Shift out	AsciiWindow	ASCII table description	Shift out
+  Dec  Hex  Oct  Code  Description	AsciiWindow		Dec  Hex  Oct  Cod  Descriere
+Device Control 2	AsciiWindow	ASCII table description	Control dispozitiv 2
+Unit separator	AsciiWindow	ASCII table description	Separator de unități
+Device Control 4	AsciiWindow	ASCII table description	Control dispozitiv 4
+Device Control 1	AsciiWindow	ASCII table description	Control dispozitiv 1
+Device Control 3	AsciiWindow	ASCII table description	Control dispozitiv 3
+Data link escape	AsciiWindow	ASCII table description	Eludare legătură de date
+Bell	AsciiWindow	ASCII table description	Bip
+Form feed	AsciiWindow	ASCII table description	Flux de formular
+Substitute	AsciiWindow	ASCII table description	Substitut
+Start of text	AsciiWindow	ASCII table description	Începutul textului
+Record separator	AsciiWindow	ASCII table description	Separator de înregistrări
+NULL	AsciiWindow	ASCII table description	NULL
+End of text	AsciiWindow	ASCII table description	Sfărșitul textului
+End of transmission block	AsciiWindow	ASCII table description	Sfârșitul blocului de transmisie
+Start of heading	AsciiWindow	ASCII table description	Începutul antetului
+New line	AsciiWindow	ASCII table description	Linie nouă
+Vertical tab	AsciiWindow	ASCII table description	Tab vertical
+Escape	AsciiWindow	ASCII table description	Eludare
+Backspace	AsciiWindow	ASCII table description	Backspace
+Synchronous idle	AsciiWindow	ASCII table description	Synchronous idle
+Negative acknowledge	AsciiWindow	ASCII table description	Confirmare negativă
+File separator	AsciiWindow	ASCII table description	Separator de fișier
+End of transmission	AsciiWindow	ASCII table description	Sfârșitul transmisiei
+Group separator	AsciiWindow	ASCII table description	Separator de grup
+Space	AsciiWindow	ASCII table description	Spațiu
+Horizontal tab	AsciiWindow	ASCII table description	Tab orizontal
+End of medium	AsciiWindow	ASCII table description	Sfârșitul mediului
+Shift in	AsciiWindow	ASCII table description	Shift in
+Enquiry	AsciiWindow	ASCII table description	Investigare
+Acknowledge	AsciiWindow	ASCII table description	Confirmare
+Delete	AsciiWindow	ASCII table description	Șterge
+Carriage return	AsciiWindow	ASCII table description	Retur transport
+Cancel	AsciiWindow	ASCII table description	Anulează
+Paladin	System name		Paladin
+Regular expression	FindWindow		Expresie regulată
+Replace all	FindWindow		Înlocuiește toate
+luare based replace all has been removed until it can be migrated from Lua	FindWindow		înlocuire toate bazată pe luare a fost eliminată până când va fi migrată de la Lua
+Match whole word	FindWindow		Potrivește cuvântul întreg
+OK	FindWindow		OK
+Search	FindWindow		Caută
+Ignore case	FindWindow		Ignoră majusculele
+No matches found	FindWindow		Nu s-au găsit potriviri
+Project	FindWindow		Proiect
+Replace	FindWindow		Înlocuiește
+Find	FindWindow		Caută
+Options	FindWindow		Opțiuni
+The following files had problems replacing the search terms:\n	FindWindow		Următoarele fișiere au avut probleme la înlocuirea termenilor căutați:\n
+Find in project	FindWindow		Caută în proiect
+Results:	FindWindow		Rezultate:
+Unknown	SCMManager		Unknown
+None	SCMManager		None
+Subversion	SCMManager		Subversion
+Git	SCMManager		Git
+Mercurial	SCMManager		Mercurial
+Repository owner:	SCMImportWindow		Repository owner:
+Providers	SCMImportWindow		Providers
+Username:	SCMImportWindow		Username:
+Project:	SCMImportWindow		Project:
+Anonymous check-out	SCMImportWindow		Anonymous check-out
+Method:	SCMImportWindow		Method:
+Import	SCMImportWindow		Import
+Import from online	SCMImportWindow		Import from online
+Import from repository	SCMImportWindow		Import from repository
+Provider:	SCMImportWindow		Provider:
+Methods	SCMImportWindow		Methods
+Command:	SCMImportWindow		Command:
+Git	SCMImportWindow		Git
+Mercurial	SCMImportWindow		Mercurial
+Subversion	SCMImportWindow		Subversion
+Replacing it with %path%.	Project		Se înlocuiește cu %path%
+%library% couldn't be found in the same place as it was under %platform%.	Project		%library% couldn't be found in the same place as it was under %platform%.
+Remove	Project		Elimină
+OK	Project		OK
+%path% seems to be missing. Do you want to remove it from the project?	Project		%path% seems to be missing. Do you want to remove it from the project?
+Detected platform from uname: %s\n	Project		A fost detectată platforma de la uname: %s\n
+Keep	Project		Păstrează
+%s seems to be missing\n	Project		%s seems to be missing\n
+Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n	SourceControl		Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n
+Command resulted in an error.\n	SourceControl		Command resulted in an error.\n
+OK	PathBox		OK
+The location entered does not exist.\nPlease check to make sure you have entered it correctly.	PathBox		Locația introdusă nu există.\nVerificați dacă ați introdus-o corect.
+Browse…	PathBox		Navighează…
+Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin nu poate găsi depanatorul.
+Close	SCMOutputWindow		Close

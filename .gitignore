@@ -3,6 +3,7 @@ objects*/
 *.dbg
 *.a
 Paladin/Paladin
+Tests/PaladinTests
 Paladin/.hg
 Paladin/Paladin.new
 Paladin/Paladin.rsrc

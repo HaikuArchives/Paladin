@@ -314,6 +314,7 @@ Project::Save(const char* path)
 		data << "GROUP=" << group->name << "\n";
 		data << "EXPANDGROUP=" << (group->expanded ? "yes" : "no") << "\n";
 		
+		group->filelist.SortItems(compare_source_files);
 		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
 			SourceFile* file = group->filelist.ItemAt(j);
 
@@ -329,6 +330,7 @@ Project::Save(const char* path)
 		}
 	}
 
+	//fLocalIncludeList.SortItems(compare_source_files);
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 		data << "LOCALINCLUDE=" << fLocalIncludeList.ItemAt(i)->Relative() << "\n";
 
@@ -374,7 +376,8 @@ Project::Save(const char* path)
 			STRACE(2,("Unknown find Status: %i\n",findStatus));
 		}
 	}
-		
+	
+	fLibraryList.SortItems(compare_source_files);
 	for (int32 i = 0; i < fLibraryList.CountItems(); i++) {
 		SourceFile* file = (SourceFile*)fLibraryList.ItemAt(i);
 		if (file == NULL)

@@ -17,3 +17,7 @@ libpaladin.so
 *.db
 *.swg
 *.archimate.bak
+*.gcda
+*.gcno
+*.info
+Tests/out

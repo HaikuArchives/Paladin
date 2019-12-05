@@ -337,8 +337,8 @@ Project::Save(const char* path)
 	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++) {
 		BString* string = fSystemIncludeList.ItemAt(i);
 		BString include = *string;
-		if (include[0] == '/')
-			include.RemoveFirst(projectPath.String());
+		//if (include[0] == '/')
+		//	include.RemoveFirst(projectPath.String());
 			
 
 		BString replacePath("/boot/system/develop/headers/x86");

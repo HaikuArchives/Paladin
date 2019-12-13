@@ -1,3 +1,12 @@
+/*
+ * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ *		Others previously, not specified
+ */
+
 #ifndef MSGDEFS_H
 #define MSGDEFS_H
 
@@ -52,7 +61,8 @@ enum
 	M_SHOW_ADD_NEW_PANEL = 'PSnP',
 	M_SHOW_FIND_AND_OPEN_PANEL = 'PShF',
 	M_FIND_AND_OPEN_FILE = 'PFaO',
-	M_SHOW_FIND_IN_PROJECT_FILES = 'PFif'
+	M_SHOW_FIND_IN_PROJECT_FILES = 'PFif',
+	M_QUICK_FIND = 'PQuF'
 };
 
 #endif

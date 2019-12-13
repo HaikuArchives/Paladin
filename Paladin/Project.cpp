@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2009 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 
 
@@ -314,6 +316,7 @@ Project::Save(const char* path)
 		data << "GROUP=" << group->name << "\n";
 		data << "EXPANDGROUP=" << (group->expanded ? "yes" : "no") << "\n";
 		
+		group->filelist.SortItems(compare_source_files);
 		for (int32 j = 0; j < group->filelist.CountItems(); j++) {
 			SourceFile* file = group->filelist.ItemAt(j);
 
@@ -329,14 +332,15 @@ Project::Save(const char* path)
 		}
 	}
 
+	//fLocalIncludeList.SortItems(compare_source_files);
 	for (int32 i = 0; i < fLocalIncludeList.CountItems(); i++)
 		data << "LOCALINCLUDE=" << fLocalIncludeList.ItemAt(i)->Relative() << "\n";
 
 	for (int32 i = 0; i < fSystemIncludeList.CountItems(); i++) {
 		BString* string = fSystemIncludeList.ItemAt(i);
 		BString include = *string;
-		if (include[0] == '/')
-			include.RemoveFirst(projectPath.String());
+		//if (include[0] == '/')
+		//	include.RemoveFirst(projectPath.String());
 			
 
 		BString replacePath("/boot/system/develop/headers/x86");
@@ -374,7 +378,8 @@ Project::Save(const char* path)
 			STRACE(2,("Unknown find Status: %i\n",findStatus));
 		}
 	}
-		
+	
+	fLibraryList.SortItems(compare_source_files);
 	for (int32 i = 0; i < fLibraryList.CountItems(); i++) {
 		SourceFile* file = (SourceFile*)fLibraryList.ItemAt(i);
 		if (file == NULL)
@@ -1203,7 +1208,7 @@ Project::SystemIncludeAt(const int32 &index)
 
 
 void
-Project::AddLibrary(const char *path)
+Project::AddLibrary(const char *path, bool failSilently)
 {
 	if (!path)
 		return;
@@ -1220,6 +1225,8 @@ Project::AddLibrary(const char *path)
 			}
 			else
 			{
+				if (failSilently)
+					return;
 				BString err = B_TRANSLATE(
 					"%path% seems to be missing. Do you want to remove it "
 					"from the project?");
@@ -1462,13 +1469,13 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 		{
 			// Having to manually add this one is terribly annoying. :/
 			if (DetectPlatform() == PLATFORM_HAIKU){
-				newproj->AddLibrary("/boot/system/develop/lib/x86/libbe.so");
-				newproj->AddLibrary("/boot/system/lib/x86/libsupc++.so");
+				newproj->AddLibrary("/boot/system/develop/lib/x86/libbe.so",true);
+				newproj->AddLibrary("/boot/system/lib/x86/libsupc++.so",true);
 			} else if (DetectPlatform() == PLATFORM_HAIKU_GCC4){
-				newproj->AddLibrary("/boot/system/develop/lib/libbe.so");
-				newproj->AddLibrary("/boot/system/lib/libsupc++.so");
+				newproj->AddLibrary("/boot/system/develop/lib/libbe.so",true);
+				newproj->AddLibrary("/boot/system/lib/libsupc++.so",true);
 			}
-			else newproj->AddLibrary("/boot/develop/lib/x86/libbe.so");
+			else newproj->AddLibrary("/boot/develop/lib/x86/libbe.so",true);
 			break;
 		}
 		case PROJECT_DRIVER:
@@ -1503,7 +1510,7 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 	if (create_folder)
 	{
 		projpath.Append(name.String());
-		if (!BEntry(projpath.Path()).Exists());
+		if (!BEntry(projpath.Path()).Exists())
 			create_directory(projpath.Path(),0777);
 	}
 	

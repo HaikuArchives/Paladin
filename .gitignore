@@ -3,6 +3,7 @@ objects*/
 *.dbg
 *.a
 Paladin/Paladin
+Tests/PaladinTests
 Paladin/.hg
 Paladin/Paladin.new
 Paladin/Paladin.rsrc
@@ -16,3 +17,7 @@ libpaladin.so
 *.db
 *.swg
 *.archimate.bak
+*.gcda
+*.gcno
+*.info
+Tests/out

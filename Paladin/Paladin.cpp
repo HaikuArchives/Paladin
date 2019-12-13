@@ -911,7 +911,7 @@ App::GenerateMakefile(const entry_ref &ref)
 	gCurrentProject = proj;
 	DPath out(proj->GetPath().GetFolder());
 	out.Append("Makefile");
-	if (MakeMake(proj, out) == B_OK); {
+	if (MakeMake(proj, out) == B_OK) {
 		BEntry entry(out.GetFullPath());
 		entry_ref new_ref;
 		if (entry.InitCheck() == B_OK) {

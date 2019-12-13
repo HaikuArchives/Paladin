@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Fowler, adamfowleruk@gmail.com
  */
 #ifndef PROJECT_H
 #define PROJECT_H
@@ -134,7 +136,7 @@ public:
 			int32		CountSystemIncludes(void) const;
 			const char *SystemIncludeAt(const int32 &index);
 			
-			void		AddLibrary(const char *path);
+			void		AddLibrary(const char *path, const bool failSilently = false);
 			void		RemoveLibrary(const char *path);
 			bool		HasLibrary(const char *path);
 			int32		CountLibraries(void) const;

@@ -56,6 +56,7 @@ SRCS = AboutWindow.cpp \
 	ProjectSettingsWindow.cpp \
 	ProjectStatus.cpp \
 	ProjectWindow.cpp \
+	QuickFindWindow.cpp \
 	RunArgsWindow.cpp \
 	StartWindow.cpp \
 	TemplateManager.cpp \

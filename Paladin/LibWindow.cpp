@@ -240,6 +240,24 @@ LibraryWindow::ScanThread(void* data)
 		r = out;
 		r.OffsetBy(0, 10);
 	}
+	
+	BView* sysDevLibHeader = window->AddHeader(r.LeftTop(),
+		B_TRANSLATE("System Develop libraries:"));
+	window->Lock();
+	r = sysDevLibHeader->Frame();
+	window->Unlock();
+	maxwidth = MAX(r.right, maxwidth);
+
+	r.OffsetBy(0.0f, r.Height() + 10.0f);
+
+	DPath sysDevLibPath = GetSystemPath(B_SYSTEM_DEVELOP_DIRECTORY);
+	BString devLib = BString(sysDevLibPath.GetFullPath() );
+	devLib << "/lib";
+	out = window->ScanFolder(r.LeftTop(), devLib.String(), &maxwidth);
+	if (out != BRect(0, 0, -1, -1)) {
+		r = out;
+		r.OffsetBy(0, 10);
+	}
 
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) {
 		// ToDo: remove this once we drop R1/A4 support

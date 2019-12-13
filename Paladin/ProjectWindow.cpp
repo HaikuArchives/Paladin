@@ -1,7 +1,7 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
- * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
+ * Copyright 2018-2019 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -67,6 +67,7 @@
 #include "ProjectSettingsWindow.h"
 #include "Project.h"
 #include "ProjectStatus.h"
+#include "QuickFindWindow.h"
 #include "RunArgsWindow.h"
 #include "SCMManager.h"
 #include "SCMOutputWindow.h"
@@ -131,7 +132,8 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	fShowingLibs(false),
 	fMenusLocked(false),
 	fBuilder(BMessenger(this)),
-	fPrefsWindow(NULL)
+	fPrefsWindow(NULL),
+	fQuickFind(NULL)
 {
 	SetSizeLimits(200, 30000, 200, 30000);
 	MoveTo(100,100);
@@ -845,6 +847,15 @@ ProjectWindow::MessageReceived(BMessage* message)
 			window->Show();
 			break;
 		}
+		case M_QUICK_FIND:
+		{
+			if (NULL == fQuickFind)
+			{
+				fQuickFind = new QuickFindWindow(B_TRANSLATE("Quick find"));
+			}
+			fQuickFind->SetProject(fProject);
+			fQuickFind->Show();
+		}
 
 		case M_FILE_NEEDS_BUILD:
 		{
@@ -1541,6 +1552,9 @@ ProjectWindow::CreateMenuBar()
 	BString findAndOpenStr(B_TRANSLATE("Find and open file" B_UTF8_ELLIPSIS));
 	fFileMenu->AddItem(new BMenuItem(findAndOpenStr,
 		new BMessage(M_SHOW_FIND_AND_OPEN_PANEL), 'D', B_COMMAND_KEY));
+	BString quickFindStr(B_TRANSLATE("Quick find and open" B_UTF8_ELLIPSIS));
+	fFileMenu->AddItem(new BMenuItem(quickFindStr,
+		new BMessage(M_QUICK_FIND), 'F', B_COMMAND_KEY));		
 	fFileMenu->AddSeparatorItem();
 	BString programSettingsStr(B_TRANSLATE("Program settings" B_UTF8_ELLIPSIS));
 	fFileMenu->AddItem(new BMenuItem(programSettingsStr,

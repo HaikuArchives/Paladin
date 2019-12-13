@@ -536,6 +536,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 	BPath entryPath;
 	char* s;
 			// TODO qfw -> QuickFindWindow.* style search
+			// TODO case insensitive
 			
 			// Check to see if the file name matches the search string
 			if (B_OK == entry.GetName(entryName))

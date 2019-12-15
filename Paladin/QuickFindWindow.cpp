@@ -7,6 +7,8 @@
  */
 #include "QuickFindWindow.h"
 
+#include <locale>
+#include <string>
 
 #include <Application.h>
 #include <Button.h>
@@ -541,8 +543,44 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 			// Check to see if the file name matches the search string
 			if (B_OK == entry.GetName(entryName))
 			{
+				bool matches = false;
 				s = strstr(entryName,text);
 				if (NULL != s)
+				{
+					matches = true;
+				} else if (strlen(text) < 10) {
+					// Grab filename capitals, lowercase them, and see if it matches
+					std::locale loc;
+					char caps[20];
+					int idx = 0;
+					for (int sIdx = 0;sIdx < strlen(entryName) && idx < 20;sIdx++)
+					{
+						if (std::isupper(entryName[sIdx],loc))
+						{
+							caps[idx++] = entryName[sIdx];
+						}
+					}
+					caps[idx] = '\0';
+					char textCaps[strlen(text)];
+					for (int tci = 0;tci < strlen(text);tci++)
+					{
+						textCaps[tci] = std::toupper(text[tci],loc);
+					}
+					textCaps[strlen(text)] = '\0';
+					STRACE(1,("Caps follows\n"));
+					STRACE(1,(caps));
+					STRACE(1,("Search text caps follows\n"));
+					STRACE(1,(textCaps));
+					if (idx > 0)
+					{
+						s = strstr(caps,textCaps); //std::toupper(text,loc)); B_BAD_CAST!?!
+						if (NULL != s)
+						{
+							matches = true;
+						}
+					}
+				}
+				if (matches)
 				{
 					// matches
 					if (B_OK == entry.GetPath(&entryPath))

@@ -1,0 +1,6 @@
+From "Learning to Program with Haiku" by Jon Yoder (DarkWyrm)
+http://haiku-os.org/development/learning_to_program_with_haiku
+
+Create and show a window that has a list of items.
+The application window changes as you select different items
+in the list.

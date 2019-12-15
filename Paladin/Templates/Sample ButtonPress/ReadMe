@@ -1,0 +1,5 @@
+From "Learning to Program with Haiku" by Jon Yoder (DarkWyrm)
+http://haiku-os.org/development/learning_to_program_with_haiku
+
+Create and show a window that has a button.
+The application counts the number of times the button is pressed.

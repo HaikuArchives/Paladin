@@ -1,0 +1,5 @@
+From "Learning to Program with Haiku" by Jon Yoder (DarkWyrm)
+http://haiku-os.org/development/learning_to_program_with_haiku
+
+This is a command line application.
+It will read and print the contents of a directory.

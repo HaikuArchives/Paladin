@@ -1,0 +1,248 @@
+<h1>Developing a Screensaver for Haiku</h1>
+
+<h2>Basics</h2>
+
+<p>A screensaver in Haiku must be a subclass of BScreenSaver. The BScreenSaver class contains a collection of method hooks. The Haiku ScreenSaverRunner uses these hooks to configure, start, stop, and draw a screensaver. All you have to do to make a screensaver is overwrite the hooks.</p>
+
+<h2>Getting Started</h2>
+
+<p>Here is the definition of an example screensaver, called AwesomeSaver.</p>
+
+<pre>
+#include <ScreenSaver.h>
+#include <StringView.h>
+
+class AwesomeSaver : public BScreenSaver
+{
+public:
+					AwesomeSaver(BMessage* archive, image_id thisImage);
+	void			StartConfig(BView* configView);
+	status_t		StartSaver(BView* view, bool preview);
+	void			Draw(BView* view, int32 frame);
+private:
+	// These variables are specific to AwesomeSaver
+	int32			fX;
+	int32			fY;
+	int32			fChangeX;
+	int32			fChangeY;
+};
+</pre>
+
+<h2>Filling In the Code</h2>
+
+<h3>Constructor</h3>
+
+<p>Initialize your screensaver object in the constructor. If you added any variables to your class, initialize them here.</p>
+
+<pre>
+AwesomeSaver::AwesomeSaver(BMessage* archive, image_id thisImage)
+	:
+	BScreenSaver(archive, thisImage), // Call the constructor for BScreenSaver
+	fX(200), // Initialize variable
+	fY(100),
+	fChangeX(1),
+	fChangeY(1)
+{
+	// Empty
+}
+</pre>
+
+<h3>StartConfig</h3>
+
+<p>This is called when the user selects your screensaver from the list of screensavers in the Screen Saver Preferences application. You're provided with a BView. You can use it to show some information about your screensaver or to provide the user with some options.</p>
+
+<pre>
+void
+AwesomeSaver::StartConfig(BView* configView)
+{
+	// Show the name of the screensaver
+	BRect rect(15, 15, 20, 20);
+	BStringView* stringView = new BStringView(rect, "module", "AwesomeSaver");
+	stringView->SetFont(be_bold_font);
+	stringView->ResizeToPreferred();
+	configView->AddChild(stringView);
+
+	// Show some info about the screensaver
+	rect.OffsetBy(0, stringView->Bounds().Height() + 4);
+	stringView = new BStringView(rect, "info", "by Me!");
+	stringView->ResizeToPreferred();
+	configView->AddChild(stringView);
+}
+</pre>
+
+<h3>StartSaver</h3>
+
+<p>This is called when your screensaver starts. If "preview" is true, it means your screensaver is running in the little preview window in the Screen Saver Preferences application. You can use this value to change how your screensaver behaves in the preview.</p>
+
+<pre>
+status_t
+AwesomeSaver::StartSaver(BView* view, bool preview)
+{
+	if (preview) {
+		fX = 20;
+		fY = 10;
+	}
+	
+	return B_OK;
+}
+</pre>
+
+<h3>Draw</h3>
+
+<p>This is the fun part. You're given a BView the size of the entire screen, and you can do whatever you want with it. "frame" is the current frame number. When the screensaver starts the frame is zero, and increases by one every time the Draw method is called.</p>
+
+<pre>
+const char* kText = "Haiku is AWESOME!";
+
+void
+AwesomeSaver::Draw(BView* view, int32 frame)
+{
+	if (frame == 0) {
+		// Erase the screen
+		view->SetLowColor(0, 0, 0);
+		view->FillRect(view->Bounds(), B_SOLID_LOW);
+	}
+	
+	// Erase the old text
+	view->SetHighColor(0, 0, 0); // Black
+	view->DrawString(kText, BPoint(fX, fY));
+	
+	// Move the text
+	fX += fChangeX;
+	fY += fChangeY;
+	
+	// Bounce off the edge of the screen
+	if (fX <= 0 || fX >= view->Bounds().right)
+		fChangeX = -fChangeX;
+	
+	if (fY <= 0 || fY >= view->Bounds().bottom)
+		fChangeY = -fChangeY;
+	
+	// Draw the text at its new location
+	view->SetHighColor(249, 210, 42); // Haiku yellow
+	view->DrawString(kText, BPoint(fX, fY));
+}
+</pre>
+
+<h3>Instantiate</h3>
+
+<p>Lastly, you need to include a function that starts the screensaver.</p>
+
+<pre>
+extern "C" _EXPORT BScreenSaver*
+instantiate_screen_saver(BMessage* msg, image_id id)
+{
+	return new AwesomeSaver(msg, id);
+}
+</pre>
+
+<h3>Other</h3>
+
+<p>There are some other hooks you can use in your screensaver. To see the full list, see the ScreenSaver.h header file.</p>
+
+<h2>Drawing</h2>
+
+<p>You draw your screensaver onto the screen by manipulating the BView. A BView has many many methods. Here are some BView methods that you might find useful.</p>
+
+<ul>
+<li>Frame() - Use this to get the dimensions of the screen</li>
+<li>SetHighColor(uchar red, uchar green, uchar blue)</li>
+<li>SetLowColor(uchar red, uchar green, uchar blue) - Use these methods to set the color used when drawing shapes or lines in the BView</li>
+<li>SetDrawingMode(drawing_mode mode) - Default is opaque, change it to B_OP_ALPHA for transparency</li>
+<li>DrawRect(BRect rect) - Draw a filled rectangle, you can use this to clear the screen</li>
+<li>DrawBitmap(const BBitmap *image, BPoint point) - Draw an image on the screen</li>
+</ul>
+
+<p>The BScreenSaver class (that your screensaver inherits) includes some useful functions too.</p>
+
+<ul>
+<li>SetTickSize(bigtime_t tickSize) - Change how ofter the Draw method gets called. "tickSize" is in microseconnds. For example, if you want your screensaver to draw two times per second, use the number 500000.</li>
+</ul>
+
+<p>Random numbers are useful in a screensaver. Here is a simple function that returns a random number.<p>
+
+<pre>
+int32
+rand_num(int32 low, int32 high)
+{
+	static bool init = false;
+	
+	if (!init) {
+		srand(system_time() % INT_MAX);	// Init the random number generator
+		init = true;
+	}
+
+	// Return a random number between high and low, inclusive
+	return (rand() % (high - low + 1)) + low;
+}
+</pre>
+
+<h2>Double Buffering</h2>
+
+<p>Double buffering is a technique used to reduce flicker. If your screensaver changes a lot on the screen each frame, it might be good to use double buffering.</p>
+
+<p>Double buffering involves drawing everything to a temporary area (a "buffer"), then drawing that temporary area to the screen.</p>
+
+<pre>
+void
+Draw(BView* view, int32 frame)
+{
+	// Setup double buffering
+	BRect rect(0, 0, view->Frame().Width(), view->Frame().Height());
+	backBitmap = new BBitmap(screenRect, B_RGBA32, true);
+	backView = new BView(screenRect, NULL, 0, 0);
+	backBitmap->AddChild(backView);
+	backBitmap->Lock();
+	
+	//
+	// Now you can draw anything you want to "backView"!
+	//
+	
+	backBitmap->Unlock();
+	view->DrawBitmap(backBitmap); // Draw the buffer to the screen
+}
+</pre>
+
+<h2>Compiling</h2>
+
+<p>Compiling a screensaver is done a little differently than a standard application. A screensaver isn't an application - it doesn't even have a "main" function. Instead, we compile it as a shared library.</p>
+
+<pre>
+gcc -o AwesomeSaver *.cpp -lbe -lscreensaver -nostart -Xlinker -soname=AwesomeSaver
+</pre>
+
+<ul>
+<li>-o AwesomeSaver - The output file name of our screensaver</li>
+<li>*.cpp - The source code, but not header files</li>
+<li>-lbe -lscreensaver - Libraries that we're using</li>
+<li>-nostart - Option to compile it as a shared library, not an application</li>
+<li>-Xlinker - Pass the next argument to the linker...</li>
+<li>-soname=AwesomeSaver - Set the shared library name</li>
+</ul>
+
+<p>When linking, be sure to include any libraries that you used in your code. For example, our example uses code from libbe.so and libscreensaver.so, so you include them with the -lbe and -lscreensaver arguments.</p>
+
+<h2>Running</h2>
+
+<p>Copy your new screensaver file to your personal screensaver area, in "~/config/non-packaged/add-ons/Screen Saver". To make testing a little speedier, simply make a link instead of copying it. That way, after you compile a new version of your screensaver, all you have to do is reload it.</p>
+
+<h2>Debugging</h2>
+
+<p>Don't worry about your screensaver crashing. If it does, the ScreenSaverRunner will notify you and give you the option of using the debugger to find out what went wrong. Use the "bt" (backtrace) debugger command to get a nice idea of where the problem is in your code.</p>
+
+<p>Try to add and test code little by little. One of the nice things about making a screensaver is that it's easy to do things in pieces. You can fill in the method hooks one by one and make sure everything still works as you do.</p>
+
+<h2>Troubleshooting</h2>
+
+<h3>I added a resource to my screensaver. Why can't I load it?</h3>
+
+<p>You can add resources to an application by using the "xres" command. This is a great way to add things like images to an application, but, unfortunately, it doesn't work with screensavers.</p>
+
+<p>Screensavers are not actually applications. Instead, they are run by the ScreenSaverRunner application. When your screensaver tries to load a resource, it actually looks for it in the ScreenSaverRunner file. It will, of course, fail, because your resource is stored in your screensaver file, not the ScreenSaverRunner file.</p>
+
+<p>As an alternative, you can create an image in Icon-O-Matic and export it as HVIF source code. You can copy the source code into your project and load it by using the BVectorIcon functions.</p>
+
+<pre>
+BBitmap* bitmap = new BBitmap(BRect(0, 0, 100, 100), B_RGBA32);
+BIconUtils::GetVectorIcon(icon, sizeof(icon), bitmap);
+</pre>

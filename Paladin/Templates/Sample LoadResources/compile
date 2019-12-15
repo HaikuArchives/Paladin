@@ -1,0 +1,2 @@
+gcc -o Run *.cpp -lbe -ltranslation
+xres -o Run Resources.rsrc

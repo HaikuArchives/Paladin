@@ -1,4 +1,15 @@
+/*
+ * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ *		Others previously, undocumented
+ */
 #include "ProjectBuilder.h"
+
+#include <fstream>
+#include <string>
 
 #include <Alert.h>
 #include <Autolock.h>
@@ -9,6 +20,8 @@
 #include <Roster.h>
 #include <stdlib.h>
 
+#include "CompileCommand.h"
+#include "CompileCommandWriter.h"
 #include "DebugTools.h"
 #include "ErrorParser.h"
 #include "Globals.h"
@@ -34,7 +47,8 @@ ProjectBuilder::ProjectBuilder(void)
 		fIsBuilding(false),
 		fTotalFilesToBuild(0L),
 		fTotalFilesBuilt(0L),
-		fManager(gCPUCount)
+		fManager(gCPUCount),
+		fCommands()
 {
 }
 
@@ -45,7 +59,8 @@ ProjectBuilder::ProjectBuilder(const BMessenger &target)
 		fIsBuilding(false),
 		fTotalFilesToBuild(0L),
 		fTotalFilesBuilt(0L),
-		fManager(gCPUCount)
+		fManager(gCPUCount),
+		fCommands()
 {
 }
 
@@ -149,6 +164,7 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 	
 	fTotalFilesToBuild = proj->CountDirtyFiles();
 	fTotalFilesBuilt = 0;
+	fCommands.clear();
 	for (int32 i = 0; i < threadcount; i++)
 		fManager.SpawnThread(BuildThread,this);
 }
@@ -175,6 +191,14 @@ ProjectBuilder::IsBuilding(void)
 void
 ProjectBuilder::DoPostBuild(void)
 {
+	// Write out compile commands JSON file first
+	std::string jsonFile(fProject->GetBuildInfo()->projectFolder.GetFullPath());
+	jsonFile += std::string("/compile_commands.json");
+	STRACE(1,("Writing out compile commands\n"));
+	STRACE(1,(jsonFile.c_str()));
+	std::ofstream ofs(jsonFile, std::ofstream::out);
+	CompileCommandWriter::ToJSONFile(ofs,fCommands);
+	
 	// It's really silly to try to run a library! ;-)
 	if (fProject->TargetType() != TARGET_APP)
 		return;
@@ -296,7 +320,6 @@ ProjectBuilder::BuildThread(void *data)
 	Project *proj = parent->fProject;
 	
 	thread_id thisThread = find_thread(NULL);
-
 	
 	BMessage msg;
 	BString errstr;
@@ -372,6 +395,13 @@ ProjectBuilder::BuildThread(void *data)
 			parent->fManager.RemoveThread(thisThread);
 			return B_OK;
 		}
+		
+		CompileCommand cc(
+			std::string(file->GetPath().GetFileName()),
+			std::string(file->GetCompileCommand(*proj->GetBuildInfo(),NULL).String()),
+			std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
+		);
+		((ProjectBuilder*)data)->fCommands.push_back(cc);
 		
 		proj->CompileFile(file);
 		

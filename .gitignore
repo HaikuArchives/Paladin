@@ -21,3 +21,16 @@ libpaladin.so
 *.gcno
 *.info
 Tests/out
+Paladin/Templates/Sample\ VerticalSlider/VerticalSlider
+Paladin/Templates/Sample\ AwesomeSaver/AwesomeSaver
+Paladin/Templates/Sample\ ButtonPress/ButtonPress
+Paladin/Templates/Sample\ FallLeaves/FallLeaves 
+Paladin/Templates/Sample\ FileDialog/FileDialog
+Paladin/Templates/Sample\ HaikuFortune/HaikuFortune
+Paladin/Templates/Sample\ ListDirectory/ListDirectory
+Paladin/Templates/Sample\ ListItems/ListItems
+Paladin/Templates/Sample\ LoadResources/LoadResources
+Paladin/Templates/Sample\ MenuBar/MenuBar
+Paladin/compile_commands.json
+
+

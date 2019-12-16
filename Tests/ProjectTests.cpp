@@ -1,4 +1,11 @@
-#include "UnitTest++/UnitTest++.h"
+/*
+ * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adam Fowler, adamfowleruk@gmail.com
+ */
+#include <UnitTest++/UnitTest++.h>
 #include "../Paladin/Project.h"
 
 SUITE(Project)
@@ -17,5 +24,4 @@ SUITE(Project)
 		CHECK_EQUAL(p.CountGroups(),0);
 		CHECK_EQUAL(p.GetRunArgs(),"");
 	}
-
 }

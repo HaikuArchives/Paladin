@@ -377,9 +377,8 @@ SourceTypeC::GetName(void) const
 }
 
 
-void
-SourceFileC::Compile(BuildInfo &info, const char *options)
-					
+BString
+SourceFileC::GetCompileCommand(BuildInfo &info,const char *options)
 {
 	BString abspath = GetPath().GetFullPath();
 	if (abspath[0] != '/')
@@ -408,7 +407,24 @@ SourceFileC::Compile(BuildInfo &info, const char *options)
 		compileString << options;
 	
 	compileString	<< "'" << abspath
-					<< "' -o '" << GetObjectPath(info).GetFullPath() << "' 2>&1";
+					<< "' -o '" << GetObjectPath(info).GetFullPath() << "'";
+	
+	return compileString;
+}
+
+void
+SourceFileC::Compile(BuildInfo &info, const char *options)
+					
+{
+	BString abspath = GetPath().GetFullPath();
+	if (abspath[0] != '/')
+	{
+		abspath.Prepend("/");
+		abspath.Prepend(info.projectFolder.GetFullPath());
+	}
+	
+	BString compileString(GetCompileCommand(info,options));
+	compileString << " 2>&1";
 	
 	BString errmsg;
 	RunPipedCommand(compileString.String(), errmsg, true);

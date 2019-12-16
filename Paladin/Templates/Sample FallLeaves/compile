@@ -1,0 +1,7 @@
+echo "Compiling FallLeaves..."
+gcc -o FallLeaves *.cpp -lbe -lscreensaver -llocale -llocalestub -nostart -Xlinker -soname=FallLeaves
+
+echo "Creating package..."
+mkdir -p "PackageRoot/add-ons/Screen Savers"
+cp -f FallLeaves "PackageRoot/add-ons/Screen Savers/"
+package create -C PackageRoot fallleaves-0.1-1-x86_gcc2.hpkg

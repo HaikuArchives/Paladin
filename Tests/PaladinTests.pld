@@ -4,6 +4,7 @@ PLATFORM=HaikuGCC4
 SCM=git
 GROUP=Source files
 EXPANDGROUP=yes
+SOURCEFILE=CompileCommandsJSONTests.cpp
 SOURCEFILE=Main.cpp
 SOURCEFILE=ProjectTests.cpp
 LOCALINCLUDE=.

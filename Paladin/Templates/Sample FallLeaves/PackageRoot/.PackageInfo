@@ -1,0 +1,20 @@
+name		fallleaves
+version		0.1-1
+architecture	x86_gcc2
+summary		"Screensaver featuring beautiful falling leaves"
+description	"A screensaver featuring falling leaves of various colors.
+The amount of leaves and the speed that they fall can be configured."
+vendor		"David Couzelis"
+packager	"David Couzelis <drcouzelis@gmail.com>"
+copyrights {
+	"Copyright (C) 2014 by David Couzelis <drcouzelis@gmail.com>"
+}
+licenses {
+	"MIT"
+}
+provides {
+	fallleaves = 0.1
+}
+urls {
+	"https://github.com/HaikuArchives/HaikuApiExamples"
+}

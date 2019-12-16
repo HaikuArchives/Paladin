@@ -63,6 +63,8 @@ SRCS = AboutWindow.cpp \
 	TemplateWindow.cpp \
 	TerminalWindow.cpp \
 	BuildSystem/BuildInfo.cpp \
+	BuildSystem/CompileCommand.cpp \
+	BuildSystem/CompileCommandWriter.cpp \
 	BuildSystem/ErrorParser.cpp \
 	BuildSystem/FileFactory.cpp \
 	BuildSystem/ProjectBuilder.cpp \

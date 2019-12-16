@@ -32,5 +32,6 @@ Paladin/Templates/Sample\ ListItems/ListItems
 Paladin/Templates/Sample\ LoadResources/LoadResources
 Paladin/Templates/Sample\ MenuBar/MenuBar
 Paladin/compile_commands.json
+SymbolFinder/compile_commands.json
 
 

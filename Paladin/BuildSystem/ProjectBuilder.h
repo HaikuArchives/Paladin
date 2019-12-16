@@ -1,10 +1,13 @@
 #ifndef PROJECT_BUILDER_H
 #define PROJECT_BUILDER_H
 
+#include <vector>
+
 #include <Locker.h>
 #include <Messenger.h>
 #include <String.h>
 
+#include "CompileCommand.h"
 #include "ErrorParser.h"
 
 enum
@@ -84,6 +87,8 @@ private:
 	int32				fPostBuildAction;
 	
 	ThreadManager		fManager;
+	
+	std::vector<CompileCommand>	fCommands;
 };
 
 #endif

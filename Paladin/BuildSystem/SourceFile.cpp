@@ -188,6 +188,12 @@ SourceFile::Precompile(BuildInfo &info, const char *options)
 }
 
 
+BString
+SourceFile::GetCompileCommand(BuildInfo &info,const char *options)
+{
+	return BString("");
+}
+
 void
 SourceFile::Compile(BuildInfo &info, const char *options)
 {

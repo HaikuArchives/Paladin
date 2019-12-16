@@ -30,6 +30,7 @@ public:
 			bool		UsesBuild(void) const;
 			void		UpdateDependencies(BuildInfo &info);
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
+	virtual BString		GetCompileCommand(BuildInfo &info,const char *options);
 			void		Compile(BuildInfo &info, const char *options);
 	
 			DPath		GetObjectPath(BuildInfo &info);

@@ -33,11 +33,25 @@
 // settings have been found.
 //#define TRACE_PROGRESS
 
-#ifdef TRACE_PROGRESS
-	#define STRACE(x) printf x
+//#ifdef TRACE_PROGRESS
+//	#define STRACE(1,x) printf x
+//#else
+//	#define STRACE(1,x) /* */
+//#endif
+
+extern int gPrintDebugMode;
+
+#ifndef STRACE
+
+#define USE_TRACE_TOOLS
+
+#ifdef USE_TRACE_TOOLS
+	#define STRACE(x,y) if (gPrintDebugMode >= x) printf y
 #else
-	#define STRACE(x) /* */
+	#define STRACE(x,y) /* */
 #endif
+
+#endif // ifndef STRACE
 
 // Define this only if you want very verbose tracing information for
 // debugging the reader class
@@ -493,7 +507,7 @@ BeIDEProject::ParseData()
 	pos += sizeof(int32) * 3;
 	DTRACE(("Position: %lld\n", pos));
 	fSystemIncludesAsLocal = (ReadInt32(pos) != 0);
-	STRACE(("System includes %s treated as local includes\n",
+	STRACE(1,("System includes %s treated as local includes\n",
 			fSystemIncludesAsLocal ? "are" : "are not"));
 	
 	DTRACE(("Position: %lld\n", pos));
@@ -509,7 +523,7 @@ BeIDEProject::ParseData()
 		pos += (sizeof(int32) * 3) + 1;
 		DTRACE(("Position: %lld\n", pos));
 		BString path = ReadString(pos);
-		STRACE(("System path: %s\n",path.String()));
+		STRACE(1,("System path: %s\n",path.String()));
 		fSysIncludes.push_back(path.String());
 		
 		// Skip over the rest of the path's fixed string storage
@@ -522,7 +536,7 @@ BeIDEProject::ParseData()
 		pos += (sizeof(int32) * 3) + 1;
 		DTRACE(("Position: %lld\n", pos));
 		BString path = ReadString(pos);
-		STRACE(("Local path: %s\n",path.String()));
+		STRACE(1,("Local path: %s\n",path.String()));
 		fLocalIncludes.push_back(path.String());
 		
 		// Skip over the rest of the path's fixed string storage
@@ -538,8 +552,8 @@ BeIDEProject::ParseData()
 		fInit = B_ERROR;
 		return;
 	}
-	STRACE(("\nReading Preferences\n"));
-	STRACE(("--------------------------------------\n"));
+	STRACE(1,("\nReading Preferences\n"));
+	STRACE(1,("--------------------------------------\n"));
 	DTRACE(("--------------------------------------\n"));
 	DTRACE(("General Preferences Tag Position: %lld\n", pos));
 	DTRACE(("--------------------------------------\n"));
@@ -589,29 +603,29 @@ BeIDEProject::ParseData()
 					if (value & 0x01000000)
 					{
 						fFileTypeMode = FILE_TYPES_C_MODE;
-						STRACE(("Treat all files as C\n"));
+						STRACE(1,("Treat all files as C\n"));
 					}
 					else if (value & 0x00010000)
 					{
 						fFileTypeMode = FILE_TYPES_CPP_MODE;
-						STRACE(("Treat all files as C++\n"));
+						STRACE(1,("Treat all files as C++\n"));
 					}
 					else
 					{
 						fFileTypeMode = FILE_TYPES_AUTODETECT;
-						STRACE(("Autodetect file types based on extension\n"));
+						STRACE(1,("Autodetect file types based on extension\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fLangOpts |= LANGOPTS_ANSI_C_MODE;
-						STRACE(("Compile in ANSI C mode\n"));
+						STRACE(1,("Compile in ANSI C mode\n"));
 					}
 					
 					if (value & 1)
 					{
 						fLangOpts |= LANGOPTS_SUPPORT_TRIGRAPHS;
-						STRACE(("Compile with trigraph support\n"));
+						STRACE(1,("Compile with trigraph support\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -621,13 +635,13 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fLangOpts |= LANGOPTS_SIGNED_CHAR;
-						STRACE(("Type 'char' is signed by default\n"));
+						STRACE(1,("Type 'char' is signed by default\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fLangOpts |= LANGOPTS_UNSIGNED_BITFIELDS;
-						STRACE(("Bitfields are unsigned by default\n"));
+						STRACE(1,("Bitfields are unsigned by default\n"));
 					}
 					
 				}
@@ -644,25 +658,25 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fLangOpts |= WARN_ALL_COMMON_ERRORS;
-						STRACE(("Warn about all common errors\n"));
+						STRACE(1,("Warn about all common errors\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fLangOpts |= WARN_MISSING_PARENTHESES;
-						STRACE(("Warn about missing parentheses\n"));
+						STRACE(1,("Warn about missing parentheses\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fLangOpts |= WARN_INCONSISTENT_RETURN;
-						STRACE(("Warn about inconsistent return types\n"));
+						STRACE(1,("Warn about inconsistent return types\n"));
 					}
 					
 					if (value & 1)
 					{
 						fLangOpts |= WARN_MISSING_ENUM_CASES;
-						STRACE(("Warn about enumerated switches missing specific cases\n"));
+						STRACE(1,("Warn about enumerated switches missing specific cases\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -674,25 +688,25 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fLangOpts |= WARN_UNUSED_VARS;
-						STRACE(("Warn when variables aren't used\n"));
+						STRACE(1,("Warn when variables aren't used\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fLangOpts |= WARN_UNINIT_AUTO_VARS;
-						STRACE(("Warn about uninitialized automatic variables\n"));
+						STRACE(1,("Warn about uninitialized automatic variables\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fLangOpts |= WARN_INIT_REORDERING;
-						STRACE(("Warn when the compiler reorders class member initialization\n"));
+						STRACE(1,("Warn when the compiler reorders class member initialization\n"));
 					}
 					
 					if (value & 1)
 					{
 						fLangOpts |= WARN_NONVIRTUAL_DESTRUCTORS;
-						STRACE(("Warn about non-virtual destructors\n"));
+						STRACE(1,("Warn about non-virtual destructors\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -704,25 +718,25 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fLangOpts |= WARN_UNRECOGNIZED_PRAGMAS;
-						STRACE(("Warn about unrecognized pragmas\n"));
+						STRACE(1,("Warn about unrecognized pragmas\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fLangOpts |= WARN_SIGNED_UNSIGNED_COMP;
-						STRACE(("Warn about signed/unsigned comparisons\n"));
+						STRACE(1,("Warn about signed/unsigned comparisons\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fLangOpts |= WARN_CHAR_SUBSCRIPTS;
-						STRACE(("Warn about subscripts with type 'char'\n"));
+						STRACE(1,("Warn about subscripts with type 'char'\n"));
 					}
 					
 					if (value & 1)
 					{
 						fLangOpts |= WARN_PRINTF_FORMATTING;
-						STRACE(("Warn about printf() formatting anomalies\n"));
+						STRACE(1,("Warn about printf() formatting anomalies\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -731,7 +745,7 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fLangOpts |= WARN_TRIGRAPHS_USED;
-						STRACE(("Warn when trigraphs are used\n"));
+						STRACE(1,("Warn when trigraphs are used\n"));
 					}
 					
 				}
@@ -748,29 +762,29 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fWarnMode = WARNMODE_DISABLED;
-						STRACE(("Warnings are disabled\n"));
+						STRACE(1,("Warnings are disabled\n"));
 					}
 					else if (value & 0x10000)
 					{
 						fWarnMode = WARNMODE_AS_ERRORS;
-						STRACE(("Warnings are treated as errors\n"));
+						STRACE(1,("Warnings are treated as errors\n"));
 					}
 					else
 					{
 						fWarnMode = WARNMODE_ENABLED;
-						STRACE(("Warnings are enabled\n"));
+						STRACE(1,("Warnings are enabled\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fWarnings |= WARN_STRICT_ANSI;
-						STRACE(("Issue all warnings demanded by strict ANSI C/C++\n"));
+						STRACE(1,("Issue all warnings demanded by strict ANSI C/C++\n"));
 					}
 					
 					if (value & 1)
 					{
 						fWarnings |= WARN_LOCAL_SHADOW;
-						STRACE(("Warn when one local variable shadows another\n"));
+						STRACE(1,("Warn when one local variable shadows another\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -782,25 +796,25 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fWarnings |= WARN_INCOMPATIBLE_CAST;
-						STRACE(("Warn about casting functions to incompatible types\n"));
+						STRACE(1,("Warn about casting functions to incompatible types\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fWarnings |= WARN_CAST_QUALIFIERS;
-						STRACE(("Warn about casts which discard qualifiers\n"));
+						STRACE(1,("Warn about casts which discard qualifiers\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fWarnings |= WARN_CONFUSING_CAST;
-						STRACE(("Warn about possibly confusing type conversions\n"));
+						STRACE(1,("Warn about possibly confusing type conversions\n"));
 					}
 					
 					if (value & 1)
 					{
 						fWarnings |= WARN_CANT_INLINE;
-						STRACE(("Warn when an inlined function cannot be inlined\n"));
+						STRACE(1,("Warn when an inlined function cannot be inlined\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -812,25 +826,25 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fWarnings |= WARN_EXTERN_TO_INLINE;
-						STRACE(("Warn when a function is declared extern, then inline\n"));
+						STRACE(1,("Warn when a function is declared extern, then inline\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fLangOpts |= LANGOPTS_CONST_CHAR_LITERALS;
-						STRACE(("Mark literal strings as 'const char *'\n"));
+						STRACE(1,("Mark literal strings as 'const char *'\n"));
 					}
 					
 					if (value & 0x100)
 					{
 						fWarnings |= WARN_OVERLOADED_VIRTUALS;
-						STRACE(("Warn about overload virtual function names\n"));
+						STRACE(1,("Warn about overload virtual function names\n"));
 					}
 					
 					if (value & 1)
 					{
 						fWarnings |= WARN_C_CASTS;
-						STRACE(("Warn if a C-style cast is used in a program\n"));
+						STRACE(1,("Warn if a C-style cast is used in a program\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -839,7 +853,7 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fWarnings |= WARN_EFFECTIVE_CPP;
-						STRACE(("Enable warnings about violations of "
+						STRACE(1,("Enable warnings about violations of "
 								"\"Effective C++\" style rules\n"));
 					}
 				}
@@ -856,24 +870,24 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fOpMode = OPTIMIZE_NONE;
-						STRACE(("Optimization: None\n"));
+						STRACE(1,("Optimization: None\n"));
 					}
 					else
 					if (value & 0x10000)
 					{
 						fOpMode = OPTIMIZE_SOME;
-						STRACE(("Optimization: Some\n"));
+						STRACE(1,("Optimization: Some\n"));
 					}
 					else
 					if (value & 0x100)
 					{
 						fOpMode = OPTIMIZE_MORE;
-						STRACE(("Optimization: More\n"));
+						STRACE(1,("Optimization: More\n"));
 					}
 					else
 					{
 						fOpMode = OPTIMIZE_FULL;
-						STRACE(("Optimization: Full\n"));
+						STRACE(1,("Optimization: Full\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -885,24 +899,24 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fCodeGenFlags |= CODEGEN_OPTIMIZE_SIZE;
-						STRACE(("Optimize for size over speed\n"));
+						STRACE(1,("Optimize for size over speed\n"));
 					}
 					else
 					if (value & 0x10000)
 					{
 						fCodeGenFlags |= CODEGEN_NO_PIC;
-						STRACE(("Do not generate position-independent code\n"));
+						STRACE(1,("Do not generate position-independent code\n"));
 					}
 					else
 					if (value & 0x100)
 					{
 						fCodeGenFlags |= CODEGEN_EXPLICIT_TEMPLATES;
-						STRACE(("Only emit code for explicit template instantiations\n"));
+						STRACE(1,("Only emit code for explicit template instantiations\n"));
 					}
 					else
 					{
 						fCodeGenFlags |= CODEGEN_IGNORE_INLINING;
-						STRACE(("Generate code for functions even if fully inlined\n"));
+						STRACE(1,("Generate code for functions even if fully inlined\n"));
 					}
 					
 					value = ReadInt32(pos);
@@ -912,13 +926,13 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fCodeGenFlags |= CODEGEN_DEBUGGING;
-						STRACE(("Compile with debugging information\n"));
+						STRACE(1,("Compile with debugging information\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fCodeGenFlags |= CODEGEN_PROFILING;
-						STRACE(("Compile with profiling information\n"));
+						STRACE(1,("Compile with profiling information\n"));
 					}
 				}
 				else if (subTagName == "AdditionalGCCCompilerOptions")
@@ -926,7 +940,7 @@ BeIDEProject::ParseData()
 					pos += sizeof(int32);
 					fCompilerOptions = ReadString(pos);
 					pos += 1023 - fCompilerOptions.CountChars();
-					STRACE(("Extra compiler options: %s\n",
+					STRACE(1,("Extra compiler options: %s\n",
 							fCompilerOptions.CountChars() > 0 ? fCompilerOptions.String() :
 																"None"));
 				}
@@ -948,13 +962,13 @@ BeIDEProject::ParseData()
 					if (value & 0x1000000)
 					{
 						fStripFlags |= STRIP_ALL_SYMBOLS;
-						STRACE(("Strip all symbols\n"));
+						STRACE(1,("Strip all symbols\n"));
 					}
 					
 					if (value & 0x10000)
 					{
 						fStripFlags |= STRIP_ALL_LOCAL_SYMBOLS;
-						STRACE(("Strip all local symbols\n"));
+						STRACE(1,("Strip all local symbols\n"));
 					}
 				}
 				else
@@ -963,7 +977,7 @@ BeIDEProject::ParseData()
 					pos += sizeof(int32);
 					fLinkerOptions = ReadString(pos);
 					pos += 1023 - fLinkerOptions.CountChars();
-					STRACE(("Extra linker options: %s\n",
+					STRACE(1,("Extra linker options: %s\n",
 							fLinkerOptions.CountChars() > 0 ? fLinkerOptions.String() :
 																"None"));
 				}
@@ -985,12 +999,12 @@ BeIDEProject::ParseData()
 				pos += (sizeof(int32) * 2);
 				
 				fTargetType = fBuffer[pos];
-				STRACE(("Target type is %d\n", fTargetType));
+				STRACE(1,("Target type is %d\n", fTargetType));
 				pos += 65;
 				
 				fTargetName = ReadString(pos);
 				pos += 66 - fTargetName.CountChars();
-				STRACE(("Target name: %s\n", fTargetName.String()));
+				STRACE(1,("Target name: %s\n", fTargetName.String()));
 				break;
 			}
 			default:
@@ -1014,8 +1028,8 @@ BeIDEProject::ParseData()
 	// Read in the project files
 	// -----------------------------------------------------------------------
 	
-	STRACE(("\nReading files and groups\n"));
-	STRACE(("--------------------------------------\n"));
+	STRACE(1,("\nReading files and groups\n"));
+	STRACE(1,("--------------------------------------\n"));
 		
 	pos = FindTagID('Sect');
 	if (pos < 0)
@@ -1037,7 +1051,7 @@ BeIDEProject::ParseData()
 		pos += (sizeof(int32) * 2) + 1;
 		DTRACE(("Position: %lld\n", pos));
 		BString groupName = ReadString(pos);
-		STRACE(("\nGroup: %s\n", groupName.String()));
+		STRACE(1,("\nGroup: %s\n", groupName.String()));
 		
 		// Skip over the rest of the path's fixed string storage
 		pos += 18 - groupName.CountChars();
@@ -1112,7 +1126,7 @@ BeIDEProject::ParseData()
 					file.mimeType = mimeType;
 					file.group = groupName;
 					fProjectFiles.push_back(file);
-					STRACE(("Added file %s\n", fileName.String()));
+					STRACE(1,("Added file %s\n", fileName.String()));
 					break;
 				}
 				default:

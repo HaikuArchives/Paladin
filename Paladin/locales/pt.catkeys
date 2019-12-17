@@ -1,4 +1,4 @@
-1	Portuguese	application/x-vnd.dw-Paladin	2226395208
+1	Portuguese	application/x-vnd.dw-Paladin	1273216190
 Compiler caching is another way to speed up builds	PrefsWindow		A cache do compilador é outra forma de acelerar a construção (build).
 Build	PrefsWindow		Construir (Build)
 Subversion	PrefsWindow		Subversion
@@ -147,6 +147,8 @@ Debugging information needs to compiled into your project. This may take some ti
 ASCII table	ProjectWindow		Tabela ASCII
 Backup project	ProjectWindow		Efetuar cópia de segurança do projeto
 Rebuild	ProjectWindow		Reconstruir (rebuild)
+Quick find	ProjectWindow		Quick find
+Quick find and open…	ProjectWindow		Quick find and open…
 Create new module…	CodeLibWindow		Criar novo módulo…
 Delete current module	CodeLibWindow		Eliminar o módulo atual
 Add	CodeLibWindow		Adicionar
@@ -177,6 +179,7 @@ System libraries:	LibWindow		Bibliotecas do sistema:
 Scanning libraries…	LibWindow		A analisar bibliotecas…
 Choose the system libraries for your project:	LibWindow		Selecione as bibliotecas de sistema a utilizar no seu projeto:
 User libraries:	LibWindow		Bibliotecas do utilizador:
+System Develop libraries:	LibWindow		System Develop libraries:
 Sort group	ProjectList		Ordenar grupo
 Force file rebuild	ProjectList		Forçar reconstrução (rebuild) do ficheiro
 Remove selected files	ProjectList		Remover ficheiros selecionados
@@ -263,7 +266,6 @@ Paladin: Start	StartWindow		Paladin: Início
 Import an existing project	StartWindow		Importar um projeto existente
 Open a project	StartWindow		Abrir um projeto
 Import a project from online	StartWindow		Importar projeto online
-Open a recent project. You can also press Command + a number key.	StartWindow		Abrir um projeto recente. Também pode pressionar Comando + uma tecla numérica.
 Paladin: 	StartWindow		Paladin:
 Paladin project	FileUtils		Projeto do Paladin
 File to build a program with Paladin	FileUtils		Ficheiro para compilar (build) um programa com o Paladin
@@ -371,3 +373,10 @@ The location entered does not exist.\nPlease check to make sure you have entered
 Browse…	PathBox		Navegar…
 Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Parece que o Paladin não consegue encontrar o depurador, desculpe.
 Close	SCMOutputWindow		Fechar
+Find files: 	QuickFindWindow		Find files: 
+DoSearch started\n	QuickFindWindow		DoSearch started\n
+Quick find	QuickFindWindow		Quick find
+Type to search	QuickFindWindow		Type to search
+Found: %s\n	QuickFindWindow		Found: %s\n
+Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
+Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n

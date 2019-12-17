@@ -1,0 +1,382 @@
+1	Swedish	application/x-vnd.dw-Paladin	1273216190
+Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
+Build	PrefsWindow		Bygg
+Subversion	PrefsWindow		Subversion
+Use single thread	PrefsWindow		Use single thread
+Show project folder on open	PrefsWindow		Show project folder on open
+Mercurial	PrefsWindow		Mercurial
+Git	PrefsWindow		Git
+Source control	PrefsWindow		Source control
+Use fastdep dependency checker	PrefsWindow		Use fastdep dependency checker
+Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Sets the location for the 'server' side of local Subversion repositories.
+Automatically synchronize modules	PrefsWindow		Automatically synchronize modules
+Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Automatically synchronize modules in your projects with the those in the code library
+The default path for new projects.	PrefsWindow		The default path for new projects.
+General	PrefsWindow		General
+When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		When checked, a project's folder is shown in Tracker when it is opened.
+Backups folder:	PrefsWindow		Mapp för säkerhetskopior:
+Use the fastdep dependency checker instead of gcc	PrefsWindow		Use the fastdep dependency checker instead of gcc
+unavailable	PrefsWindow		inte tillgänglig
+None	PrefsWindow		Ingen
+Preferred source control:	PrefsWindow		Preferred source control:
+Sets the location for project backups	PrefsWindow		Sets the location for project backups
+Use ccache to build faster	PrefsWindow		Use ccache to build faster
+Omit header files from projects	PrefsWindow		Omit header files from projects
+If checked, header files are not automatically added to projects.	PrefsWindow		If checked, header files are not automatically added to projects.
+Build with just one thread instead of one thread per processor	PrefsWindow		Build with just one thread instead of one thread per processor
+Projects folder:	PrefsWindow		Projektmapp:
+Paladin settings	PrefsWindow		Paladin-inställningar
+Source control repository folder:	PrefsWindow		Source control repository folder:
+Rename partner file	AddNewFileWindow		Rename partner file
+New name: 	AddNewFileWindow		Nytt namn:
+Cancel	AddNewFileWindow		Avbryt
+Create both a header and source file	AddNewFileWindow		Skapa både inkluderings- och källkodsfil
+New file name: 	AddNewFileWindow		Nytt filnamn:
+Add new file	AddNewFileWindow		Lägg till ny fil
+Create	AddNewFileWindow		Skapa
+Rename file	AddNewFileWindow		Ändra filnamn
++	ProjectSettingsWindow		+
+General	ProjectSettingsWindow		Allmän
+Check this if you want to use your program with gprof or bprof for profiling.	ProjectSettingsWindow		Check this if you want to use your program with gprof or bprof for profiling.
+The kind of program you want to build	ProjectSettingsWindow		The kind of program you want to build
+Device driver	ProjectSettingsWindow		Enhetsdrivrutin
+None	ProjectSettingsWindow		Ingen
+Extra GCC linker flags you wish included when your project is linked.	ProjectSettingsWindow		Extra GCC linker flags you wish included when your project is linked.
+Target name:	ProjectSettingsWindow		Målnamn:
+More	ProjectSettingsWindow		Mer
+Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWindow		Extra GCC flags you wish included when each file is compiled.
+Add a file to the include path list	ProjectSettingsWindow		Add a file to the include path list
+Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.
+Target type	ProjectSettingsWindow		Måltyp
+Optimization	ProjectSettingsWindow		Optimering
+−	ProjectSettingsWindow		−
+Extra linker options:	ProjectSettingsWindow		Extra linker options:
+Shared library	ProjectSettingsWindow		Delat bibliotek
+Target type:	ProjectSettingsWindow		Måltyp:
+Application	ProjectSettingsWindow		Applikation
+Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler optimization level. Disabled when debugging info is checked.
+Static library	ProjectSettingsWindow		Statiskt bibliotek
+Full	ProjectSettingsWindow		Full
+Project settings	ProjectSettingsWindow		Projektinställningar
+Build debugging information	ProjectSettingsWindow		Build debugging information
+Include paths:	ProjectSettingsWindow		Include paths:
+Remove the selected path	ProjectSettingsWindow		Ta bort den valda sökvägen
+Some	ProjectSettingsWindow		Några
+Optimize:	ProjectSettingsWindow		Optimera:
+Build profiling information	ProjectSettingsWindow		Build profiling information
+The folders you want Paladin to search for header files	ProjectSettingsWindow		The folders you want Paladin to search for header files
+Optimize for size over speed	ProjectSettingsWindow		Optimera för storlek över hastighet
+Extra compiler options:	ProjectSettingsWindow		Extra compiler options:
+This will undo all changes since the last commit. Continue?	ProjectWindow		This will undo all changes since the last commit. Continue?
+Update dependencies	ProjectWindow		Uppdatera beroenden
+Run	ProjectWindow		Kör
+File	ProjectWindow		Arkiv
+Project status	ProjectWindow		Projektstatus
+Revert selected files	ProjectWindow		Revert selected files
+Revert	ProjectWindow		Revert
+Check project in	ProjectWindow		Check project in
+Empty build cache	ProjectWindow		Empty build cache
+Open recent project	ProjectWindow		Öppna tidigare projekt
+Emptying build cache	ProjectWindow		Emptying build cache
+Build	ProjectWindow		Bygg
+Differences	ProjectWindow		Skillnader
+The project cannot be built because some of its files are missing.	ProjectWindow		The project cannot be built because some of its files are missing.
+Tools	ProjectWindow		Verktyg
+Push	ProjectWindow		Push
+Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?
+Backing up project	ProjectWindow		Säkerhetskopierar projekt
+Add selected files to repository	ProjectWindow		Add selected files to repository
+Revert project	ProjectWindow		Revert project
+Commit	ProjectWindow		Commit
+Building 	ProjectWindow		Building 
+Don't revert	ProjectWindow		Don't revert
+Show differences	ProjectWindow		Visa skillnader
+Make project	ProjectWindow		Skapa projekt
+Project	ProjectWindow		Projekt
+Force project to rebuild	ProjectWindow		Force project to rebuild
+Remove Selected files from repository	ProjectWindow		Remove Selected files from repository
+Add to repository	ProjectWindow		Add to repository
+Sort group	ProjectWindow		Sortera grupp
+Show differences from last check-in	ProjectWindow		Show differences from last check-in
+Debug	ProjectWindow		Avlusa
+Show changed files from last check-in	ProjectWindow		Show changed files from last check-in
+New group	ProjectWindow		Ny grupp
+Source control	ProjectWindow		Versionshantering
+Performing post-build tasks	ProjectWindow		Performing post-build tasks
+Pull	ProjectWindow		Pull
+Updating resources	ProjectWindow		Uppdaterar resurser
+Remove selected files	ProjectWindow		Ta bort valda filer
+Enter the description for the changes in this revision.	ProjectWindow		Ange en beskrivning för ändringarna i denna revidering.
+Pull changes from remote repository	ProjectWindow		Pull changes from remote repository
+Remove from repository	ProjectWindow		Remove from repository
+Rename group	ProjectWindow		Döp om grupp
+Push changes to remote repository	ProjectWindow		Push changes to remote repository
+Linking	ProjectWindow		Länkar
+New project…	ProjectWindow		Nytt projekt...
+Paladin: Project	ProjectWindow		Paladin: Projekt
+Add files…	ProjectWindow		Lägg till filer...
+Build successful.	ProjectWindow		Build successful.
+Settings…	ProjectWindow		Inställningar...
+Examining source files	ProjectWindow		Examining source files
+Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Couldn't find %filename%. It may have been moved or renamed.
+Set software license…	ProjectWindow		Ange mjukvarulicens...
+OK	ProjectWindow		OK
+Examining %file%	ProjectWindow		Examining %file%
+Cancel	ProjectWindow		Avbryt
+Regular expression tester	ProjectWindow		Regular expression tester
+Show project folder	ProjectWindow		Visa projektmapp
+Build had errors or warnings.	ProjectWindow		Build had errors or warnings.
+Generate makefile	ProjectWindow		Generate makefile
+Opening project...	ProjectWindow		Öppnar projekt...
+Program settings…	ProjectWindow		Programinställningar...
+Set run arguments…	ProjectWindow		Ange körningsargument...
+Find in project files…	ProjectWindow		Hitta bland projektfiler...
+Paladin: Change description	ProjectWindow		Paladin: Ändra beskrivning
+Open project…	ProjectWindow		Öppna projekt...
+Change system libraries…	ProjectWindow		Byt systembibliotek...
+Updating dependencies	ProjectWindow		Uppdaterar beroenden
+Find and open file…	ProjectWindow		Hitta och öppna fil...
+Add new file…	ProjectWindow		Lägg till ny fil...
+Error window	ProjectWindow		Error window
+Symbol finder	ProjectWindow		Symbol finder
+Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.	ProjectWindow		Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.
+Run logged	ProjectWindow		Run logged
+Project opened.	ProjectWindow		Projektet öppnad.
+About Paladin	ProjectWindow		Om Paladin
+Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?	ProjectWindow		Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?
+ASCII table	ProjectWindow		ASCII-tabell
+Backup project	ProjectWindow		Säkerhetskopiera projekt
+Rebuild	ProjectWindow		Bygg om
+Quick find	ProjectWindow		Quick find
+Quick find and open…	ProjectWindow		Quick find and open…
+Create new module…	CodeLibWindow		Skapa ny modul...
+Delete current module	CodeLibWindow		Ta bort aktuell modul
+Add	CodeLibWindow		Lägg till
+Choose the name for the new module:	CodeLibWindow		Välj nan för den nya modulen:
+Actions	CodeLibWindow		Actions
+Remove files from module	CodeLibWindow		Ta bort filer från modul
+Code Modules:	CodeLibWindow		Kodmoduler:
+Description:	CodeLibWindow		Beskrivning:
+Projects	CodeLibWindow		Projekt
+These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		These files (except libraries) will be permanently deleted. Remove them?
+Delete	CodeLibWindow		Ta bort
+Export module to project	CodeLibWindow		Exportera modul till projekt
+Selected project:	CodeLibWindow		Valt projekt:
+Add project files to module…	CodeLibWindow		Lägg till projektfiler till modul...
+Code library	CodeLibWindow		Kodbibliotek
+This cannot be undone. Delete module?	CodeLibWindow		Detta kan inte ångras. Ta bort modulen?
+Cancel	CodeLibWindow		Avbryt
+Files in Module:	CodeLibWindow		Filer i Modul:
+Add files to Module…	CodeLibWindow		Lägg till filer till Modul...
+Remove	CodeLibWindow		Ta bort
+Modules	CodeLibWindow		Moduler
+Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).	CodeLibWindow		Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).
+Module files	CodeLibWindow		Modulfiler
+Create module	CodeLibWindow		Skapa modul
+Libraries: 	LibWindow		Bibliotek:
+Common libraries:	LibWindow		Common libraries:
+System libraries:	LibWindow		Systembibliotek:
+Scanning libraries…	LibWindow		Scanning libraries…
+Choose the system libraries for your project:	LibWindow		Choose the system libraries for your project:
+User libraries:	LibWindow		Användarbibliotek:
+System Develop libraries:	LibWindow		System Develop libraries:
+Sort group	ProjectList		Sort group
+Force file rebuild	ProjectList		Force file rebuild
+Remove selected files	ProjectList		Remove selected files
+Show changes in selected files	ProjectList		Show changes in selected files
+ - Missing	ProjectList		- Saknas
+Add selected files to repository	ProjectList		Add selected files to repository
+New group	ProjectList		Ny grupp
+Revert selected files	ProjectList		Revert selected files
+Remove selected files from repository	ProjectList		Remove selected files from repository
+Open parent folder	ProjectList		Open parent folder
+Source Control	ProjectList		Versionshantering
+Rename group…	ProjectList		Byt namn på grupp...
+Add license to project	LicenseManager		Lägg till licens till projekt
+Full version:	LicenseManager		Full version:
+Summary:	LicenseManager		Sammanfattning:
+Set license	LicenseManager		Ange licens
+License:	LicenseManager		Licens:
+A summary of this license is not available.	LicenseManager		En sammanfattning av den här licensen finns inte tillgänglig.
+Errors and warnings: 	ErrorWindow		Fel och varningar:
+Copy list to clipboard	ErrorWindow		Kopiera lista till urklipp
+Warnings	ErrorWindow		Varningar
+Copy to clipboard	ErrorWindow		Kopiera till urklipp
+Errors	ErrorWindow		Fel
+Errors and warnings	ErrorWindow		Fel och varningar
+Updating resources\n	Paladin		Updating resources\n
+Success\n	Paladin		Success\n
+Printing debug output\n	Paladin		Printing debug output\n
+Linking\n	Paladin		Länkar\n
+Printing debug output with extra detail\n	Paladin		Printing debug output with extra detail\n
+Can't find file %s\n	Paladin		Kan inte hitta filen %s\n
+Building %s\n	Paladin		Building %s\n
+This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.
+No	Paladin		Nej
+%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n
+This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.
+Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.
+Paladin: Open project	Paladin		Paladin: Öppna projekt
+Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n
+Yes	Paladin		Ja
+NULL pointer in M_BUILDING_FILE\n	Paladin		NULL-pekare i M_BUILDING_FILE\n
+Attempting to open %s\n	Paladin		Försöker öppna %s\n
+Build failure\n%s	Paladin		Build failure\n%s
+Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Couldn't find a partner file for %refname% in %reffolder%/.
+Project type: 	TemplateWindow		Projekttyp:
+None	TemplateWindow		Ingen
+Choose the source control manager for your project, if any.	TemplateWindow		Välj versionshanterare för ditt projekt, om någon.
+Subversion unavailable	TemplateWindow		Subversion inte tillgänglig
+Mercurial unavailable	TemplateWindow		Mercurial inte tillgänglig
+The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		The name of your project. It can be the same as the Target name, but it does not have to be.
+Project name:	TemplateWindow		Projektnamn:
+The name of the compiled application or library	TemplateWindow		The name of the compiled application or library
+Source control: 	TemplateWindow		Versionshantering:
+Location:	TemplateWindow		Mål:
+Create project folder	TemplateWindow		Skapa projektmapp
+Set the location for your project.	TemplateWindow		Ange målet för ditt projekt.
+Target name:	TemplateWindow		Målnamn:
+Git unavailable	TemplateWindow		Git inte tillgänglig
+Choose a project type	TemplateWindow		Välj projekttyp
+Templates	TemplateWindow		Mallar
+If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
+Create project…	TemplateWindow		Skapa projekt...
+Git	TemplateWindow		Git
+Project type	TemplateWindow		Projekttyp
+Subversion	TemplateWindow		Subversion
+Mercurial	TemplateWindow		Mercurial
+Search only system folders	FindOpenFileWindow		Sök enbart i system-mappar
+Open: 	FindOpenFileWindow		Öppna:
+Open	FindOpenFileWindow		Öppna
+Find and open file	FindOpenFileWindow		Sök och öppna fil
+Cancel	FindOpenFileWindow		Avbryt
+Arguments: 	RunArgsWindow		Argument:
+Run arguments	RunArgsWindow		Körargument
+Open project	StartWindow		Öppna projekt
+Open the selected project	StartWindow		Öppna det valda projektet
+Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.
+Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Open a project in the list on the right. You can also press Command + a number key.
+Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.
+Import a project from an online repository	StartWindow		Import a project from an online repository
+Remove from recent list	StartWindow		Ta bort från listan över tidigare projekt
+Create a new project	StartWindow		Skapa ett nytt projekt
+Choose project folder	StartWindow		Välj projektmapp
+Recent projects:	StartWindow		Tidigare projekt:
+Paladin: Start	StartWindow		Paladin: Start
+Import an existing project	StartWindow		Importera ett befintligt projekt
+Open a project	StartWindow		Öppna ett projekt
+Import a project from online	StartWindow		Import a project from online
+Paladin: 	StartWindow		Paladin:
+Paladin project	FileUtils		Paladin-projekt
+File to build a program with Paladin	FileUtils		File to build a program with Paladin
+Couldn't find %file%.	FileUtils		Kunde inte hitta %file%.
+OK	FileUtils		OK
+New group name: 	GroupRenameWindow		Nytt gruppnamn:
+Rename	GroupRenameWindow		Byt namn
+Cancel	GroupRenameWindow		Avbryt
+Rename group	GroupRenameWindow		Byt namn på grupp
+Enter text to search here:	VRegWindow		Enter text to search here:
+Matched text:	VRegWindow		Matched text:
+Regular expression tester	VRegWindow		Regular expression tester
+Regex:	VRegWindow		Regex:
+Terminal output	TerminalWindow		Terminal output
+Overwrite	Globals		Skriv över
+Cancel	Globals		Avbryt
+OK	Globals		OK
+%filepath% already exists. Do you want to overwrite it?	Globals		%filepath% already exists. Do you want to overwrite it?
+OK	GetTextWindow		OK
+Cancel	GetTextWindow		Avbryt
+ASCII table	AsciiWindow		ASCII-tabell
+Shift out	AsciiWindow	ASCII table description	Shift out
+  Dec  Hex  Oct  Code  Description	AsciiWindow		Dec  Hex  Oct  Kodbeskrivning
+Device Control 2	AsciiWindow	ASCII table description	Enhetskontroll 2
+Unit separator	AsciiWindow	ASCII table description	Enhetsseparator
+Device Control 4	AsciiWindow	ASCII table description	Enhetskontroll 4
+Device Control 1	AsciiWindow	ASCII table description	Enhetskontroll 1
+Device Control 3	AsciiWindow	ASCII table description	Enhetskontroll 3
+Data link escape	AsciiWindow	ASCII table description	Data link escape
+Bell	AsciiWindow	ASCII table description	Ringning
+Form feed	AsciiWindow	ASCII table description	Sidbyte
+Substitute	AsciiWindow	ASCII table description	Substitute
+Start of text	AsciiWindow	ASCII table description	Start of text
+Record separator	AsciiWindow	ASCII table description	Record separator
+NULL	AsciiWindow	ASCII table description	NULL
+End of text	AsciiWindow	ASCII table description	End of text
+End of transmission block	AsciiWindow	ASCII table description	End of transmission block
+Start of heading	AsciiWindow	ASCII table description	Start of heading
+New line	AsciiWindow	ASCII table description	Radbrytning
+Vertical tab	AsciiWindow	ASCII table description	Vertikal tabulator
+Escape	AsciiWindow	ASCII table description	Escape
+Backspace	AsciiWindow	ASCII table description	Backsteg
+Synchronous idle	AsciiWindow	ASCII table description	Synchronous idle
+Negative acknowledge	AsciiWindow	ASCII table description	Negative acknowledge
+File separator	AsciiWindow	ASCII table description	Filavskiljare
+End of transmission	AsciiWindow	ASCII table description	End of transmission
+Group separator	AsciiWindow	ASCII table description	Gruppavskiljare
+Space	AsciiWindow	ASCII table description	Blamktecken
+Horizontal tab	AsciiWindow	ASCII table description	Horizontell tabulator
+End of medium	AsciiWindow	ASCII table description	End of medium
+Shift in	AsciiWindow	ASCII table description	Shift in
+Enquiry	AsciiWindow	ASCII table description	Enquiry
+Acknowledge	AsciiWindow	ASCII table description	Acknowledge
+Delete	AsciiWindow	ASCII table description	Radera
+Carriage return	AsciiWindow	ASCII table description	Vagnretur
+Cancel	AsciiWindow	ASCII table description	Avbryt
+Paladin	System name		Paladin
+Regular expression	FindWindow		Reguljärt uttryck
+Replace all	FindWindow		Ersätt alla
+luare based replace all has been removed until it can be migrated from Lua	FindWindow		luare based replace all has been removed until it can be migrated from Lua
+Match whole word	FindWindow		Matcha hela ord
+OK	FindWindow		OK
+Search	FindWindow		Sök
+Ignore case	FindWindow		Ignorera skiftläge
+No matches found	FindWindow		No matches found
+Project	FindWindow		Projekt
+Replace	FindWindow		Ersätt
+Find	FindWindow		Sök
+Options	FindWindow		Options
+The following files had problems replacing the search terms:\n	FindWindow		The following files had problems replacing the search terms:\n
+Find in project	FindWindow		Sök i projekt
+Results:	FindWindow		Resultat:
+Unknown	SCMManager		Okänd
+None	SCMManager		Ingen
+Subversion	SCMManager		Subversion
+Git	SCMManager		Git
+Mercurial	SCMManager		Mercurial
+Repository owner:	SCMImportWindow		Repository owner:
+Providers	SCMImportWindow		Providers
+Username:	SCMImportWindow		Användarnamn:
+Project:	SCMImportWindow		Projekt:
+Anonymous check-out	SCMImportWindow		Anonymous check-out
+Method:	SCMImportWindow		Metod:
+Import	SCMImportWindow		Importera
+Import from online	SCMImportWindow		Import from online
+Import from repository	SCMImportWindow		Import from repository
+Provider:	SCMImportWindow		Provider:
+Methods	SCMImportWindow		Metoder
+Command:	SCMImportWindow		Kommando:
+Git	SCMImportWindow		Git
+Mercurial	SCMImportWindow		Mercurial
+Subversion	SCMImportWindow		Subversion
+Replacing it with %path%.	Project		Ersätter med %path%.
+%library% couldn't be found in the same place as it was under %platform%.	Project		%library% couldn't be found in the same place as it was under %platform%.
+Remove	Project		Ta bort
+OK	Project		OK
+%path% seems to be missing. Do you want to remove it from the project?	Project		%path% seems to be missing. Do you want to remove it from the project?
+Detected platform from uname: %s\n	Project		Detected platform from uname: %s\n
+Keep	Project		Behåll
+%s seems to be missing\n	Project		%s seems to be missing\n
+Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n	SourceControl		Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n
+Command resulted in an error.\n	SourceControl		Kommandot resulterade i ett fel.\n
+OK	PathBox		OK
+The location entered does not exist.\nPlease check to make sure you have entered it correctly.	PathBox		The location entered does not exist.\nPlease check to make sure you have entered it correctly.
+Browse…	PathBox		Välj…
+Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin can't seem to find the debugger. Sorry.
+Close	SCMOutputWindow		Stäng
+Find files: 	QuickFindWindow		Find files: 
+DoSearch started\n	QuickFindWindow		DoSearch started\n
+Quick find	QuickFindWindow		Quick find
+Type to search	QuickFindWindow		Type to search
+Found: %s\n	QuickFindWindow		Found: %s\n
+Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
+Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n

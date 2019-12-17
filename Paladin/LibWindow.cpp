@@ -57,7 +57,11 @@ LibraryWindow::LibraryWindow(BRect frame, const BMessenger& parent,
 		B_TRANSLATE("Choose the system libraries for your project:"));
 	label->SetText(B_TRANSLATE("Scanning libraries" B_UTF8_ELLIPSIS));
 
-	fCheckList = new BView("checklist", B_WILL_DRAW | B_SCROLL_VIEW_AWARE);
+	fCheckList = new BView("checklist", B_WILL_DRAW
+#ifdef B_SCROLL_VIEW_AWARE
+		| B_SCROLL_VIEW_AWARE
+#endif	
+	);
 
 	BScrollView* scrollView = new BScrollView("scrollView", fCheckList,
 		0, false, true);

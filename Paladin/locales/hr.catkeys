@@ -1,0 +1,382 @@
+1	Croatian	application/x-vnd.dw-Paladin	1273216190
+Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
+Build	PrefsWindow		Build
+Subversion	PrefsWindow		Subversion
+Use single thread	PrefsWindow		Use single thread
+Show project folder on open	PrefsWindow		Show project folder on open
+Mercurial	PrefsWindow		Mercurial
+Git	PrefsWindow		Git
+Source control	PrefsWindow		Source control
+Use fastdep dependency checker	PrefsWindow		Use fastdep dependency checker
+Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Sets the location for the 'server' side of local Subversion repositories.
+Automatically synchronize modules	PrefsWindow		Automatski sinkroniziraj module
+Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Automatically synchronize modules in your projects with the those in the code library
+The default path for new projects.	PrefsWindow		Zadana putanja za nove projekte.
+General	PrefsWindow		General
+When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		When checked, a project's folder is shown in Tracker when it is opened.
+Backups folder:	PrefsWindow		Backups folder:
+Use the fastdep dependency checker instead of gcc	PrefsWindow		Use the fastdep dependency checker instead of gcc
+unavailable	PrefsWindow		nedostupno
+None	PrefsWindow		None
+Preferred source control:	PrefsWindow		Preferred source control:
+Sets the location for project backups	PrefsWindow		Sets the location for project backups
+Use ccache to build faster	PrefsWindow		Use ccache to build faster
+Omit header files from projects	PrefsWindow		Omit header files from projects
+If checked, header files are not automatically added to projects.	PrefsWindow		If checked, header files are not automatically added to projects.
+Build with just one thread instead of one thread per processor	PrefsWindow		Build with just one thread instead of one thread per processor
+Projects folder:	PrefsWindow		Mapa projekata:
+Paladin settings	PrefsWindow		Paladin postavke
+Source control repository folder:	PrefsWindow		Source control repository folder:
+Rename partner file	AddNewFileWindow		Rename partner file
+New name: 	AddNewFileWindow		Novo ime:
+Cancel	AddNewFileWindow		Otkaži
+Create both a header and source file	AddNewFileWindow		Create both a header and source file
+New file name: 	AddNewFileWindow		Novo ime datoteke:
+Add new file	AddNewFileWindow		Dodaj novu datoteku
+Create	AddNewFileWindow		Napravi
+Rename file	AddNewFileWindow		Preimenuj datoteku
++	ProjectSettingsWindow		+
+General	ProjectSettingsWindow		General
+Check this if you want to use your program with gprof or bprof for profiling.	ProjectSettingsWindow		Check this if you want to use your program with gprof or bprof for profiling.
+The kind of program you want to build	ProjectSettingsWindow		The kind of program you want to build
+Device driver	ProjectSettingsWindow		Upravljački program uređaja
+None	ProjectSettingsWindow		None
+Extra GCC linker flags you wish included when your project is linked.	ProjectSettingsWindow		Extra GCC linker flags you wish included when your project is linked.
+Target name:	ProjectSettingsWindow		Target name:
+More	ProjectSettingsWindow		More
+Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWindow		Extra GCC flags you wish included when each file is compiled.
+Add a file to the include path list	ProjectSettingsWindow		Add a file to the include path list
+Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.
+Target type	ProjectSettingsWindow		Target type
+Optimization	ProjectSettingsWindow		Optimizacija
+−	ProjectSettingsWindow		−
+Extra linker options:	ProjectSettingsWindow		Extra linker options:
+Shared library	ProjectSettingsWindow		Shared library
+Target type:	ProjectSettingsWindow		Target type:
+Application	ProjectSettingsWindow		Aplikacija
+Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler optimization level. Disabled when debugging info is checked.
+Static library	ProjectSettingsWindow		Static library
+Full	ProjectSettingsWindow		Full
+Project settings	ProjectSettingsWindow		Postavke projekta
+Build debugging information	ProjectSettingsWindow		Build debugging information
+Include paths:	ProjectSettingsWindow		Include paths:
+Remove the selected path	ProjectSettingsWindow		Ukloni odabranu putanju
+Some	ProjectSettingsWindow		Some
+Optimize:	ProjectSettingsWindow		Optimiziraj:
+Build profiling information	ProjectSettingsWindow		Build profiling information
+The folders you want Paladin to search for header files	ProjectSettingsWindow		The folders you want Paladin to search for header files
+Optimize for size over speed	ProjectSettingsWindow		Optimize for size over speed
+Extra compiler options:	ProjectSettingsWindow		Extra compiler options:
+This will undo all changes since the last commit. Continue?	ProjectWindow		This will undo all changes since the last commit. Continue?
+Update dependencies	ProjectWindow		Ažuriraj zavisnosti
+Run	ProjectWindow		Pokreni
+File	ProjectWindow		Datoteka
+Project status	ProjectWindow		Status projekta
+Revert selected files	ProjectWindow		Revert selected files
+Revert	ProjectWindow		Revert
+Check project in	ProjectWindow		Check project in
+Empty build cache	ProjectWindow		Empty build cache
+Open recent project	ProjectWindow		Otvori nedavni projekt
+Emptying build cache	ProjectWindow		Emptying build cache
+Build	ProjectWindow		Build
+Differences	ProjectWindow		Razlike
+The project cannot be built because some of its files are missing.	ProjectWindow		The project cannot be built because some of its files are missing.
+Tools	ProjectWindow		Alati
+Push	ProjectWindow		Gurni
+Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?
+Backing up project	ProjectWindow		Backing up project
+Add selected files to repository	ProjectWindow		Dodaj izabrane datoteke u repozitorij
+Revert project	ProjectWindow		Revert project
+Commit	ProjectWindow		Commit
+Building 	ProjectWindow		Building 
+Don't revert	ProjectWindow		Don't revert
+Show differences	ProjectWindow		Pokaži razlike
+Make project	ProjectWindow		Make project
+Project	ProjectWindow		Projekt
+Force project to rebuild	ProjectWindow		Force project to rebuild
+Remove Selected files from repository	ProjectWindow		Ukloni odabrane datoteke iz repozitorija
+Add to repository	ProjectWindow		Dodaj u repozitorij
+Sort group	ProjectWindow		Sort group
+Show differences from last check-in	ProjectWindow		Show differences from last check-in
+Debug	ProjectWindow		Debug
+Show changed files from last check-in	ProjectWindow		Show changed files from last check-in
+New group	ProjectWindow		Nova grupa
+Source control	ProjectWindow		Source control
+Performing post-build tasks	ProjectWindow		Performing post-build tasks
+Pull	ProjectWindow		Pull
+Updating resources	ProjectWindow		Updating resources
+Remove selected files	ProjectWindow		Ukloni odabrane datoteke
+Enter the description for the changes in this revision.	ProjectWindow		Enter the description for the changes in this revision.
+Pull changes from remote repository	ProjectWindow		Povuci izmjene iz udaljenog repozitorija
+Remove from repository	ProjectWindow		Ukloni iz repozitorija
+Rename group	ProjectWindow		Preimenuj grupu
+Push changes to remote repository	ProjectWindow		Gurni izmjene u udaljeni repozitorij
+Linking	ProjectWindow		Linking
+New project…	ProjectWindow		Novi projekt...
+Paladin: Project	ProjectWindow		Paladin: Projekt
+Add files…	ProjectWindow		Dodaj datoteke…
+Build successful.	ProjectWindow		Build successful.
+Settings…	ProjectWindow		Postavke...
+Examining source files	ProjectWindow		Examining source files
+Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Ne mogu naći %filename%. Možda je premješten ili preimenovan.
+Set software license…	ProjectWindow		Set software license…
+OK	ProjectWindow		U redu
+Examining %file%	ProjectWindow		Examining %file%
+Cancel	ProjectWindow		Otkaži
+Regular expression tester	ProjectWindow		Regular expression tester
+Show project folder	ProjectWindow		Pokaži mapu projekta
+Build had errors or warnings.	ProjectWindow		Build had errors or warnings.
+Generate makefile	ProjectWindow		Generate makefile
+Opening project...	ProjectWindow		Otvaram projekt...
+Program settings…	ProjectWindow		Postavke programa…
+Set run arguments…	ProjectWindow		Set run arguments…
+Find in project files…	ProjectWindow		Nađi u datotekama projekta...
+Paladin: Change description	ProjectWindow		Paladin: Izmjena opisa
+Open project…	ProjectWindow		Otvori projekt...
+Change system libraries…	ProjectWindow		Change system libraries…
+Updating dependencies	ProjectWindow		Ažuriram zavisnosti
+Find and open file…	ProjectWindow		Nađi i otvori datoteku...
+Add new file…	ProjectWindow		Dodaj novu datoteku…
+Error window	ProjectWindow		Error window
+Symbol finder	ProjectWindow		Symbol finder
+Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.	ProjectWindow		Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.
+Run logged	ProjectWindow		Run logged
+Project opened.	ProjectWindow		Projekt je otvoren.
+About Paladin	ProjectWindow		O Paladinu
+Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?	ProjectWindow		Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?
+ASCII table	ProjectWindow		ASCII tablica
+Backup project	ProjectWindow		Backup project
+Rebuild	ProjectWindow		Rebuild
+Quick find	ProjectWindow		Quick find
+Quick find and open…	ProjectWindow		Quick find and open…
+Create new module…	CodeLibWindow		Napravi novi modul...
+Delete current module	CodeLibWindow		Izbriši trenutni modul
+Add	CodeLibWindow		Dodaj
+Choose the name for the new module:	CodeLibWindow		Odaberite ime za novi modul:
+Actions	CodeLibWindow		Radnje
+Remove files from module	CodeLibWindow		Ukloni datoteke iz modula
+Code Modules:	CodeLibWindow		Code Modules:
+Description:	CodeLibWindow		Opis:
+Projects	CodeLibWindow		Projekti
+These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		These files (except libraries) will be permanently deleted. Remove them?
+Delete	CodeLibWindow		Izbriši
+Export module to project	CodeLibWindow		Izvezi modul u projekt
+Selected project:	CodeLibWindow		Odabrani projekt:
+Add project files to module…	CodeLibWindow		Add project files to module…
+Code library	CodeLibWindow		Code library
+This cannot be undone. Delete module?	CodeLibWindow		This cannot be undone. Delete module?
+Cancel	CodeLibWindow		Otkaži
+Files in Module:	CodeLibWindow		Datoteke u modulu:
+Add files to Module…	CodeLibWindow		Dodaj datoteke u Modul…
+Remove	CodeLibWindow		Ukloni
+Modules	CodeLibWindow		Moduli
+Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).	CodeLibWindow		Izaberite datoteke projekta koje želite uvesti. Možete uvesti veše datoteka klikom na stavke dok držite naredbenu tipku (obično ALT).
+Module files	CodeLibWindow		Datoteke modula
+Create module	CodeLibWindow		Napravi modul
+Libraries: 	LibWindow		Libraries: 
+Common libraries:	LibWindow		Common libraries:
+System libraries:	LibWindow		System libraries:
+Scanning libraries…	LibWindow		Scanning libraries…
+Choose the system libraries for your project:	LibWindow		Choose the system libraries for your project:
+User libraries:	LibWindow		User libraries:
+System Develop libraries:	LibWindow		System Develop libraries:
+Sort group	ProjectList		Sort group
+Force file rebuild	ProjectList		Force file rebuild
+Remove selected files	ProjectList		Ukloni izabrane datoteke
+Show changes in selected files	ProjectList		Pokaži izmjene u izabranim datotekama
+ - Missing	ProjectList		- Nedostaje
+Add selected files to repository	ProjectList		Add selected files to repository
+New group	ProjectList		Nova grupa
+Revert selected files	ProjectList		Revert selected files
+Remove selected files from repository	ProjectList		Ukloni izabrane datoteke iz repozitorija
+Open parent folder	ProjectList		Open parent folder
+Source Control	ProjectList		Source Control
+Rename group…	ProjectList		Preimenuj grupu…
+Add license to project	LicenseManager		Dodaj licencu projektu
+Full version:	LicenseManager		Puna verzija:
+Summary:	LicenseManager		Sažetak:
+Set license	LicenseManager		Set license
+License:	LicenseManager		Licenca:
+A summary of this license is not available.	LicenseManager		Sažetak ove licence nije dostupan.
+Errors and warnings: 	ErrorWindow		Greške i upozorenja:
+Copy list to clipboard	ErrorWindow		Kopiraj listu u međuspremnik
+Warnings	ErrorWindow		Upozorenja
+Copy to clipboard	ErrorWindow		Kopiraj u međuspremnik
+Errors	ErrorWindow		Greške
+Errors and warnings	ErrorWindow		Greške i upozorenja
+Updating resources\n	Paladin		Updating resources\n
+Success\n	Paladin		Uspjeh\n
+Printing debug output\n	Paladin		Printing debug output\n
+Linking\n	Paladin		Linking\n
+Printing debug output with extra detail\n	Paladin		Printing debug output with extra detail\n
+Can't find file %s\n	Paladin		Ne mogu naći datoteku %s\n
+Building %s\n	Paladin		Building %s\n
+This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.
+No	Paladin		Ne
+%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n
+This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.
+Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.
+Paladin: Open project	Paladin		Paladin: Open project
+Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n
+Yes	Paladin		Da
+NULL pointer in M_BUILDING_FILE\n	Paladin		NULL pointer in M_BUILDING_FILE\n
+Attempting to open %s\n	Paladin		Attempting to open %s\n
+Build failure\n%s	Paladin		Build failure\n%s
+Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Couldn't find a partner file for %refname% in %reffolder%/.
+Project type: 	TemplateWindow		Vrsta projekta:
+None	TemplateWindow		Nijedan
+Choose the source control manager for your project, if any.	TemplateWindow		Choose the source control manager for your project, if any.
+Subversion unavailable	TemplateWindow		Subversion je nedostupan
+Mercurial unavailable	TemplateWindow		Mercurial je nedostupan
+The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		The name of your project. It can be the same as the Target name, but it does not have to be.
+Project name:	TemplateWindow		Ime projekta:
+The name of the compiled application or library	TemplateWindow		The name of the compiled application or library
+Source control: 	TemplateWindow		Source control: 
+Location:	TemplateWindow		Lokacija:
+Create project folder	TemplateWindow		Napravi mapu projekta
+Set the location for your project.	TemplateWindow		Set the location for your project.
+Target name:	TemplateWindow		Target name:
+Git unavailable	TemplateWindow		Git je nedostupan
+Choose a project type	TemplateWindow		Choose a project type
+Templates	TemplateWindow		Templates
+If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
+Create project…	TemplateWindow		Napravi projekt...
+Git	TemplateWindow		Git
+Project type	TemplateWindow		Vrsta projekta
+Subversion	TemplateWindow		Subversion
+Mercurial	TemplateWindow		Mercurial
+Search only system folders	FindOpenFileWindow		Traži samo mape sustava
+Open: 	FindOpenFileWindow		Otvori:
+Open	FindOpenFileWindow		Otvori
+Find and open file	FindOpenFileWindow		Nađi i otvori datoteku
+Cancel	FindOpenFileWindow		Otkaži
+Arguments: 	RunArgsWindow		Arguments: 
+Run arguments	RunArgsWindow		Run arguments
+Open project	StartWindow		Otvori projekt
+Open the selected project	StartWindow		Otvori izabrani projekt
+Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.
+Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Open a project in the list on the right. You can also press Command + a number key.
+Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.
+Import a project from an online repository	StartWindow		Uvezi projekt iz mrežnog repozitorija
+Remove from recent list	StartWindow		Remove from recent list
+Create a new project	StartWindow		Napravi novi projekt
+Choose project folder	StartWindow		Zatvori mapu projekta
+Recent projects:	StartWindow		Recent projects:
+Paladin: Start	StartWindow		Paladin: Start
+Import an existing project	StartWindow		Uvezi postojeći projekt
+Open a project	StartWindow		Otvori projekt
+Import a project from online	StartWindow		Uvezi projekt sa mreže
+Paladin: 	StartWindow		Paladin:
+Paladin project	FileUtils		Paladin projekt
+File to build a program with Paladin	FileUtils		File to build a program with Paladin
+Couldn't find %file%.	FileUtils		Ne mogu naći %file%.
+OK	FileUtils		U redu
+New group name: 	GroupRenameWindow		Novo ime grupe:
+Rename	GroupRenameWindow		Preimenuj
+Cancel	GroupRenameWindow		Otkaži
+Rename group	GroupRenameWindow		Preimenuj grupu
+Enter text to search here:	VRegWindow		Unesite tekst da biste ovdje pretraživali:
+Matched text:	VRegWindow		Matched text:
+Regular expression tester	VRegWindow		Regular expression tester
+Regex:	VRegWindow		Regex:
+Terminal output	TerminalWindow		Terminal output
+Overwrite	Globals		Overwrite
+Cancel	Globals		Otkaži
+OK	Globals		U redu
+%filepath% already exists. Do you want to overwrite it?	Globals		%filepath% already exists. Do you want to overwrite it?
+OK	GetTextWindow		U redu
+Cancel	GetTextWindow		Otkaži
+ASCII table	AsciiWindow		ASCII tablica
+Shift out	AsciiWindow	ASCII table description	Shift out
+  Dec  Hex  Oct  Code  Description	AsciiWindow		  Dec  Hex  Oct  Code  Description
+Device Control 2	AsciiWindow	ASCII table description	Device Control 2
+Unit separator	AsciiWindow	ASCII table description	Unit separator
+Device Control 4	AsciiWindow	ASCII table description	Device Control 4
+Device Control 1	AsciiWindow	ASCII table description	Device Control 1
+Device Control 3	AsciiWindow	ASCII table description	Device Control 3
+Data link escape	AsciiWindow	ASCII table description	Data link escape
+Bell	AsciiWindow	ASCII table description	Zvono
+Form feed	AsciiWindow	ASCII table description	Form feed
+Substitute	AsciiWindow	ASCII table description	Zamjeni
+Start of text	AsciiWindow	ASCII table description	Početak teksta
+Record separator	AsciiWindow	ASCII table description	Record separator
+NULL	AsciiWindow	ASCII table description	NULL
+End of text	AsciiWindow	ASCII table description	Kraj teksta
+End of transmission block	AsciiWindow	ASCII table description	End of transmission block
+Start of heading	AsciiWindow	ASCII table description	Start of heading
+New line	AsciiWindow	ASCII table description	Novi redak
+Vertical tab	AsciiWindow	ASCII table description	Okomita kartica
+Escape	AsciiWindow	ASCII table description	Escape
+Backspace	AsciiWindow	ASCII table description	Backspace
+Synchronous idle	AsciiWindow	ASCII table description	Synchronous idle
+Negative acknowledge	AsciiWindow	ASCII table description	Negative acknowledge
+File separator	AsciiWindow	ASCII table description	Razdjelnik datoteka
+End of transmission	AsciiWindow	ASCII table description	Kraj prijenosa
+Group separator	AsciiWindow	ASCII table description	Group separator
+Space	AsciiWindow	ASCII table description	Razmak
+Horizontal tab	AsciiWindow	ASCII table description	Vodoravna kartica
+End of medium	AsciiWindow	ASCII table description	Kraj medija
+Shift in	AsciiWindow	ASCII table description	Shift in
+Enquiry	AsciiWindow	ASCII table description	Enquiry
+Acknowledge	AsciiWindow	ASCII table description	Acknowledge
+Delete	AsciiWindow	ASCII table description	Izbriši
+Carriage return	AsciiWindow	ASCII table description	Carriage return
+Cancel	AsciiWindow	ASCII table description	Otkaži
+Paladin	System name		Paladin
+Regular expression	FindWindow		Regular expression
+Replace all	FindWindow		Zamijeni sve
+luare based replace all has been removed until it can be migrated from Lua	FindWindow		luare based replace all has been removed until it can be migrated from Lua
+Match whole word	FindWindow		Match whole word
+OK	FindWindow		U redu
+Search	FindWindow		Traži
+Ignore case	FindWindow		Ignore case
+No matches found	FindWindow		No matches found
+Project	FindWindow		Projekt
+Replace	FindWindow		Zamijeni
+Find	FindWindow		Nađi
+Options	FindWindow		Opcije
+The following files had problems replacing the search terms:\n	FindWindow		The following files had problems replacing the search terms:\n
+Find in project	FindWindow		Nađi u projektu
+Results:	FindWindow		Rezultati:
+Unknown	SCMManager		Nepoznato
+None	SCMManager		Nijedan
+Subversion	SCMManager		Subversion
+Git	SCMManager		Git
+Mercurial	SCMManager		Mercurial
+Repository owner:	SCMImportWindow		Vlasnik repozitorija:
+Providers	SCMImportWindow		Providers
+Username:	SCMImportWindow		Korisničko ime:
+Project:	SCMImportWindow		Projekt:
+Anonymous check-out	SCMImportWindow		Anonymous check-out
+Method:	SCMImportWindow		Metoda:
+Import	SCMImportWindow		Uvezi
+Import from online	SCMImportWindow		Uvezi sa mreže
+Import from repository	SCMImportWindow		Uvezi iz repozitorija
+Provider:	SCMImportWindow		Provider:
+Methods	SCMImportWindow		Metode
+Command:	SCMImportWindow		Naredba:
+Git	SCMImportWindow		Git
+Mercurial	SCMImportWindow		Mercurial
+Subversion	SCMImportWindow		Subversion
+Replacing it with %path%.	Project		Zamjenjujem sa %path%.
+%library% couldn't be found in the same place as it was under %platform%.	Project		%library% couldn't be found in the same place as it was under %platform%.
+Remove	Project		Ukloni
+OK	Project		U redu
+%path% seems to be missing. Do you want to remove it from the project?	Project		%path% seems to be missing. Do you want to remove it from the project?
+Detected platform from uname: %s\n	Project		Detected platform from uname: %s\n
+Keep	Project		Keep
+%s seems to be missing\n	Project		%s izgleda da nedostaje\n
+Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n	SourceControl		Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n
+Command resulted in an error.\n	SourceControl		Command resulted in an error.\n
+OK	PathBox		U redu
+The location entered does not exist.\nPlease check to make sure you have entered it correctly.	PathBox		The location entered does not exist.\nPlease check to make sure you have entered it correctly.
+Browse…	PathBox		Pregledaj…
+Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin can't seem to find the debugger. Sorry.
+Close	SCMOutputWindow		Zatvori
+Find files: 	QuickFindWindow		Find files: 
+DoSearch started\n	QuickFindWindow		DoSearch started\n
+Quick find	QuickFindWindow		Quick find
+Type to search	QuickFindWindow		Type to search
+Found: %s\n	QuickFindWindow		Found: %s\n
+Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
+Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n

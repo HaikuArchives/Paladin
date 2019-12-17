@@ -1,4 +1,4 @@
-1	German	application/x-vnd.dw-Paladin	2226395208
+1	German	application/x-vnd.dw-Paladin	1273216190
 Compiler caching is another way to speed up builds	PrefsWindow		Ein Compiler-Cache kann das Kompilieren beschleunigen
 Build	PrefsWindow		Erzeugen
 Subversion	PrefsWindow		Subversion
@@ -147,6 +147,8 @@ Debugging information needs to compiled into your project. This may take some ti
 ASCII table	ProjectWindow		ASCII-Tabelle
 Backup project	ProjectWindow		Projekt sichern
 Rebuild	ProjectWindow		Re-build
+Quick find	ProjectWindow		Quick find
+Quick find and open…	ProjectWindow		Quick find and open…
 Create new module…	CodeLibWindow		Neues Modul anlegen…
 Delete current module	CodeLibWindow		Aktuelles Modul löschen
 Add	CodeLibWindow		Hinzu
@@ -177,6 +179,7 @@ System libraries:	LibWindow		Systembibliotheken:
 Scanning libraries…	LibWindow		Bibliotheken einlesen…
 Choose the system libraries for your project:	LibWindow		Systembibliotheken für das Projekt wählen:
 User libraries:	LibWindow		Benutzerbibliotheken:
+System Develop libraries:	LibWindow		System Develop libraries:
 Sort group	ProjectList		Gruppe sortieren
 Force file rebuild	ProjectList		Re-build von Dateien erzwingen
 Remove selected files	ProjectList		Ausgewählte Dateien entfernen
@@ -263,7 +266,6 @@ Paladin: Start	StartWindow		Paladin: Start
 Import an existing project	StartWindow		Bestehendes Projekt importieren
 Open a project	StartWindow		Projekt öffnen
 Import a project from online	StartWindow		Ein Projekt aus dem Netz importieren
-Open a recent project. You can also press Command + a number key.	StartWindow		Letztes Projekt öffnen. Funktioniert auch mit Befehlstaste + Zahlentaste.
 Paladin: 	StartWindow		Paladin:
 Paladin project	FileUtils		Paladin Projekt
 File to build a program with Paladin	FileUtils		Datei um ein Programm mit Paladin zu erzeugen
@@ -371,3 +373,10 @@ The location entered does not exist.\nPlease check to make sure you have entered
 Browse…	PathBox		Durchsuchen…
 Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin kann den Debugger nicht finden.
 Close	SCMOutputWindow		Schließen
+Find files: 	QuickFindWindow		Find files: 
+DoSearch started\n	QuickFindWindow		DoSearch started\n
+Quick find	QuickFindWindow		Quick find
+Type to search	QuickFindWindow		Type to search
+Found: %s\n	QuickFindWindow		Found: %s\n
+Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
+Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n

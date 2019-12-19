@@ -845,6 +845,9 @@ Project::Link(void)
 	} else {
 		linkString = "g++ -o '";
 		linkString << targetPath << "' ";
+		
+		if (Profiling())
+			linkString << "-p ";
 			
 		for (int32 i = 0; i < CountGroups(); i++)
 		{

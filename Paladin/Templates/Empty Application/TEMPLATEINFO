@@ -1,2 +1,1 @@
 TYPE=Application
-LIB=B_BEOS_LIB_DIRECTORY/libsupc++.so

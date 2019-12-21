@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
+ * Copyright 2019 Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adam Fowler, adamfowleruk@gmail.com
+ *		2019	Adam Fowler, adamfowleruk@gmail.com
  *		Others previously, undocumented
  */
 #include "ProjectBuilder.h"
@@ -26,11 +26,9 @@
 #include "ErrorParser.h"
 #include "Globals.h"
 #include "LaunchHelper.h"
-#include "MonitorWindow.h"
 #include "Project.h"
 #include "SourceFile.h"
 #include "StatCache.h"
-#include "TerminalWindow.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ProjectBuilder"
@@ -230,25 +228,14 @@ ProjectBuilder::DoPostBuild(void)
 			
 			STRACE(1,("Terminal Run command: %s\n",command.String()));
 			
-			BMessage* runMsg = new BMessage();
+			BMessage* runMsg = new BMessage(M_BUILD_MONITOR);
 			
 			entry_ref ref;
 			BEntry(fProject->GetPath().GetFolder()).GetRef(&ref);
 			runMsg->AddRef("pwd",&ref);
 			runMsg->AddString("cmd",command);
 			
-			MonitorWindow* monWindow = new MonitorWindow(BRect(100,600,100,400));
-			//BString bo("build");
-			BString so("stdout");
-			BString se("stderr");
-			//MonitorViewInfo miBuild = {bo.String(),B_TRANSLATE("Build")};
-			MonitorViewInfo miOut = {so.String(),B_TRANSLATE("Standard Out")};
-			MonitorViewInfo miErr = {se.String(),B_TRANSLATE("Standard Error")};
-			//monWindow->AddView(miBuild);
-			monWindow->AddView(miOut);
-			monWindow->AddView(miErr);
-			monWindow->Show();
-			monWindow->Launch(runMsg,so.String(),se.String());
+			fMsgr.SendMessage(runMsg);
 			
 			/*
 			TerminalWindow *termwin = new TerminalWindow(command.String());

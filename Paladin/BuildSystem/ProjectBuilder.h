@@ -30,7 +30,8 @@ enum
 	M_BUILD_WARNINGS = 'blwr',
 	M_BUILD_FAILURE = 'blfa',
 	M_BUILD_SUCCESS = 'blsc',
-	M_FILE_NEEDS_BUILD = 'fnbl'
+	M_FILE_NEEDS_BUILD = 'fnbl',
+	M_BUILD_MONITOR = 'blmn'
 };
 
 class Project;

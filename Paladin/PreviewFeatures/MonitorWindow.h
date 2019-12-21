@@ -1,3 +1,10 @@
+/*
+ * Copyright 2019 Haiku Inc
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		2019	Adam Fowler, adamfowleruk@gmail.com
+ */
 #ifndef MONITORWINDOW_H
 #define MONITORWINDOW_H
 
@@ -19,6 +26,11 @@ public:
 	const char*			title = "";
 	bool				visible = true;
 	BView*				view = NULL;
+	MonitorViewInfo(const char* n,const char* t,const bool b,BView* v)
+		: name(n), title(t), visible(b), view(v){}
+	
+	MonitorViewInfo(const char* n,const char* t)
+		: name(n), title(t), visible(true), view(NULL){}
 };
 
 struct CommandContext

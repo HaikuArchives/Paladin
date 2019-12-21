@@ -1,3 +1,10 @@
+/*
+ * Copyright 2019 Haiku Inc
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		2019	Adam Fowler, adamfowleruk@gmail.com
+ */
 #include "MonitorWindow.h"
 
 #include <Catalog.h>
@@ -25,9 +32,8 @@ MonitorWindow::MonitorWindow(BRect frame)
 	fNextContextId(1)
 {
 	SetSizeLimits(400,30000,200,30000);
-	//MoveTo(100,100);
-	// Initialise TabView holder with no tabs
 	
+	// Initialise TabView holder with no tabs	
 	BLayoutBuilder::Group<>(this,B_VERTICAL,0.0f)
 		.Add(fTabView, 1.0f)
 	;
@@ -43,18 +49,40 @@ MonitorWindow::~MonitorWindow()
 void
 MonitorWindow::AddView(MonitorViewInfo info)
 {
-	// TODO check if another viewinfo with the same name has a view
+	// Check if another viewinfo with the same name has a view
 	// (Possible because multiple sources can output to stderr and stdout)
 	
 	// Create view
-	StreamingTextView* v = new StreamingTextView(info.name);
-	info.view = v;
-	
-	// Add view
-	fViews.emplace_back(info);
-	
-	// Show view in tab view
-	fTabView->AddTab(info.view);
+	printf("ADDVIEW\n");
+	printf(info.name);
+	printf("\n");
+	printf(info.title);
+	printf("\n");
+	MonitorViewInfo* existing = FindInfo(info.name);
+	StreamingTextView* v;
+	if (NULL == existing)
+	{
+		v = new StreamingTextView(strdup(info.title));
+		info.view = v;
+	/*
+		MonitorViewInfo mvi{info.name,info.title,info.visible,info.view};
+		v = new StreamingTextView(strdup(mvi.title));
+		mvi.view = v;
+	printf("ADDMVI\n");
+	printf(mvi.name);
+	printf("\n");
+	printf(mvi.title);
+	printf("\n");
+	*/
+		// Add view
+		fViews.emplace_back(MonitorViewInfo(info));
+		// Show view in tab view
+		fTabView->AddTab(info.view);
+	} else {
+		v = (StreamingTextView*)(existing->view);
+		info.view = v;
+		// TODO bring to front?
+	}
 }
 	
 void
@@ -117,6 +145,12 @@ MonitorWindow::FindInfo(const char* name)
 {
 	for (auto& info: fViews)
 	{
+		printf("Testing view with name:-\n");
+		printf(info.name);
+		printf("\n");
+		printf("Against required name:-\n");
+		printf(name);
+		printf("\n");
 		if (0 == strcmp(info.name,name))
 		{
 			return &info;
@@ -138,12 +172,17 @@ MonitorWindow::MessageReceived(BMessage* message)
 			printf("Got something on stdout\n");
 			if (B_OK == message->FindPointer("context",&ptr))
 			{
+				printf("Got out ptr\n");
 				ctx = ((CommandContext*)ptr);
+				printf(ctx->stdoutViewName);
 				MonitorViewInfo* info = FindInfo(ctx->stdoutViewName);
 				if (NULL != info)
 				{
+				printf("Got out info\n");
 					if (B_OK == message->FindString("output",&txt))
 					{
+				printf("Got output\n");
+				printf(txt);
 						((StreamingTextView*)info->view)->Append(txt);
 					}
 				}
@@ -155,12 +194,17 @@ MonitorWindow::MessageReceived(BMessage* message)
 			printf("Got something on stderr\n");
 			if (B_OK == message->FindPointer("context",&ptr))
 			{
+				printf("Got error ptr\n");
 				ctx = ((CommandContext*)ptr);
+				printf(ctx->stderrViewName);
 				MonitorViewInfo* info = FindInfo(ctx->stderrViewName);
 				if (NULL != info)
 				{
+				printf("Got error info\n");
 					if (B_OK == message->FindString("error",&txt))
 					{
+				printf("Got errors\n");
+				printf(txt);
 						((StreamingTextView*)info->view)->Append(txt);
 					}
 				}
@@ -169,12 +213,40 @@ MonitorWindow::MessageReceived(BMessage* message)
 		}
 		case M_COMMAND_EXITED:
 		{
-			printf("Command exited\n");
+			if (B_OK == message->FindPointer("context",&ptr))
+			{
+				ctx = ((CommandContext*)ptr);
+				txt = "\n<Command exited>\n";
+				MonitorViewInfo* info = FindInfo(ctx->stderrViewName);
+				if (NULL != info)
+				{
+					((StreamingTextView*)info->view)->Append(txt);
+				}
+				info = FindInfo(ctx->stdoutViewName);
+				if (NULL != info)
+				{
+					((StreamingTextView*)info->view)->Append(txt);
+				}
+			}
 			break;
 		}
 		case M_COMMAND_EXITED_IN_ERROR:
 		{
-			printf("Command exited in error\n");
+			if (B_OK == message->FindPointer("context",&ptr))
+			{
+				ctx = ((CommandContext*)ptr);
+				txt = "\n<Command exited in error>\n";
+				MonitorViewInfo* info = FindInfo(ctx->stderrViewName);
+				if (NULL != info)
+				{
+					((StreamingTextView*)info->view)->Append(txt);
+				}
+				info = FindInfo(ctx->stdoutViewName);
+				if (NULL != info)
+				{
+					((StreamingTextView*)info->view)->Append(txt);
+				}
+			}
 			break;
 		}
 		default:

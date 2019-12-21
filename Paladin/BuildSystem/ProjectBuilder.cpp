@@ -26,6 +26,7 @@
 #include "ErrorParser.h"
 #include "Globals.h"
 #include "LaunchHelper.h"
+#include "MonitorWindow.h"
 #include "Project.h"
 #include "SourceFile.h"
 #include "StatCache.h"
@@ -224,12 +225,32 @@ ProjectBuilder::DoPostBuild(void)
 			BString command;
 			DPath targetpath = fProject->GetPath().GetFolder();
 			targetpath.Append(fProject->GetTargetName());
-			command << "cd '" << targetpath.GetFolder() << "'; '"
-				<< targetpath.GetFileName() << "' " << fProject->GetRunArgs()
-				<< " 2>&1";
+			command << "'" << targetpath.GetFileName() << "' " 
+					<< fProject->GetRunArgs();
 			
 			STRACE(1,("Terminal Run command: %s\n",command.String()));
 			
+			BMessage* runMsg = new BMessage();
+			
+			entry_ref ref;
+			BEntry(fProject->GetPath().GetFolder()).GetRef(&ref);
+			runMsg->AddRef("pwd",&ref);
+			runMsg->AddString("cmd",command);
+			
+			MonitorWindow* monWindow = new MonitorWindow(BRect(100,600,100,400));
+			//BString bo("build");
+			BString so("stdout");
+			BString se("stderr");
+			//MonitorViewInfo miBuild = {bo.String(),B_TRANSLATE("Build")};
+			MonitorViewInfo miOut = {so.String(),B_TRANSLATE("Standard Out")};
+			MonitorViewInfo miErr = {se.String(),B_TRANSLATE("Standard Error")};
+			//monWindow->AddView(miBuild);
+			monWindow->AddView(miOut);
+			monWindow->AddView(miErr);
+			monWindow->Show();
+			monWindow->Launch(runMsg,so.String(),se.String());
+			
+			/*
 			TerminalWindow *termwin = new TerminalWindow(command.String());
 			BString termtitle = "Terminal Output: ";
 			termtitle << fProject->GetName();
@@ -237,6 +258,7 @@ ProjectBuilder::DoPostBuild(void)
 			termwin->Hide();
 			termwin->Show();
 			termwin->RunCommand();
+			*/
 			break;
 		}
 		case POSTBUILD_DEBUG:

@@ -1,9 +1,9 @@
 /*
- * Copyright 2019 Adam Fowler <adamfowleruk@gmail.com>
+ * Copyright 2019 Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adam Fowler, adamfowleruk@gmail.com
+ *		2019	Adam Fowler, adamfowleruk@gmail.com
  *		Others previously, undocumented
  */
 #include "ProjectBuilder.h"
@@ -29,7 +29,6 @@
 #include "Project.h"
 #include "SourceFile.h"
 #include "StatCache.h"
-#include "TerminalWindow.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ProjectBuilder"
@@ -224,12 +223,21 @@ ProjectBuilder::DoPostBuild(void)
 			BString command;
 			DPath targetpath = fProject->GetPath().GetFolder();
 			targetpath.Append(fProject->GetTargetName());
-			command << "cd '" << targetpath.GetFolder() << "'; '"
-				<< targetpath.GetFileName() << "' " << fProject->GetRunArgs()
-				<< " 2>&1";
+			command << "'" << targetpath.GetFileName() << "' " 
+					<< fProject->GetRunArgs();
 			
 			STRACE(1,("Terminal Run command: %s\n",command.String()));
 			
+			BMessage* runMsg = new BMessage(M_BUILD_MONITOR);
+			
+			entry_ref ref;
+			BEntry(fProject->GetPath().GetFolder()).GetRef(&ref);
+			runMsg->AddRef("pwd",&ref);
+			runMsg->AddString("cmd",command);
+			
+			fMsgr.SendMessage(runMsg);
+			
+			/*
 			TerminalWindow *termwin = new TerminalWindow(command.String());
 			BString termtitle = "Terminal Output: ";
 			termtitle << fProject->GetName();
@@ -237,6 +245,7 @@ ProjectBuilder::DoPostBuild(void)
 			termwin->Hide();
 			termwin->Show();
 			termwin->RunCommand();
+			*/
 			break;
 		}
 		case POSTBUILD_DEBUG:

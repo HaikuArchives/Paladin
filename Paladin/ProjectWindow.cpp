@@ -59,6 +59,7 @@
 #include "LibWindow.h"
 #include "LicenseManager.h"
 #include "Makemake.h"
+#include "MonitorWindow.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
 #include "PrefsWindow.h"
@@ -133,7 +134,8 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	fMenusLocked(false),
 	fBuilder(BMessenger(this)),
 	fPrefsWindow(NULL),
-	fQuickFind(NULL)
+	fQuickFind(NULL),
+	fMonitorWindow(NULL)
 {
 	SetSizeLimits(200, 30000, 200, 30000);
 	MoveTo(100,100);
@@ -1172,6 +1174,16 @@ ProjectWindow::MessageReceived(BMessage* message)
 			SetStatus(B_TRANSLATE("Performing post-build tasks"));
 			break;
 		}
+		
+		case M_BUILD_MONITOR:
+		{
+			EnsureMonitorWindow();
+			fMonitorWindow->Show();
+			BString so("stdout");
+			BString se("stderr");
+			fMonitorWindow->Launch(message,so.String(),se.String());
+			break;
+		}
 
 		case M_BUILD_FAILURE:
 			SetMenuLock(false);
@@ -1263,6 +1275,27 @@ ProjectWindow::MessageReceived(BMessage* message)
 
 		default:
 			BWindow::MessageReceived(message);
+	}
+}
+
+void
+ProjectWindow::EnsureMonitorWindow()
+{
+	if (NULL == fMonitorWindow)
+	{
+		fMonitorWindow = new MonitorWindow(BRect(100,100,700,500));
+		const char* bo = "build";
+		const char* so = "stdout";
+		const char* se = "stderr";
+		const char* tsb = B_TRANSLATE("Build");
+		const char* tso = B_TRANSLATE("Standard Out");
+		const char* tse = B_TRANSLATE("Standard Error");
+		MonitorViewInfo miBuild = {bo,tsb};
+		MonitorViewInfo miOut = {so,tso};
+		MonitorViewInfo miErr = {se,tse};
+		fMonitorWindow->AddView(miBuild);
+		fMonitorWindow->AddView(miOut);
+		fMonitorWindow->AddView(miErr);
 	}
 }
 

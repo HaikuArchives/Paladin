@@ -24,10 +24,10 @@ StreamingTextView::StreamingTextView(const char* name)
 	textView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, 
 		B_ALIGN_USE_FULL_HEIGHT));
 
-	BScrollBar* textScroll = new BScrollBar("textscrollbar",
+	fTextScroll = new BScrollBar("textscrollbar",
 		fText, 0, 100, B_VERTICAL);
-	textScroll->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	BLayoutItem* liScrollBar = hGroup->AddView(textScroll);
+	fTextScroll->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	BLayoutItem* liScrollBar = hGroup->AddView(fTextScroll);
 	liScrollBar->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, 
 		B_ALIGN_USE_FULL_HEIGHT));
 }
@@ -42,4 +42,8 @@ StreamingTextView::Append(BString& text)
 	BString newText(fText->Text());
 	newText << text;
 	fText->SetText(newText);
+	
+	float min, max;
+	fTextScroll->GetRange(&min,&max);
+	fTextScroll->SetValue(max);
 }

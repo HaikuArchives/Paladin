@@ -392,6 +392,11 @@ ProjectWindow::QuitRequested()
 		fErrorWindow->Quit();
 		fErrorWindow = NULL;
 	}
+	
+	if (fMonitorWindow != NULL) {
+		fMonitorWindow->Quit();
+		fMonitorWindow = NULL;
+	}
 
 	DeregisterWindow();
 
@@ -1184,6 +1189,14 @@ ProjectWindow::MessageReceived(BMessage* message)
 			fMonitorWindow->Launch(message,so.String(),se.String());
 			break;
 		}
+		case M_MONITOR_CLOSED:
+		{
+			BNode node(fProject->GetPath().GetFullPath());
+			BRect frame = message->GetRect("frame",BRect(100,100,700,500));
+			node.WriteAttr("monitor_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect));
+			fMonitorWindow = NULL;
+			break;
+		}
 
 		case M_BUILD_FAILURE:
 			SetMenuLock(false);
@@ -1283,7 +1296,25 @@ ProjectWindow::EnsureMonitorWindow()
 {
 	if (NULL == fMonitorWindow)
 	{
-		fMonitorWindow = new MonitorWindow(BRect(100,100,700,500));
+		BNode node(fProject->GetPath().GetFullPath());
+		BRect frame(100,100,700,500);
+		if (node.ReadAttr("monitor_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect))) {
+			if (frame.Width() < 400)
+				frame.right = frame.left + 400;
+
+			if (frame.Height() < 200)
+				frame.top = frame.bottom + 200;
+
+			if (frame.left < 0) 
+				frame.left = 0;
+			
+			if (frame.top < 0)
+				frame.top = 0;
+			
+			//MoveTo(frame.LeftTop());
+			//ResizeTo(frame.Width(), frame.Height());
+		}
+		fMonitorWindow = new MonitorWindow(frame, this);
 		const char* bo = "build";
 		const char* so = "stdout";
 		const char* se = "stderr";

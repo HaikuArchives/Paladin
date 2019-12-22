@@ -19,6 +19,11 @@ class BTabView;
 class BView;
 class CommandThread;
 
+enum
+{
+	M_MONITOR_CLOSED = 'mncl'
+};
+
 struct MonitorViewInfo
 {
 public:
@@ -46,6 +51,8 @@ class MonitorWindow : public BWindow
 {
 public:
 							MonitorWindow(BRect frame);
+							MonitorWindow(BRect frame,BLooper* parent);
+							
 	virtual					~MonitorWindow();
 	
 	void					AddView(MonitorViewInfo info);
@@ -55,6 +62,7 @@ public:
 	void					Launch(BMessage* commandMessage, const char* stdoutVewName, const char* stderrViewName);
 	
 	void					MessageReceived(BMessage* message);
+	virtual	bool			QuitRequested(void);
 	
 	void					Attach(CommandThread* runningThread, MonitorViewInfo info);
 	void					Attach(CommandThread* runningThread, const char* viewName);
@@ -70,6 +78,7 @@ private:
 	BTabView*						fTabView;
 	std::vector<MonitorViewInfo>	fViews;
 	uint32							fNextContextId;
+	BLooper*						fParent;
 };
 
 #endif

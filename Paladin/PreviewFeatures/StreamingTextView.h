@@ -4,6 +4,7 @@
 #include <View.h>
 
 class BTextView;
+class BScrollBar;
 
 class StreamingTextView : public BView
 {
@@ -18,7 +19,7 @@ protected:
 
 private:
 	BTextView*					fText;
-
+	BScrollBar*					fTextScroll;
 
 };
 

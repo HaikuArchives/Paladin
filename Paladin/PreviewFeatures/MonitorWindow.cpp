@@ -27,11 +27,32 @@
 MonitorWindow::MonitorWindow(BRect frame)
 	:
 	BWindow(frame,B_TRANSLATE("Monitor"),B_TITLED_WINDOW,B_NOT_ZOOMABLE),
-	fTabView(new BTabView("tabview")),
+	fTabView(new BTabView("tabview",B_WIDTH_FROM_WIDEST,
+		B_FULL_UPDATE_ON_RESIZE|B_WILL_DRAW|B_NAVIGABLE_JUMP|
+		B_FRAME_EVENTS|B_NAVIGABLE|B_SUPPORTS_LAYOUT)),
 	fViews(),
-	fNextContextId(1)
+	fNextContextId(1),
+	fParent(NULL)
 {
-	SetSizeLimits(400,30000,200,30000);
+	SetSizeLimits(300,30000,200,30000);
+	
+	// Initialise TabView holder with no tabs	
+	BLayoutBuilder::Group<>(this,B_VERTICAL,0.0f)
+		.Add(fTabView, 1.0f)
+	;
+}
+
+MonitorWindow::MonitorWindow(BRect frame, BLooper* parent)
+	:
+	BWindow(frame,B_TRANSLATE("Monitor"),B_TITLED_WINDOW,B_NOT_ZOOMABLE),
+	fTabView(new BTabView("tabview",B_WIDTH_FROM_WIDEST,
+		B_FULL_UPDATE_ON_RESIZE|B_WILL_DRAW|B_NAVIGABLE_JUMP|
+		B_FRAME_EVENTS|B_NAVIGABLE|B_SUPPORTS_LAYOUT)),
+	fViews(),
+	fNextContextId(1),
+	fParent(parent)
+{
+	SetSizeLimits(300,30000,200,30000);
 	
 	// Initialise TabView holder with no tabs	
 	BLayoutBuilder::Group<>(this,B_VERTICAL,0.0f)
@@ -44,6 +65,20 @@ MonitorWindow::~MonitorWindow()
 {
 	// Destroy should remove all views
 	// vector taken care of by auto destruction rules
+	
+}
+
+
+bool
+MonitorWindow::QuitRequested(void)
+{
+	if (fParent != NULL) {
+		BMessage message(M_MONITOR_CLOSED);
+		message.AddRect("frame", Frame());
+		fParent->PostMessage(&message);
+	}
+
+	return true;
 }
 	
 void
@@ -53,29 +88,15 @@ MonitorWindow::AddView(MonitorViewInfo info)
 	// (Possible because multiple sources can output to stderr and stdout)
 	
 	// Create view
-	printf("ADDVIEW\n");
-	printf(info.name);
-	printf("\n");
-	printf(info.title);
-	printf("\n");
 	MonitorViewInfo* existing = FindInfo(info.name);
 	StreamingTextView* v;
 	if (NULL == existing)
 	{
 		v = new StreamingTextView(strdup(info.title));
 		info.view = v;
-	/*
-		MonitorViewInfo mvi{info.name,info.title,info.visible,info.view};
-		v = new StreamingTextView(strdup(mvi.title));
-		mvi.view = v;
-	printf("ADDMVI\n");
-	printf(mvi.name);
-	printf("\n");
-	printf(mvi.title);
-	printf("\n");
-	*/
+		
 		// Add view
-		fViews.emplace_back(MonitorViewInfo(info));
+		fViews.emplace_back(info); // invokes copy constructor
 		// Show view in tab view
 		fTabView->AddTab(info.view);
 	} else {
@@ -169,20 +190,14 @@ MonitorWindow::MessageReceived(BMessage* message)
 	{
 		case M_COMMAND_RECEIVE_STDOUT:
 		{
-			printf("Got something on stdout\n");
 			if (B_OK == message->FindPointer("context",&ptr))
 			{
-				printf("Got out ptr\n");
 				ctx = ((CommandContext*)ptr);
-				printf(ctx->stdoutViewName);
 				MonitorViewInfo* info = FindInfo(ctx->stdoutViewName);
 				if (NULL != info)
 				{
-				printf("Got out info\n");
 					if (B_OK == message->FindString("output",&txt))
 					{
-				printf("Got output\n");
-				printf(txt);
 						((StreamingTextView*)info->view)->Append(txt);
 					}
 				}
@@ -191,20 +206,14 @@ MonitorWindow::MessageReceived(BMessage* message)
 		}
 		case M_COMMAND_RECEIVE_STDERR:
 		{
-			printf("Got something on stderr\n");
 			if (B_OK == message->FindPointer("context",&ptr))
 			{
-				printf("Got error ptr\n");
 				ctx = ((CommandContext*)ptr);
-				printf(ctx->stderrViewName);
 				MonitorViewInfo* info = FindInfo(ctx->stderrViewName);
 				if (NULL != info)
 				{
-				printf("Got error info\n");
 					if (B_OK == message->FindString("error",&txt))
 					{
-				printf("Got errors\n");
-				printf(txt);
 						((StreamingTextView*)info->view)->Append(txt);
 					}
 				}

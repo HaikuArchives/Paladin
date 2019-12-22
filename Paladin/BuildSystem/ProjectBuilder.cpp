@@ -405,12 +405,11 @@ ProjectBuilder::BuildThread(void *data)
 			return B_OK;
 		}
 		
-		CompileCommand cc(
+		((ProjectBuilder*)data)->fCommands.emplace_back(
 			std::string(file->GetPath().GetFileName()),
 			std::string(file->GetCompileCommand(*proj->GetBuildInfo(),NULL).String()),
 			std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
 		);
-		((ProjectBuilder*)data)->fCommands.push_back(cc);
 		
 		proj->CompileFile(file);
 		

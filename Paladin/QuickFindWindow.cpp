@@ -231,7 +231,6 @@ void
 BTextQueryList::MessageReceived(BMessage* message)
 {
 	STRACE(1,("Message Received in BTextQueryList\n"));
-	const char* selText = NULL;
 	switch (message->what)
 	{
 		case M_QUICK_FIND_TEXT_UPDATED:
@@ -239,18 +238,18 @@ BTextQueryList::MessageReceived(BMessage* message)
 			// was BControl::MessageReceived(message);
 			// , but we want to use a separate thread in case search takes a long time
 			fResults->MakeEmpty();
-			fMessenger->SendMessage(message, fTextQueryLooper); // reply to handler interface
+			BMessage qm(*fQueryMessage);
+			BString qry;
+			if (B_OK == message->FindString("query",&qry))
+			{
+				qm.AddString("query",qry);
+			}
+			fMessenger->SendMessage(&qm, fTextQueryLooper); // reply to handler interface
 			break;
 		}
 		case M_QUICK_FIND_SELECT:
 		{
-			if (fResults->CountItems() > 0)
-			{
-				int idx = fResults->CurrentSelection();
-				selText = ((BStringItem*)fResults->ItemAt(idx))->Text();
-				message->AddString("selected",selText);
-				fMessenger->SendMessage(message);
-			}
+			_FireSelect();
 			break;
 		}
 		case M_QUICK_FIND_SELECT_NEXT:
@@ -279,16 +278,47 @@ BTextQueryList::MessageReceived(BMessage* message)
 		}
 		default:
 		{
-			printf("Message what: \n");
+			STRACE(1,("Message what: \n"));
 			message->PrintToStream();
 			BControl::MessageReceived(message);
 		}
 	}
 }
 
-// TODO also handle double click on a list item
+void
+BTextQueryList::_FireSelect()
+{
+	BMessage message(*fSelectionMessage);
+	if (fResults->CountItems() > 0)
+	{
+		//int idx = fResults->CurrentSelection();
+		//const char* selText = ((BStringItem*)fResults->ItemAt(idx))->Text();
+		//STRACE(1,("Selected: %s\n",selText));
+		//message.AddString("selected",selText);
+		// Listener will use GetSelectionOption() to get selected text
+		//   Needed as if done by mouse, the selection text isn't sent
+		fMessenger->SendMessage(&message);
+		fText->SelectAll();
+	}
+}
 
-// TODO intercept enter when list, not text view, selected
+void
+BTextQueryList::SelectText()
+{
+	if (NULL != fText)
+	{
+		fText->SelectAll();
+	}
+}
+
+const char*
+BTextQueryList::GetSelectedOption()
+{
+	int idx = fResults->CurrentSelection();
+	const char* selText = ((BStringItem*)fResults->ItemAt(idx))->Text();
+	return selText;
+}
+
 
 
 void
@@ -434,7 +464,10 @@ BTextQueryList::_InitResults()
 	BRect r = Bounds();
 	r.top = r.top + 32.0;
 	fResults = new BListView(r,"results",B_SINGLE_SELECTION_LIST,B_WILL_DRAW);
-	fResults->SetSelectionMessage(new BMessage(M_QUICK_FIND_SELECT));
+	//fResults->SetSelectionMessage(fSelectionMessage);
+	// Don't attach this as it bypasses our selection handler, and is for single click
+	//   not double click
+	fResults->SetInvocationMessage(fSelectionMessage);
 	AddChild(fResults);
 	
 	fResults->AddItem(new BStringItem(B_TRANSLATE("Type to search")));
@@ -447,11 +480,10 @@ BTextQueryList::_InitResults()
 
 
 
-
 QuickFindWindow::QuickFindWindow(const char* panelText)
 	:
-	BWindow(BRect(100,200,700,500), B_TRANSLATE("Quick find"), B_TITLED_WINDOW, 
-		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(100,200,700,500), B_TRANSLATE("Quick find"), B_BORDERED_WINDOW, 
+		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	fSelectedPath = NULL;
 	
@@ -537,7 +569,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 	char* entryName = new char[1024];
 	BPath entryPath;
 	char* s;
-			// TODO qfw -> QuickFindWindow.* style search
+			// qfw -> QuickFindWindow.* style search
 			// TODO case insensitive
 			
 			// Check to see if the file name matches the search string
@@ -604,7 +636,7 @@ QuickFindWindow::MessageReceived(BMessage* message)
 		case M_QUICK_FIND_SELECT:
 			STRACE(1,("Find selection message received\n"));
 			// go do something now (open the file)
-			option = message->GetString("selected");
+			option = fList->GetSelectedOption();
 			if (NULL != option)
 			{
 				// Hide quick find window (me)
@@ -620,17 +652,35 @@ QuickFindWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		default:
-			printf("Observed unhandled: %i",message->what);
+			STRACE(1,("Observed unhandled: %i\n",message->what));
 			BWindow::MessageReceived(message);
 	}
 }
 
-
+void
+QuickFindWindow::WindowActivated(bool active)
+{
+	STRACE(1,("QuickFindWindow::WindowActivated\n"));
+	BWindow::WindowActivated(active);
+	if (!active)
+	{
+		STRACE(1,("QuickFindWindow inactive - hiding if necessary\n"));
+		// Note: Hide and Show are cumulative - don't call if hidden
+		if (!IsHidden())
+			Hide();
+		fList->SelectText();
+	} else {
+		fList->MakeFocus(true);
+	}
+}
 
 bool
 QuickFindWindow::QuitRequested(void)
 {
-	Hide();
-	fList->SetText(""); // Clear for the next search
+	STRACE(1,("QuickFindWindow::QuitRequested\n"));
+	if (!IsHidden())
+		Hide();
+	//fList->SetText(""); // Clear for the next search
+	// the above is redundant - select all done by text query list instead
 	return false;
 }

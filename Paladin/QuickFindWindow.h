@@ -90,6 +90,7 @@ public:
 	virtual void			SetText(const char*);
 			const char*		Text() const;
 			int32			TextLength() const;
+			void			SelectText();
 			
 			BTextView*		TextView() const;
 	virtual void			MakeFocus(bool);
@@ -101,6 +102,7 @@ public:
 	virtual void			ClearOptions(void);
 	virtual void			AddOption(const char* option);
 	virtual void			AllOptionsAdded(void);
+	virtual const char*		GetSelectedOption(void);
 	
 private:
 	friend class _BTextQueryEntry_;
@@ -108,6 +110,7 @@ private:
 			void			_InitText(const char* initialText,
 								const BMessage* archive = NULL);
 			void			_InitResults(void);
+			void			_FireSelect(void);
 								
 private:
 			BPrivate::_BTextQueryEntry_* fText;
@@ -135,6 +138,7 @@ public:
 			void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested(void);
 			void				SetProject(Project* project);
+			void				WindowActivated(bool active);
 	
 private:
 			void				DoSearch(BMessage* queryMessage);

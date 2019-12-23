@@ -856,8 +856,10 @@ ProjectWindow::MessageReceived(BMessage* message)
 		}
 		case M_QUICK_FIND:
 		{
+			STRACE(1,("M_QUICK_FIND\n"));
 			if (NULL == fQuickFind)
 			{
+				STRACE(1,("Creating new quick find window\n"));
 				fQuickFind = new QuickFindWindow(B_TRANSLATE("Quick find"));
 			}
 			fQuickFind->SetProject(fProject);

@@ -102,7 +102,11 @@ SRCS = AboutWindow.cpp \
 	SourceControl/SCMManager.cpp \
 	SourceControl/SCMOutputWindow.cpp \
 	SourceControl/SVNSourceControl.cpp \
-	SourceControl/SourceControl.cpp
+	SourceControl/SourceControl.cpp \
+	PreviewFeatures/MonitorWindow.cpp \
+	PreviewFeatures/StreamingTextView.cpp \
+	PreviewFeatures/CommandThread.cpp \
+	PreviewFeatures/GenericThread.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.

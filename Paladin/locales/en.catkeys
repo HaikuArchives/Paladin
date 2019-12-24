@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	1273216190
+1	English	application/x-vnd.dw-Paladin	386614745
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -17,6 +17,7 @@ Backspace	AsciiWindow	ASCII table description	Backspace
 This cannot be undone. Delete module?	CodeLibWindow		This cannot be undone. Delete module?
 New line	AsciiWindow	ASCII table description	New line
 Error window	ProjectWindow		Error window
+Standard Error	ProjectWindow		Standard Error
 Module files	CodeLibWindow		Module files
 Providers	SCMImportWindow		Providers
 Extra compiler options:	ProjectSettingsWindow		Extra compiler options:
@@ -58,6 +59,7 @@ Run logged	ProjectWindow		Run logged
 Settings…	ProjectWindow		Settings…
 Subversion	SCMImportWindow		Subversion
 DoSearch started\n	QuickFindWindow		DoSearch started\n
+Standard Out	ProjectWindow		Standard Out
 Revert selected files	ProjectWindow		Revert selected files
 Source control repository folder:	PrefsWindow		Source control repository folder:
 Matched text:	VRegWindow		Matched text:
@@ -122,6 +124,7 @@ Updating resources	ProjectWindow		Updating resources
 These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		These files (except libraries) will be permanently deleted. Remove them?
 Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Sets the location for the 'server' side of local Subversion repositories.
 Add new file	AddNewFileWindow		Add new file
+Monitor	MonitorWindow		Monitor
 Success\n	Paladin		Success\n
 Import an existing project	StartWindow		Import an existing project
 Create new module…	CodeLibWindow		Create new module…

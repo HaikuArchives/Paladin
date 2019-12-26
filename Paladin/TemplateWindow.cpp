@@ -71,6 +71,11 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 		templatePath<<"Templates";
 		fTempList.ScanFolder(templatePath.GetFullPath());
 	}
+	
+	// #312 allow user specified templates
+	fTempList.ScanFolder("/boot/home/config/settings/Paladin/Templates");
+	// And allow other packages to install Paladin templates too
+	fTempList.ScanFolder("/system/data/Paladin/Templates");
 
 	// project type
 	BPopUpMenu* projectTypeMenu = new BPopUpMenu(B_TRANSLATE("Project type"));

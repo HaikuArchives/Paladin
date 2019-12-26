@@ -21,7 +21,9 @@ TemplateManager::ScanFolder(const char *path)
 	if (!path || !BEntry(path).IsDirectory())
 		return;
 	
-	fList.MakeEmpty();
+	// #312 - default app, user, and system template paths
+	//   must all be supported - so don't clear
+	//fList.MakeEmpty();
 	BDirectory dir(path);
 	dir.Rewind();
 	

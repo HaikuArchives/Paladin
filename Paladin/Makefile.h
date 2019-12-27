@@ -20,6 +20,7 @@ const char* template_makefile = "## Haiku Generic Makefile v2.6 ##\n\
 \n\
 # The name of the binary.\n\
 NAME = $@NAME@$\n\
+TARGET_DIR = .\n\
 \n\
 # The type of binary, must be one of:\n\
 #	APP:	Application\n\

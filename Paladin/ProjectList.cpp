@@ -610,7 +610,7 @@ SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR); // was {0, 0, 0, 255};
 	// not used - see StringListItem.cpp
-	//    rgb_color textSelectColor = tint_color(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR), B_LIGHTEN_1_TINT);
+	rgb_color textSelectColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 	rgb_color backColor = ui_color(B_LIST_BACKGROUND_COLOR); //was white;
 	rgb_color selectColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR); //was tint_color(white, B_DARKEN_2_TINT);
 
@@ -631,6 +631,7 @@ SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 	if (IsSelected())
 	{
 		backColor = selectColor;
+		textColor = textSelectColor;
 	}
 
 	switch (fDisplayState) {
@@ -651,7 +652,6 @@ SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 		case SFITEM_NEEDS_BUILD:
 		{
 			if (IsSelected()) {
-				textColor = white;
 			} else {
 				SET_COLOR(textColor, 144, 144, 144);
 			}
@@ -722,8 +722,16 @@ SourceGroupItem::DrawItem(BView* owner, BRect frame, bool complete)
 	if (GetData()->expanded != IsExpanded())
 		GetData()->expanded = IsExpanded();
 
+
+	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR); // was {0, 0, 0, 255};
+	// not used - see StringListItem.cpp
+	rgb_color textSelectColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+	rgb_color backColor = ui_color(B_LIST_BACKGROUND_COLOR); //was white;
+	rgb_color selectColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR); //was tint_color(white, B_DARKEN_2_TINT);
+
+
 	owner->SetFont(be_bold_font);
-	owner->SetHighColor(black);
+	//owner->SetHighColor(black); 
 	BStringItem::DrawItem(owner, frame, complete);
 	owner->SetFont(be_plain_font);
 }

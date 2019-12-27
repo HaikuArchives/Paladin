@@ -20,6 +20,12 @@ else
 	MAKECLEAN=0
 fi
 
+if [ ! -f "/boot/system/develop/headers/pcre.h" ]
+then
+	echo "pcre.h does not exist. Have you run pkgman install devel:libpcre ?"
+	exit -1;
+fi
+
 # This function creates a temporary project from which we make
 # sure that the target is being built without debugging enabled
 BuildNoDebug ()
@@ -81,3 +87,31 @@ cd ../
 cd SymbolFinder
 BuildNoDebug SymbolFinder
 cd ..
+
+# Attempt to build and run tests
+cd Tests
+if [ ! -f "/boot/system/develop/headers/UnitTest++/UnitTest++.h" ]
+then
+	echo "UnitTest++.h does not exist. Have you run pkgman install unittest++_devel ?"
+	exit -1;
+fi
+
+./compile.sh
+
+if [ "$?" -eq "0" ]
+then
+	echo "Building tests completed OK"
+else
+	echo "Building tests failed"
+	exit 1;
+fi
+./tests.o
+if [ "$?" -eq "0" ]
+then
+	echo "Tests succeeded OK"
+else
+	echo "Tests failed."
+	exit 1;
+fi
+cd ..
+

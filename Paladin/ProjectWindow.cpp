@@ -237,6 +237,9 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	if (decRect.top < 0)
 		moveY = - decRect.top;
 	MoveBy(moveX, moveY);
+	
+	MoveOnScreen(B_DO_NOT_RESIZE_TO_FIT | 
+		B_MOVE_IF_PARTIALLY_OFFSCREEN);
 
 	fProjectList->SetTarget(this);
 	fProjectList->MakeFocus(true);
@@ -1317,6 +1320,8 @@ ProjectWindow::EnsureMonitorWindow()
 			//ResizeTo(frame.Width(), frame.Height());
 		}
 		fMonitorWindow = new MonitorWindow(frame, this);
+		fMonitorWindow->MoveOnScreen(B_DO_NOT_RESIZE_TO_FIT | 
+			B_MOVE_IF_PARTIALLY_OFFSCREEN);
 		const char* bo = "build";
 		const char* so = "stdout";
 		const char* se = "stderr";

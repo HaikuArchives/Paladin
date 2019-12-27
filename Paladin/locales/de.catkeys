@@ -1,4 +1,4 @@
-1	German	application/x-vnd.dw-Paladin	1273216190
+1	German	application/x-vnd.dw-Paladin	386614745
 Compiler caching is another way to speed up builds	PrefsWindow		Ein Compiler-Cache kann das Kompilieren beschleunigen
 Build	PrefsWindow		Erzeugen
 Subversion	PrefsWindow		Subversion
@@ -147,8 +147,10 @@ Debugging information needs to compiled into your project. This may take some ti
 ASCII table	ProjectWindow		ASCII-Tabelle
 Backup project	ProjectWindow		Projekt sichern
 Rebuild	ProjectWindow		Re-build
-Quick find	ProjectWindow		Quick find
-Quick find and open…	ProjectWindow		Quick find and open…
+Quick find	ProjectWindow		Schnellsuche
+Quick find and open…	ProjectWindow		Schnell suchen und öffnen…
+Standard Error	ProjectWindow		Standard Error
+Standard Out	ProjectWindow		Standard Out
 Create new module…	CodeLibWindow		Neues Modul anlegen…
 Delete current module	CodeLibWindow		Aktuelles Modul löschen
 Add	CodeLibWindow		Hinzu
@@ -179,7 +181,7 @@ System libraries:	LibWindow		Systembibliotheken:
 Scanning libraries…	LibWindow		Bibliotheken einlesen…
 Choose the system libraries for your project:	LibWindow		Systembibliotheken für das Projekt wählen:
 User libraries:	LibWindow		Benutzerbibliotheken:
-System Develop libraries:	LibWindow		System Develop libraries:
+System Develop libraries:	LibWindow		System Entwicklungsbibliotheken:
 Sort group	ProjectList		Gruppe sortieren
 Force file rebuild	ProjectList		Re-build von Dateien erzwingen
 Remove selected files	ProjectList		Ausgewählte Dateien entfernen
@@ -373,10 +375,11 @@ The location entered does not exist.\nPlease check to make sure you have entered
 Browse…	PathBox		Durchsuchen…
 Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin kann den Debugger nicht finden.
 Close	SCMOutputWindow		Schließen
-Find files: 	QuickFindWindow		Find files: 
-DoSearch started\n	QuickFindWindow		DoSearch started\n
-Quick find	QuickFindWindow		Quick find
-Type to search	QuickFindWindow		Type to search
-Found: %s\n	QuickFindWindow		Found: %s\n
-Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
-Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Find files: 	QuickFindWindow		Suche Dateien:
+DoSearch started\n	QuickFindWindow		DoSearch begonnen\n
+Quick find	QuickFindWindow		Schnellsuche
+Type to search	QuickFindWindow		Suche während der Eingabe
+Found: %s\n	QuickFindWindow		Gefunden: %s\n
+Searching for file matching: %s\n	QuickFindWindow		Suche Dateien mit: %s\n
+Directory InitCheck failed\n	QuickFindWindow		Ordner InitCheck fehlgeschlagen\n
+Monitor	MonitorWindow		Monitor

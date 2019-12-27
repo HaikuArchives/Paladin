@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	386614745
+1	English	application/x-vnd.dw-Paladin	3938325755
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -161,7 +161,6 @@ Preferred source control:	PrefsWindow		Preferred source control:
 Project settings	ProjectSettingsWindow		Project settings
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
-Templates	TemplateWindow		Templates
 Backups folder:	PrefsWindow		Backups folder:
 Git	TemplateWindow		Git
 Find in project	FindWindow		Find in project

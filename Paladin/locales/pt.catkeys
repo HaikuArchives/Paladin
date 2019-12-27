@@ -1,4 +1,4 @@
-1	Portuguese	application/x-vnd.dw-Paladin	1273216190
+1	Portuguese	application/x-vnd.dw-Paladin	386614745
 Compiler caching is another way to speed up builds	PrefsWindow		A cache do compilador é outra forma de acelerar a construção (build).
 Build	PrefsWindow		Construir (Build)
 Subversion	PrefsWindow		Subversion
@@ -149,6 +149,8 @@ Backup project	ProjectWindow		Efetuar cópia de segurança do projeto
 Rebuild	ProjectWindow		Reconstruir (rebuild)
 Quick find	ProjectWindow		Quick find
 Quick find and open…	ProjectWindow		Quick find and open…
+Standard Error	ProjectWindow		Standard Error
+Standard Out	ProjectWindow		Standard Out
 Create new module…	CodeLibWindow		Criar novo módulo…
 Delete current module	CodeLibWindow		Eliminar o módulo atual
 Add	CodeLibWindow		Adicionar
@@ -380,3 +382,4 @@ Type to search	QuickFindWindow		Type to search
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
 Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Monitor	MonitorWindow		Monitor

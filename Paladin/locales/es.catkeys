@@ -1,4 +1,4 @@
-1	Spanish	application/x-vnd.dw-Paladin	386614745
+1	Spanish	application/x-vnd.dw-Paladin	3705667463
 Compiler caching is another way to speed up builds	PrefsWindow		Usar el cache del compilador es otra manera de acelerar las compilaciones
 Build	PrefsWindow		Compilar
 Subversion	PrefsWindow		Subversion
@@ -151,6 +151,7 @@ Quick find	ProjectWindow		Quick find
 Quick find and open…	ProjectWindow		Quick find and open…
 Standard Error	ProjectWindow		Standard Error
 Standard Out	ProjectWindow		Standard Out
+Delete group	ProjectWindow		Delete group
 Create new module…	CodeLibWindow		Crear nuevo módulo…
 Delete current module	CodeLibWindow		Eliminar módulo actual
 Add	CodeLibWindow		Agregar
@@ -194,6 +195,7 @@ Remove selected files from repository	ProjectList		Quitar los archivos seleccion
 Open parent folder	ProjectList		Abrir carpeta padre
 Source Control	ProjectList		Control de fuentes
 Rename group…	ProjectList		Renombrar grupo…
+Delete group	ProjectList		Delete group
 Add license to project	LicenseManager		Agregar licencia al proyecto
 Full version:	LicenseManager		Versión completa:
 Summary:	LicenseManager		Resumen:
@@ -240,7 +242,6 @@ Set the location for your project.	TemplateWindow		Establece la ubicación para 
 Target name:	TemplateWindow		Nombre destino:
 Git unavailable	TemplateWindow		Git no disponible
 Choose a project type	TemplateWindow		Elija el tipo de proyecto
-Templates	TemplateWindow		Plantillas
 If checked, a folder for your project will be created in the location entered above.	TemplateWindow		Si está activado, una carpeta para su proyecto será creada en la ubicación ingresada arriba.
 Create project…	TemplateWindow		Crear proyecto…
 Git	TemplateWindow		Git

@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	3938325755
+1	English	application/x-vnd.dw-Paladin	3705667463
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -113,6 +113,7 @@ Paladin: Project	ProjectWindow		Paladin: Project
 Remove	Project		Remove
 Add	CodeLibWindow		Add
 Shift in	AsciiWindow	ASCII table description	Shift in
+Delete group	ProjectList		Delete group
 Show differences from last check-in	ProjectWindow		Show differences from last check-in
 Errors and warnings: 	ErrorWindow		Errors and warnings: 
 Remove selected files	ProjectWindow		Remove selected files
@@ -364,6 +365,7 @@ Paladin settings	PrefsWindow		Paladin settings
 Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n
 General	PrefsWindow		General
 Paladin: Start	StartWindow		Paladin: Start
+Delete group	ProjectWindow		Delete group
 Mercurial	PrefsWindow		Mercurial
 Results:	FindWindow		Results:
 Regex:	VRegWindow		Regex:

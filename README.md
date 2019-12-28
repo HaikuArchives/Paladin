@@ -2,12 +2,14 @@
  
 Paladin is an open source integrated development environment (IDE) modeled after BeOS' BeIDE. It can use fastdep and ccache to speed up builds if you have them installed.
 
-To build: run `pkgman install devel:libpcre` and then run `./buildsuite.sh.`
+To build: run `pkgman install devel:libpcre unittest++_devel` and then run `./buildsuite.sh 1`
 
 
 ## Features
 
 - Command-line build support
+
+- Quick Find a file by name with Alt+F, with abbreviations (E.g. QFW finds QuickFindWindow.cpp)
 
 - Multithreaded builds
 

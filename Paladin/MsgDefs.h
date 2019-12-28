@@ -25,6 +25,7 @@ enum
 	M_REBUILD_FILE = 'rbfl',
 	M_NEW_GROUP = 'nwgr',
 	M_SORT_GROUP = 'srgr',
+	M_DELETE_GROUP = 'dlgr',
 	M_SHOW_RENAME_GROUP = 'shrg',
 	M_CULL_EMPTY_GROUPS = 'cleg',
 	M_IMPORT_REFS = 'imrf',

@@ -770,9 +770,24 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_SORT_GROUP:
 		{
 			int32 selection = fProjectList->FullListCurrentSelection();
-			SortGroup(selection);
-			fProject->Save();
+			if (selection >= 0)
+			{
+				SortGroup(selection);
+				fProject->Save();
+			}
 
+			break;
+		}
+		case M_DELETE_GROUP:
+		{
+			int32 selection = fProjectList->FullListCurrentSelection();
+			if (selection >= 0)
+			{
+				RemoveGroup(selection);
+				fProject->Save();
+				fProjectList->RefreshList();
+			}
+		
 			break;
 		}
 
@@ -1356,6 +1371,24 @@ ProjectWindow::SortGroup(int32 selection)
 	groupItem->GetData()->Sort();
 }
 
+void
+ProjectWindow::RemoveGroup(int32 selection)
+{
+	SourceGroupItem* groupItem = NULL;
+	if (selection < 0) {
+		return;
+	}
+	
+	BStringItem* stringItem 
+		= (BStringItem*)fProjectList->FullListItemAt(selection);
+	groupItem = fProjectList->GroupForItem(stringItem);
+	
+	if (groupItem == NULL)
+		return;
+
+	fProject->RemoveGroup(groupItem->GetData(),true);
+}
+
 
 void
 ProjectWindow::MenusBeginning(void)
@@ -1707,6 +1740,8 @@ ProjectWindow::CreateMenuBar()
 		new BMessage(M_SHOW_RENAME_GROUP)));
 	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 		new BMessage(M_SORT_GROUP)));
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Delete group"),
+		new BMessage(M_DELETE_GROUP)));
 	fProjectMenu->AddSeparatorItem();
 	BString showProjFolderStr(B_TRANSLATE("Show project folder"));
 	fProjectMenu->AddItem(new BMenuItem(showProjFolderStr,
@@ -1796,16 +1831,21 @@ ProjectWindow::SetMenuLock(bool locked)
 void
 ProjectWindow::MakeGroup(int32 selection)
 {
-	if (selection < 0) {
-		return;
-	}
+/*
+	//if (selection < 0) {
+	//	return;
+	//}
 
 	int32 newGroupIndex = -1;
 	
-	bool groupSelected = dynamic_cast<SourceGroupItem*>(
+	bool groupSelected = false;
+	if (selection >= 0)
+	{
+		groupSelected = dynamic_cast<SourceGroupItem*>(
 			fProjectList->FullListItemAt(selection))
 		|| dynamic_cast<SourceGroupItem*>(
 			fProjectList->FullListItemAt(selection - 1));
+	}
 	
 	if (groupSelected)
 	{
@@ -1819,12 +1859,16 @@ ProjectWindow::MakeGroup(int32 selection)
 				if (dynamic_cast<SourceGroupItem*>(fProjectList->FullListItemAt(i)))
 					groupcount++;
 			}
+			newGroupIndex = groupcount;
 		}
 	}
+	*/
+	int32 newGroupIndex = fProject->CountGroups(); // zero indexed
 
 	SourceGroup* newgroup = fProject->AddGroup("New group", newGroupIndex);
 	SourceGroupItem* newGroupItem = new SourceGroupItem(newgroup);
 	
+	/*
 	if (!groupSelected) {
 		SourceGroupItem* oldgroupitem = (SourceGroupItem*)fProjectList->Superitem(
 			fProjectList->FullListItemAt(selection));
@@ -1845,9 +1889,11 @@ ProjectWindow::MakeGroup(int32 selection)
 		}
 		fProjectList->InvalidateItem(selection);
 	} else {
+	*/
 		fProjectList->AddItem(newGroupItem);
 		fProjectList->Select(fProjectList->CountItems() - 1);
-	}
+	//}
+	
 
 	fProjectList->Expand(newGroupItem);
 	fProject->Save();
@@ -1901,6 +1947,9 @@ ProjectWindow::ShowErrorWindow(ErrorList* list)
 void
 ProjectWindow::CullEmptyGroups(void)
 {
+	// #329 - Making a no op as it is misleading if not only deps 
+	//        that are culled
+	/*
 	for (int32 i = fProjectList->CountItems() - 1; i >= 0; i--) {
 		SourceGroupItem* groupitem = dynamic_cast<SourceGroupItem*>(
 			fProjectList->ItemAt(i));
@@ -1912,6 +1961,7 @@ ProjectWindow::CullEmptyGroups(void)
 	}
 
 	fProject->Save();
+	*/
 }
 
 

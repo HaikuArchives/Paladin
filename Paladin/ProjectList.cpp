@@ -360,6 +360,8 @@ ProjectList::ShowContextMenu(BPoint where)
 			new BMessage(M_SHOW_RENAME_GROUP)));
 		menu.AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 			new BMessage(M_SORT_GROUP)));
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Delete group"),
+			new BMessage(M_DELETE_GROUP)));
 
 		menu.SetTargetForItems(Window());
 		menu.Go(screenPoint, true, false);

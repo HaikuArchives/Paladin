@@ -1,13 +1,13 @@
 /*
  * Copyright 2001-2010 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
- * Copyright 2018-2019 Adam Fowler <adamfowleruk@gmail.com>
+ * Copyright 2018-2019 Haiku Inc
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
- *		Adam Fowler, adamfowleruk@gmail.com
+ *		2018-2019	Adam Fowler, adamfowleruk@gmail.com
  */
 #ifndef PROJECT_WINDOW_H
 #define PROJECT_WINDOW_H
@@ -34,6 +34,7 @@ class SourceControl;
 class SourceFile;
 class PrefsWindow;
 class QuickFindWindow;
+class MonitorWindow;
 
 typedef struct {
 	BMessage		refMessage;
@@ -66,11 +67,13 @@ private:
 			void				ShowErrorWindow(ErrorList* list);
 			void				CullEmptyGroups(void);
 			void				SortGroup(int32 selection);
+			void				RemoveGroup(int32 selection);
 			void				UpdateProjectList(void);
 			void				UpdateDependencies(void);
 			void				ToggleDebugMenu(void);
 
 			void				DoBuild(int32 postbuild);
+			void				EnsureMonitorWindow(void);
 			void				AddNewFile(BString name, bool createPair);
 	static	int32				AddFileThread(void* data);
 			void				AddFolder(entry_ref folderref);
@@ -108,6 +111,7 @@ private:
 			
 			PrefsWindow*		fPrefsWindow;
 			QuickFindWindow*	fQuickFind;
+			MonitorWindow*		fMonitorWindow;
 };
 
 

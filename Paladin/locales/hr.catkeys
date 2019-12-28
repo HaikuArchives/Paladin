@@ -1,4 +1,4 @@
-1	Croatian	application/x-vnd.dw-Paladin	1273216190
+1	Croatian	application/x-vnd.dw-Paladin	3705667463
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Build	PrefsWindow		Build
 Subversion	PrefsWindow		Subversion
@@ -149,6 +149,9 @@ Backup project	ProjectWindow		Backup project
 Rebuild	ProjectWindow		Rebuild
 Quick find	ProjectWindow		Quick find
 Quick find and open…	ProjectWindow		Quick find and open…
+Standard Error	ProjectWindow		Standard Error
+Standard Out	ProjectWindow		Standard Out
+Delete group	ProjectWindow		Delete group
 Create new module…	CodeLibWindow		Napravi novi modul...
 Delete current module	CodeLibWindow		Izbriši trenutni modul
 Add	CodeLibWindow		Dodaj
@@ -192,6 +195,7 @@ Remove selected files from repository	ProjectList		Ukloni izabrane datoteke iz r
 Open parent folder	ProjectList		Open parent folder
 Source Control	ProjectList		Source Control
 Rename group…	ProjectList		Preimenuj grupu…
+Delete group	ProjectList		Delete group
 Add license to project	LicenseManager		Dodaj licencu projektu
 Full version:	LicenseManager		Puna verzija:
 Summary:	LicenseManager		Sažetak:
@@ -238,7 +242,6 @@ Set the location for your project.	TemplateWindow		Set the location for your pro
 Target name:	TemplateWindow		Target name:
 Git unavailable	TemplateWindow		Git je nedostupan
 Choose a project type	TemplateWindow		Choose a project type
-Templates	TemplateWindow		Templates
 If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
 Create project…	TemplateWindow		Napravi projekt...
 Git	TemplateWindow		Git
@@ -380,3 +383,4 @@ Type to search	QuickFindWindow		Type to search
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
 Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Monitor	MonitorWindow		Monitor

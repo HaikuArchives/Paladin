@@ -1,4 +1,4 @@
-1	Italian	application/x-vnd.dw-Paladin	1273216190
+1	Italian	application/x-vnd.dw-Paladin	3705667463
 Compiler caching is another way to speed up builds	PrefsWindow		La cache del compilatore è un altro modo per velocizzare le operazioni di build.
 Build	PrefsWindow		Build
 Subversion	PrefsWindow		Subversion
@@ -149,6 +149,9 @@ Backup project	ProjectWindow		Backup progetto
 Rebuild	ProjectWindow		Rebuild
 Quick find	ProjectWindow		Quick find
 Quick find and open…	ProjectWindow		Quick find and open…
+Standard Error	ProjectWindow		Standard Error
+Standard Out	ProjectWindow		Standard Out
+Delete group	ProjectWindow		Delete group
 Create new module…	CodeLibWindow		Crea nuovo modulo…
 Delete current module	CodeLibWindow		Elimina modulo corrente
 Add	CodeLibWindow		Aggiungi
@@ -192,6 +195,7 @@ Remove selected files from repository	ProjectList		Rimuovi i file selezionati da
 Open parent folder	ProjectList		Apri livello superiore
 Source Control	ProjectList		Versionamento del codice
 Rename group…	ProjectList		Rinomina gruppo…
+Delete group	ProjectList		Delete group
 Add license to project	LicenseManager		Aggiungi licenza al progetto
 Full version:	LicenseManager		Versione completa:
 Summary:	LicenseManager		Sintesi:
@@ -238,7 +242,6 @@ Set the location for your project.	TemplateWindow		Scegli il percorso per il pro
 Target name:	TemplateWindow		Nome target:
 Git unavailable	TemplateWindow		Git non disponibile
 Choose a project type	TemplateWindow		Scegli il tipo di progetto
-Templates	TemplateWindow		Modelli
 If checked, a folder for your project will be created in the location entered above.	TemplateWindow		Se selezionato, una cartella per questo progetto verrà creata nel percorso selezionato.
 Create project…	TemplateWindow		Crea progetto…
 Git	TemplateWindow		Git
@@ -380,3 +383,4 @@ Type to search	QuickFindWindow		Type to search
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
 Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Monitor	MonitorWindow		Monitor

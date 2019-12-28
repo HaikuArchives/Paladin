@@ -1,11 +1,13 @@
 /*
  * Copyright 2001-2009 DarkWyrm <bpmagic@columbus.rr.com>
  * Copyright 2014 John Scipione <jscipione@gmail.com>
+ * Copyright 2019 Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
+ *		2019	Adam Fowler, adamfowleruk@gmail.com
  */
 
 

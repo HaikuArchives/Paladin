@@ -38,8 +38,8 @@
 static const rgb_color white = (rgb_color){ 255, 255, 255, 255 };
 static const rgb_color black = (rgb_color){ 0, 0, 0, 255 };
 
-static int
-compare_bstringitems(BStringItem* one, BStringItem* two);
+//static int
+//compare_bstringitems(BStringItem* one, BStringItem* two);
 
 
 ProjectList::ProjectList(Project* project, const BRect& frame, const char* name,
@@ -185,8 +185,8 @@ ProjectList::InitiateDrag(BPoint where, int32 index, bool selected)
 	if (dragIcon == NULL) {
 		dragIcon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 		BMimeType mime;
-		status_t s = mime.SetTo("text/plain");
-		s = mime.GetIcon(dragIcon, B_MINI_ICON);
+		mime.SetTo("text/plain");
+		mime.GetIcon(dragIcon, B_MINI_ICON);
 	}
 
 	BMessage message(B_SIMPLE_DATA);
@@ -360,6 +360,8 @@ ProjectList::ShowContextMenu(BPoint where)
 			new BMessage(M_SHOW_RENAME_GROUP)));
 		menu.AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 			new BMessage(M_SORT_GROUP)));
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Delete group"),
+			new BMessage(M_DELETE_GROUP)));
 
 		menu.SetTargetForItems(Window());
 		menu.Go(screenPoint, true, false);
@@ -608,18 +610,20 @@ SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 	if (Text() == NULL)
 		return;
 
-	rgb_color textColor = {0, 0, 0, 255};
-	rgb_color backColor = white;
-	rgb_color selectColor = tint_color(white, B_DARKEN_2_TINT);
+	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR); // was {0, 0, 0, 255};
+	// not used - see StringListItem.cpp
+	rgb_color textSelectColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+	rgb_color backColor = ui_color(B_LIST_BACKGROUND_COLOR); //was white;
+	rgb_color selectColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR); //was tint_color(white, B_DARKEN_2_TINT);
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(selectColor);
-			owner->SetLowColor(white);
-		} else
-			owner->SetHighColor(white);
-
-		owner->FillRect(frame);
+			owner->SetLowColor(selectColor);
+		} else {
+			owner->SetLowColor(owner->ViewColor());
+		}
+		
+		owner->FillRect(frame,B_SOLID_LOW);
 	}
 
 	owner->MovePenTo(frame.left, frame.top + fTextOffset);
@@ -627,7 +631,10 @@ SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->SetFont(be_plain_font);
 
 	if (IsSelected())
+	{
 		backColor = selectColor;
+		textColor = textSelectColor;
+	}
 
 	switch (fDisplayState) {
 		case SFITEM_MISSING:
@@ -647,7 +654,6 @@ SourceFileItem::DrawItem(BView* owner, BRect frame, bool complete)
 		case SFITEM_NEEDS_BUILD:
 		{
 			if (IsSelected()) {
-				textColor = white;
 			} else {
 				SET_COLOR(textColor, 144, 144, 144);
 			}
@@ -718,8 +724,16 @@ SourceGroupItem::DrawItem(BView* owner, BRect frame, bool complete)
 	if (GetData()->expanded != IsExpanded())
 		GetData()->expanded = IsExpanded();
 
+
+	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR); // was {0, 0, 0, 255};
+	// not used - see StringListItem.cpp
+	rgb_color textSelectColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+	rgb_color backColor = ui_color(B_LIST_BACKGROUND_COLOR); //was white;
+	rgb_color selectColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR); //was tint_color(white, B_DARKEN_2_TINT);
+
+
 	owner->SetFont(be_bold_font);
-	owner->SetHighColor(black);
+	//owner->SetHighColor(black); 
 	BStringItem::DrawItem(owner, frame, complete);
 	owner->SetFont(be_plain_font);
 }

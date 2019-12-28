@@ -49,6 +49,7 @@ MakeMake(Project *proj, DPath outfile)
 	
 	BString srcsString;
 	int32 i,j;
+	bool first = true;
 	for (i = 0; i < proj->CountGroups(); i++)
 	{
 		SourceGroup *group = proj->GroupAt(i);
@@ -62,6 +63,12 @@ MakeMake(Project *proj, DPath outfile)
 				BString path = file->GetPath().GetFullPath();
 				path.RemoveFirst(projfolder);
 				path.CharacterEscape("' ",'\\');
+				if (first)
+				{
+					first = false;
+				} else {
+					srcsString << " \\\n";
+				}
 				srcsString << " " << path;
 			}
 		}
@@ -69,6 +76,7 @@ MakeMake(Project *proj, DPath outfile)
 	mkfile.ReplaceFirst("$@SRCS@$", srcsString);
 	
 	BString rsrcsString;
+	first = true;
 	for (i = 0; i < proj->CountGroups(); i++)
 	{
 		SourceGroup *group = proj->GroupAt(i);
@@ -80,6 +88,12 @@ MakeMake(Project *proj, DPath outfile)
 			{
 				BString path = file->GetPath().GetFullPath();
 				path.RemoveFirst(projfolder);
+				if (first)
+				{
+					first = false;
+				} else {
+					rsrcsString << " \\\n";
+				}
 				rsrcsString << " " << path;
 			}
 		}
@@ -87,6 +101,7 @@ MakeMake(Project *proj, DPath outfile)
 	mkfile.ReplaceFirst("$@RSRCS@$", rsrcsString);
 	
 	BString libsString;
+	first = true;
 	for (i = 0; i < proj->CountLibraries(); i++)
 	{
 		SourceFile *file = proj->LibraryAt(i);
@@ -95,25 +110,45 @@ MakeMake(Project *proj, DPath outfile)
 		{
 			BString path = file->GetPath().GetFullPath();
 			path.RemoveFirst(projfolder);
+			if (first)
+			{
+				first = false;
+			} else {
+				libsString << " \\\n";
+			}
 			libsString << " " << path;
 		}
 	}
 	mkfile.ReplaceFirst("$@LIBS@$", libsString);
 	
 	BString inclPaths;
+	first = true;
 	for (i = 0; i < proj->CountSystemIncludes(); i++)
 	{
 		BString path = proj->SystemIncludeAt(i);
 		path.CharacterEscape("' ",'\\');
+		if (first)
+		{
+			first = false;
+		} else {
+			inclPaths << " \\\n";
+		}
 		inclPaths << " " << path;
 	}
 	mkfile.ReplaceFirst("$@SYSTEM_INCLUDE_PATHS@$", inclPaths);
 	
 	inclPaths = "";
+	first = true;
 	for (i = 0; i < proj->CountLocalIncludes(); i++)
 	{
 		BString path = proj->LocalIncludeAt(i).Relative();
 		path.CharacterEscape("' ",'\\');
+		if (first)
+		{
+			first = false;
+		} else {
+			inclPaths << " \\\n";
+		}
 		inclPaths << " " << path;
 	}
 	mkfile.ReplaceFirst("$@LOCAL_INCLUDE_PATHS@$", inclPaths);

@@ -59,6 +59,7 @@
 #include "LibWindow.h"
 #include "LicenseManager.h"
 #include "Makemake.h"
+#include "MonitorWindow.h"
 #include "MsgDefs.h"
 #include "Paladin.h"
 #include "PrefsWindow.h"
@@ -133,7 +134,8 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	fMenusLocked(false),
 	fBuilder(BMessenger(this)),
 	fPrefsWindow(NULL),
-	fQuickFind(NULL)
+	fQuickFind(NULL),
+	fMonitorWindow(NULL)
 {
 	SetSizeLimits(200, 30000, 200, 30000);
 	MoveTo(100,100);
@@ -235,6 +237,9 @@ ProjectWindow::ProjectWindow(BRect frame, Project* project)
 	if (decRect.top < 0)
 		moveY = - decRect.top;
 	MoveBy(moveX, moveY);
+	
+	MoveOnScreen(B_DO_NOT_RESIZE_TO_FIT | 
+		B_MOVE_IF_PARTIALLY_OFFSCREEN);
 
 	fProjectList->SetTarget(this);
 	fProjectList->MakeFocus(true);
@@ -365,7 +370,6 @@ void
 ProjectWindow::SetStatus(const char* msg)
 {
 	fStatusBar->SetStatus(msg);
-	fStatusBar->Invalidate();
 }
 
 
@@ -389,6 +393,11 @@ ProjectWindow::QuitRequested()
 	if (fErrorWindow != NULL) {
 		fErrorWindow->Quit();
 		fErrorWindow = NULL;
+	}
+	
+	if (fMonitorWindow != NULL) {
+		fMonitorWindow->Quit();
+		fMonitorWindow = NULL;
 	}
 
 	DeregisterWindow();
@@ -761,9 +770,24 @@ ProjectWindow::MessageReceived(BMessage* message)
 		case M_SORT_GROUP:
 		{
 			int32 selection = fProjectList->FullListCurrentSelection();
-			SortGroup(selection);
-			fProject->Save();
+			if (selection >= 0)
+			{
+				SortGroup(selection);
+				fProject->Save();
+			}
 
+			break;
+		}
+		case M_DELETE_GROUP:
+		{
+			int32 selection = fProjectList->FullListCurrentSelection();
+			if (selection >= 0)
+			{
+				RemoveGroup(selection);
+				fProject->Save();
+				fProjectList->RefreshList();
+			}
+		
 			break;
 		}
 
@@ -849,8 +873,10 @@ ProjectWindow::MessageReceived(BMessage* message)
 		}
 		case M_QUICK_FIND:
 		{
+			STRACE(1,("M_QUICK_FIND\n"));
 			if (NULL == fQuickFind)
 			{
+				STRACE(1,("Creating new quick find window\n"));
 				fQuickFind = new QuickFindWindow(B_TRANSLATE("Quick find"));
 			}
 			fQuickFind->SetProject(fProject);
@@ -1172,6 +1198,24 @@ ProjectWindow::MessageReceived(BMessage* message)
 			SetStatus(B_TRANSLATE("Performing post-build tasks"));
 			break;
 		}
+		
+		case M_BUILD_MONITOR:
+		{
+			EnsureMonitorWindow();
+			fMonitorWindow->Show();
+			BString so("stdout");
+			BString se("stderr");
+			fMonitorWindow->Launch(message,so.String(),se.String());
+			break;
+		}
+		case M_MONITOR_CLOSED:
+		{
+			BNode node(fProject->GetPath().GetFullPath());
+			BRect frame = message->GetRect("frame",BRect(100,100,700,500));
+			node.WriteAttr("monitor_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect));
+			fMonitorWindow = NULL;
+			break;
+		}
 
 		case M_BUILD_FAILURE:
 			SetMenuLock(false);
@@ -1267,6 +1311,47 @@ ProjectWindow::MessageReceived(BMessage* message)
 }
 
 void
+ProjectWindow::EnsureMonitorWindow()
+{
+	if (NULL == fMonitorWindow)
+	{
+		BNode node(fProject->GetPath().GetFullPath());
+		BRect frame(100,100,700,500);
+		if (node.ReadAttr("monitor_frame", B_RECT_TYPE, 0, &frame, sizeof(BRect))) {
+			if (frame.Width() < 400)
+				frame.right = frame.left + 400;
+
+			if (frame.Height() < 200)
+				frame.top = frame.bottom + 200;
+
+			if (frame.left < 0) 
+				frame.left = 0;
+			
+			if (frame.top < 0)
+				frame.top = 0;
+			
+			//MoveTo(frame.LeftTop());
+			//ResizeTo(frame.Width(), frame.Height());
+		}
+		fMonitorWindow = new MonitorWindow(frame, this);
+		fMonitorWindow->MoveOnScreen(B_DO_NOT_RESIZE_TO_FIT | 
+			B_MOVE_IF_PARTIALLY_OFFSCREEN);
+		const char* bo = "build";
+		const char* so = "stdout";
+		const char* se = "stderr";
+		const char* tsb = B_TRANSLATE("Build");
+		const char* tso = B_TRANSLATE("Standard Out");
+		const char* tse = B_TRANSLATE("Standard Error");
+		MonitorViewInfo miBuild = {bo,tsb};
+		MonitorViewInfo miOut = {so,tso};
+		MonitorViewInfo miErr = {se,tse};
+		fMonitorWindow->AddView(miBuild);
+		fMonitorWindow->AddView(miOut);
+		fMonitorWindow->AddView(miErr);
+	}
+}
+
+void
 ProjectWindow::SortGroup(int32 selection)
 {
 	SourceGroupItem* groupItem = NULL;
@@ -1284,6 +1369,24 @@ ProjectWindow::SortGroup(int32 selection)
 
 	fProjectList->SortItemsUnder(groupItem, true, compare_source_file_items);
 	groupItem->GetData()->Sort();
+}
+
+void
+ProjectWindow::RemoveGroup(int32 selection)
+{
+	SourceGroupItem* groupItem = NULL;
+	if (selection < 0) {
+		return;
+	}
+	
+	BStringItem* stringItem 
+		= (BStringItem*)fProjectList->FullListItemAt(selection);
+	groupItem = fProjectList->GroupForItem(stringItem);
+	
+	if (groupItem == NULL)
+		return;
+
+	fProject->RemoveGroup(groupItem->GetData(),true);
 }
 
 
@@ -1637,6 +1740,8 @@ ProjectWindow::CreateMenuBar()
 		new BMessage(M_SHOW_RENAME_GROUP)));
 	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Sort group"),
 		new BMessage(M_SORT_GROUP)));
+	fProjectMenu->AddItem(new BMenuItem(B_TRANSLATE("Delete group"),
+		new BMessage(M_DELETE_GROUP)));
 	fProjectMenu->AddSeparatorItem();
 	BString showProjFolderStr(B_TRANSLATE("Show project folder"));
 	fProjectMenu->AddItem(new BMenuItem(showProjFolderStr,
@@ -1726,16 +1831,21 @@ ProjectWindow::SetMenuLock(bool locked)
 void
 ProjectWindow::MakeGroup(int32 selection)
 {
-	if (selection < 0) {
-		return;
-	}
+/*
+	//if (selection < 0) {
+	//	return;
+	//}
 
 	int32 newGroupIndex = -1;
 	
-	bool groupSelected = dynamic_cast<SourceGroupItem*>(
+	bool groupSelected = false;
+	if (selection >= 0)
+	{
+		groupSelected = dynamic_cast<SourceGroupItem*>(
 			fProjectList->FullListItemAt(selection))
 		|| dynamic_cast<SourceGroupItem*>(
 			fProjectList->FullListItemAt(selection - 1));
+	}
 	
 	if (groupSelected)
 	{
@@ -1749,12 +1859,16 @@ ProjectWindow::MakeGroup(int32 selection)
 				if (dynamic_cast<SourceGroupItem*>(fProjectList->FullListItemAt(i)))
 					groupcount++;
 			}
+			newGroupIndex = groupcount;
 		}
 	}
+	*/
+	int32 newGroupIndex = fProject->CountGroups(); // zero indexed
 
 	SourceGroup* newgroup = fProject->AddGroup("New group", newGroupIndex);
 	SourceGroupItem* newGroupItem = new SourceGroupItem(newgroup);
 	
+	/*
 	if (!groupSelected) {
 		SourceGroupItem* oldgroupitem = (SourceGroupItem*)fProjectList->Superitem(
 			fProjectList->FullListItemAt(selection));
@@ -1775,9 +1889,11 @@ ProjectWindow::MakeGroup(int32 selection)
 		}
 		fProjectList->InvalidateItem(selection);
 	} else {
+	*/
 		fProjectList->AddItem(newGroupItem);
 		fProjectList->Select(fProjectList->CountItems() - 1);
-	}
+	//}
+	
 
 	fProjectList->Expand(newGroupItem);
 	fProject->Save();
@@ -1831,6 +1947,9 @@ ProjectWindow::ShowErrorWindow(ErrorList* list)
 void
 ProjectWindow::CullEmptyGroups(void)
 {
+	// #329 - Making a no op as it is misleading if not only deps 
+	//        that are culled
+	/*
 	for (int32 i = fProjectList->CountItems() - 1; i >= 0; i--) {
 		SourceGroupItem* groupitem = dynamic_cast<SourceGroupItem*>(
 			fProjectList->ItemAt(i));
@@ -1842,6 +1961,7 @@ ProjectWindow::CullEmptyGroups(void)
 	}
 
 	fProject->Save();
+	*/
 }
 
 

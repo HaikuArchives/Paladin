@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	1273216190
+1	English	application/x-vnd.dw-Paladin	3705667463
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -17,6 +17,7 @@ Backspace	AsciiWindow	ASCII table description	Backspace
 This cannot be undone. Delete module?	CodeLibWindow		This cannot be undone. Delete module?
 New line	AsciiWindow	ASCII table description	New line
 Error window	ProjectWindow		Error window
+Standard Error	ProjectWindow		Standard Error
 Module files	CodeLibWindow		Module files
 Providers	SCMImportWindow		Providers
 Extra compiler options:	ProjectSettingsWindow		Extra compiler options:
@@ -58,6 +59,7 @@ Run logged	ProjectWindow		Run logged
 Settings…	ProjectWindow		Settings…
 Subversion	SCMImportWindow		Subversion
 DoSearch started\n	QuickFindWindow		DoSearch started\n
+Standard Out	ProjectWindow		Standard Out
 Revert selected files	ProjectWindow		Revert selected files
 Source control repository folder:	PrefsWindow		Source control repository folder:
 Matched text:	VRegWindow		Matched text:
@@ -111,6 +113,7 @@ Paladin: Project	ProjectWindow		Paladin: Project
 Remove	Project		Remove
 Add	CodeLibWindow		Add
 Shift in	AsciiWindow	ASCII table description	Shift in
+Delete group	ProjectList		Delete group
 Show differences from last check-in	ProjectWindow		Show differences from last check-in
 Errors and warnings: 	ErrorWindow		Errors and warnings: 
 Remove selected files	ProjectWindow		Remove selected files
@@ -122,6 +125,7 @@ Updating resources	ProjectWindow		Updating resources
 These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		These files (except libraries) will be permanently deleted. Remove them?
 Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Sets the location for the 'server' side of local Subversion repositories.
 Add new file	AddNewFileWindow		Add new file
+Monitor	MonitorWindow		Monitor
 Success\n	Paladin		Success\n
 Import an existing project	StartWindow		Import an existing project
 Create new module…	CodeLibWindow		Create new module…
@@ -158,7 +162,6 @@ Preferred source control:	PrefsWindow		Preferred source control:
 Project settings	ProjectSettingsWindow		Project settings
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
-Templates	TemplateWindow		Templates
 Backups folder:	PrefsWindow		Backups folder:
 Git	TemplateWindow		Git
 Find in project	FindWindow		Find in project
@@ -362,6 +365,7 @@ Paladin settings	PrefsWindow		Paladin settings
 Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n
 General	PrefsWindow		General
 Paladin: Start	StartWindow		Paladin: Start
+Delete group	ProjectWindow		Delete group
 Mercurial	PrefsWindow		Mercurial
 Results:	FindWindow		Results:
 Regex:	VRegWindow		Regex:

@@ -1,4 +1,4 @@
-1	English (British)	application/x-vnd.dw-Paladin	1273216190
+1	English (British)	application/x-vnd.dw-Paladin	3705667463
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Build	PrefsWindow		Build
 Subversion	PrefsWindow		Subversion
@@ -149,6 +149,9 @@ Backup project	ProjectWindow		Backup project
 Rebuild	ProjectWindow		Rebuild
 Quick find	ProjectWindow		Quick find
 Quick find and open…	ProjectWindow		Quick find and open…
+Standard Error	ProjectWindow		Standard Error
+Standard Out	ProjectWindow		Standard Out
+Delete group	ProjectWindow		Delete group
 Create new module…	CodeLibWindow		Create new module…
 Delete current module	CodeLibWindow		Delete current module
 Add	CodeLibWindow		Add
@@ -192,6 +195,7 @@ Remove selected files from repository	ProjectList		Remove selected files from re
 Open parent folder	ProjectList		Open parent folder
 Source Control	ProjectList		Source Control
 Rename group…	ProjectList		Rename group…
+Delete group	ProjectList		Delete group
 Add license to project	LicenseManager		Add license to project
 Full version:	LicenseManager		Full version:
 Summary:	LicenseManager		Summary:
@@ -238,7 +242,6 @@ Set the location for your project.	TemplateWindow		Set the location for your pro
 Target name:	TemplateWindow		Target name:
 Git unavailable	TemplateWindow		Git unavailable
 Choose a project type	TemplateWindow		Choose a project type
-Templates	TemplateWindow		Templates
 If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
 Create project…	TemplateWindow		Create project…
 Git	TemplateWindow		Git
@@ -380,3 +383,4 @@ Type to search	QuickFindWindow		Type to search
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
 Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Monitor	MonitorWindow		Monitor

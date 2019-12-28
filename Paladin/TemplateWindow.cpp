@@ -62,15 +62,25 @@ TemplateWindow::TemplateWindow(const BRect& frame)
 	CheckTemplates();
 	
 	DPath templatePath(gAppPath.GetFolder());
-	templatePath << B_TRANSLATE("Templates");
+	// Translating the folder causes a bug. See #286
+	//templatePath << B_TRANSLATE("Templates");
+	templatePath << "Templates";
 	fTempList.ScanFolder(templatePath.GetFullPath());
 	
 	// Reuse default english folder if no translated folder is found
+	/*
 	if(fTempList.CountTemplates()==0){
 		templatePath = gAppPath.GetFolder();
 		templatePath<<"Templates";
 		fTempList.ScanFolder(templatePath.GetFullPath());
 	}
+	*/
+	
+	// #312 allow user specified templates
+	fTempList.ScanFolder("/boot/home/config/settings/Paladin/Templates");
+	// And allow other packages to install Paladin templates too
+	fTempList.ScanFolder("/system/data/Paladin/Templates");
+	fTempList.ScanFolder("/system/develop/Paladin/Templates");
 
 	// project type
 	BPopUpMenu* projectTypeMenu = new BPopUpMenu(B_TRANSLATE("Project type"));

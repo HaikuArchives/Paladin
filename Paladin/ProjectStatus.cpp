@@ -17,7 +17,7 @@
  *	   written permission.
  *
  *
- * Copyright 2018 Adam Fowler <adamfowleruk@gmail.com>
+ * Copyright 2018-2019 Adam Fowler <adamfowleruk@gmail.com>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,6 +60,9 @@ void
 ProjectStatus::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
+	
+	// #325 Remove old text by drawing the background first
+	FillRect(bounds,B_SOLID_LOW);
 
 	rgb_color highColor = HighColor();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));

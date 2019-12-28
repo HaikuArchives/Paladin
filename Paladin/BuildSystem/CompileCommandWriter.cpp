@@ -7,7 +7,7 @@
  */
 #include <sstream>
 #include <vector>
-
+#include <iterator> 
 #include "CompileCommandWriter.h"
 #include "CompileCommand.h"
 
@@ -16,15 +16,19 @@ CompileCommandWriter::ToJSONFile(std::ostream& oss,std::vector<CompileCommand>& 
 {
 	bool first = true;
 	oss << "[" << std::endl;
-	for (auto& command: commands)
+	// C++11: for (auto& cmd: commands)
+	vector<CompileCommand>::iterator iter;
+	for (iter = commands.begin();iter < commands.end();iter++)
 	{
+		CompileCommand cmd = *iter;
+
 		if (!first)
 		{
 			oss << "," << std::endl;
 		}
-		oss << "	{  \"directory:\": \"" << command.directory << "\"," << std::endl;
-		oss << "	   \"command\": \"" << command.command << "\"," << std::endl;
-		oss << "	   \"file\": \"" << command.file << "\" }"; // leave for comma or endl
+		oss << "	{  \"directory:\": \"" << cmd.directory << "\"," << std::endl;
+		oss << "	   \"command\": \"" << std::string(cmd.command) << "\"," << std::endl;
+		oss << "	   \"file\": \"" << cmd.file << "\" }"; // leave for comma or endl
 		first = false;
 	}
 	oss << std::endl << "]" << std::endl; // start with endl to finish last json object line

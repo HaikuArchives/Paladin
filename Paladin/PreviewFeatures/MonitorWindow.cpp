@@ -96,7 +96,8 @@ MonitorWindow::AddView(MonitorViewInfo info)
 		info.view = v;
 		
 		// Add view
-		fViews.emplace_back(info); // invokes copy constructor
+		//fViews.emplace_back(info); // invokes copy constructor
+		fViews.push_back(MonitorViewInfo(info));
 		// Show view in tab view
 		fTabView->AddTab(info.view);
 	} else {
@@ -120,7 +121,8 @@ void
 MonitorWindow::Launch(BMessage* commandMessage, const char* stdoutViewName, const char* stderrViewName)
 {
 	uint32 ctxId = fNextContextId++;
-	void* ctx = new CommandContext{ctxId,commandMessage,strdup(stdoutViewName),strdup(stderrViewName)};
+	void* ctx = new CommandContext(ctxId,commandMessage,strdup(stdoutViewName),strdup(stderrViewName));
+
 	
 	// Make this tab visible
 	/*
@@ -164,8 +166,11 @@ MonitorWindow::ReceiveError(BMessage* threadMessage)
 MonitorViewInfo*
 MonitorWindow::FindInfo(const char* name)
 {
-	for (auto& info: fViews)
+	// C++11 for (auto& info: fViews)
+	vector<MonitorViewInfo>::iterator iter;
+	for (iter = fViews.begin();iter < fViews.end();iter++)
 	{
+		MonitorViewInfo info = *iter;
 		printf("Testing view with name:-\n");
 		printf(info.name);
 		printf("\n");
@@ -174,7 +179,7 @@ MonitorWindow::FindInfo(const char* name)
 		printf("\n");
 		if (0 == strcmp(info.name,name))
 		{
-			return &info;
+			return iter;
 		}
 	}
 	return NULL;

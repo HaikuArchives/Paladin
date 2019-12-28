@@ -195,7 +195,7 @@ ProjectBuilder::DoPostBuild(void)
 	jsonFile += std::string("/compile_commands.json");
 	STRACE(1,("Writing out compile commands\n"));
 	STRACE(1,(jsonFile.c_str()));
-	std::ofstream ofs(jsonFile, std::ofstream::out);
+	std::ofstream ofs(jsonFile.c_str(), std::ofstream::out);
 	CompileCommandWriter::ToJSONFile(ofs,fCommands);
 	
 	// It's really silly to try to run a library! ;-)
@@ -405,11 +405,20 @@ ProjectBuilder::BuildThread(void *data)
 			return B_OK;
 		}
 		
+		((ProjectBuilder*)data)->fCommands.push_back(
+			CompileCommand(
+				std::string(file->GetPath().GetFileName()),
+				std::string(file->GetCompileCommand(*proj->GetBuildInfo(),NULL).String()),
+				std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
+			)
+		);
+		/*
 		((ProjectBuilder*)data)->fCommands.emplace_back(
 			std::string(file->GetPath().GetFileName()),
 			std::string(file->GetCompileCommand(*proj->GetBuildInfo(),NULL).String()),
 			std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
 		);
+		*/
 		
 		proj->CompileFile(file);
 		

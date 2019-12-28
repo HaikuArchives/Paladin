@@ -27,10 +27,10 @@ enum
 struct MonitorViewInfo
 {
 public:
-	const char* 		name = "";
-	const char*			title = "";
-	bool				visible = true;
-	BView*				view = NULL;
+	const char* 			name;
+	const char*			title;
+	bool				visible;
+	BView*				view;
 	MonitorViewInfo(const char* n,const char* t,const bool b,BView* v)
 		: name(n), title(t), visible(b), view(v){}
 	
@@ -45,6 +45,13 @@ public:
 	BMessage*			commandMessage;
 	const char*			stdoutViewName;
 	const char*			stderrViewName;
+	CommandContext(uint32 tid,BMessage* tmsg,const char* tstdoutViewName,const char* tstderrViewName) 
+		:
+			id(tid),
+			commandMessage(tmsg),
+			stdoutViewName(tstdoutViewName),
+			stderrViewName(tstderrViewName)
+	{}
 };
 
 class MonitorWindow : public BWindow

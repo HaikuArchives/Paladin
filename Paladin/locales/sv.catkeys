@@ -1,4 +1,4 @@
-1	Swedish	application/x-vnd.dw-Paladin	386614745
+1	Swedish	application/x-vnd.dw-Paladin	3705667463
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Build	PrefsWindow		Bygg
 Subversion	PrefsWindow		Subversion
@@ -151,6 +151,7 @@ Quick find	ProjectWindow		Quick find
 Quick find and open…	ProjectWindow		Quick find and open…
 Standard Error	ProjectWindow		Standard Error
 Standard Out	ProjectWindow		Standard Out
+Delete group	ProjectWindow		Delete group
 Create new module…	CodeLibWindow		Skapa ny modul...
 Delete current module	CodeLibWindow		Ta bort aktuell modul
 Add	CodeLibWindow		Lägg till
@@ -194,6 +195,7 @@ Remove selected files from repository	ProjectList		Remove selected files from re
 Open parent folder	ProjectList		Open parent folder
 Source Control	ProjectList		Versionshantering
 Rename group…	ProjectList		Byt namn på grupp...
+Delete group	ProjectList		Delete group
 Add license to project	LicenseManager		Lägg till licens till projekt
 Full version:	LicenseManager		Full version:
 Summary:	LicenseManager		Sammanfattning:
@@ -240,7 +242,6 @@ Set the location for your project.	TemplateWindow		Ange målet för ditt projekt
 Target name:	TemplateWindow		Målnamn:
 Git unavailable	TemplateWindow		Git inte tillgänglig
 Choose a project type	TemplateWindow		Välj projekttyp
-Templates	TemplateWindow		Mallar
 If checked, a folder for your project will be created in the location entered above.	TemplateWindow		If checked, a folder for your project will be created in the location entered above.
 Create project…	TemplateWindow		Skapa projekt...
 Git	TemplateWindow		Git

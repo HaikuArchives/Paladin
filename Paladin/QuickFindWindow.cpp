@@ -587,7 +587,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 					int idx = 0;
 					for (int sIdx = 0;sIdx < strlen(entryName) && idx < 20;sIdx++)
 					{
-						if (std::isupper(entryName[sIdx],loc))
+						if (std::isupper(entryName[sIdx]))
 						{
 							caps[idx++] = entryName[sIdx];
 						}
@@ -596,7 +596,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 					char textCaps[strlen(text)];
 					for (int tci = 0;tci < strlen(text);tci++)
 					{
-						textCaps[tci] = std::toupper(text[tci],loc);
+						textCaps[tci] = std::toupper(text[tci]);
 					}
 					textCaps[strlen(text)] = '\0';
 					STRACE(1,("Caps follows\n"));

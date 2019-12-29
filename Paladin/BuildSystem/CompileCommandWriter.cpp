@@ -5,10 +5,12 @@
  * Authors:
  *		Adam Fowler, adamfowleruk@gmail.com
  */
+#include "CompileCommandWriter.h"
+
 #include <sstream>
 #include <vector>
 #include <iterator> 
-#include "CompileCommandWriter.h"
+
 #include "CompileCommand.h"
 
 int
@@ -17,8 +19,7 @@ CompileCommandWriter::ToJSONFile(std::ostream& oss,std::vector<CompileCommand>& 
 	bool first = true;
 	oss << "[" << std::endl;
 	// C++11: for (auto& cmd: commands)
-	vector<CompileCommand>::iterator iter;
-	for (iter = commands.begin();iter < commands.end();iter++)
+	for (std::vector<CompileCommand>::iterator iter = commands.begin();iter < commands.end();iter++)
 	{
 		CompileCommand cmd = *iter;
 

@@ -167,8 +167,7 @@ MonitorViewInfo*
 MonitorWindow::FindInfo(const char* name)
 {
 	// C++11 for (auto& info: fViews)
-	vector<MonitorViewInfo>::iterator iter;
-	for (iter = fViews.begin();iter < fViews.end();iter++)
+	for (std::vector<MonitorViewInfo>::iterator iter = fViews.begin();iter < fViews.end();iter++)
 	{
 		MonitorViewInfo info = *iter;
 		printf("Testing view with name:-\n");
@@ -179,7 +178,7 @@ MonitorWindow::FindInfo(const char* name)
 		printf("\n");
 		if (0 == strcmp(info.name,name))
 		{
-			return iter;
+			return &*iter;
 		}
 	}
 	return NULL;

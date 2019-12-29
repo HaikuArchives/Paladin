@@ -1342,9 +1342,9 @@ ProjectWindow::EnsureMonitorWindow()
 		const char* tsb = B_TRANSLATE("Build");
 		const char* tso = B_TRANSLATE("Standard Out");
 		const char* tse = B_TRANSLATE("Standard Error");
-		MonitorViewInfo miBuild = {bo,tsb};
-		MonitorViewInfo miOut = {so,tso};
-		MonitorViewInfo miErr = {se,tse};
+		MonitorViewInfo miBuild(bo,tsb);
+		MonitorViewInfo miOut(so,tso);
+		MonitorViewInfo miErr(se,tse);
 		fMonitorWindow->AddView(miBuild);
 		fMonitorWindow->AddView(miOut);
 		fMonitorWindow->AddView(miErr);

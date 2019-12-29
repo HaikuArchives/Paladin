@@ -7,7 +7,6 @@
  */
 #include "QuickFindWindow.h"
 
-#include <locale>
 #include <string>
 
 #include <Application.h>
@@ -582,12 +581,11 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 					matches = true;
 				} else if (strlen(text) < 10) {
 					// Grab filename capitals, lowercase them, and see if it matches
-					std::locale loc;
 					char caps[20];
 					int idx = 0;
 					for (int sIdx = 0;sIdx < strlen(entryName) && idx < 20;sIdx++)
 					{
-						if (std::isupper(entryName[sIdx]))
+						if (isupper(entryName[sIdx]))
 						{
 							caps[idx++] = entryName[sIdx];
 						}
@@ -596,7 +594,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 					char textCaps[strlen(text)];
 					for (int tci = 0;tci < strlen(text);tci++)
 					{
-						textCaps[tci] = std::toupper(text[tci]);
+						textCaps[tci] = toupper(text[tci]);
 					}
 					textCaps[strlen(text)] = '\0';
 					STRACE(1,("Caps follows\n"));

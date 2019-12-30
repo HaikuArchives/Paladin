@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	3705667463
+1	English	application/x-vnd.dw-Paladin	787335371
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -108,6 +108,7 @@ Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin can't se
 Device driver	ProjectSettingsWindow		Device driver
 Examining %file%	ProjectWindow		Examining %file%
 Replacing it with %path%.	Project		Replacing it with %path%.
+Directory Init Check failed\n	QuickFindWindow		Directory Init Check failed\n
 Paladin: Project	ProjectWindow		Paladin: Project
   Dec  Hex  Oct  Code  Description	AsciiWindow		  Dec  Hex  Oct  Code  Description
 Remove	Project		Remove
@@ -252,7 +253,6 @@ Git	SCMManager		Git
 Commit	ProjectWindow		Commit
 Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Couldn't find %filename%. It may have been moved or renamed.
 New group	ProjectList		New group
-Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
 −	ProjectSettingsWindow		−
 Copy list to clipboard	ErrorWindow		Copy list to clipboard
 Use ccache to build faster	PrefsWindow		Use ccache to build faster

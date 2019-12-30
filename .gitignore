@@ -20,6 +20,9 @@ libpaladin.so
 *.gcda
 *.gcno
 *.info
+*.bbg
+*.bb
+*.da
 Tests/out
 Paladin/Templates/Sample\ VerticalSlider/VerticalSlider
 Paladin/Templates/Sample\ AwesomeSaver/AwesomeSaver

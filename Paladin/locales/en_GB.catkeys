@@ -1,4 +1,4 @@
-1	English (British)	application/x-vnd.dw-Paladin	3705667463
+1	English (British)	application/x-vnd.dw-Paladin	787335371
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Build	PrefsWindow		Build
 Subversion	PrefsWindow		Subversion
@@ -9,8 +9,8 @@ Git	PrefsWindow		Git
 Source control	PrefsWindow		Source control
 Use fastdep dependency checker	PrefsWindow		Use fastdep dependency checker
 Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Sets the location for the 'server' side of local Subversion repositories.
-Automatically synchronize modules	PrefsWindow		Automatically synchronize modules
-Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Automatically synchronize modules in your projects with the those in the code library
+Automatically synchronize modules	PrefsWindow		Automatically synchronise modules
+Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Automatically synchronise modules in your projects with the those in the code library
 The default path for new projects.	PrefsWindow		The default path for new projects.
 General	PrefsWindow		General
 When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		When checked, a project's folder is shown in Tracker when it is opened.
@@ -48,13 +48,13 @@ Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWin
 Add a file to the include path list	ProjectSettingsWindow		Add a file to the include path list
 Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.
 Target type	ProjectSettingsWindow		Target type
-Optimization	ProjectSettingsWindow		Optimization
+Optimization	ProjectSettingsWindow		Optimisation
 −	ProjectSettingsWindow		−
 Extra linker options:	ProjectSettingsWindow		Extra linker options:
 Shared library	ProjectSettingsWindow		Shared library
 Target type:	ProjectSettingsWindow		Target type:
 Application	ProjectSettingsWindow		Application
-Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler optimization level. Disabled when debugging info is checked.
+Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler optimisation level. Disabled when debugging info is checked.
 Static library	ProjectSettingsWindow		Static library
 Full	ProjectSettingsWindow		Full
 Project settings	ProjectSettingsWindow		Project settings
@@ -62,10 +62,10 @@ Build debugging information	ProjectSettingsWindow		Build debugging information
 Include paths:	ProjectSettingsWindow		Include paths:
 Remove the selected path	ProjectSettingsWindow		Remove the selected path
 Some	ProjectSettingsWindow		Some
-Optimize:	ProjectSettingsWindow		Optimize:
+Optimize:	ProjectSettingsWindow		Optimise:
 Build profiling information	ProjectSettingsWindow		Build profiling information
 The folders you want Paladin to search for header files	ProjectSettingsWindow		The folders you want Paladin to search for header files
-Optimize for size over speed	ProjectSettingsWindow		Optimize for size over speed
+Optimize for size over speed	ProjectSettingsWindow		Optimise for size over speed
 Extra compiler options:	ProjectSettingsWindow		Extra compiler options:
 This will undo all changes since the last commit. Continue?	ProjectWindow		This will undo all changes since the last commit. Continue?
 Update dependencies	ProjectWindow		Update dependencies
@@ -88,8 +88,8 @@ Backing up project	ProjectWindow		Backing up project
 Add selected files to repository	ProjectWindow		Add selected files to repository
 Revert project	ProjectWindow		Revert project
 Commit	ProjectWindow		Commit
-Building 	ProjectWindow		Building 
-Don't revert	ProjectWindow		Don't revert
+Building 	ProjectWindow		Building
+Don't revert	ProjectWindow		Do not revert
 Show differences	ProjectWindow		Show differences
 Make project	ProjectWindow		Make project
 Project	ProjectWindow		Project
@@ -118,9 +118,9 @@ Add files…	ProjectWindow		Add files…
 Build successful.	ProjectWindow		Build successful.
 Settings…	ProjectWindow		Settings…
 Examining source files	ProjectWindow		Examining source files
-Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Couldn't find %filename%. It may have been moved or renamed.
-Set software license…	ProjectWindow		Set software license…
-OK	ProjectWindow		OK
+Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		Could not find %filename%. It may have been moved or renamed.
+Set software license…	ProjectWindow		Set software licence…
+OK	ProjectWindow		Alright
 Examining %file%	ProjectWindow		Examining %file%
 Cancel	ProjectWindow		Cancel
 Regular expression tester	ProjectWindow		Regular expression tester
@@ -176,7 +176,7 @@ Modules	CodeLibWindow		Modules
 Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).	CodeLibWindow		Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).
 Module files	CodeLibWindow		Module files
 Create module	CodeLibWindow		Create module
-Libraries: 	LibWindow		Libraries: 
+Libraries: 	LibWindow		Libraries:
 Common libraries:	LibWindow		Common libraries:
 System libraries:	LibWindow		System libraries:
 Scanning libraries…	LibWindow		Scanning libraries…
@@ -187,7 +187,7 @@ Sort group	ProjectList		Sort group
 Force file rebuild	ProjectList		Force file rebuild
 Remove selected files	ProjectList		Remove selected files
 Show changes in selected files	ProjectList		Show changes in selected files
- - Missing	ProjectList		 - Missing
+ - Missing	ProjectList		- Missing
 Add selected files to repository	ProjectList		Add selected files to repository
 New group	ProjectList		New group
 Revert selected files	ProjectList		Revert selected files
@@ -202,7 +202,7 @@ Summary:	LicenseManager		Summary:
 Set license	LicenseManager		Set license
 License:	LicenseManager		License:
 A summary of this license is not available.	LicenseManager		A summary of this license is not available.
-Errors and warnings: 	ErrorWindow		Errors and warnings: 
+Errors and warnings: 	ErrorWindow		Errors and warnings:
 Copy list to clipboard	ErrorWindow		Copy list to clipboard
 Warnings	ErrorWindow		Warnings
 Copy to clipboard	ErrorWindow		Copy to clipboard
@@ -213,11 +213,11 @@ Success\n	Paladin		Success\n
 Printing debug output\n	Paladin		Printing debug output\n
 Linking\n	Paladin		Linking\n
 Printing debug output with extra detail\n	Paladin		Printing debug output with extra detail\n
-Can't find file %s\n	Paladin		Can't find file %s\n
+Can't find file %s\n	Paladin		Cannot find file %s\n
 Building %s\n	Paladin		Building %s\n
-This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.
+This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		This project is on a read-only disc. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disc.
 No	Paladin		No
-%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n
+%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% is on a read-only disc. Please copy the project to another disc or remount the disc with write support to be able to build it.\n
 This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.
 Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.
 Paladin: Open project	Paladin		Paladin: Open project
@@ -226,8 +226,8 @@ Yes	Paladin		Yes
 NULL pointer in M_BUILDING_FILE\n	Paladin		NULL pointer in M_BUILDING_FILE\n
 Attempting to open %s\n	Paladin		Attempting to open %s\n
 Build failure\n%s	Paladin		Build failure\n%s
-Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Couldn't find a partner file for %refname% in %reffolder%/.
-Project type: 	TemplateWindow		Project type: 
+Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Could not find a partner file for %refname% in %reffolder%/.
+Project type: 	TemplateWindow		Project type:
 None	TemplateWindow		None
 Choose the source control manager for your project, if any.	TemplateWindow		Choose the source control manager for your project, if any.
 Subversion unavailable	TemplateWindow		Subversion unavailable
@@ -235,7 +235,7 @@ Mercurial unavailable	TemplateWindow		Mercurial unavailable
 The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		The name of your project. It can be the same as the Target name, but it does not have to be.
 Project name:	TemplateWindow		Project name:
 The name of the compiled application or library	TemplateWindow		The name of the compiled application or library
-Source control: 	TemplateWindow		Source control: 
+Source control: 	TemplateWindow		Source control:
 Location:	TemplateWindow		Location:
 Create project folder	TemplateWindow		Create project folder
 Set the location for your project.	TemplateWindow		Set the location for your project.
@@ -249,15 +249,15 @@ Project type	TemplateWindow		Project type
 Subversion	TemplateWindow		Subversion
 Mercurial	TemplateWindow		Mercurial
 Search only system folders	FindOpenFileWindow		Search only system folders
-Open: 	FindOpenFileWindow		Open: 
+Open: 	FindOpenFileWindow		Open:
 Open	FindOpenFileWindow		Open
 Find and open file	FindOpenFileWindow		Find and open file
 Cancel	FindOpenFileWindow		Cancel
-Arguments: 	RunArgsWindow		Arguments: 
+Arguments: 	RunArgsWindow		Arguments:
 Run arguments	RunArgsWindow		Run arguments
 Open project	StartWindow		Open project
 Open the selected project	StartWindow		Open the selected project
-Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.
+Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin cannot find them, sorry.
 Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Open a project in the list on the right. You can also press Command + a number key.
 Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.
 Import a project from an online repository	StartWindow		Import a project from an online repository
@@ -269,12 +269,12 @@ Paladin: Start	StartWindow		Paladin: Start
 Import an existing project	StartWindow		Import an existing project
 Open a project	StartWindow		Open a project
 Import a project from online	StartWindow		Import a project from online
-Paladin: 	StartWindow		Paladin: 
+Paladin: 	StartWindow		Paladin:
 Paladin project	FileUtils		Paladin project
 File to build a program with Paladin	FileUtils		File to build a program with Paladin
 Couldn't find %file%.	FileUtils		Couldn't find %file%.
-OK	FileUtils		OK
-New group name: 	GroupRenameWindow		New group name: 
+OK	FileUtils		Alright
+New group name: 	GroupRenameWindow		New group name:
 Rename	GroupRenameWindow		Rename
 Cancel	GroupRenameWindow		Cancel
 Rename group	GroupRenameWindow		Rename group
@@ -285,9 +285,9 @@ Regex:	VRegWindow		Regex:
 Terminal output	TerminalWindow		Terminal output
 Overwrite	Globals		Overwrite
 Cancel	Globals		Cancel
-OK	Globals		OK
+OK	Globals		Alright
 %filepath% already exists. Do you want to overwrite it?	Globals		%filepath% already exists. Do you want to overwrite it?
-OK	GetTextWindow		OK
+OK	GetTextWindow		Alright
 Cancel	GetTextWindow		Cancel
 ASCII table	AsciiWindow		ASCII table
 Shift out	AsciiWindow	ASCII table description	Shift out
@@ -330,7 +330,7 @@ Regular expression	FindWindow		Regular expression
 Replace all	FindWindow		Replace all
 luare based replace all has been removed until it can be migrated from Lua	FindWindow		luare based replace all has been removed until it can be migrated from Lua
 Match whole word	FindWindow		Match whole word
-OK	FindWindow		OK
+OK	FindWindow		Alright
 Search	FindWindow		Search
 Ignore case	FindWindow		Ignore case
 No matches found	FindWindow		No matches found
@@ -362,25 +362,25 @@ Git	SCMImportWindow		Git
 Mercurial	SCMImportWindow		Mercurial
 Subversion	SCMImportWindow		Subversion
 Replacing it with %path%.	Project		Replacing it with %path%.
-%library% couldn't be found in the same place as it was under %platform%.	Project		%library% couldn't be found in the same place as it was under %platform%.
+%library% couldn't be found in the same place as it was under %platform%.	Project		%library% could not be found in the same place as it was under %platform%.
 Remove	Project		Remove
-OK	Project		OK
+OK	Project		Alright
 %path% seems to be missing. Do you want to remove it from the project?	Project		%path% seems to be missing. Do you want to remove it from the project?
 Detected platform from uname: %s\n	Project		Detected platform from uname: %s\n
 Keep	Project		Keep
 %s seems to be missing\n	Project		%s seems to be missing\n
 Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n	SourceControl		Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n
 Command resulted in an error.\n	SourceControl		Command resulted in an error.\n
-OK	PathBox		OK
+OK	PathBox		Alright
 The location entered does not exist.\nPlease check to make sure you have entered it correctly.	PathBox		The location entered does not exist.\nPlease check to make sure you have entered it correctly.
 Browse…	PathBox		Browse…
-Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin can't seem to find the debugger. Sorry.
+Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin cannot seem to find the debugger. Sorry.
 Close	SCMOutputWindow		Close
-Find files: 	QuickFindWindow		Find files: 
+Find files: 	QuickFindWindow		Find files:
 DoSearch started\n	QuickFindWindow		DoSearch started\n
 Quick find	QuickFindWindow		Quick find
 Type to search	QuickFindWindow		Type to search
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
-Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Directory Init Check failed\n	QuickFindWindow		Directory Init Check failed\n
 Monitor	MonitorWindow		Monitor

@@ -26,7 +26,10 @@ SUITE(CompileCommandsJSON)
 		CompileCommand c1("a.c","g++ a.c","objfolder");
 		CompileCommand c2("b.c","g++ b.c","objfolder");
 		CompileCommand c3("b.c","g++ b.c","objfolder");
-		std::vector<CompileCommand> commands = std::vector<CompileCommand>{c1,c2,c3};
+		std::vector<CompileCommand> commands = std::vector<CompileCommand>();
+		commands.push_back(c1);
+		commands.push_back(c2);
+		commands.push_back(c3);
 		
 		std::ostringstream oss; // in memory for this test
 		CompileCommandWriter::ToJSONFile(oss,commands);

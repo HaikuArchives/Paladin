@@ -1,4 +1,4 @@
-1	Romanian	application/x-vnd.dw-Paladin	3705667463
+1	Romanian	application/x-vnd.dw-Paladin	787335371
 Compiler caching is another way to speed up builds	PrefsWindow		Compiler caching is another way to speed up builds
 Build	PrefsWindow		Generare
 Subversion	PrefsWindow		Subversion
@@ -382,5 +382,5 @@ Quick find	QuickFindWindow		Quick find
 Type to search	QuickFindWindow		Type to search
 Found: %s\n	QuickFindWindow		Found: %s\n
 Searching for file matching: %s\n	QuickFindWindow		Searching for file matching: %s\n
-Directory InitCheck failed\n	QuickFindWindow		Directory InitCheck failed\n
+Directory Init Check failed\n	QuickFindWindow		Directory Init Check failed\n
 Monitor	MonitorWindow		Monitor

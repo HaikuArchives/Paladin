@@ -1,386 +1,386 @@
 1	German	application/x-vnd.dw-Paladin	787335371
-Compiler caching is another way to speed up builds	PrefsWindow		Ein Compiler-Cache kann das Kompilieren beschleunigen
-Build	PrefsWindow		Erzeugen
-Subversion	PrefsWindow		Subversion
-Use single thread	PrefsWindow		Benutze einzelnen Thread
-Show project folder on open	PrefsWindow		Zeige den Projektordner beim Start
-Mercurial	PrefsWindow		Mercurial
-Git	PrefsWindow		Git
-Source control	PrefsWindow		Versionskontrolle
-Use fastdep dependency checker	PrefsWindow		Benutze fastdep Abhängikeitsprüfung
-Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Setzt den Speicherort für die 'Serverseite' lokaler Subversion Repositories.
+  Dec  Hex  Oct  Code  Description	AsciiWindow		  Dec  Hex  Oct  Code  Beschreibung
+ - Missing	ProjectList		- fehlt
+%filepath% already exists. Do you want to overwrite it?	Globals		%filepath% existiert bereits. Überschreiben?
+%library% couldn't be found in the same place as it was under %platform%.	Project		%library% konnte nicht am selben Ort gefunden werden wie unter %platform%.
+%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% befindet sich auf einem schreibgeschützten Datenträger. Um Kompilieren zu können, entweder den Datenträger mit Schreibzugriff neu einhängen, oder das Projekt auf einen anderen Datenträger kopieren.
+%path% seems to be missing. Do you want to remove it from the project?	Project		%path% scheint zu fehlen. Soll es aus dem Projekt entfernt werden?
+%s seems to be missing\n	Project		%s scheint zu fehlen\n
++	ProjectSettingsWindow		+
+−	ProjectSettingsWindow		−
+A summary of this license is not available.	LicenseManager		Für diese Lizenz existiert keine Kurzfassung
+About Paladin	ProjectWindow		Über Paladin
+Acknowledge	AsciiWindow	ASCII table description	Acknowledge - Positive Antwort auf eine Anfrage
+Actions	CodeLibWindow		Aktionen
+Add	CodeLibWindow		Hinzu
+Add a file to the include path list	ProjectSettingsWindow		Eine Datei der Include-Pfadliste hinzufügen
+Add files to module…	CodeLibWindow		Dateien dem Modul hinzufügen…
+Add files…	ProjectWindow		Dateien hinzufügen…
+Add license to project	LicenseManager		Lizenz wählen
+Add new file	AddNewFileWindow		Neue Datei hinzufügen
+Add new file…	ProjectWindow		Neue Datei hinzufügen…
+Add project files to module…	CodeLibWindow		Projektdateien dem Modul hinzufügen…
+Add selected files to repository	ProjectList		Gewählte Dateien dem Repository hinzufügen
+Add selected files to repository	ProjectWindow		Ausgewählte Datein dem Repository hinzufügen
+Add to repository	ProjectWindow		Repository hinzufügen
+Anonymous check-out	SCMImportWindow		Anonymer Check-out
+Application	ProjectSettingsWindow		Anwendung
+Arguments: 	RunArgsWindow		Parameter:
+ASCII table	AsciiWindow		ASCII Tabelle
+ASCII table	ProjectWindow		ASCII-Tabelle
+Attempting to open %s\n	Paladin		Versuche %s zu öffnen\n
 Automatically synchronize modules	PrefsWindow		Module automatisch synchronisieren
 Automatically synchronize modules in your projects with the those in the code library	PrefsWindow		Module des Projekts automatisch mit denen der Code-Bibliothek synchronisieren
-The default path for new projects.	PrefsWindow		Der Standardpfad für neue Projekte.
-General	PrefsWindow		Allgemein
-When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		Wenn aktiviert, zeige den Ordner des Projekts im Tracker wenn es geöffnet wird.
-Backups folder:	PrefsWindow		Backup-Ordner:
-Use the fastdep dependency checker instead of gcc	PrefsWindow		Benutze fastdep Abhängikeitsprüfung anstatt gcc
-unavailable	PrefsWindow		nicht verfügbar
-None	PrefsWindow		kein
-Preferred source control:	PrefsWindow		Bevorzugte Versionsverwaltung:
-Sets the location for project backups	PrefsWindow		Setzt den Speicherort für Projekt-Backups
-Use ccache to build faster	PrefsWindow		Benutze ccache für schnelleres Kompilieren
-Omit header files from projects	PrefsWindow		Header-Dateien aus Projekten weglassen
-If checked, header files are not automatically added to projects.	PrefsWindow		Falls aktiviert, werden Header-Dateien nicht automatisch dem Projekt hinzugefügt.
-Build with just one thread instead of one thread per processor	PrefsWindow		Nur einen Thread anstatt ein Thread pro Prozessor benutzen
-Projects folder:	PrefsWindow		Projektordner:
-Paladin settings	PrefsWindow		Paladin Einstellungen
-Source control repository folder:	PrefsWindow		Repository-Ordner der Versionskontrolle:
-Rename partner file	AddNewFileWindow		Partnerdatei umbenennen
-New name: 	AddNewFileWindow		Neuer Name:
-Cancel	AddNewFileWindow		Abbrechen
-Create both a header and source file	AddNewFileWindow		Header- und Source-Datei anlegen
-New file name: 	AddNewFileWindow		Neuer Dateiname:
-Add new file	AddNewFileWindow		Neue Datei hinzufügen
-Create	AddNewFileWindow		Anlegen
-Rename file	AddNewFileWindow		Datei umbenennen
-+	ProjectSettingsWindow		+
-General	ProjectSettingsWindow		Allgemein
-Check this if you want to use your program with gprof or bprof for profiling.	ProjectSettingsWindow		Aktivieren, für Profiling mit gprof oder bprof.
-The kind of program you want to build	ProjectSettingsWindow		Die Art des Programms
-Device driver	ProjectSettingsWindow		Gerätetreiber
-None	ProjectSettingsWindow		Keine
-Extra GCC linker flags you wish included when your project is linked.	ProjectSettingsWindow		Extra GCC Linker-Flags für das Projekt.
-Target name:	ProjectSettingsWindow		Zielname:
-More	ProjectSettingsWindow		Mehr
-Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWindow		Extra GCC Flags für die Kompilierung aller Dateien.
-Add a file to the include path list	ProjectSettingsWindow		Eine Datei der Include-Pfadliste hinzufügen
-Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Aktivieren, um das Programm während der Entwicklung in einem Debugger laufen zu lassen. Das Projekt sollte nach dieser Änderung neu kompiliert werden.
-Target type	ProjectSettingsWindow		Zieltyp:
-Optimization	ProjectSettingsWindow		Optimierung
-−	ProjectSettingsWindow		−
-Extra linker options:	ProjectSettingsWindow		Extra Linker-Optionen:
-Shared library	ProjectSettingsWindow		Dynamische Bibliothek
-Target type:	ProjectSettingsWindow		Zieltyp:
-Application	ProjectSettingsWindow		Anwendung
-Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler Optmierungslevel. Deaktiviert wenn Debuginfo überprüft wird.
-Static library	ProjectSettingsWindow		Statische Bibliothek
-Full	ProjectSettingsWindow		Vollständig
-Project settings	ProjectSettingsWindow		Projekteinstellungen
-Build debugging information	ProjectSettingsWindow		Debuginfo erzeugen
-Include paths:	ProjectSettingsWindow		Include-Pfade:
-Remove the selected path	ProjectSettingsWindow		Ausgewählten Pfad entfernen
-Some	ProjectSettingsWindow		Einige
-Optimize:	ProjectSettingsWindow		Optimieren:
-Build profiling information	ProjectSettingsWindow		Profilinginfo erzeugen
-The folders you want Paladin to search for header files	ProjectSettingsWindow		Die Ordner, die Paladin nach Header-Dateien durchsuchen soll
-Optimize for size over speed	ProjectSettingsWindow		Optimierung von Größe vor Geschwindigkeit
-Extra compiler options:	ProjectSettingsWindow		Weitere Compiler Optionen:
-This will undo all changes since the last commit. Continue?	ProjectWindow		Dies wird alle Änderungen seit dem letzten Commit rückgängig machen. Sicher?
-Update dependencies	ProjectWindow		Abhängigkeiten aktualisieren
-Run	ProjectWindow		Ausführen
-File	ProjectWindow		Datei
-Project status	ProjectWindow		Projektstatus
-Revert selected files	ProjectWindow		Ausgewählte Dateien zurücksetzen
-Revert	ProjectWindow		Zurücksetzen
-Check project in	ProjectWindow		Projekt einchecken
-Empty build cache	ProjectWindow		Build-Cache leeren
-Open recent project	ProjectWindow		Letztes Projekt öffnen
-Emptying build cache	ProjectWindow		Build-Cache wird geleert
-Build	ProjectWindow		Erzeugen
-Differences	ProjectWindow		Unterschiede
-The project cannot be built because some of its files are missing.	ProjectWindow		Das Projekt konnte nicht kompiliert werden, da einige seiner Dateien fehlen.
-Tools	ProjectWindow		Werkzeuge
-Push	ProjectWindow		Push
-Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Das Projekt beinhaltet eine Debuginfos und muss daher für das Debuggen neu kompiliert werden. Soll es neu kompiliert und im Debugger gestartet werden?
 Backing up project	ProjectWindow		Projekt sichern
-Add selected files to repository	ProjectWindow		Ausgewählte Datein dem Repository hinzufügen
-Revert project	ProjectWindow		Projekt zurücksetzen
-Commit	ProjectWindow		Commit
-Building 	ProjectWindow		Erzeugen
-Don't revert	ProjectWindow		Nicht rückgängig machen
-Show differences	ProjectWindow		Unterschiede zeigen
-Make project	ProjectWindow		Projekt kompilieren
-Project	ProjectWindow		Projekt
-Force project to rebuild	ProjectWindow		Re-build des Projekts erzwingen
-Remove Selected files from repository	ProjectWindow		Ausgewählte Dateien aus Repository entfernen
-Add to repository	ProjectWindow		Repository hinzufügen
-Sort group	ProjectWindow		Gruppe sortieren
-Show differences from last check-in	ProjectWindow		Unterschiede seit dem letzten Check-in zeigen
-Debug	ProjectWindow		Debug
-Show changed files from last check-in	ProjectWindow		Geänderte Dateien seit dem letzten Check-in zeigen
-New group	ProjectWindow		Neue Gruppe
-Source control	ProjectWindow		Versionskontrolle
-Performing post-build tasks	ProjectWindow		Abschließende Aufgaben werden abgearbeitet
-Pull	ProjectWindow		Pull
-Updating resources	ProjectWindow		Ressourcen aktualisieren
-Remove selected files	ProjectWindow		Ausgewählte Dateien entfernen
-Enter the description for the changes in this revision.	ProjectWindow		Beschreibung der Änderungen in dieser Revision eingeben.
-Pull changes from remote repository	ProjectWindow		Änderungen von externem Repository ziehen
-Remove from repository	ProjectWindow		Von Repository entfernen
-Rename group	ProjectWindow		Gruppe umbenennen
-Push changes to remote repository	ProjectWindow		Änderungen auf externes Repository schieben
-Linking	ProjectWindow		Linking
-New project…	ProjectWindow		Neues projekt…
-Paladin: Project	ProjectWindow		Paladin: Projekt
-Add files…	ProjectWindow		Dateien hinzufügen…
-Build successful.	ProjectWindow		Build erfolgreich.
-Settings…	ProjectWindow		Einstellungen…
-Examining source files	ProjectWindow		Untersuche Quelldateien
-Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		%filename% konnte nicht gefunden werden. Es könnte verschoben oder umbenannt worden sein.
-Set software license…	ProjectWindow		Softwarelizenz wählen…
-OK	ProjectWindow		OK
-Examining %file%	ProjectWindow		%file% wird untersucht
-Cancel	ProjectWindow		Abbrechen
-Regular expression tester	ProjectWindow		Regulären Ausdruck prüfen
-Show project folder	ProjectWindow		Projektordner öffnen
-Build had errors or warnings.	ProjectWindow		Es gab Fehler und Warnungen.
-Generate makefile	ProjectWindow		Makefile erstellen
-Opening project...	ProjectWindow		Projekt wird geöffnet...
-Program settings…	ProjectWindow		Programmeinstellungen…
-Set run arguments…	ProjectWindow		Laufzeitparameter setzen…
-Find in project files…	ProjectWindow		In Projektdateien suchen…
-Paladin: Change description	ProjectWindow		Paladin: Beschreibung ändern
-Open project…	ProjectWindow		Projekt öffnen…
-Change system libraries…	ProjectWindow		Systembibliotheken ändern…
-Updating dependencies	ProjectWindow		Abhängigkeiten aktualisieren
-Find and open file…	ProjectWindow		Suche und öffne Datei…
-Add new file…	ProjectWindow		Neue Datei hinzufügen…
-Error window	ProjectWindow		Fehlerfenster
-Symbol finder	ProjectWindow		Symbolsuche
-Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.	ProjectWindow		Pull von Repository ist fehlgeschlagen. Falls eine sichere Verbindung benutzt wird, müssen auf dem Server die entsprechenden SSH Schlüssel eingerichtet werden.
-Run logged	ProjectWindow		Ausführen (mit Log)
-Project opened.	ProjectWindow		Projekt geöffnet.
-About Paladin	ProjectWindow		Über Paladin
-Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?	ProjectWindow		Debuginfo muss im Projekt kompiliert sein. Bei großen Projekten kann das etwas dauern. Soll das Projekt neu kompiliert und im Debugger gestartet werden?
-ASCII table	ProjectWindow		ASCII-Tabelle
+Backspace	AsciiWindow	ASCII table description	Backspace - Bewegt den Cursor ein Zeichen zurück
 Backup project	ProjectWindow		Projekt sichern
-Rebuild	ProjectWindow		Re-build
-Quick find	ProjectWindow		Schnellsuche
-Quick find and open…	ProjectWindow		Schnell suchen und öffnen…
-Standard Error	ProjectWindow		Standard Fehlerausgabe
-Standard Out	ProjectWindow		Standard Ausgabe
-Delete group	ProjectWindow		Gruppe entfernen
-Create new module…	CodeLibWindow		Neues Modul anlegen…
-Delete current module	CodeLibWindow		Aktuelles Modul löschen
-Add	CodeLibWindow		Hinzu
-Choose the name for the new module:	CodeLibWindow		Name für neues Modul wählen:
-Actions	CodeLibWindow		Aktionen
-Remove files from module	CodeLibWindow		Dateien aus Modul entfernen
-Code Modules:	CodeLibWindow		Code Module:
-Description:	CodeLibWindow		Beschreibung:
-Projects	CodeLibWindow		Projekte
-These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		Diese Dateien (außer den Bibliotheken) werden unwiederbringlich gelöscht. Löschen?
-Delete	CodeLibWindow		Löschen
-Export module to project	CodeLibWindow		Modul als Projekt exportieren
-Selected project:	CodeLibWindow		Gewähltes Projekt:
-Add project files to module…	CodeLibWindow		Projektdateien dem Modul hinzufügen…
-Code library	CodeLibWindow		Code Bibliothek
-This cannot be undone. Delete module?	CodeLibWindow		Dies kann nicht rückgängig gemacht werden. Modul löschen?
+Backups folder:	PrefsWindow		Backup-Ordner:
+Bell	AsciiWindow	ASCII table description	Bell - Spielt einen Klang ab
+Browse…	PathBox		Durchsuchen…
+Build	PrefsWindow		Erzeugen
+Build	ProjectWindow		Erzeugen
+Build debugging information	ProjectSettingsWindow		Debuginfo erzeugen
+Build failure\n%s	Paladin		Build Fehler\n%s
+Build had errors or warnings.	ProjectWindow		Es gab Fehler und Warnungen.
+Build profiling information	ProjectSettingsWindow		Profilinginfo erzeugen
+Build successful.	ProjectWindow		Build erfolgreich.
+Build with just one thread instead of one thread per processor	PrefsWindow		Nur einen Thread anstatt ein Thread pro Prozessor benutzen
+Building 	ProjectWindow		Erzeugen
+Building %s\n	Paladin		Erzeuge %s\n
+Can't find file %s\n	Paladin		Datei %s nicht gefunden\n
+Cancel	AddNewFileWindow		Abbrechen
+Cancel	AsciiWindow	ASCII table description	Cancel - Fehlerhafte Übertragung verwerfen
 Cancel	CodeLibWindow		Abbrechen
-Files in Module:	CodeLibWindow		Dateien im Modul:
-Add files to Module…	CodeLibWindow		Dateien dem Modul hinzufügen…
-Remove	CodeLibWindow		Entfernen
-Modules	CodeLibWindow		Module
+Cancel	FindOpenFileWindow		Abbrechen
+Cancel	GetTextWindow		Abbrechen
+Cancel	Globals		Abbrechen
+Cancel	GroupRenameWindow		Abbrechen
+Cancel	ProjectWindow		Abbrechen
+Carriage return	AsciiWindow	ASCII table description	Carriage return - Setzt den Cursor an den Anfang der Zeile
+Change system libraries…	ProjectWindow		Systembibliotheken ändern…
+Check project in	ProjectWindow		Projekt einchecken
+Check this if you want to use your program in a debugger during development. You'll want to rebuild your project after change this.	ProjectSettingsWindow		Aktivieren, um das Programm während der Entwicklung in einem Debugger laufen zu lassen. Das Projekt sollte nach dieser Änderung neu kompiliert werden.
+Check this if you want to use your program with gprof or bprof for profiling.	ProjectSettingsWindow		Aktivieren, für Profiling mit gprof oder bprof.
+Choose a project type	TemplateWindow		Projekttap wählen
+Choose project folder	StartWindow		Projektordner wählen
+Choose the name for the new module:	CodeLibWindow		Name für neues Modul wählen:
 Choose the project files you wish to import. You can select multiple files by clicking on items while holding the Command key (usually ALT).	CodeLibWindow		Das Projekt für den Import auswählen. Mehrere Dateien lassen sich durch Halten der Befehlstaste (normal: ALT) auswählen.
-Module files	CodeLibWindow		Moduldateien
-Create module	CodeLibWindow		Modul erstellen
-Libraries: 	LibWindow		Bibliotheken:
-Common libraries:	LibWindow		Übliche Bibliotheken
-System libraries:	LibWindow		Systembibliotheken:
-Scanning libraries…	LibWindow		Bibliotheken einlesen…
+Choose the source control manager for your project, if any.	TemplateWindow		Versionskontrolle des Projekts wählen, falls gewünscht.
 Choose the system libraries for your project:	LibWindow		Systembibliotheken für das Projekt wählen:
-User libraries:	LibWindow		Benutzerbibliotheken:
-System Develop libraries:	LibWindow		System Entwicklungsbibliotheken:
-Sort group	ProjectList		Gruppe sortieren
-Force file rebuild	ProjectList		Re-build von Dateien erzwingen
-Remove selected files	ProjectList		Ausgewählte Dateien entfernen
-Show changes in selected files	ProjectList		Änderungen in ausgewählten Dateien zeigen
- - Missing	ProjectList		- fehlt
-Add selected files to repository	ProjectList		Gewählte Dateien dem Repository hinzufügen
-New group	ProjectList		Neue Gruppe
-Revert selected files	ProjectList		Ursprungszustand der ausgewählten Dateien wiederherstellen
-Remove selected files from repository	ProjectList		Ausgewählte Dateien aus Repository entfernen
-Open parent folder	ProjectList		Speicherort öffnen
-Source Control	ProjectList		Versionskontrolle
-Rename group…	ProjectList		Gruppe umbenennen…
-Delete group	ProjectList		Gruppe entfernen
-Add license to project	LicenseManager		Lizenz wählen
-Full version:	LicenseManager		Volltext:
-Summary:	LicenseManager		Kurzfassung:
-Set license	LicenseManager		Lizenz wählen
-License:	LicenseManager		Lizenz:
-A summary of this license is not available.	LicenseManager		Für diese Lizenz existiert keine Kurzfassung
-Errors and warnings: 	ErrorWindow		Fehler und Warnungen:
+Close	SCMOutputWindow		Schließen
+Code library	CodeLibWindow		Code Bibliothek
+Code modules:	CodeLibWindow		Code Module:
+Command resulted in an error.\n	SourceControl		Befehl ergab einen Fehler.\n
+Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n	SourceControl		Befehl erfolgreich. Um das Projekt vom lokalen Dateisystem zu laden, im Hauptfenster den Menüpunkt 'Bestehendes Projekt importieren" ausführen.
+Command:	SCMImportWindow		Befehl:
+Commit	ProjectWindow		Commit
+Common libraries:	LibWindow		Übliche Bibliotheken
+Compiler caching is another way to speed up builds	PrefsWindow		Ein Compiler-Cache kann das Kompilieren beschleunigen
+Compiler optimization level. Disabled when debugging info is checked.	ProjectSettingsWindow		Compiler Optmierungslevel. Deaktiviert wenn Debuginfo überprüft wird.
 Copy list to clipboard	ErrorWindow		Liste in Zwischenablage kopieren
-Warnings	ErrorWindow		Warnungen
 Copy to clipboard	ErrorWindow		In Zwischenablage kopieren
+Couldn't find %file%.	FileUtils		Konnte %file% nicht finden.
+Couldn't find %filename%. It may have been moved or renamed.	ProjectWindow		%filename% konnte nicht gefunden werden. Es könnte verschoben oder umbenannt worden sein.
+Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Die Partnerdatei von %refname% konnte nicht in %reffolder%/ gefunden werden.
+Create	AddNewFileWindow		Anlegen
+Create a new project	StartWindow		Neues Projekt anlegen
+Create both a header and source file	AddNewFileWindow		Header- und Source-Datei anlegen
+Create module	CodeLibWindow		Modul erstellen
+Create new module…	CodeLibWindow		Neues Modul anlegen…
+Create project folder	TemplateWindow		Projektordner anlegen
+Create project…	TemplateWindow		Projekt anlegen…
+Data link escape	AsciiWindow	ASCII table description	Data link escape - Nachfolgende Zeichen werden 'escaped'
+Debug	ProjectWindow		Debug
+Debugging information needs to compiled into your project. This may take some time for large projects. Do you wish to rebuild and run the debugger?	ProjectWindow		Debuginfo muss im Projekt kompiliert sein. Bei großen Projekten kann das etwas dauern. Soll das Projekt neu kompiliert und im Debugger gestartet werden?
+Delete	AsciiWindow	ASCII table description	Delete - Zeichen löschen
+Delete	CodeLibWindow		Löschen
+Delete current module	CodeLibWindow		Aktuelles Modul löschen
+Delete group	ProjectList		Gruppe entfernen
+Delete group	ProjectWindow		Gruppe entfernen
+Description:	CodeLibWindow		Beschreibung:
+Detected platform from uname: %s\n	Project		Plattform per uname erkennen: %s\n
+Device Control 1	AsciiWindow	ASCII table description	Device Control 1 - Gerätspezifische Funktion
+Device Control 2	AsciiWindow	ASCII table description	Device Control 2 - Gerätspezifische Funktion
+Device Control 3	AsciiWindow	ASCII table description	Device Control 3 - Gerätspezifische Funktion
+Device Control 4	AsciiWindow	ASCII table description	Device Control 4 - Gerätspezifische Funktion
+Device driver	ProjectSettingsWindow		Gerätetreiber
+Differences	ProjectWindow		Unterschiede
+Directory Init Check failed\n	QuickFindWindow		Ordner Init Check fehlgeschlagen\n
+Don't revert	ProjectWindow		Nicht rückgängig machen
+DoSearch started\n	QuickFindWindow		DoSearch begonnen\n
+Empty build cache	ProjectWindow		Build-Cache leeren
+Emptying build cache	ProjectWindow		Build-Cache wird geleert
+End of medium	AsciiWindow	ASCII table description	End of medium - Ende des Speichermediums
+End of text	AsciiWindow	ASCII table description	End of text - Ende der Nachricht
+End of transmission	AsciiWindow	ASCII table description	End of transmission - Ende des Übertragungsblocks
+End of transmission block	AsciiWindow	ASCII table description	End of transmission block - Ende des Übertragungsblocks
+Enquiry	AsciiWindow	ASCII table description	Enquiry - Anfrage, die auf Antwort wartet
+Enter text to search here:	VRegWindow		Suchtext hier eingeben:
+Enter the description for the changes in this revision.	ProjectWindow		Beschreibung der Änderungen in dieser Revision eingeben.
+Error window	ProjectWindow		Fehlerfenster
 Errors	ErrorWindow		Fehler
 Errors and warnings	ErrorWindow		Fehler und Warnungen
-Updating resources\n	Paladin		Ressourcen aktualisieren\n
-Success\n	Paladin		Erfolreich\n
-Printing debug output\n	Paladin		Debug-Ausgabe\n
-Linking\n	Paladin		Linking\n
-Printing debug output with extra detail\n	Paladin		Detailierte Debug-Ausgabe\n
-Can't find file %s\n	Paladin		Datei %s nicht gefunden\n
-Building %s\n	Paladin		Erzeuge %s\n
-This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		Das Projekt befindet sich auf einem schreibgeschützten Datenträger. Es kann daher zwar nicht kompiliert werden, seine Dateien lassen sich jedoch anzeigen und man alles machen das kein Speichern erfordert.
-No	Paladin		Nein
-%path% is on a read-only disk. Please copy the project to another disk or remount the disk with write support to be able to build it.\n	Paladin		%path% befindet sich auf einem schreibgeschützten Datenträger. Um Kompilieren zu können, entweder den Datenträger mit Schreibzugriff neu einhängen, oder das Projekt auf einen anderen Datenträger kopieren.
-This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		Das Projekt benutzt keine Versionskontrolle. Soll dafür %sourcecontrol% benutzt werden?\n Diese Frage wird nur dieses eine Mal gestellt.
-Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Die Projektdatei '%projectname%.pld' existiert bereits. Die Originaldatei für diese Vorlage heißt '%pldname%'. Der Projektordner sollte geöffnet werden, um herauszufinden welche Datei behalten werden soll.
-Paladin: Open project	Paladin		Paladin: Projekt öffnen
-Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Gebrauch: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [Datei1 [Datei2 ...]]\n-b, Kompiliert das angegebene Projekt. Mit diesem Schalter kann nur eine einzelne Datei angegeben werden.\n-m, Erzeugt ein Makefile aus dem angegebenen Projekt.\n-r, Baut das Projekt komplett neu.\n-s, Benutzt nur einen einzelnen Thread.\n-d, Ausgabe von Debuginfo\n-v, Macht die Debuginfo noch ausführlicher.\n
-Yes	Paladin		Ja
-NULL pointer in M_BUILDING_FILE\n	Paladin		NULL-Zeiger im M_BUILDING_FILE\n
-Attempting to open %s\n	Paladin		Versuche %s zu öffnen\n
-Build failure\n%s	Paladin		Build Fehler\n%s
-Couldn't find a partner file for %refname% in %reffolder%/.	Paladin		Die Partnerdatei von %refname% konnte nicht in %reffolder%/ gefunden werden.
-Project type: 	TemplateWindow		Projekttyp:
-None	TemplateWindow		Keine
-Choose the source control manager for your project, if any.	TemplateWindow		Versionskontrolle des Projekts wählen, falls gewünscht.
-Subversion unavailable	TemplateWindow		Subversion nicht verfügbar
-Mercurial unavailable	TemplateWindow		Mercurial nicht verfügbar
-The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		Der Name des Projekts. Das kann derselbe wie der Zielname sein, muss es aber nicht.
-Project name:	TemplateWindow		Projektname:
-The name of the compiled application or library	TemplateWindow		Name der erzeugten Anwendung oder Bibliothek
-Source control: 	TemplateWindow		Versionskontrolle:
-Location:	TemplateWindow		Speicherort:
-Create project folder	TemplateWindow		Projektordner anlegen
-Set the location for your project.	TemplateWindow		Speicherort des Projekts wählen.
-Target name:	TemplateWindow		Zielname:
-Git unavailable	TemplateWindow		Git nicht verfügbar
-Choose a project type	TemplateWindow		Projekttap wählen
-If checked, a folder for your project will be created in the location entered above.	TemplateWindow		Falls aktiviert, wird der Projektordner am oben eingegeben Ort angelegt.
-Create project…	TemplateWindow		Projekt anlegen…
-Git	TemplateWindow		Git
-Project type	TemplateWindow		Projekttyp
-Subversion	TemplateWindow		Subversion
-Mercurial	TemplateWindow		Mercurial
-Search only system folders	FindOpenFileWindow		Nur Systemordner durchsuchen
-Open: 	FindOpenFileWindow		Öffnen
-Open	FindOpenFileWindow		Öffnen
-Find and open file	FindOpenFileWindow		Datei suchen und öffnen
-Cancel	FindOpenFileWindow		Abbrechen
-Arguments: 	RunArgsWindow		Parameter:
-Run arguments	RunArgsWindow		Laufzeitparameter
-Open project	StartWindow		Projekt öffnen
-Open the selected project	StartWindow		Ausgewähltes Projekt öffnen
-Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Für einen Online-Import muss Mercurial, Git, und/oder Subversion installiert sein. Paladin kann sie jedoch nicht finden.
-Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Ein Projekt aus der Liste rechts öffnen. Auch möglich mit Befehlstaste + eine Zahlentaste.
-Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Schnell ein Projekt anlegen durch Import aller Quelldateien und Ressourcen.\nEs lassen sich auch BeIDE Projekte importieren.
-Import a project from an online repository	StartWindow		Ein Projekt von einem Repository im Netz importieren
-Remove from recent list	StartWindow		Entfernen aus Liste letzter Projekte
-Create a new project	StartWindow		Neues Projekt anlegen
-Choose project folder	StartWindow		Projektordner wählen
-Recent projects:	StartWindow		Letzte Projekte:
-Paladin: Start	StartWindow		Paladin: Start
-Import an existing project	StartWindow		Bestehendes Projekt importieren
-Open a project	StartWindow		Projekt öffnen
-Import a project from online	StartWindow		Ein Projekt aus dem Netz importieren
-Paladin: 	StartWindow		Paladin:
-Paladin project	FileUtils		Paladin Projekt
-File to build a program with Paladin	FileUtils		Datei um ein Programm mit Paladin zu erzeugen
-Couldn't find %file%.	FileUtils		Konnte %file% nicht finden.
-OK	FileUtils		OK
-New group name: 	GroupRenameWindow		Neuer Gruppenname:
-Rename	GroupRenameWindow		Umbenennen
-Cancel	GroupRenameWindow		Abbrechen
-Rename group	GroupRenameWindow		Gruppe umbenennen
-Enter text to search here:	VRegWindow		Suchtext hier eingeben:
-Matched text:	VRegWindow		Übereinstimmender Text:
-Regular expression tester	VRegWindow		Regulären Ausdruck prüfen
-Regex:	VRegWindow		Regulärer Ausdruck:
-Terminal output	TerminalWindow		Terminalausgabe
-Overwrite	Globals		Überschreiben
-Cancel	Globals		Abbrechen
-OK	Globals		OK
-%filepath% already exists. Do you want to overwrite it?	Globals		%filepath% existiert bereits. Überschreiben?
-OK	GetTextWindow		OK
-Cancel	GetTextWindow		Abbrechen
-ASCII table	AsciiWindow		ASCII Tabelle
-Shift out	AsciiWindow	ASCII table description	Shift out - Schaltet die alternative Darstllung ein
-  Dec  Hex  Oct  Code  Description	AsciiWindow		  Dec  Hex  Oct  Code  Beschreibung
-Device Control 2	AsciiWindow	ASCII table description	Device Control 2 - Gerätspezifische Funktion
-Unit separator	AsciiWindow	ASCII table description	Unit separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
-Device Control 4	AsciiWindow	ASCII table description	Device Control 4 - Gerätspezifische Funktion
-Device Control 1	AsciiWindow	ASCII table description	Device Control 1 - Gerätspezifische Funktion
-Device Control 3	AsciiWindow	ASCII table description	Device Control 3 - Gerätspezifische Funktion
-Data link escape	AsciiWindow	ASCII table description	Data link escape - Nachfolgende Zeichen werden 'escaped'
-Bell	AsciiWindow	ASCII table description	Bell - Spielt einen Klang ab
-Form feed	AsciiWindow	ASCII table description	Form feed - Seitenumbruch
-Substitute	AsciiWindow	ASCII table description	Substitute - Ersetzt fehlerhaftes Zeichen
-Start of text	AsciiWindow	ASCII table description	Start of text - Ende der Kopfzeile, Beginn der Nachricht
-Record separator	AsciiWindow	ASCII table description	Record separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
-NULL	AsciiWindow	ASCII table description	NULL - Nullzeichen
-End of text	AsciiWindow	ASCII table description	End of text - Ende der Nachricht
-End of transmission block	AsciiWindow	ASCII table description	End of transmission block - Ende des Übertragungsblocks
-Start of heading	AsciiWindow	ASCII table description	Start of heading - Beginn der Kopfzeile
-New line	AsciiWindow	ASCII table description	Line feed - Zeilenumbruch
-Vertical tab	AsciiWindow	ASCII table description	Vertical tab - Vertikaler Tabulator: Cursor springt in zuvor bestimmte Zeile
+Errors and warnings: 	ErrorWindow		Fehler und Warnungen:
 Escape	AsciiWindow	ASCII table description	Escape - Start einer Escape-Sequenz
-Backspace	AsciiWindow	ASCII table description	Backspace - Bewegt den Cursor ein Zeichen zurück
-Synchronous idle	AsciiWindow	ASCII table description	Synchronous idle - Synchronisiert die Datenübertragung (auch wenn gerade keine stattfindet)
-Negative acknowledge	AsciiWindow	ASCII table description	Negative acknowledge - Negative Antwort
+Examining %file%	ProjectWindow		%file% wird untersucht
+Examining source files	ProjectWindow		Untersuche Quelldateien
+Export module to project	CodeLibWindow		Modul als Projekt exportieren
+Extra compiler options:	ProjectSettingsWindow		Weitere Compiler Optionen:
+Extra GCC flags you wish included when each file is compiled.	ProjectSettingsWindow		Extra GCC Flags für die Kompilierung aller Dateien.
+Extra GCC linker flags you wish included when your project is linked.	ProjectSettingsWindow		Extra GCC Linker-Flags für das Projekt.
+Extra linker options:	ProjectSettingsWindow		Extra Linker-Optionen:
+File	ProjectWindow		Datei
 File separator	AsciiWindow	ASCII table description	File separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
-End of transmission	AsciiWindow	ASCII table description	End of transmission - Ende des Übertragungsblocks
-Group separator	AsciiWindow	ASCII table description	Group separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
-Space	AsciiWindow	ASCII table description	Space - Leerzeichen
-Horizontal tab	AsciiWindow	ASCII table description	Horizontal tab - Horizontaler Tabulator: Cursor springt in zuvor bestimmte Position dieser Zeile
-End of medium	AsciiWindow	ASCII table description	End of medium - Ende des Speichermediums
-Shift in	AsciiWindow	ASCII table description	Shift in - Schaltet die alternative Darstllung aus
-Enquiry	AsciiWindow	ASCII table description	Enquiry - Anfrage, die auf Antwort wartet
-Acknowledge	AsciiWindow	ASCII table description	Acknowledge - Positive Antwort auf eine Anfrage
-Delete	AsciiWindow	ASCII table description	Delete - Zeichen löschen
-Carriage return	AsciiWindow	ASCII table description	Carriage return - Setzt den Cursor an den Anfang der Zeile
-Cancel	AsciiWindow	ASCII table description	Cancel - Fehlerhafte Übertragung verwerfen
-Paladin	System name		Paladin
-Regular expression	FindWindow		Regulärer Ausdruck
-Replace all	FindWindow		Alle ersetzen
-luare based replace all has been removed until it can be migrated from Lua	FindWindow		luare basiertes Ersetzen wurde einstweilen entfernt, solange es nicht von Lua gelöst werden kann.
-Match whole word	FindWindow		Nur ganze Wörter
-OK	FindWindow		OK
-Search	FindWindow		Suchen
-Ignore case	FindWindow		Groß-/Kleinschreibung ignorieren
-No matches found	FindWindow		Keine Suchergebnisse
-Project	FindWindow		Projekt
-Replace	FindWindow		Ersetzen
+File to build a program with Paladin	FileUtils		Datei um ein Programm mit Paladin zu erzeugen
+Files in module:	CodeLibWindow		Dateien im Modul:
 Find	FindWindow		Suchen
-Options	FindWindow		Optionen
-The following files had problems replacing the search terms:\n	FindWindow		In folgenden Dateien kam es beim Ersetzen der Suchbegriffe zu Problemen:\n
+Find and open file	FindOpenFileWindow		Datei suchen und öffnen
+Find and open file…	ProjectWindow		Suche und öffne Datei…
+Find files: 	QuickFindWindow		Suche Dateien:
 Find in project	FindWindow		Suche im Projekt
-Results:	FindWindow		Ergebnisse:
-Unknown	SCMManager		Unbekannt
-None	SCMManager		Keine
-Subversion	SCMManager		Subversion
+Find in project files…	ProjectWindow		In Projektdateien suchen…
+Force file rebuild	ProjectList		Re-build von Dateien erzwingen
+Force project to rebuild	ProjectWindow		Re-build des Projekts erzwingen
+Form feed	AsciiWindow	ASCII table description	Form feed - Seitenumbruch
+Found: %s\n	QuickFindWindow		Gefunden: %s\n
+Full	ProjectSettingsWindow		Vollständig
+Full version:	LicenseManager		Volltext:
+General	PrefsWindow		Allgemein
+General	ProjectSettingsWindow		Allgemein
+Generate makefile	ProjectWindow		Makefile erstellen
+Git	PrefsWindow		Git
+Git	SCMImportWindow		Git
 Git	SCMManager		Git
-Mercurial	SCMManager		Mercurial
-Repository owner:	SCMImportWindow		Repository Besitzer:
-Providers	SCMImportWindow		Anbieter
-Username:	SCMImportWindow		Benutzername:
-Project:	SCMImportWindow		Projekt:
-Anonymous check-out	SCMImportWindow		Anonymer Check-out
-Method:	SCMImportWindow		Methode:
+Git	TemplateWindow		Git
+Git unavailable	TemplateWindow		Git nicht verfügbar
+Group separator	AsciiWindow	ASCII table description	Group separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
+Horizontal tab	AsciiWindow	ASCII table description	Horizontal tab - Horizontaler Tabulator: Cursor springt in zuvor bestimmte Position dieser Zeile
+If checked, a folder for your project will be created in the location entered above.	TemplateWindow		Falls aktiviert, wird der Projektordner am oben eingegeben Ort angelegt.
+If checked, header files are not automatically added to projects.	PrefsWindow		Falls aktiviert, werden Header-Dateien nicht automatisch dem Projekt hinzugefügt.
+Ignore case	FindWindow		Groß-/Kleinschreibung ignorieren
 Import	SCMImportWindow		Importieren
+Import a project from an online repository	StartWindow		Ein Projekt von einem Repository im Netz importieren
+Import a project from online	StartWindow		Ein Projekt aus dem Netz importieren
+Import an existing project	StartWindow		Bestehendes Projekt importieren
 Import from online	SCMImportWindow		Aus dem Netz importieren
 Import from repository	SCMImportWindow		Von Repository importieren
-Provider:	SCMImportWindow		Anbieter:
-Methods	SCMImportWindow		Methoden
-Command:	SCMImportWindow		Befehl:
-Git	SCMImportWindow		Git
-Mercurial	SCMImportWindow		Mercurial
-Subversion	SCMImportWindow		Subversion
-Replacing it with %path%.	Project		Ersetzen mit %path%.
-%library% couldn't be found in the same place as it was under %platform%.	Project		%library% konnte nicht am selben Ort gefunden werden wie unter %platform%.
-Remove	Project		Entfernen
-OK	Project		OK
-%path% seems to be missing. Do you want to remove it from the project?	Project		%path% scheint zu fehlen. Soll es aus dem Projekt entfernt werden?
-Detected platform from uname: %s\n	Project		Plattform per uname erkennen: %s\n
+Include paths:	ProjectSettingsWindow		Include-Pfade:
 Keep	Project		Behalten
-%s seems to be missing\n	Project		%s scheint zu fehlen\n
-Command succeeded. Use 'Import existing project' function in the main window to load the project from the local filesystem\n	SourceControl		Befehl erfolgreich. Um das Projekt vom lokalen Dateisystem zu laden, im Hauptfenster den Menüpunkt 'Bestehendes Projekt importieren" ausführen.
-Command resulted in an error.\n	SourceControl		Befehl ergab einen Fehler.\n
-OK	PathBox		OK
-The location entered does not exist.\nPlease check to make sure you have entered it correctly.	PathBox		Der angegebene Speicherort existiert nicht.\nEingabe bitte nochmal kontrollieren.
-Browse…	PathBox		Durchsuchen…
-Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin kann den Debugger nicht finden.
-Close	SCMOutputWindow		Schließen
-Find files: 	QuickFindWindow		Suche Dateien:
-DoSearch started\n	QuickFindWindow		DoSearch begonnen\n
-Quick find	QuickFindWindow		Schnellsuche
-Type to search	QuickFindWindow		Suche während der Eingabe
-Found: %s\n	QuickFindWindow		Gefunden: %s\n
-Searching for file matching: %s\n	QuickFindWindow		Suche Dateien mit: %s\n
-Directory Init Check failed\n	QuickFindWindow		Ordner Init Check fehlgeschlagen\n
+Libraries: 	LibWindow		Bibliotheken:
+License:	LicenseManager		Lizenz:
+Linking	ProjectWindow		Linking
+Linking\n	Paladin		Linking\n
+Location:	TemplateWindow		Speicherort:
+luare based replace all has been removed until it can be migrated from Lua	FindWindow		luare basiertes Ersetzen wurde einstweilen entfernt, solange es nicht von Lua gelöst werden kann.
+Make project	ProjectWindow		Projekt kompilieren
+Match whole word	FindWindow		Nur ganze Wörter
+Matched text:	VRegWindow		Übereinstimmender Text:
+Mercurial	PrefsWindow		Mercurial
+Mercurial	SCMImportWindow		Mercurial
+Mercurial	SCMManager		Mercurial
+Mercurial	TemplateWindow		Mercurial
+Mercurial unavailable	TemplateWindow		Mercurial nicht verfügbar
+Method:	SCMImportWindow		Methode:
+Methods	SCMImportWindow		Methoden
+Module files	CodeLibWindow		Moduldateien
+Modules	CodeLibWindow		Module
 Monitor	MonitorWindow		Monitor
+More	ProjectSettingsWindow		Mehr
+Negative acknowledge	AsciiWindow	ASCII table description	Negative acknowledge - Negative Antwort
+New file name:	AddNewFileWindow		Neuer Dateiname:
+New group	ProjectList		Neue Gruppe
+New group	ProjectWindow		Neue Gruppe
+New group name: 	GroupRenameWindow		Neuer Gruppenname:
+New line	AsciiWindow	ASCII table description	Line feed - Zeilenumbruch
+New name:	AddNewFileWindow		Neuer Name:
+New project…	ProjectWindow		Neues projekt…
+No	Paladin		Nein
+No matches found	FindWindow		Keine Suchergebnisse
+None	PrefsWindow		kein
+None	ProjectSettingsWindow		Keine
+None	SCMManager		Keine
+None	TemplateWindow		Keine
+NULL	AsciiWindow	ASCII table description	NULL - Nullzeichen
+NULL pointer in M_BUILDING_FILE\n	Paladin		NULL-Zeiger im M_BUILDING_FILE\n
+OK	FileUtils		OK
+OK	FindWindow		OK
+OK	GetTextWindow		OK
+OK	Globals		OK
+OK	PathBox		OK
+OK	Project		OK
+OK	ProjectWindow		OK
+Omit header files from projects	PrefsWindow		Header-Dateien aus Projekten weglassen
+Online import requires Mercurial, Git, and/or Subversion to be installed, but Paladin can't find them, sorry.	StartWindow		Für einen Online-Import muss Mercurial, Git, und/oder Subversion installiert sein. Paladin kann sie jedoch nicht finden.
+Open	FindOpenFileWindow		Öffnen
+Open a project	StartWindow		Projekt öffnen
+Open a project in the list on the right. You can also press Command + a number key.	StartWindow		Ein Projekt aus der Liste rechts öffnen. Auch möglich mit Befehlstaste + eine Zahlentaste.
+Open parent folder	ProjectList		Speicherort öffnen
+Open project	StartWindow		Projekt öffnen
+Open project…	ProjectWindow		Projekt öffnen…
+Open recent project	ProjectWindow		Letztes Projekt öffnen
+Open the selected project	StartWindow		Ausgewähltes Projekt öffnen
+Open: 	FindOpenFileWindow		Öffnen
+Opening project...	ProjectWindow		Projekt wird geöffnet...
+Optimization	ProjectSettingsWindow		Optimierung
+Optimize for size over speed	ProjectSettingsWindow		Optimierung von Größe vor Geschwindigkeit
+Optimize:	ProjectSettingsWindow		Optimieren:
+Options	FindWindow		Optionen
+Overwrite	Globals		Überschreiben
+Paladin	System name		Paladin
+Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin kann den Debugger nicht finden.
+Paladin project	FileUtils		Paladin Projekt
+Paladin settings	PrefsWindow		Paladin Einstellungen
+Paladin: 	StartWindow		Paladin:
+Paladin: Change description	ProjectWindow		Paladin: Beschreibung ändern
+Paladin: Open project	Paladin		Paladin: Projekt öffnen
+Paladin: Project	ProjectWindow		Paladin: Projekt
+Paladin: Start	StartWindow		Paladin: Start
+Performing post-build tasks	ProjectWindow		Abschließende Aufgaben werden abgearbeitet
+Preferred source control:	PrefsWindow		Bevorzugte Versionsverwaltung:
+Printing debug output with extra detail\n	Paladin		Detailierte Debug-Ausgabe\n
+Printing debug output\n	Paladin		Debug-Ausgabe\n
+Program settings…	ProjectWindow		Programmeinstellungen…
+Project	FindWindow		Projekt
+Project	ProjectWindow		Projekt
+Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Die Projektdatei '%projectname%.pld' existiert bereits. Die Originaldatei für diese Vorlage heißt '%pldname%'. Der Projektordner sollte geöffnet werden, um herauszufinden welche Datei behalten werden soll.
+Project name:	TemplateWindow		Projektname:
+Project opened.	ProjectWindow		Projekt geöffnet.
+Project settings	ProjectSettingsWindow		Projekteinstellungen
+Project status	ProjectWindow		Projektstatus
+Project type	TemplateWindow		Projekttyp
+Project type:	TemplateWindow		Projekttyp:
+Project:	SCMImportWindow		Projekt:
+Projects	CodeLibWindow		Projekte
+Projects folder:	PrefsWindow		Projektordner:
+Provider:	SCMImportWindow		Anbieter:
+Providers	SCMImportWindow		Anbieter
+Pull	ProjectWindow		Pull
+Pull changes from remote repository	ProjectWindow		Änderungen von externem Repository ziehen
+Push	ProjectWindow		Push
+Push changes to remote repository	ProjectWindow		Änderungen auf externes Repository schieben
+Quick find	ProjectWindow		Schnellsuche
+Quick find	QuickFindWindow		Schnellsuche
+Quick find and open…	ProjectWindow		Schnell suchen und öffnen…
+Quickly make a project by importing all source files and resource files.\nYou can also import a BeIDE project.	StartWindow		Schnell ein Projekt anlegen durch Import aller Quelldateien und Ressourcen.\nEs lassen sich auch BeIDE Projekte importieren.
+Rebuild	ProjectWindow		Re-build
+Recent projects:	StartWindow		Letzte Projekte:
+Record separator	AsciiWindow	ASCII table description	Record separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
+Regex:	VRegWindow		Regulärer Ausdruck:
+Regular expression	FindWindow		Regulärer Ausdruck
+Regular expression tester	ProjectWindow		Regulären Ausdruck prüfen
+Regular expression tester	VRegWindow		Regulären Ausdruck prüfen
+Remove	CodeLibWindow		Entfernen
+Remove	Project		Entfernen
+Remove files from module	CodeLibWindow		Dateien aus Modul entfernen
+Remove from recent list	StartWindow		Entfernen aus Liste letzter Projekte
+Remove from repository	ProjectWindow		Von Repository entfernen
+Remove selected files	ProjectList		Ausgewählte Dateien entfernen
+Remove selected files	ProjectWindow		Ausgewählte Dateien entfernen
+Remove selected files from repository	ProjectList		Ausgewählte Dateien aus Repository entfernen
+Remove selected files from repository	ProjectWindow		Ausgewählte Dateien aus Repository entfernen
+Remove the selected path	ProjectSettingsWindow		Ausgewählten Pfad entfernen
+Rename	GroupRenameWindow		Umbenennen
+Rename file	AddNewFileWindow		Datei umbenennen
+Rename group	GroupRenameWindow		Gruppe umbenennen
+Rename group	ProjectWindow		Gruppe umbenennen
+Rename group…	ProjectList		Gruppe umbenennen…
+Rename partner file	AddNewFileWindow		Partnerdatei umbenennen
+Replace	FindWindow		Ersetzen
+Replace all	FindWindow		Alle ersetzen
+Replacing it with %path%.	Project		Ersetzen mit %path%.
+Repository owner:	SCMImportWindow		Repository Besitzer:
+Results:	FindWindow		Ergebnisse:
+Revert	ProjectWindow		Zurücksetzen
+Revert project	ProjectWindow		Projekt zurücksetzen
+Revert selected files	ProjectList		Ursprungszustand der ausgewählten Dateien wiederherstellen
+Revert selected files	ProjectWindow		Ausgewählte Dateien zurücksetzen
+Run	ProjectWindow		Ausführen
+Run arguments	RunArgsWindow		Laufzeitparameter
+Run logged	ProjectWindow		Ausführen (mit Log)
+Scanning libraries…	LibWindow		Bibliotheken einlesen…
+Search	FindWindow		Suchen
+Search only system folders	FindOpenFileWindow		Nur Systemordner durchsuchen
+Searching for file matching: %s\n	QuickFindWindow		Suche Dateien mit: %s\n
+Selected project:	CodeLibWindow		Gewähltes Projekt:
+Set license	LicenseManager		Lizenz wählen
+Set run arguments…	ProjectWindow		Laufzeitparameter setzen…
+Set software license…	ProjectWindow		Softwarelizenz wählen…
+Set the location for your project.	TemplateWindow		Speicherort des Projekts wählen.
+Sets the location for project backups	PrefsWindow		Setzt den Speicherort für Projekt-Backups
+Sets the location for the 'server' side of local Subversion repositories.	PrefsWindow		Setzt den Speicherort für die 'Serverseite' lokaler Subversion Repositories.
+Settings…	ProjectWindow		Einstellungen…
+Shared library	ProjectSettingsWindow		Dynamische Bibliothek
+Shift in	AsciiWindow	ASCII table description	Shift in - Schaltet die alternative Darstllung aus
+Shift out	AsciiWindow	ASCII table description	Shift out - Schaltet die alternative Darstllung ein
+Show changed files from last check-in	ProjectWindow		Geänderte Dateien seit dem letzten Check-in zeigen
+Show changes in selected files	ProjectList		Änderungen in ausgewählten Dateien zeigen
+Show differences	ProjectWindow		Unterschiede zeigen
+Show differences from last check-in	ProjectWindow		Unterschiede seit dem letzten Check-in zeigen
+Show project folder	ProjectWindow		Projektordner öffnen
+Show project folder on open	PrefsWindow		Zeige den Projektordner beim Start
+Some	ProjectSettingsWindow		Einige
+Sort group	ProjectList		Gruppe sortieren
+Sort group	ProjectWindow		Gruppe sortieren
+Source control	PrefsWindow		Versionskontrolle
+Source Control	ProjectList		Versionskontrolle
+Source control	ProjectWindow		Versionskontrolle
+Source control repository folder:	PrefsWindow		Repository-Ordner der Versionskontrolle:
+Source control:	TemplateWindow		Versionskontrolle:
+Space	AsciiWindow	ASCII table description	Space - Leerzeichen
+Standard Error	ProjectWindow		Standard Fehlerausgabe
+Standard Out	ProjectWindow		Standard Ausgabe
+Start of heading	AsciiWindow	ASCII table description	Start of heading - Beginn der Kopfzeile
+Start of text	AsciiWindow	ASCII table description	Start of text - Ende der Kopfzeile, Beginn der Nachricht
+Static library	ProjectSettingsWindow		Statische Bibliothek
+Substitute	AsciiWindow	ASCII table description	Substitute - Ersetzt fehlerhaftes Zeichen
+Subversion	PrefsWindow		Subversion
+Subversion	SCMImportWindow		Subversion
+Subversion	SCMManager		Subversion
+Subversion	TemplateWindow		Subversion
+Subversion unavailable	TemplateWindow		Subversion nicht verfügbar
+Success\n	Paladin		Erfolreich\n
+Summary:	LicenseManager		Kurzfassung:
+Symbol finder	ProjectWindow		Symbolsuche
+Synchronous idle	AsciiWindow	ASCII table description	Synchronous idle - Synchronisiert die Datenübertragung (auch wenn gerade keine stattfindet)
+System Develop libraries:	LibWindow		System Entwicklungsbibliotheken:
+System libraries:	LibWindow		Systembibliotheken:
+Target name:	ProjectSettingsWindow		Zielname:
+Target name:	TemplateWindow		Zielname:
+Target type	ProjectSettingsWindow		Zieltyp:
+Target type:	ProjectSettingsWindow		Zieltyp:
+Terminal output	TerminalWindow		Terminalausgabe
+The default path for new projects.	PrefsWindow		Der Standardpfad für neue Projekte.
+The folders you want Paladin to search for header files	ProjectSettingsWindow		Die Ordner, die Paladin nach Header-Dateien durchsuchen soll
+The following files had problems replacing the search terms:\n	FindWindow		In folgenden Dateien kam es beim Ersetzen der Suchbegriffe zu Problemen:\n
+The kind of program you want to build	ProjectSettingsWindow		Die Art des Programms
+The location entered does not exist.\nPlease check to make sure you have entered it correctly.	PathBox		Der angegebene Speicherort existiert nicht.\nEingabe bitte nochmal kontrollieren.
+The name of the compiled application or library	TemplateWindow		Name der erzeugten Anwendung oder Bibliothek
+The name of your project. It can be the same as the Target name, but it does not have to be.	TemplateWindow		Der Name des Projekts. Das kann derselbe wie der Zielname sein, muss es aber nicht.
+The project cannot be built because some of its files are missing.	ProjectWindow		Das Projekt konnte nicht kompiliert werden, da einige seiner Dateien fehlen.
+These files (except libraries) will be permanently deleted. Remove them?	CodeLibWindow		Diese Dateien (außer den Bibliotheken) werden unwiederbringlich gelöscht. Löschen?
+This cannot be undone. Delete module?	CodeLibWindow		Dies kann nicht rückgängig gemacht werden. Modul löschen?
+This project is not under source control. Would you like to use %sourcecontrol% for this project?\nYou will only be asked this one time.	Paladin		Das Projekt benutzt keine Versionskontrolle. Soll dafür %sourcecontrol% benutzt werden?\n Diese Frage wird nur dieses eine Mal gestellt.
+This project is on a read-only disk. You will not be able to build it, but you can still view its files and do anything else that does not require saving to the disk.	Paladin		Das Projekt befindet sich auf einem schreibgeschützten Datenträger. Es kann daher zwar nicht kompiliert werden, seine Dateien lassen sich jedoch anzeigen und man alles machen das kein Speichern erfordert.
+This will undo all changes since the last commit. Continue?	ProjectWindow		Dies wird alle Änderungen seit dem letzten Commit rückgängig machen. Sicher?
+Tools	ProjectWindow		Werkzeuge
+Type to search	QuickFindWindow		Suche während der Eingabe
+Unable to pull from the remote repository. If it uses a secure connection, please set up the appropriate SSH keys on the remote server.	ProjectWindow		Pull von Repository ist fehlgeschlagen. Falls eine sichere Verbindung benutzt wird, müssen auf dem Server die entsprechenden SSH Schlüssel eingerichtet werden.
+unavailable	PrefsWindow		nicht verfügbar
+Unit separator	AsciiWindow	ASCII table description	Unit separator - Trennung logischer Datenblöcke (Hierarchie: File, Group, Record, Unit)
+Unknown	SCMManager		Unbekannt
+Update dependencies	ProjectWindow		Abhängigkeiten aktualisieren
+Updating dependencies	ProjectWindow		Abhängigkeiten aktualisieren
+Updating resources	ProjectWindow		Ressourcen aktualisieren
+Updating resources\n	Paladin		Ressourcen aktualisieren\n
+Usage: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [file1 [file2 ...]]\n-b, Build the specified project. Only one file can be specified with this switch.\n-m, Generate a makefile for the specified project.\n-r, Completely rebuild the project.\n-s, Use only one thread for building.\n-d, Print debugging output.\n-v, Make debugging mode verbose.\n	Paladin		Gebrauch: Paladin [-b] [-m] [-r] [-s] [-d] [-v] [Datei1 [Datei2 ...]]\n-b, Kompiliert das angegebene Projekt. Mit diesem Schalter kann nur eine einzelne Datei angegeben werden.\n-m, Erzeugt ein Makefile aus dem angegebenen Projekt.\n-r, Baut das Projekt komplett neu.\n-s, Benutzt nur einen einzelnen Thread.\n-d, Ausgabe von Debuginfo\n-v, Macht die Debuginfo noch ausführlicher.\n
+Use ccache to build faster	PrefsWindow		Benutze ccache für schnelleres Kompilieren
+Use fastdep dependency checker	PrefsWindow		Benutze fastdep Abhängikeitsprüfung
+Use single thread	PrefsWindow		Benutze einzelnen Thread
+Use the fastdep dependency checker instead of gcc	PrefsWindow		Benutze fastdep Abhängikeitsprüfung anstatt gcc
+User libraries:	LibWindow		Benutzerbibliotheken:
+Username:	SCMImportWindow		Benutzername:
+Vertical tab	AsciiWindow	ASCII table description	Vertical tab - Vertikaler Tabulator: Cursor springt in zuvor bestimmte Zeile
+Warnings	ErrorWindow		Warnungen
+When checked, a project's folder is shown in Tracker when it is opened.	PrefsWindow		Wenn aktiviert, zeige den Ordner des Projekts im Tracker wenn es geöffnet wird.
+Yes	Paladin		Ja
+Your project does not have debugging information compiled in and will need to be rebuilt to debug. Do you wish to rebuild and run the debugger?	ProjectWindow		Das Projekt beinhaltet eine Debuginfos und muss daher für das Debuggen neu kompiliert werden. Soll es neu kompiliert und im Debugger gestartet werden?

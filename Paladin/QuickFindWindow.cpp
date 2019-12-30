@@ -540,7 +540,7 @@ QuickFindWindow::DoSearchDirectory(const char* text, BMessage* reply,BEntry& dir
 	BDirectory dir(&dirEntry);
 	if (B_OK != dir.InitCheck())
 	{
-		printf(B_TRANSLATE("Directory InitCheck failed\n"));
+		printf(B_TRANSLATE("Directory Init Check failed\n"));
 		return;
 	}
 	dir.Rewind();

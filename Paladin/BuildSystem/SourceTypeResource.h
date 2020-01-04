@@ -4,6 +4,8 @@
 #include "SourceFile.h"
 #include "SourceType.h"
 
+class CompileCommand;
+
 class SourceTypeResource : public SourceType
 {
 public:
@@ -28,7 +30,7 @@ public:
 						SourceFileResource(const entry_ref &ref);
 			bool		UsesBuild(void) const;
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
-			void		Compile(BuildInfo &info, const char *options);
+			void		Compile(BuildInfo &info, const CompileCommand& cc);//const char *options);
 			
 			DPath		GetResourcePath(BuildInfo &info);
 			void		RemoveObjects(BuildInfo &info);

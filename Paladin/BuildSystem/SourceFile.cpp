@@ -7,6 +7,7 @@
 #include "BuildInfo.h"
 #include "Globals.h"
 #include "StatCache.h"
+#include "CompileCommand.h"
 
 SourceFile::SourceFile(const char *path)
 	:	fNeedsBuild(BUILD_YES),
@@ -195,7 +196,7 @@ SourceFile::GetCompileCommand(BuildInfo &info,const char *options)
 }
 
 void
-SourceFile::Compile(BuildInfo &info, const char *options)
+SourceFile::Compile(BuildInfo &info, const CompileCommand& cc) //const char *options)
 {
 }
 

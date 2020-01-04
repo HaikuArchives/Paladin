@@ -4,6 +4,7 @@
 #include <Node.h>
 
 #include "BuildInfo.h"
+#include "CompileCommand.h"
 #include "DebugTools.h"
 #include "Globals.h"
 
@@ -159,7 +160,7 @@ SourceFileYacc::Precompile(BuildInfo &info, const char *options)
 
 
 void
-SourceFileYacc::Compile(BuildInfo &info, const char *options)
+SourceFileYacc::Compile(BuildInfo &info, const CompileCommand& cc)//const char *options)
 {
 	BString abspath = GetPath().GetFullPath();
 	if (abspath[0] != '/')
@@ -174,8 +175,8 @@ SourceFileYacc::Compile(BuildInfo &info, const char *options)
 	// Compile the generated C++ file
 	BString compileString = "gcc -c ";
 	
-	if (options)
-		compileString << options;
+	if (cc.command.length() > 0)
+		compileString << cc.command.c_str();
 	
 	compileString	<< " -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-unknown-pragmas ";
 	compileString	<< "'" << cppPath

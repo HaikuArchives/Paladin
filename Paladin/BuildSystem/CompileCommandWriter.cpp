@@ -21,15 +21,15 @@ CompileCommandWriter::ToJSONFile(std::ostream& oss,std::vector<CompileCommand>& 
 	// C++11: for (auto& cmd: commands)
 	for (std::vector<CompileCommand>::iterator iter = commands.begin();iter < commands.end();iter++)
 	{
-		CompileCommand cmd = *iter;
+		//CompileCommand cmd = *iter;
 
 		if (!first)
 		{
 			oss << "," << std::endl;
 		}
-		oss << "	{  \"directory:\": \"" << cmd.directory << "\"," << std::endl;
-		oss << "	   \"command\": \"" << std::string(cmd.command) << "\"," << std::endl;
-		oss << "	   \"file\": \"" << cmd.file << "\" }"; // leave for comma or endl
+		oss << "	{  \"directory:\": \"" << iter->directory << "\"," << std::endl;
+		oss << "	   \"command\": \"" << std::string(iter->command) << "\"," << std::endl;
+		oss << "	   \"file\": \"" << iter->file << "\" }"; // leave for comma or endl
 		first = false;
 	}
 	oss << std::endl << "]" << std::endl; // start with endl to finish last json object line

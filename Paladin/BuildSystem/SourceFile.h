@@ -9,6 +9,7 @@
 
 class BuildInfo;
 class BMenu;
+class CompileCommand;
 
 enum
 {
@@ -60,7 +61,7 @@ public:
 	virtual	bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 	virtual	void		Precompile(BuildInfo &info, const char *options);
 	virtual BString		GetCompileCommand(BuildInfo &info,const char *options);
-	virtual	void		Compile(BuildInfo &info, const char *options);
+	virtual	void		Compile(BuildInfo &info,const CompileCommand& cc);// const char *options);
 	virtual	void		PostBuild(BuildInfo &info, const char *options);
 	virtual	void		RemoveObjects(BuildInfo &info);
 

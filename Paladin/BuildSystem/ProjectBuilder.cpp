@@ -8,6 +8,7 @@
  */
 #include "ProjectBuilder.h"
 
+#include <unistd.h>
 #include <fstream>
 #include <string>
 
@@ -339,6 +340,10 @@ ProjectBuilder::BuildThread(void *data)
 	proj->Lock();
 	proj->SortDirtyList();
 	
+	// Reacllocate compile commands vector
+	//((ProjectBuilder*)data)->fCommands = std::vector<CompileCommand>(proj->CountDirtyFiles());
+	//STRACE(1,("Dirty files:", +proj->CountDirtyFiles()));
+	
 	SourceFile *file = proj->GetNextDirtyFile();
 	if (file)
 	{
@@ -387,7 +392,7 @@ ProjectBuilder::BuildThread(void *data)
 				parent->Unlock();
 				
 				parent->fManager.RemoveThread(thisThread);
-				parent->fManager.QuitAllThreads();
+				//parent->fManager.QuitAllThreads();
 				
 				BTRACE(("Thread %ld quit on errors after precompile\n",thisThread));
 				
@@ -405,6 +410,7 @@ ProjectBuilder::BuildThread(void *data)
 			return B_OK;
 		}
 		
+		/*
 		((ProjectBuilder*)data)->fCommands.push_back(
 			CompileCommand(
 				std::string(file->GetPath().GetFileName()),
@@ -412,6 +418,7 @@ ProjectBuilder::BuildThread(void *data)
 				std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
 			)
 		);
+		*/
 		/*
 		((ProjectBuilder*)data)->fCommands.emplace_back(
 			std::string(file->GetPath().GetFileName()),
@@ -438,7 +445,7 @@ ProjectBuilder::BuildThread(void *data)
 				parent->Unlock();
 				
 				parent->fManager.RemoveThread(thisThread);
-				parent->fManager.QuitAllThreads();
+				//parent->fManager.QuitAllThreads();
 				
 				BTRACE(("Thread %ld quit after compile\n",thisThread));
 				
@@ -472,6 +479,9 @@ ProjectBuilder::BuildThread(void *data)
 		proj->Unlock();
 	}
 	
+	//sleep(10);
+		sleep(10);
+	
 	// Now that we've finished building the individual source files, we need to
 	// link the whole thing together. No real special tricks are required -- just
 	// lock the owning object, check to see if another thread is already doing the
@@ -502,6 +512,7 @@ ProjectBuilder::BuildThread(void *data)
 			do_postprocess = false;
 	}
 	
+		sleep(10);
 	parent->Unlock();
 	
 	if (do_postprocess)
@@ -546,7 +557,7 @@ ProjectBuilder::BuildThread(void *data)
 					proj->Unlock();
 					
 					parent->fManager.RemoveThread(thisThread);
-					parent->fManager.QuitAllThreads();
+					//parent->fManager.QuitAllThreads();
 					
 					BTRACE(("Thread %ld quit after linker errors\n",thisThread));
 					
@@ -566,6 +577,7 @@ ProjectBuilder::BuildThread(void *data)
 			
 			proj->Unlock();
 		}
+		sleep(10);
 		
 		// Now that the linking is done, we should add any resource files
 		parent->fMsgr.SendMessage(M_UPDATING_RESOURCES);
@@ -585,7 +597,7 @@ ProjectBuilder::BuildThread(void *data)
 				proj->Unlock();
 				
 				parent->fManager.RemoveThread(thisThread);
-				parent->fManager.QuitAllThreads();
+				//parent->fManager.QuitAllThreads();
 				return B_ERROR;
 			}
 		}
@@ -626,6 +638,8 @@ ProjectBuilder::BuildThread(void *data)
 		parent->fIsBuilding = false;
 		parent->Unlock();
 		parent->fMsgr.SendMessage(M_BUILD_SUCCESS);
+		
+		sleep(10);
 		
 		parent->DoPostBuild();
 	}

@@ -13,7 +13,9 @@
 class CompileCommand
 {
 public:
+							CompileCommand(); // needed for vector preallocation
 							CompileCommand(std::string ifile, std::string icommand, std::string idirectory);
+							CompileCommand(const CompileCommand& orig);
 							~CompileCommand();
 			
 		std::string			file;

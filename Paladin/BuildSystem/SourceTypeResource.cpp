@@ -1,9 +1,13 @@
 #include "SourceTypeResource.h"
+
+#include <string>
+
 #include <Entry.h>
 #include <File.h>
 #include <stdio.h>
 #include <Menu.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Resources.h>
@@ -12,6 +16,9 @@
 #include "DebugTools.h"
 #include "FileActions.h"
 #include "Globals.h"
+#include "CommandOutputHandler.h"
+#include "CommandThread.h"
+#include "CompileCommand.h"
 
 SourceTypeResource::SourceTypeResource(void)
 {
@@ -166,7 +173,7 @@ SourceFileResource::CheckNeedsBuild(BuildInfo &info, bool check_deps)
 
 
 void
-SourceFileResource::Compile(BuildInfo &info, const char *options)
+SourceFileResource::Compile(BuildInfo &info, const CompileCommand& cc) // const char *options)
 {
 	BString abspath = GetPath().GetFullPath();
 	if (abspath[0] != '/')
@@ -183,13 +190,30 @@ SourceFileResource::Compile(BuildInfo &info, const char *options)
 			<< "' '" << abspath << "'";
 	
 	
-	BString errmsg;
-	RunPipedCommand(pipestr.String(), errmsg, false);
+	//BString errmsg;
+	//RunPipedCommand(pipestr.String(), errmsg, false);
 	
-	STRACE(1,("Compiling %s\nCommand:%s\nOutput:%s\n",
-			abspath.String(),pipestr.String(),errmsg.String()));
+	BMessage cmd;
+	cmd.AddString("cmd",pipestr);
+	//cmd.AddString("pwd",abspath);
+		
 	
-	ParseRCErrors(errmsg.String(),info.errorList);
+	CommandOutputHandler handler(true); // enable redirect
+	BLooper* looper = new BLooper();
+	looper->AddHandler(&handler);
+	BMessenger msgr(&handler,looper);
+	thread_id looperThread = looper->Run();
+	CommandThread thread(&cmd,&msgr);
+	status_t startStatus = thread.Start();
+	status_t okReturn = B_OK;
+	status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+	std::string errmsg = handler.GetOut();
+	
+	STRACE(1,("Compiling Resource %s\nCommand:%s\nOutput:%s\n",
+			abspath.String(),pipestr.String(),errmsg.c_str()));
+	
+	ParseRCErrors(errmsg.c_str(),info.errorList);
 }
 
 

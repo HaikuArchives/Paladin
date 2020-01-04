@@ -43,7 +43,7 @@ CommandThread::CommandThread(BMessage* refs_message, BMessenger* messenger)
 
 CommandThread::~CommandThread()
 {
-	delete fWindowMessenger;
+	//DO NOT delete fWindowMessenger;
 }
 
 

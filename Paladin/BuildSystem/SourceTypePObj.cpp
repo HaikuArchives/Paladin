@@ -245,7 +245,7 @@ SourceFilePObj::Precompile(BuildInfo &info, const char *options)
 
 
 void
-SourceFilePObj::Compile(BuildInfo &info, const char *options)
+SourceFilePObj::Compile(BuildInfo &info, const CompileCommand& cc)//const char *options)
 {
 	// TODO: Implement
 	/*

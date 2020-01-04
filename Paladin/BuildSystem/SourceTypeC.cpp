@@ -1,12 +1,19 @@
 #include "SourceTypeC.h"
+
+#include <string>
+
 #include <Entry.h>
 #include <stdio.h>
 #include <Node.h>
 #include <StringList.h>
+#include <Messenger.h>
 
 #include "BuildInfo.h"
 #include "DebugTools.h"
 #include "Globals.h"
+#include "CommandOutputHandler.h"
+#include "CommandThread.h"
+#include "CompileCommand.h"
 
 SourceTypeC::SourceTypeC(void)
 {
@@ -413,7 +420,7 @@ SourceFileC::GetCompileCommand(BuildInfo &info,const char *options)
 }
 
 void
-SourceFileC::Compile(BuildInfo &info, const char *options)
+SourceFileC::Compile(BuildInfo &info, const CompileCommand& cc)
 					
 {
 	BString abspath = GetPath().GetFullPath();
@@ -423,15 +430,37 @@ SourceFileC::Compile(BuildInfo &info, const char *options)
 		abspath.Prepend(info.projectFolder.GetFullPath());
 	}
 	
-	BString compileString(GetCompileCommand(info,options));
-	compileString << " 2>&1";
+	BString compileString(cc.command.c_str());
+	//compileString << " 2>&1";
 	
-	BString errmsg;
-	RunPipedCommand(compileString.String(), errmsg, true);
-	STRACE(1,("Compiling %s\nCommand:%s\nOutput:%s\n",
-			abspath.String(),compileString.String(),errmsg.String()));
+	//BString errmsg;
 	
-	ParseGCCErrors(errmsg.String(),info.errorList);
+	BMessage cmd;
+	cmd.AddString("cmd",compileString);
+	cmd.AddString("pwd",abspath);
+		
+	
+	CommandOutputHandler handler(true); // enable redirect
+	BLooper* looper = new BLooper();
+	looper->AddHandler(&handler);
+	BMessenger msgr(&handler,looper);
+	thread_id looperThread = looper->Run();
+	CommandThread thread(&cmd,&msgr);
+	status_t startStatus = thread.Start();
+	status_t okReturn = B_OK;
+	status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+	std::string errmsg = handler.GetOut();
+	
+	STRACE(1,("Compiling c++ %s\nCommand:%s\nOutput:%s\n",
+			abspath.String(),compileString.String(),errmsg.c_str()));
+		
+	//RunPipedCommand(compileString.String(), errmsg, true);
+	//STRACE(1,("Compiling %s\nCommand:%s\nOutput:%s\n",
+	//		abspath.String(),compileString.String(),errmsg.String()));
+	
+	ParseGCCErrors(errmsg.c_str(),info.errorList);
+	//ParseGCCErrors(errmsg.String(),info.errorList);
 }
 
 

@@ -4,6 +4,8 @@
 #include "SourceFile.h"
 #include "SourceType.h"
 
+class CompileCommand;
+
 class SourceTypeLex : public SourceType
 {
 public:
@@ -27,7 +29,7 @@ public:
 			bool		UsesBuild(void) const;
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 			void		Precompile(BuildInfo &info, const char *options);
-			void		Compile(BuildInfo &info, const char *options);
+			void		Compile(BuildInfo &info, const CompileCommand& cc);
 	
 			DPath		GetObjectPath(BuildInfo &info);
 			void		RemoveObjects(BuildInfo &info);

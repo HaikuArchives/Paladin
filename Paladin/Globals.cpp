@@ -170,7 +170,8 @@ EnsureTemplates(void)
 		filePath = templatePath;
 		filePath << "Empty Application/TEMPLATEINFO";
 		file.SetTo(filePath.GetFullPath(), B_CREATE_FILE | B_READ_WRITE);
-		file.WriteString("TYPE=Application\n"); //LIB=B_BEOS_LIB_DIRECTORY/libsupc++.so\n");
+		file.WriteString("TYPE=Application\n");
+		// Not required: LIB=B_BEOS_LIB_DIRECTORY/libsupc++.so\n");
 		
 		filePath = templatePath;
 		filePath << "Kernel Driver/TEMPLATEINFO";

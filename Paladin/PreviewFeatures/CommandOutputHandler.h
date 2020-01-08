@@ -21,6 +21,9 @@ public:
 	std::string								GetOut() const;
 	std::string								GetErr() const;
 	bool									IsErrRedirectedToOut() const;
+	bool									HasExited() const;
+	void									WaitForExit() const;
+	bool									HasFailed() const;
 	
 	// BHandler
 	virtual void							MessageReceived(BMessage* msg) override;
@@ -32,7 +35,8 @@ private:
 	std::string								out;
 	std::string								err;
 	bool									redirectErrToOut;
-
+	bool									exited;
+	bool									failed;
 
 };
 

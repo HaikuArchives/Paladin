@@ -34,7 +34,7 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ProjectBuilder"
 
-//#define BUILD_THREAD_TRACING
+#define BUILD_THREAD_TRACING
 
 #ifdef BUILD_THREAD_TRACING
 	#define BTRACE(x) printf x
@@ -370,7 +370,7 @@ ProjectBuilder::BuildThread(void *data)
 		msg.AddInt32("total",parent->fTotalFilesToBuild);
 		parent->fMsgr.SendMessage(&msg);
 		
-		BTRACE(("Thread %ld is building file %s\n",thisThread,file->GetPath().GetFileName()));
+		BTRACE(("Thread %ld is precompiling file %s\n",thisThread,file->GetPath().GetFileName()));
 		
 		BuildInfo *info = proj->GetBuildInfo();
 		info->errorList.msglist.MakeEmpty();
@@ -392,7 +392,7 @@ ProjectBuilder::BuildThread(void *data)
 				parent->Unlock();
 				
 				parent->fManager.RemoveThread(thisThread);
-				//parent->fManager.QuitAllThreads();
+				parent->fManager.QuitAllThreads();
 				
 				BTRACE(("Thread %ld quit on errors after precompile\n",thisThread));
 				
@@ -426,8 +426,10 @@ ProjectBuilder::BuildThread(void *data)
 			std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
 		);
 		*/
-		
+		BTRACE(("Thread %ld is compiling file %s\n",thisThread,file->GetPath().GetFileName()));
+		//sleep(10 * (thisThread % 10));
 		proj->CompileFile(file);
+		BTRACE(("Thread %ld compiling complete for file %s\n",thisThread,file->GetPath().GetFileName()));
 		
 		if (info->errorList.msglist.CountItems() > 0)
 		{
@@ -445,7 +447,7 @@ ProjectBuilder::BuildThread(void *data)
 				parent->Unlock();
 				
 				parent->fManager.RemoveThread(thisThread);
-				//parent->fManager.QuitAllThreads();
+				parent->fManager.QuitAllThreads();
 				
 				BTRACE(("Thread %ld quit after compile\n",thisThread));
 				
@@ -479,9 +481,6 @@ ProjectBuilder::BuildThread(void *data)
 		proj->Unlock();
 	}
 	
-	//sleep(10);
-		sleep(10);
-	
 	// Now that we've finished building the individual source files, we need to
 	// link the whole thing together. No real special tricks are required -- just
 	// lock the owning object, check to see if another thread is already doing the
@@ -512,7 +511,6 @@ ProjectBuilder::BuildThread(void *data)
 			do_postprocess = false;
 	}
 	
-		sleep(10);
 	parent->Unlock();
 	
 	if (do_postprocess)
@@ -577,7 +575,7 @@ ProjectBuilder::BuildThread(void *data)
 			
 			proj->Unlock();
 		}
-		sleep(10);
+		//sleep(10);
 		
 		// Now that the linking is done, we should add any resource files
 		parent->fMsgr.SendMessage(M_UPDATING_RESOURCES);
@@ -639,7 +637,7 @@ ProjectBuilder::BuildThread(void *data)
 		parent->Unlock();
 		parent->fMsgr.SendMessage(M_BUILD_SUCCESS);
 		
-		sleep(10);
+		//sleep(10);
 		
 		parent->DoPostBuild();
 	}

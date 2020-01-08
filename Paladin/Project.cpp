@@ -964,6 +964,8 @@ Project::Link(void)
 	status_t okReturn = B_OK;
 	status_t waitStatus = thread.WaitForThread(&okReturn);
 	
+	handler.WaitForExit();
+	
 	std::string errmsg = handler.GetOut();
 
 	STRACE(1, ("Linking %s:\n%s\nErrors:\n%s\n", GetName(), linkString.String(),
@@ -1012,6 +1014,8 @@ Project::UpdateResources(void)
 	status_t startStatus = thread.Start();
 	status_t okReturn = B_OK;
 	status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+	handler.WaitForExit();
 	
 	std::string errmsg = handler.GetOut();		
 		

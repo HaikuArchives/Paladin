@@ -58,8 +58,8 @@ CommandThread::ThreadStartup()
 	if ((status = GetDataStore()->FindRef("pwd", &pwd)) == B_OK) {
 		BPath path(&pwd);
 		BString pt(path.Path());
-		printf("SWITCHING DIR\n");
-		printf(pt);
+		//printf("SWITCHING DIR\n");
+		//printf(pt);
 		chdir(path.Path());
 	}
 
@@ -99,10 +99,10 @@ CommandThread::ThreadStartup()
 	return B_OK;
 }
 
-
-status_t
-CommandThread::ExecuteUnit(void)
+void
+CommandThread::CheckForOutput()
 {
+
 	// read output and error from command
 	// send it to listener
 
@@ -166,6 +166,12 @@ CommandThread::ExecuteUnit(void)
 		}
 		fWindowMessenger->SendMessage(&message);
 	}
+}
+
+status_t
+CommandThread::ExecuteUnit(void)
+{
+	CheckForOutput();
 
 	// streams are non blocking, sleep every 100ms
 	// snooze(100000);
@@ -203,6 +209,22 @@ status_t
 CommandThread::ThreadShutdown(void)
 {
 	close(fStdIn);
+	
+	while (EOF != ExecuteUnit()) {
+    	// catches any remaining stderr/stdout data
+		// awaiting execute unit to have no more thread running
+		BMessage message(M_COMMAND_AWAITING_QUIT);
+		message.AddUInt64("thread_id",fThreadId);
+		
+		// Send through any context, if provided
+		void* ctx = NULL;
+		if (B_OK == GetDataStore()->FindPointer("context", &ctx)) {
+			message.AddPointer("context",ctx);
+		}
+		fWindowMessenger->SendMessage(&message);
+		
+		snooze(100000);
+	}
 	close(fStdOut);
 	close(fStdErr);
 
@@ -223,6 +245,8 @@ CommandThread::ThreadStartupFailed(status_t status)
 void
 CommandThread::ExecuteUnitFailed(status_t status)
 {
+	CheckForOutput();
+	
 	if (status == EOF) {
 		// thread has finished, been quit or killed, we don't know
 		BMessage* message = new BMessage(M_COMMAND_EXITED);
@@ -392,7 +416,11 @@ CommandThread::WaitOnCommand()
 	status_t status = get_thread_info(fThreadId, &info);
 
 	if (status == B_OK)
-		return wait_for_thread(fThreadId, &status);
-	else
+	{
+		status = wait_for_thread(fThreadId, &status);
+		//BeginUnit(); // forces a wait if there's output to process???
+		//EndUnit();
+	}
+	//else
 		return status;
 }

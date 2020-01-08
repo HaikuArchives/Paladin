@@ -15,6 +15,7 @@ SUITE(CommandOutputHandler)
 
 	TEST(StdOut) 
 	{
+		std::cout << "StdOut" << std::endl;
 		BMessage cmd;
 		cmd.AddString("cmd","echo 'first'; echo 'second'; echo 'third'");
 		
@@ -35,6 +36,8 @@ SUITE(CommandOutputHandler)
 		status_t waitStatus = thread.WaitForThread(&okReturn);
 		CHECK_EQUAL(waitStatus,B_OK);
 		
+		handler.WaitForExit();
+		
 		std::string expected("first\nsecond\nthird\n");
 		std::string actual(handler.GetOut());
 		CHECK_EQUAL(expected,actual);
@@ -47,6 +50,7 @@ SUITE(CommandOutputHandler)
 
 	TEST(StdErr) 
 	{
+		std::cout << "StdErr" << std::endl;
 		BMessage cmd;
 		cmd.AddString("cmd",">&2 echo 'first'; >&2 echo 'second'; >&2 echo 'third'");
 		
@@ -67,6 +71,8 @@ SUITE(CommandOutputHandler)
 		status_t waitStatus = thread.WaitForThread(&okReturn);
 		CHECK_EQUAL(waitStatus,B_OK);
 		
+		handler.WaitForExit();
+		
 		std::string expected("");
 		std::string actual(handler.GetOut());
 		CHECK_EQUAL(expected,actual);
@@ -80,6 +86,7 @@ SUITE(CommandOutputHandler)
 
 	TEST(StdErrRedirect) 
 	{
+		std::cout << "StdErrRedirect" << std::endl;
 		BMessage cmd;
 		cmd.AddString("cmd",">&2 echo 'first'; >&2 echo 'second'; >&2 echo 'third'");
 		
@@ -93,12 +100,14 @@ SUITE(CommandOutputHandler)
 		CHECK(looperThread > 0);
 		
 		CommandThread thread(&cmd,&msgr);
-		status_t startStatus = thread.Start();
+		status_t startStatus = thread.Start(); 
 		CHECK_EQUAL(startStatus,B_OK);
 		
 		status_t okReturn = B_OK;
 		status_t waitStatus = thread.WaitForThread(&okReturn);
 		CHECK_EQUAL(waitStatus,B_OK);
+		
+		handler.WaitForExit();
 		
 		std::string expected("first\nsecond\nthird\n");
 		std::string actual(handler.GetOut());

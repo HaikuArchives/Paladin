@@ -450,6 +450,8 @@ SourceFileC::Compile(BuildInfo &info, const CompileCommand& cc)
 	status_t okReturn = B_OK;
 	status_t waitStatus = thread.WaitForThread(&okReturn);
 	
+	handler.WaitForExit(); // REQUIRED so as not to miss output/errors
+	
 	std::string errmsg = handler.GetOut();
 	
 	STRACE(1,("Compiling c++ %s\nCommand:%s\nOutput:%s\n",

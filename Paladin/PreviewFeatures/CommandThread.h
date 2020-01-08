@@ -24,7 +24,8 @@ enum {
 	M_COMMAND_RECEIVE_STDOUT = 'outp',
 	M_COMMAND_RECEIVE_STDERR = 'errp',
 	M_COMMAND_EXITED         = 'exit',
-	M_COMMAND_EXITED_IN_ERROR = 'exrr'
+	M_COMMAND_EXITED_IN_ERROR = 'exrr',
+	M_COMMAND_AWAITING_QUIT  = 'caqt'
 };
 
 extern const char* CommandThreadName;
@@ -57,6 +58,8 @@ private:
 			thread_id			PipeCommand(int argc, const char** argv,
 									int& in, int& out, int& err,
 									const char** envp = (const char**)environ);
+									
+			void				CheckForOutput(); // very internal
 
 			BMessenger*			fWindowMessenger;
 

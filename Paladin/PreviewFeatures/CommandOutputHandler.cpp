@@ -11,7 +11,9 @@ CommandOutputHandler::CommandOutputHandler(bool reto)
 	: BHandler(),
 	  out(),
 	  err(),
-	  redirectErrToOut(reto)
+	  redirectErrToOut(reto),
+	  exited(false),
+	  failed(false)
 {
 	;
 }
@@ -37,6 +39,26 @@ bool
 CommandOutputHandler::IsErrRedirectedToOut() const
 {
 	return redirectErrToOut;
+}
+
+bool 
+CommandOutputHandler::HasExited() const
+{
+	return exited;
+}
+
+void
+CommandOutputHandler::WaitForExit() const
+{
+	while (!HasExited()) {
+		snooze(100000);
+	}
+}
+
+bool
+CommandOutputHandler::HasFailed() const
+{
+	return failed;
 }
 
 void
@@ -72,6 +94,24 @@ CommandOutputHandler::MessageReceived(BMessage* msg)
 					err += content;
 				}
 			}
+			break;
+		}
+		case M_COMMAND_AWAITING_QUIT:
+		{
+			std::cout << "Awaiting quit" << std::endl;
+			break;
+		}
+		case M_COMMAND_EXITED:
+		{
+			exited = true;
+			std::cout << "Command exited normally" << std::endl;
+			break;
+		}
+		case M_COMMAND_EXITED_IN_ERROR:
+		{
+			exited = true;
+			failed = true;
+			std::cout << "Command exited in error" << std::endl;
 			break;
 		}
 		default:

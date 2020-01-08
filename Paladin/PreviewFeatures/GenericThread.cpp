@@ -270,7 +270,9 @@ GenericThread::SetExitCallback(void (*callback)(void*), void* data)
 status_t
 GenericThread::WaitForThread(status_t* exitValue)
 {
-	return (wait_for_thread(fThreadId, exitValue));
+	status_t status =  (wait_for_thread(fThreadId, exitValue));
+	Quit(); // REQUIRED - Ensures ThreadFunction exits
+	return status;
 }
 
 

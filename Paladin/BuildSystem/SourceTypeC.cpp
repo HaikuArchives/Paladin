@@ -1,6 +1,8 @@
 #include "SourceTypeC.h"
 
 #include <string>
+#include <vector>
+#include <algorithm>
 
 #include <Entry.h>
 #include <stdio.h>
@@ -232,9 +234,19 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	// now we have a pipe delimited string, split and filter for this source type (headers only left)
 	BStringList components;
 	fDependencies.Split("|",true,components);
+	std::vector<BString> included;
 	for (int32 si = components.CountStrings() - 1;si >=0;si--) {
-		if (!components.StringAt(si).EndsWith(".h") || components.StringAt(si).StartsWith("/boot/system/"))
+		if (!components.StringAt(si).EndsWith(".h") || 
+			 components.StringAt(si).StartsWith("/boot/system/"))
+		{
 			components.Remove(si);
+		} else if(std::find(included.begin(), included.end(), 
+				  components.StringAt(si)) != included.end()) {
+			// already included, remove
+			components.Remove(si);
+		} else {
+			included.push_back(components.StringAt(si));
+		}
 	}
 	/*
 	auto it = components.end();

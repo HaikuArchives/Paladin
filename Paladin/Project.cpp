@@ -1270,10 +1270,18 @@ Project::AddLibrary(const char *path, bool failSilently)
 {
 	if (!path)
 		return;
-	
+		
 	DPath libpath(path);
 	if (!BEntry(libpath.GetFullPath()).Exists())
 	{
+		STRACE(1,("%s\n",libpath.GetFileName()));
+		BString fname = libpath.GetFileName();
+		if (fname == "libsupc++.so" || fname == "libstdc++.so" || fname == "libstdc++.r4.so")
+		{
+			STRACE(1,("%s: AddLibrary Ignoring %s\n",GetName(),libpath.GetFileName()));
+			return;
+		}
+			
 		DPath findlibpath = FindLibrary(libpath.GetFileName());
 		if (findlibpath.IsEmpty())
 		{
@@ -1608,6 +1616,12 @@ Project::ImportLibrary(const char *path, const platform_t &platform)
 	DPath libpath(path);
 	BString filename = libpath.GetFileName();
 	
+	// libsupc++ is only for Haiku GCC4. It is not found or needed on other platforms,
+	// so we will silently ignore any requests for the library on any other platform and
+	// the code will build just fine.
+	if (filename == "libsupc++.so") // && platform != PLATFORM_HAIKU_GCC4)
+		return;
+	
 	BPath systemLibPath;
 	find_directory(B_BEOS_LIB_DIRECTORY,&systemLibPath);
 	
@@ -1643,11 +1657,6 @@ Project::ImportLibrary(const char *path, const platform_t &platform)
 		}
 	}
 	
-	// libsupc++ is only for Haiku GCC4. It is not found or needed on other platforms,
-	// so we will silently ignore any requests for the library on any other platform and
-	// the code will build just fine.
-	if (filename == "libsupc++.so" && platform != PLATFORM_HAIKU_GCC4)
-		return;
 	
 	AddLibrary(libpath.GetFullPath());
 }
@@ -1660,10 +1669,21 @@ Project::FindLibrary(const char *libname)
 	
 	if (!libname)
 		return outpath;
+		
+	BString name(libname);
+	
+	// libsupc++ is only for Haiku GCC4. It is not found or needed on other platforms,
+	// so we will silently ignore any requests for the library on any other platform and
+	// the code will build just fine.
+	if (name == "libsupc++.so") // && platform != PLATFORM_HAIKU_GCC4)
+	{
+		// Security in depth - sometimes FindLibrary is called directly
+		STRACE(1,("%s: FindLibrary Ignoring %s\n",GetName(),name));
+		return outpath;
+	}
 	
 	// Take some reasonable care that we're actually dealing with a library or something
 	// like one
-	BString name(libname);
 	if (name.FindLast(".so") == B_ERROR && name.FindLast(".a") == B_ERROR &&
 		name.FindLast(".o") == B_ERROR)
 		return outpath;

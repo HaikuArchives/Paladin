@@ -411,7 +411,7 @@ ProjectWindow::MessageReceived(BMessage* message)
 {
 	status_t status;
 	
-	STRACE(2,("ProjectWindow::MessageReceived!\n"));
+	//STRACE(2,("ProjectWindow::MessageReceived!\n"));
 
 	if ((message->WasDropped() && message->what == B_SIMPLE_DATA)
 		|| message->what == M_ADD_FILES) {

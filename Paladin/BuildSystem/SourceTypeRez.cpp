@@ -154,7 +154,7 @@ SourceFileRez::Precompile(BuildInfo &info, const char *options)
 
 
 void
-SourceFileRez::Compile(BuildInfo &info, const char *options)
+SourceFileRez::Compile(BuildInfo &info, const CompileCommand& cc)//const char *options)
 {
 	BString abspath = GetPath().GetFullPath();
 	if (abspath[0] != '/')

@@ -1,9 +1,14 @@
 #include "SourceTypeResource.h"
+
+#include <string>
+//#include <iostream>
+
 #include <Entry.h>
 #include <File.h>
 #include <stdio.h>
 #include <Menu.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Resources.h>
@@ -12,6 +17,9 @@
 #include "DebugTools.h"
 #include "FileActions.h"
 #include "Globals.h"
+#include "CommandOutputHandler.h"
+#include "CommandThread.h"
+#include "CompileCommand.h"
 
 SourceTypeResource::SourceTypeResource(void)
 {
@@ -166,52 +174,94 @@ SourceFileResource::CheckNeedsBuild(BuildInfo &info, bool check_deps)
 
 
 void
-SourceFileResource::Compile(BuildInfo &info, const char *options)
+SourceFileResource::Compile(BuildInfo &info, const CompileCommand& cc) // const char *options)
 {
+	//std::cout << "Resource Compile STARTS" << std::endl;
 	BString abspath = GetPath().GetFullPath();
 	if (abspath[0] != '/')
 	{
 		abspath.Prepend("/");
 		abspath.Prepend(info.projectFolder.GetFullPath());
 	}
+	//std::cout << "Resource Compile GOT PATH" << std::endl;
 	
 	if (BString(GetPath().GetExtension()).ICompare("rsrc") == 0)
 		return;
+	
+	
+	//std::cout << "Resource Compile PREPPING RC COMMAND" << std::endl;
 	
 	BString pipestr = "rc -o '";
 	pipestr << GetResourcePath(info).GetFullPath()
 			<< "' '" << abspath << "'";
 	
 	
-	BString errmsg;
-	RunPipedCommand(pipestr.String(), errmsg, false);
+	//std::cout << "Resource Compile GOT RC COMMAND" << std::endl;
+	//BString errmsg;
+	//RunPipedCommand(pipestr.String(), errmsg, false);
 	
-	STRACE(1,("Compiling %s\nCommand:%s\nOutput:%s\n",
-			abspath.String(),pipestr.String(),errmsg.String()));
+	BMessage cmd;
+	cmd.AddString("cmd",pipestr);
+	//cmd.AddString("pwd",abspath);
+		
+	//std::cout << "Resource Compile GOT CMD PARAMETER" << std::endl;
 	
-	ParseRCErrors(errmsg.String(),info.errorList);
+	CommandOutputHandler handler(true); // enable redirect
+	BLooper* looper = new BLooper();
+	looper->AddHandler(&handler);
+	BMessenger msgr(&handler,looper);
+	//std::cout << "Resource Compile EXECUTING LOOPER" << std::endl;
+	thread_id looperThread = looper->Run();
+	CommandThread thread(&cmd,&msgr);
+	//std::cout << "Resource Compile STARTING THREAD" << std::endl;
+	status_t startStatus = thread.Start();
+	status_t okReturn = B_OK;
+	status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+	//std::cout << "Resource Compile THREAD COMPLETE" << std::endl;
+	
+	handler.WaitForExit();
+	
+	//std::cout << "Resource Compile THREAD OUTPUT COMPLETE" << std::endl;
+	
+	std::string errmsg = handler.GetOut();
+	
+	STRACE(1,("Compiling Resource %s\nCommand:%s\nOutput:%s\n",
+			abspath.String(),pipestr.String(),errmsg.c_str()));
+	
+	ParseRCErrors(errmsg.c_str(),info.errorList);
+	
+	//std::cout << "Resource Compile ENDS" << std::endl;
 }
 
 
 DPath
 SourceFileResource::GetResourcePath(BuildInfo &info)
 {
+	//std::cout << "GetResourcePath Begins" << std::endl;
 	if (BString(GetPath().GetExtension()).ICompare("rsrc") == 0)
 	{
+		//std::cout << "GetResourcePath got rsrc file" << std::endl;
 		BString path(GetPath().GetFullPath());
 		if (path[0] != '/')
 		{
+			//std::cout << "GetResourcePath Path doesn't start with slash" << std::endl;
 			path.Prepend("/");
 			path.Prepend(info.projectFolder.GetFullPath());
 		}
+		//std::cout << "GetResourcePath returns DPath" << std::endl;
 		return DPath(path);
 	}
 	
 	BString objname(GetPath().GetBaseName());
 	objname << ".rsrc";
 	
+	//std::cout << "GetResourcePath creating objfolder reference" << std::endl;
+	
 	DPath objfolder(info.objectFolder);
 	objfolder.Append(objname);
+	//std::cout << "GetResourcePath returns objfolder:- " << std::endl;
+	//std::cout << objfolder.GetFullPath() << std::endl;
 	return objfolder;
 }
 

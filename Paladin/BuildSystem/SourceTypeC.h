@@ -5,6 +5,8 @@
 #include "SourceFile.h"
 #include "SourceType.h"
 
+class CompileCommand;
+
 class SourceTypeC : public SourceType
 {
 public:
@@ -31,7 +33,7 @@ public:
 			void		UpdateDependencies(BuildInfo &info);
 			bool		CheckNeedsBuild(BuildInfo &info, bool check_deps = true);
 	virtual BString		GetCompileCommand(BuildInfo &info,const char *options);
-			void		Compile(BuildInfo &info, const char *options);
+			void		Compile(BuildInfo &info, const CompileCommand& cc);//const char *options);
 	
 			DPath		GetObjectPath(BuildInfo &info);
 			void		RemoveObjects(BuildInfo &info);

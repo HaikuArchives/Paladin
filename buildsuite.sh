@@ -50,7 +50,7 @@ BuildNoDebug ()
 	# unknown to me includes /system/develop, but does not contain /boot/system/develop
 	sed 's/CCDEBUG=yes//' "$PROJNAME" | sed 's/CCOPLEVEL=[0-9]/CCOPLEVEL=3/' | sed 's_/boot/develop_/system/develop_' | sed 's_/system/develop/headers/cpp_/system/develop/headers/c++_' | sed 's_/system/develop/lib/x86_/system/develop/lib_' > "$TMPPROJ"
 	
-	$START_DIRECTORY/Paladin/Paladin -d -v -b "$TMPPROJ"
+	$START_DIRECTORY/Paladin/Paladin -d -v -s -b "$TMPPROJ"
 	SUCCESS=$?
 	
 	if [ "$MAKECLEAN" == 1 ]

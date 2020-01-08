@@ -13,6 +13,8 @@
 
 #include "Project.h"
 
+#include <string>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -26,6 +28,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Message.h>
+#include <Messenger.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -39,6 +42,9 @@
 #include "SCMManager.h"
 #include "SourceFile.h"
 #include "TextFile.h"
+#include "CommandOutputHandler.h"
+#include "CommandThread.h"
+#include "CompileCommand.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Project"
@@ -250,12 +256,13 @@ Project::Load(const char* path)
 
 	// Fix one of my pet peeves when changing platforms: having to add libsupc++.so
 	// whenever I change to Haiku GCC4 or GCC4hybrid from any other platform
-	if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform) {
-		BPath libpath;
-		find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &libpath);
-		libpath.Append("lib/x86/libsupc++.so");
-		AddLibrary(libpath.Path());
-	}
+	//if (actualPlatform == PLATFORM_HAIKU_GCC4 && actualPlatform != fPlatform) {
+	//	BPath libpath;
+	//	find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &libpath);
+	//	libpath.Append("lib/x86/libsupc++.so");
+	//	AddLibrary(libpath.Path());
+	//}
+	// Above no longer needed - auto with GCC system options in Haiku
 
 	fObjectPath = fPath.GetFolder();
 
@@ -765,7 +772,7 @@ Project::PrecompileFile(SourceFile* file)
 	if (file == NULL)
 		return;
 
-	DPath projfolder(GetPath().GetFolder());
+	//DPath projfolder(GetPath().GetFolder());
 	file->Precompile(fBuildInfo,"");
 }
 
@@ -811,8 +818,14 @@ Project::CompileFile(SourceFile* file)
 		compileString << "-I '" << item.String() << "' ";
 	}
 
-	DPath projfolder(GetPath().GetFolder());
-	file->Compile(fBuildInfo,compileString.String());
+	//DPath projfolder(GetPath().GetFolder());
+	
+	CompileCommand cc(
+		std::string(file->GetPath().GetFileName()),
+		std::string(file->GetCompileCommand(fBuildInfo,compileString).String()),
+		std::string(fBuildInfo.objectFolder.GetFullPath())
+	);
+	file->Compile(fBuildInfo,cc);
 }
 
 
@@ -932,16 +945,34 @@ Project::Link(void)
 		}
 	}
 
-	linkString << " 2>&1";
+	//linkString << " 2>&1";
 
-	BString errorMessage;
-	PipeCommand(linkString.String(),errorMessage);
+	//BString errorMessage;
+	//PipeCommand(linkString.String(),errorMessage);
+	
+	BMessage cmd;
+	cmd.AddString("cmd",linkString);
+	//cmd.AddString("pwd",abspath);
+	
+	CommandOutputHandler handler(true); // enable redirect
+	BLooper* looper = new BLooper();
+	looper->AddHandler(&handler);
+	BMessenger msgr(&handler,looper);
+	thread_id looperThread = looper->Run();
+	CommandThread thread(&cmd,&msgr);
+	status_t startStatus = thread.Start();
+	status_t okReturn = B_OK;
+	status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+	handler.WaitForExit();
+	
+	std::string errmsg = handler.GetOut();
 
 	STRACE(1, ("Linking %s:\n%s\nErrors:\n%s\n", GetName(), linkString.String(),
-		errorMessage.String()));
+		errmsg.c_str()));
 
-	if (errorMessage.CountChars() > 0)
-		ParseLDErrors(errorMessage.String(),fBuildInfo.errorList);
+	if (errmsg.length() > 0)
+		ParseLDErrors(errmsg.c_str(),fBuildInfo.errorList);
 }
 
 
@@ -968,14 +999,34 @@ Project::UpdateResources(void)
 	if (resCount > 0) {
 		BString resString = "xres -o ";
 		resString << "'" << targetpath.GetFullPath() << "' " << resFileString;		
-		BString errorMessage;
-		PipeCommand(resString.String(),errorMessage);
+		
+
+	BMessage cmd;
+	cmd.AddString("cmd",resString);
+	//cmd.AddString("pwd",abspath);
+	
+	CommandOutputHandler handler(true); // enable redirect
+	BLooper* looper = new BLooper();
+	looper->AddHandler(&handler);
+	BMessenger msgr(&handler,looper);
+	thread_id looperThread = looper->Run();
+	CommandThread thread(&cmd,&msgr);
+	status_t startStatus = thread.Start();
+	status_t okReturn = B_OK;
+	status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+	handler.WaitForExit();
+	
+	std::string errmsg = handler.GetOut();		
+		
+		//BString errorMessage;
+		//PipeCommand(resString.String(),errorMessage);
 
 		STRACE(1, ("Resources for %s:\n%s\nErrors:%s\n", GetName(), resString.String(),
-			errorMessage.String()));
+			errmsg.c_str()));
 
-		if (errorMessage.CountChars() > 0)
-			printf("Resource errors: %s\n",errorMessage.String());
+		if (errmsg.length() > 0)
+			printf("Resource errors: %s\n",errmsg.c_str());
 	} else
 		STRACE(1, ("Resources for %s: No resource files to add\n", GetName()));
 }
@@ -1018,7 +1069,7 @@ Project::PostBuild(SourceFile *file)
 		return;
 	}
 
-	DPath projfolder(GetPath().GetFolder());
+	//DPath projfolder(GetPath().GetFolder());
 	file->PostBuild(fBuildInfo,NULL);
 }
 
@@ -1473,10 +1524,10 @@ Project::CreateProject(const char *projname, const char *target, int32 type, con
 			// Having to manually add this one is terribly annoying. :/
 			if (DetectPlatform() == PLATFORM_HAIKU){
 				newproj->AddLibrary("/boot/system/develop/lib/x86/libbe.so",true);
-				newproj->AddLibrary("/boot/system/lib/x86/libsupc++.so",true);
+				//newproj->AddLibrary("/boot/system/lib/x86/libsupc++.so",true);
 			} else if (DetectPlatform() == PLATFORM_HAIKU_GCC4){
 				newproj->AddLibrary("/boot/system/develop/lib/libbe.so",true);
-				newproj->AddLibrary("/boot/system/lib/libsupc++.so",true);
+				//newproj->AddLibrary("/boot/system/lib/libsupc++.so",true);
 			}
 			else newproj->AddLibrary("/boot/develop/lib/x86/libbe.so",true);
 			break;

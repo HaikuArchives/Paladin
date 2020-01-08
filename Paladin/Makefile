@@ -106,7 +106,8 @@ SRCS = AboutWindow.cpp \
 	PreviewFeatures/MonitorWindow.cpp \
 	PreviewFeatures/StreamingTextView.cpp \
 	PreviewFeatures/CommandThread.cpp \
-	PreviewFeatures/GenericThread.cpp
+	PreviewFeatures/GenericThread.cpp \
+	PreviewFeatures/CommandOutputHandler.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
@@ -182,7 +183,7 @@ SYMBOLS :=
 DEBUGGER := 
 
 #	Specify any additional compiler flags to be used.
-COMPILER_FLAGS = 
+COMPILER_FLAGS = -std=c++0x 
 
 #	Specify any additional linker flags to be used.
 LINKER_FLAGS = 

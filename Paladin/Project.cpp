@@ -862,6 +862,7 @@ Project::Link(void)
 		if (Profiling())
 			linkString << "-p ";
 			
+			
 		for (int32 i = 0; i < CountGroups(); i++)
 		{
 			SourceGroup *group = GroupAt(i);
@@ -898,6 +899,9 @@ Project::Link(void)
 			
 			linkString << "-l" << filenamebase << " ";
 		}
+		
+		if (fExtraLinkerOptions.CountChars() > 0)
+			linkString << fExtraLinkerOptions << " ";
 
 		if (TargetType() == TARGET_DRIVER)
 		{

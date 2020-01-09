@@ -110,7 +110,7 @@ CommandThread::CheckForOutput()
 	int32 readsPerPass = 200; // high so that we don't incur a 
 	// large cost from get_thread_info
 	BString toSend;
-	for (int32 i = 0; i < readsPerPass; i++) {
+	for (int32 i = 0; NULL != fThreadOutput && NULL != fStdOut && !feof(fThreadOutput) && i < readsPerPass; i++) {
 		char* output_string = fgets(fThreadOutputBuffer , LINE_MAX,
 			fThreadOutput);
 		if (output_string == NULL)
@@ -142,7 +142,7 @@ CommandThread::CheckForOutput()
 
 	bool errorsAdded = false;
 	BString toSendErr;
-	for (int32 i = 0; i < readsPerPass; i++) {
+	for (int32 i = 0; NULL != fThreadError && NULL != fStdErr && !feof(fThreadError) && i < readsPerPass; i++) {
 		char* error_string = fgets(fThreadOutputBuffer, LINE_MAX,
 			fThreadError);
 		if (error_string == NULL) 

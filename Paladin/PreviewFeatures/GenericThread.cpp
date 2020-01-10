@@ -27,9 +27,15 @@ GenericThread::GenericThread(const char* threadName, int32 priority,
 
 GenericThread::~GenericThread()
 {
-	kill_thread(fThreadId);
+	Quit();
+	
+	//ExitWithReturnValue(0);
+	//Kill();
+	//if (fThreadId > B_OK)
+		//kill_thread(fThreadId);
+		//send_signal(fThreadId,SIGTSTP);
 
-	delete_sem(fExecuteUnit);
+	//delete_sem(fExecuteUnit);
 }
 
 
@@ -56,7 +62,7 @@ GenericThread::ThreadFunction(void)
 					// what do we do?
 			}
 
-			delete this;
+			//delete this;
 				// destructor
 			return B_OK;
 		}
@@ -249,7 +255,13 @@ GenericThread::Resume(void)
 status_t
 GenericThread::Kill(void)
 {
-	return (kill_thread(fThreadId));
+	thread_info info;
+	status_t status = get_thread_info(fThreadId, &info);
+
+	if (status == B_OK)
+		return (kill_thread(fThreadId));
+		
+	return status;
 }
 
 

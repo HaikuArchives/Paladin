@@ -161,6 +161,7 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 		// build 2 files, so limit spawned threads to whichever is less
 		threadcount = MIN(gCPUCount,fProject->CountDirtyFiles());
 	}
+	threadcount = 2;
 	
 	fTotalFilesToBuild = proj->CountDirtyFiles();
 	fTotalFilesBuilt = 0;
@@ -694,7 +695,10 @@ ThreadManager::SpawnThread(thread_func func, void *data)
 			fThreadCount++;
 		}
 		else
+		{
+			BTRACE(("No free slot so killing thread %ld\n",t));
 			kill_thread(t);
+		}
 	}
 	
 	return t;	

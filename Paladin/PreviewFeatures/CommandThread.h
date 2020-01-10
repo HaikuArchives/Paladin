@@ -52,6 +52,8 @@ private:
 	virtual	void				ThreadStartupFailed(status_t a_status);
 	virtual	void				ExecuteUnitFailed(status_t a_status);
 	virtual	void				ThreadShutdownFailed(status_t a_status);
+	
+	static	void				ExitCallback(void* data);
 
 			status_t			ProcessRefs(BMessage* message);
 

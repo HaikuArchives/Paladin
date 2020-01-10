@@ -161,11 +161,12 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 		// build 2 files, so limit spawned threads to whichever is less
 		threadcount = MIN(gCPUCount,fProject->CountDirtyFiles());
 	}
-	threadcount = 2;
+	//threadcount = 2;
 	
 	fTotalFilesToBuild = proj->CountDirtyFiles();
 	fTotalFilesBuilt = 0;
 	fCommands.clear();
+	proj->GetBuildInfo()->errorList.msglist.MakeEmpty(); // clears previous, once
 	for (int32 i = 0; i < threadcount; i++)
 		fManager.SpawnThread(BuildThread,this);
 }
@@ -197,6 +198,7 @@ ProjectBuilder::DoPostBuild(void)
 	jsonFile += std::string("/compile_commands.json");
 	STRACE(1,("Writing out compile commands\n"));
 	STRACE(1,(jsonFile.c_str()));
+	STRACE(1,("\n"));
 	std::ofstream ofs(jsonFile.c_str(), std::ofstream::out);
 	CompileCommandWriter::ToJSONFile(ofs,fCommands);
 	
@@ -312,6 +314,7 @@ ProjectBuilder::DoPostBuild(void)
 void
 ProjectBuilder::SendErrorMessage(ErrorList &list)
 {
+
 	BMessage errmsg;
 	if (list.CountErrors() > 0)
 		errmsg.what = M_BUILD_FAILURE;
@@ -321,6 +324,7 @@ ProjectBuilder::SendErrorMessage(ErrorList &list)
 		errmsg.what = M_BUILD_MESSAGES;
 	list.Flatten(errmsg);
 	fMsgr.SendMessage(&errmsg);
+	
 }
 
 
@@ -374,14 +378,18 @@ ProjectBuilder::BuildThread(void *data)
 		BTRACE(("Thread %ld is precompiling file %s\n",thisThread,file->GetPath().GetFileName()));
 		
 		BuildInfo *info = proj->GetBuildInfo();
-		info->errorList.msglist.MakeEmpty();
+		ErrorList errorList("");
+		//info->errorList.msglist.MakeEmpty();
 		proj->PrecompileFile(file);
 		
-		if (info->errorList.msglist.CountItems() > 0)
+		//if (info->errorList.msglist.CountItems() > 0)
+		if (errorList.msglist.CountItems() > 0)
 		{
-			parent->SendErrorMessage(info->errorList);
+			//parent->SendErrorMessage(info->errorList);
+			parent->SendErrorMessage(errorList);
 			
-			if (info->errorList.CountErrors() > 0)
+			//if (info->errorList.CountErrors() > 0)
+			if (errorList.CountErrors() > 0)
 			{
 				msg.MakeEmpty();
 				msg.what = M_BUILDING_DONE;
@@ -399,8 +407,9 @@ ProjectBuilder::BuildThread(void *data)
 				
 				return B_ERROR;
 			}
-			else
-				info->errorList.msglist.MakeEmpty();
+			//else
+				//info->errorList.msglist.MakeEmpty();
+				//errorList.msglist.MakeEmpty();
 		}
 		
 		if (parent->fManager.ThreadCheckQuit())
@@ -432,11 +441,14 @@ ProjectBuilder::BuildThread(void *data)
 		proj->CompileFile(file);
 		BTRACE(("Thread %ld compiling complete for file %s\n",thisThread,file->GetPath().GetFileName()));
 		
-		if (info->errorList.msglist.CountItems() > 0)
+		//if (info->errorList.msglist.CountItems() > 0)
+		if (errorList.msglist.CountItems() > 0)
 		{
-			parent->SendErrorMessage(info->errorList);
+			parent->SendErrorMessage(errorList);
+			//parent->SendErrorMessage(info->errorList);
 			
-			if (info->errorList.CountErrors() > 0)
+			//if (info->errorList.CountErrors() > 0)
+			if (errorList.CountErrors() > 0)
 			{
 				msg.MakeEmpty();
 				msg.what = M_BUILDING_DONE;
@@ -454,8 +466,9 @@ ProjectBuilder::BuildThread(void *data)
 				
 				return B_ERROR;
 			}
-			else
-				info->errorList.msglist.MakeEmpty();
+			//else
+				//errorList.msglist.MakeEmpty();
+				//info->errorList.msglist.MakeEmpty();
 		}
 		
 		msg.MakeEmpty();
@@ -480,6 +493,10 @@ ProjectBuilder::BuildThread(void *data)
 			file->UpdateModTime();
 		}
 		proj->Unlock();
+		
+		// copy over errors in to build info
+		info->errorList.msglist.AddList(&errorList.msglist);
+		errorList.msglist.MakeEmpty(false);
 	}
 	
 	// Now that we've finished building the individual source files, we need to
@@ -536,6 +553,7 @@ ProjectBuilder::BuildThread(void *data)
 		}
 		
 		BuildInfo *info = proj->GetBuildInfo();
+		ErrorList errorList("");
 		if (link_needed)
 		{
 			parent->fMsgr.SendMessage(M_LINKING_PROJECT);
@@ -543,11 +561,14 @@ ProjectBuilder::BuildThread(void *data)
 			proj->Lock();
 			proj->Link();
 			
-			if (info->errorList.msglist.CountItems() > 0)
+			//if (info->errorList.msglist.CountItems() > 0)
+			if (errorList.msglist.CountItems() > 0)
 			{
-				parent->SendErrorMessage(info->errorList);
+				//parent->SendErrorMessage(info->errorList);
+				parent->SendErrorMessage(errorList);
 				
-				if (info->errorList.CountErrors() > 0)
+				//if (info->errorList.CountErrors() > 0)
+				if (errorList.CountErrors() > 0)
 				{
 					parent->Lock();
 					parent->fIsLinking = false;
@@ -562,8 +583,9 @@ ProjectBuilder::BuildThread(void *data)
 					
 					return B_ERROR;
 				}
-				else
-					info->errorList.msglist.MakeEmpty();
+				//else
+					//errorList.msglist.MakeEmpty();
+					//info->errorList.msglist.MakeEmpty();
 			}
 			
 			if (parent->fManager.ThreadCheckQuit())
@@ -583,11 +605,14 @@ ProjectBuilder::BuildThread(void *data)
 		
 		proj->Lock();
 		proj->UpdateResources();
-		if (info->errorList.msglist.CountItems() > 0)
+		//if (info->errorList.msglist.CountItems() > 0)
+		if (errorList.msglist.CountItems() > 0)
 		{
-			parent->SendErrorMessage(info->errorList);
+			//parent->SendErrorMessage(info->errorList);
+			parent->SendErrorMessage(errorList);
 			
-			if (info->errorList.CountErrors() > 0)
+			//if (info->errorList.CountErrors() > 0)
+			if (errorList.CountErrors() > 0)
 			{
 				parent->Lock();
 				parent->fIsLinking = false;
@@ -624,10 +649,13 @@ ProjectBuilder::BuildThread(void *data)
 				proj->PostBuild(file);
 				proj->Unlock();
 				
-				if (info->errorList.msglist.CountItems() > 0)
+				//if (info->errorList.msglist.CountItems() > 0)
+				if (errorList.msglist.CountItems() > 0)
 				{
-					parent->SendErrorMessage(info->errorList);
-					info->errorList.msglist.MakeEmpty();
+					//parent->SendErrorMessage(info->errorList);
+					//info->errorList.msglist.MakeEmpty();
+					parent->SendErrorMessage(errorList);
+					errorList.msglist.MakeEmpty();
 				}
 			}
 		}
@@ -639,6 +667,10 @@ ProjectBuilder::BuildThread(void *data)
 		parent->fMsgr.SendMessage(M_BUILD_SUCCESS);
 		
 		//sleep(10);
+		
+		// copy over errors in to build info
+		info->errorList.msglist.AddList(&errorList.msglist);
+		errorList.msglist.MakeEmpty(false);
 		
 		parent->DoPostBuild();
 	}

@@ -1975,14 +1975,19 @@ ProjectWindow::UpdateDependencies(void)
 	if (toggleHack)
 		gUsePipeHack = false;
 	
-	SetStatus(B_TRANSLATE("Updating dependencies"));
 	SetMenuLock(true);
+
+	SetStatus(B_TRANSLATE("Updating dependencies"));
+	
 	for (int32 i = 0; i < fProjectList->CountItems(); i++) {
 		SourceFileItem* item = dynamic_cast<SourceFileItem*>(
 			fProjectList->FullListItemAt(i));
 		if (item != NULL)
 			item->GetData()->UpdateDependencies(*fProject->GetBuildInfo());
 	}
+	
+	SetStatus(B_TRANSLATE("Finished updating dependencies"));
+	
 	SetMenuLock(false);
 
 	if (toggleHack)

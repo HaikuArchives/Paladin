@@ -156,7 +156,37 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	BString depstr;
 	RunPipedCommand(command.String(), depstr, true);
 	
-	STRACE(1,("Update Dependencies for %s\nCommand:%s\nOutput:%s\n",
+	BMessage cmd;
+	cmd.AddString("cmd",command);
+		
+	STRACE(1,("Updating dependencies for %s\n",GetPath().GetFullPath()));
+	/*
+	CommandOutputHandler handler(true); // enable redirect
+	BLooper* looper = new BLooper();
+	looper->AddHandler(&handler);
+	BMessenger msgr(&handler,looper);
+	thread_id looperThread = looper->Run();
+	CommandThread thread(&cmd,&msgr);
+	status_t startStatus = thread.Start();
+	
+	std::string errmsg;	
+	
+	if (B_BUSTED_PIPE == startStatus)
+	{
+		errmsg = "CommandThread was unable to allocate a thread\n";
+	} else {
+		status_t okReturn = B_OK;
+		status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+		handler.WaitForExit(); // REQUIRED so as not to miss output/errors
+	
+		depstr = BString(handler.GetOut().c_str());
+	}
+	
+	*/
+	
+	
+	STRACE(1,("Updated Dependencies for %s\nCommand:%s\nOutput:%s\n",
 			GetPath().GetFullPath(),command.String(),depstr.String()));
 	
 	if (gUseFastDep && gFastDepAvailable)
@@ -459,12 +489,20 @@ SourceFileC::Compile(BuildInfo &info, const CompileCommand& cc)
 	thread_id looperThread = looper->Run();
 	CommandThread thread(&cmd,&msgr);
 	status_t startStatus = thread.Start();
-	status_t okReturn = B_OK;
-	status_t waitStatus = thread.WaitForThread(&okReturn);
 	
-	handler.WaitForExit(); // REQUIRED so as not to miss output/errors
+	std::string errmsg;	
 	
-	std::string errmsg = handler.GetOut();
+	if (B_BUSTED_PIPE == startStatus)
+	{
+		errmsg = "CommandThread was unable to allocate a thread\n";
+	} else {
+		status_t okReturn = B_OK;
+		status_t waitStatus = thread.WaitForThread(&okReturn);
+	
+		handler.WaitForExit(); // REQUIRED so as not to miss output/errors
+	
+		errmsg = handler.GetOut();
+	}
 	
 	STRACE(1,("Compiling c++ %s\nCommand:%s\nOutput:%s\n",
 			abspath.String(),compileString.String(),errmsg.c_str()));

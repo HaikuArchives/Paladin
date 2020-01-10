@@ -295,9 +295,10 @@ ErrorList::AsString(void)
 
 
 void
-ParseGCCErrors(const char *string, ErrorList &list)
+ParseGCCErrors(const char *string, ErrorList &masterlist)
 {
-	list.msglist.MakeEmpty();
+	//list.msglist.MakeEmpty(); // DANGEROUS - shared structure
+	ErrorList list("");
 	if (!string)
 		return;
 	
@@ -322,7 +323,7 @@ ParseGCCErrors(const char *string, ErrorList &list)
 	{
 		error_msg *msg = (error_msg*)list.msglist.ItemAt(i);
 		
-		if (msg->rawdata.CountChars() < 1)
+		if (!msg->rawdata || msg->rawdata.CountChars() < 1)
 			continue;
 		
 		int32 startpos = 0;
@@ -412,7 +413,11 @@ ParseGCCErrors(const char *string, ErrorList &list)
 			}
 		} // end null endpos if	
 		errorPrev = msg->type;
+		
+		// Add back to master list after processing
+		masterlist.msglist.AddItem(msg);
 	}
+	list.msglist.MakeEmpty(false); // don't delete msg pointers
 	
 	delete [] data;
 }
@@ -492,7 +497,7 @@ ParseRCErrors(const char *string, ErrorList &list)
 	if (length < 1)
 		return;
 	
-	debugger("ParseRCErrors unimplemented");
+	//debugger("ParseRCErrors unimplemented");
 }
 
 
@@ -507,7 +512,7 @@ ParseLexErrors(const char *string, ErrorList &list)
 	if (length < 1)
 		return;
 	
-	debugger("ParseRCErrors unimplemented");
+	//debugger("ParseRCErrors unimplemented");
 }
 
 
@@ -522,7 +527,7 @@ ParseYaccErrors(const char *string, ErrorList &list)
 	if (length < 1)
 		return;
 	
-	debugger("ParseRCErrors unimplemented");
+	//debugger("ParseRCErrors unimplemented");
 }
 
 

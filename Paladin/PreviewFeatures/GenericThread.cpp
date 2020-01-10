@@ -35,7 +35,10 @@ GenericThread::~GenericThread()
 		//kill_thread(fThreadId);
 		//send_signal(fThreadId,SIGTSTP);
 
-	//delete_sem(fExecuteUnit);
+	acquire_sem(fExecuteUnit);
+	delete_sem(fExecuteUnit);
+	
+	// TODO call Kill() here??? removes user thread ?
 }
 
 
@@ -153,6 +156,10 @@ GenericThread::ThreadShutdownFailed(status_t status)
 status_t
 GenericThread::Start(void)
 {
+	// validate we have a valid child thread first
+	if (fThreadId < 0)
+		return B_BUSTED_PIPE;
+	
 	status_t status = B_OK;
 
 	if (IsPaused()) {
@@ -255,6 +262,9 @@ GenericThread::Resume(void)
 status_t
 GenericThread::Kill(void)
 {
+	if (fThreadId < 0)
+		return B_BUSTED_PIPE;
+		
 	thread_info info;
 	status_t status = get_thread_info(fThreadId, &info);
 

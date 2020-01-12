@@ -10,6 +10,8 @@
 #include "CompileCommand.h"
 #include "ErrorParser.h"
 
+class SourceFile;
+
 enum
 {
 	POSTBUILD_NOTHING = 0,
@@ -31,7 +33,9 @@ enum
 	M_BUILD_FAILURE = 'blfa',
 	M_BUILD_SUCCESS = 'blsc',
 	M_FILE_NEEDS_BUILD = 'fnbl',
-	M_BUILD_MONITOR = 'blmn'
+	M_BUILD_MONITOR = 'blmn',
+	M_DEPENDENCY_UPDATED = 'adpu',
+	M_DEPENDENCIES_UPDATED = 'allu'
 };
 
 class Project;
@@ -69,6 +73,7 @@ public:
 						~ProjectBuilder(void);
 						
 			void		BuildProject(Project *proj, int32 postbuild);
+			void		UpdateDependencies(Project* proj);
 			void		QuitBuild(void);
 			bool		IsBuilding(void);
 			
@@ -77,6 +82,7 @@ private:
 			void		DoPostBuild(void);
 			void		SendErrorMessage(ErrorList &list);
 	static	int32		BuildThread(void *data);
+	static	int32		UpdateDependenciesThread(void *data);
 	
 	BMessenger			fMsgr;
 	Project				*fProject;
@@ -90,6 +96,7 @@ private:
 	ThreadManager		fManager;
 	
 	std::vector<CompileCommand>	fCommands;
+	std::vector<SourceFile*>	fFilesToUpdate;
 };
 
 #endif

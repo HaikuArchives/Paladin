@@ -120,6 +120,7 @@ public:
 			int32		UpdateAttributes(void);
 			void		PostBuild(SourceFile *file);
 			void		ForceRebuild(void);
+			void		UpdateFileDependencies(SourceFile* file);
 			
 			void		UpdateErrorList(const ErrorList &list);
 			ErrorList *	GetErrorList(void) const;

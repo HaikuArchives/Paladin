@@ -84,7 +84,7 @@ CommandThread::ThreadStartup()
 	// lower the command priority since it is a background task.
 	set_thread_priority(fThreadId, B_LOW_PRIORITY);
 
-	resume_thread(fThreadId);
+	resume_thread(fThreadId); // is this too early, before stdout is available?
 
 	int flags = fcntl(fStdOut, F_GETFL, 0);
 	flags |= O_NONBLOCK;
@@ -95,8 +95,23 @@ CommandThread::ThreadStartup()
 
 	fThreadOutput = fdopen(fStdOut, "r");
 	fThreadError = fdopen(fStdErr, "r");
+	
+	SetExitCallback(ExitCallback, this);
 
 	return B_OK;
+}
+
+void
+CommandThread::ExitCallback(void* data)
+{
+	CommandThread* me = (CommandThread*)data;
+	if (me->fStdIn)
+		close(me->fStdIn);
+		
+	//if (me->fStdOut)
+	//	close(me->fStdOut);
+	//if (me->fStdErr)
+	//	close(me->fStdErr);
 }
 
 void
@@ -110,7 +125,7 @@ CommandThread::CheckForOutput()
 	int32 readsPerPass = 200; // high so that we don't incur a 
 	// large cost from get_thread_info
 	BString toSend;
-	for (int32 i = 0; i < readsPerPass; i++) {
+	for (int32 i = 0; NULL != fThreadOutput && -1 != fStdOut && !feof(fThreadOutput) && i < readsPerPass; i++) {
 		char* output_string = fgets(fThreadOutputBuffer , LINE_MAX,
 			fThreadOutput);
 		if (output_string == NULL)
@@ -123,16 +138,16 @@ CommandThread::CheckForOutput()
 	}
 	if (outputAdded)
 	{
-		BMessage message(M_COMMAND_RECEIVE_STDOUT);
-		message.AddString("output", toSend);
-		message.AddUInt64("thread_id",fThreadId);
+		BMessage* message = new BMessage(M_COMMAND_RECEIVE_STDOUT);
+		message->AddString("output", strdup(toSend.String()));
+		message->AddUInt64("thread_id",fThreadId);
 		
 		// Send through any context, if provided
 		void* ctx = NULL;
 		if (B_OK == GetDataStore()->FindPointer("context", &ctx)) {
-			message.AddPointer("context",ctx);
+			message->AddPointer("context",ctx);
 		}
-		fWindowMessenger->SendMessage(&message);
+		fWindowMessenger->SendMessage(message);
 	}
 
 	//if (feof(fThreadOutput))
@@ -142,7 +157,7 @@ CommandThread::CheckForOutput()
 
 	bool errorsAdded = false;
 	BString toSendErr;
-	for (int32 i = 0; i < readsPerPass; i++) {
+	for (int32 i = 0; NULL != fThreadError && -1 != fStdErr && !feof(fThreadError) && i < readsPerPass; i++) {
 		char* error_string = fgets(fThreadOutputBuffer, LINE_MAX,
 			fThreadError);
 		if (error_string == NULL) 
@@ -155,16 +170,16 @@ CommandThread::CheckForOutput()
 	}
 	if (errorsAdded)
 	{
-		BMessage message(M_COMMAND_RECEIVE_STDERR);
-		message.AddString("error", toSendErr);
-		message.AddUInt64("thread_id",fThreadId);
+		BMessage* message = new BMessage(M_COMMAND_RECEIVE_STDERR);
+		message->AddString("error", strdup(toSendErr.String()));
+		message->AddUInt64("thread_id",fThreadId);
 		
 		// Send through any context, if provided
 		void* ctx = NULL;
 		if (B_OK == GetDataStore()->FindPointer("context", &ctx)) {
-			message.AddPointer("context",ctx);
+			message->AddPointer("context",ctx);
 		}
-		fWindowMessenger->SendMessage(&message);
+		fWindowMessenger->SendMessage(message);
 	}
 }
 
@@ -208,7 +223,7 @@ CommandThread::PushInput(BString text)
 status_t
 CommandThread::ThreadShutdown(void)
 {
-	close(fStdIn);
+	//close(fStdIn);
 	
 	while (EOF != ExecuteUnit()) {
     	// catches any remaining stderr/stdout data
@@ -225,8 +240,8 @@ CommandThread::ThreadShutdown(void)
 		
 		snooze(100000);
 	}
-	close(fStdOut);
-	close(fStdErr);
+	//close(fStdOut);
+	//close(fStdErr);
 
 	return B_OK;
 }

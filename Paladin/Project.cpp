@@ -776,6 +776,14 @@ Project::PrecompileFile(SourceFile* file)
 	file->Precompile(fBuildInfo,"");
 }
 
+void
+Project::UpdateFileDependencies(SourceFile* file)
+{
+	if (file == NULL)
+		return;
+		
+	file->UpdateDependencies(fBuildInfo);
+}
 
 void
 Project::CompileFile(SourceFile* file)

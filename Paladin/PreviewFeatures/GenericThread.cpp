@@ -27,9 +27,18 @@ GenericThread::GenericThread(const char* threadName, int32 priority,
 
 GenericThread::~GenericThread()
 {
-	kill_thread(fThreadId);
+	Quit();
+	
+	//ExitWithReturnValue(0);
+	//Kill();
+	//if (fThreadId > B_OK)
+		//kill_thread(fThreadId);
+		//send_signal(fThreadId,SIGTSTP);
 
+	acquire_sem(fExecuteUnit);
 	delete_sem(fExecuteUnit);
+	
+	// TODO call Kill() here??? removes user thread ?
 }
 
 
@@ -56,7 +65,7 @@ GenericThread::ThreadFunction(void)
 					// what do we do?
 			}
 
-			delete this;
+			//delete this;
 				// destructor
 			return B_OK;
 		}
@@ -147,6 +156,10 @@ GenericThread::ThreadShutdownFailed(status_t status)
 status_t
 GenericThread::Start(void)
 {
+	// validate we have a valid child thread first
+	if (fThreadId < 0)
+		return B_BUSTED_PIPE;
+	
 	status_t status = B_OK;
 
 	if (IsPaused()) {
@@ -249,7 +262,16 @@ GenericThread::Resume(void)
 status_t
 GenericThread::Kill(void)
 {
-	return (kill_thread(fThreadId));
+	if (fThreadId < 0)
+		return B_BUSTED_PIPE;
+		
+	thread_info info;
+	status_t status = get_thread_info(fThreadId, &info);
+
+	if (status == B_OK)
+		return (kill_thread(fThreadId));
+		
+	return status;
 }
 
 

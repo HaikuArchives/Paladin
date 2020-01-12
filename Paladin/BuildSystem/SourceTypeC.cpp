@@ -139,13 +139,13 @@ SourceFileC::UsesBuild(void) const
 void
 SourceFileC::UpdateDependencies(BuildInfo &info)
 {
+	
 	BString abspath = GetPath().GetFullPath();
 	if (abspath[0] != '/')
 	{
 		abspath.Prepend("/");
 		abspath.Prepend(info.projectFolder.GetFullPath());
 	}
-	
 	BString command;
 	
 	if (gUseFastDep && gFastDepAvailable)
@@ -154,13 +154,13 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 		command << "g++ -MM " << info.includeString << " '" << abspath.String() << "'";
 	
 	BString depstr;
-	RunPipedCommand(command.String(), depstr, true);
+	//RunPipedCommand(command.String(), depstr, true);
 	
 	BMessage cmd;
 	cmd.AddString("cmd",command);
 		
 	STRACE(1,("Updating dependencies for %s\n",GetPath().GetFullPath()));
-	/*
+	
 	CommandOutputHandler handler(true); // enable redirect
 	BLooper* looper = new BLooper();
 	looper->AddHandler(&handler);
@@ -183,7 +183,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 		depstr = BString(handler.GetOut().c_str());
 	}
 	
-	*/
+	
 	
 	
 	STRACE(1,("Updated Dependencies for %s\nCommand:%s\nOutput:%s\n",
@@ -278,6 +278,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 			included.push_back(components.StringAt(si));
 		}
 	}
+	
 	/*
 	auto it = components.end();
 	while (it > components.begin()) {

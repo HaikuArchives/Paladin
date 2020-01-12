@@ -1084,6 +1084,25 @@ ProjectWindow::MessageReceived(BMessage* message)
 			UpdateDependencies();
 			break;
 		}
+		case M_DEPENDENCY_UPDATED:
+		{
+			int idx = message->GetInt32("idx",-1);
+			int max = message->GetInt32("max",-1);
+			BString txt;
+			txt << idx << "/" << max << B_TRANSLATE(" dependencies updated");
+			SetStatus(txt);
+			break;
+		}
+		case M_DEPENDENCIES_UPDATED:
+		{
+			SetStatus(B_TRANSLATE("Finished updating dependencies"));
+	
+			SetMenuLock(false);
+
+			UpdateProjectList();
+			
+			break;
+		}
 
 		case M_MAKE_PROJECT:
 		case M_BUILD_PROJECT:
@@ -1241,8 +1260,9 @@ ProjectWindow::MessageReceived(BMessage* message)
 				fErrorWindow = new ErrorWindow(r, this);
 				fErrorWindow->Show();
 			} else {
-				if (!fErrorWindow->IsFront())
-					fErrorWindow->Activate();
+				//if (!fErrorWindow->IsFront())
+				//	fErrorWindow->Activate();
+				// The above was really annoying - happens repeatedly during a build
 			}
 			SetStatus(B_TRANSLATE("Build had errors or warnings."));
 
@@ -1968,32 +1988,29 @@ ProjectWindow::CullEmptyGroups(void)
 void
 ProjectWindow::UpdateDependencies(void)
 {
+	/*
 	bool toggleHack = false;
 	if (gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4)
 		toggleHack = true;
 
 	if (toggleHack)
 		gUsePipeHack = false;
+	*/
 	
 	SetMenuLock(true);
 
 	SetStatus(B_TRANSLATE("Updating dependencies"));
 	
+	fBuilder.UpdateDependencies(fProject);
+	
+	/*
 	for (int32 i = 0; i < fProjectList->CountItems(); i++) {
 		SourceFileItem* item = dynamic_cast<SourceFileItem*>(
 			fProjectList->FullListItemAt(i));
 		if (item != NULL)
 			item->GetData()->UpdateDependencies(*fProject->GetBuildInfo());
 	}
-	
-	SetStatus(B_TRANSLATE("Finished updating dependencies"));
-	
-	SetMenuLock(false);
-
-	if (toggleHack)
-		gUsePipeHack = true;
-		
-	UpdateProjectList();
+	*/
 }
 
 

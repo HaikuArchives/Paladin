@@ -48,7 +48,8 @@ ProjectBuilder::ProjectBuilder(void)
 		fTotalFilesToBuild(0L),
 		fTotalFilesBuilt(0L),
 		fManager(gCPUCount),
-		fCommands()
+		fCommands(),
+		fFilesToUpdate()
 {
 }
 
@@ -60,7 +61,8 @@ ProjectBuilder::ProjectBuilder(const BMessenger &target)
 		fTotalFilesToBuild(0L),
 		fTotalFilesBuilt(0L),
 		fManager(gCPUCount),
-		fCommands()
+		fCommands(),
+		fFilesToUpdate()
 {
 }
 
@@ -69,6 +71,49 @@ ProjectBuilder::~ProjectBuilder(void)
 {
 	if (IsBuilding())
 		QuitBuild();
+}
+
+void ProjectBuilder::UpdateDependencies(Project *proj)
+{
+	if (!proj)
+		return;
+	
+	fProject = proj;
+	
+	fFilesToUpdate.clear();
+
+	if ((gPlatform == PLATFORM_HAIKU || gPlatform == PLATFORM_HAIKU_GCC4) &&
+		fProject->IsLocked() && fProject->LockingThread() == find_thread(NULL))
+		fProject->Unlock();
+		
+	for (int32 i = 0; i < fProject->CountGroups(); i++)
+	{
+		SourceGroup *group = fProject->GroupAt(i);
+		
+		for (int32 j = 0; j < group->filelist.CountItems(); j++)
+		{
+			SourceFile* file = group->filelist.ItemAt(j);
+			
+			fFilesToUpdate.push_back(file);
+		}
+	}
+	
+	proj->GetBuildInfo()->errorList.msglist.MakeEmpty();
+	
+	fTotalFilesToBuild = fFilesToUpdate.size();
+	fTotalFilesBuilt = 0;
+	int32 threadcount = 1;
+	if (fTotalFilesToBuild > 1 && !gSingleThreadedBuild)
+	{
+		// It's kind of silly spawning 4 threads on a quad core system to
+		// build 2 files, so limit spawned threads to whichever is less
+		threadcount = MIN(gCPUCount,fTotalFilesToBuild);
+	}
+	
+	for (int32 i = 0; i < threadcount; i++)
+	{
+		fManager.SpawnThread(UpdateDependenciesThread,this);
+	}
 }
 
 
@@ -116,6 +161,8 @@ ProjectBuilder::BuildProject(Project *proj, int32 postbuild)
 	
 	// Always start the cache fresh on a new build
 	gStatCache.MakeEmpty();
+	
+	
 	
 	// Check any files not already marked as needing built
 	for (int32 i = 0; i < fProject->CountGroups(); i++)
@@ -378,18 +425,18 @@ ProjectBuilder::BuildThread(void *data)
 		BTRACE(("Thread %ld is precompiling file %s\n",thisThread,file->GetPath().GetFileName()));
 		
 		BuildInfo *info = proj->GetBuildInfo();
-		ErrorList errorList("");
+		//ErrorList errorList("");
 		//info->errorList.msglist.MakeEmpty();
 		proj->PrecompileFile(file);
 		
-		//if (info->errorList.msglist.CountItems() > 0)
-		if (errorList.msglist.CountItems() > 0)
+		if (info->errorList.msglist.CountItems() > 0)
+		//if (errorList.msglist.CountItems() > 0)
 		{
-			//parent->SendErrorMessage(info->errorList);
-			parent->SendErrorMessage(errorList);
+			parent->SendErrorMessage(info->errorList);
+			//parent->SendErrorMessage(errorList);
 			
-			//if (info->errorList.CountErrors() > 0)
-			if (errorList.CountErrors() > 0)
+			if (info->errorList.CountErrors() > 0)
+			//if (errorList.CountErrors() > 0)
 			{
 				msg.MakeEmpty();
 				msg.what = M_BUILDING_DONE;
@@ -441,14 +488,14 @@ ProjectBuilder::BuildThread(void *data)
 		proj->CompileFile(file);
 		BTRACE(("Thread %ld compiling complete for file %s\n",thisThread,file->GetPath().GetFileName()));
 		
-		//if (info->errorList.msglist.CountItems() > 0)
-		if (errorList.msglist.CountItems() > 0)
+		if (info->errorList.msglist.CountItems() > 0)
+		//if (errorList.msglist.CountItems() > 0)
 		{
-			parent->SendErrorMessage(errorList);
-			//parent->SendErrorMessage(info->errorList);
+			//parent->SendErrorMessage(errorList);
+			parent->SendErrorMessage(info->errorList);
 			
-			//if (info->errorList.CountErrors() > 0)
-			if (errorList.CountErrors() > 0)
+			if (info->errorList.CountErrors() > 0)
+			//if (errorList.CountErrors() > 0)
 			{
 				msg.MakeEmpty();
 				msg.what = M_BUILDING_DONE;
@@ -495,8 +542,8 @@ ProjectBuilder::BuildThread(void *data)
 		proj->Unlock();
 		
 		// copy over errors in to build info
-		info->errorList.msglist.AddList(&errorList.msglist);
-		errorList.msglist.MakeEmpty(false);
+		//info->errorList.msglist.AddList(&errorList.msglist);
+		//errorList.msglist.MakeEmpty(false);
 	}
 	
 	// Now that we've finished building the individual source files, we need to
@@ -553,7 +600,7 @@ ProjectBuilder::BuildThread(void *data)
 		}
 		
 		BuildInfo *info = proj->GetBuildInfo();
-		ErrorList errorList("");
+		//ErrorList errorList("");
 		if (link_needed)
 		{
 			parent->fMsgr.SendMessage(M_LINKING_PROJECT);
@@ -561,14 +608,14 @@ ProjectBuilder::BuildThread(void *data)
 			proj->Lock();
 			proj->Link();
 			
-			//if (info->errorList.msglist.CountItems() > 0)
-			if (errorList.msglist.CountItems() > 0)
+			if (info->errorList.msglist.CountItems() > 0)
+			//if (errorList.msglist.CountItems() > 0)
 			{
-				//parent->SendErrorMessage(info->errorList);
-				parent->SendErrorMessage(errorList);
+				parent->SendErrorMessage(info->errorList);
+				//parent->SendErrorMessage(errorList);
 				
-				//if (info->errorList.CountErrors() > 0)
-				if (errorList.CountErrors() > 0)
+				if (info->errorList.CountErrors() > 0)
+				//if (errorList.CountErrors() > 0)
 				{
 					parent->Lock();
 					parent->fIsLinking = false;
@@ -605,14 +652,14 @@ ProjectBuilder::BuildThread(void *data)
 		
 		proj->Lock();
 		proj->UpdateResources();
-		//if (info->errorList.msglist.CountItems() > 0)
-		if (errorList.msglist.CountItems() > 0)
+		if (info->errorList.msglist.CountItems() > 0)
+		//if (errorList.msglist.CountItems() > 0)
 		{
-			//parent->SendErrorMessage(info->errorList);
-			parent->SendErrorMessage(errorList);
+			parent->SendErrorMessage(info->errorList);
+			//parent->SendErrorMessage(errorList);
 			
-			//if (info->errorList.CountErrors() > 0)
-			if (errorList.CountErrors() > 0)
+			if (info->errorList.CountErrors() > 0)
+			//if (errorList.CountErrors() > 0)
 			{
 				parent->Lock();
 				parent->fIsLinking = false;
@@ -649,13 +696,13 @@ ProjectBuilder::BuildThread(void *data)
 				proj->PostBuild(file);
 				proj->Unlock();
 				
-				//if (info->errorList.msglist.CountItems() > 0)
-				if (errorList.msglist.CountItems() > 0)
+				if (info->errorList.msglist.CountItems() > 0)
+				//if (errorList.msglist.CountItems() > 0)
 				{
-					//parent->SendErrorMessage(info->errorList);
+					parent->SendErrorMessage(info->errorList);
 					//info->errorList.msglist.MakeEmpty();
-					parent->SendErrorMessage(errorList);
-					errorList.msglist.MakeEmpty();
+					//parent->SendErrorMessage(errorList);
+					//errorList.msglist.MakeEmpty();
 				}
 			}
 		}
@@ -669,8 +716,8 @@ ProjectBuilder::BuildThread(void *data)
 		//sleep(10);
 		
 		// copy over errors in to build info
-		info->errorList.msglist.AddList(&errorList.msglist);
-		errorList.msglist.MakeEmpty(false);
+		//info->errorList.msglist.AddList(&errorList.msglist);
+		//errorList.msglist.MakeEmpty(false);
 		
 		parent->DoPostBuild();
 	}
@@ -681,6 +728,49 @@ ProjectBuilder::BuildThread(void *data)
 		parent->DoPostBuild();
 	}
 	
+	parent->fManager.RemoveThread(thisThread);
+	return B_OK;
+}
+
+int32
+ProjectBuilder::UpdateDependenciesThread(void* data)
+{
+	ProjectBuilder *parent = (ProjectBuilder *)data;
+	Project *proj = parent->fProject;
+	
+	thread_id thisThread = find_thread(NULL);
+	
+	//BuildInfo& info = proj->GetBuildInfo()
+	
+	if (parent->fFilesToUpdate.size() > 0)
+	{
+		while (true)
+		{
+			proj->Lock();
+			int32 idx = parent->fTotalFilesBuilt;
+			parent->fTotalFilesBuilt++;
+			proj->Unlock();
+			if (idx >= parent->fFilesToUpdate.size())
+				break;
+		
+			SourceFile* file = (SourceFile*)parent->fFilesToUpdate.at(idx);
+			proj->UpdateFileDependencies(file); // must be done in project context, like compile et al
+		
+			// raise updated message for this index
+			BMessage* updatedMessage = new BMessage(M_DEPENDENCY_UPDATED);
+			updatedMessage->AddInt32("idx",idx);
+			updatedMessage->AddInt32("max",parent->fFilesToUpdate.size());
+			parent->fMsgr.SendMessage(updatedMessage);
+		}
+	}
+	
+	
+	
+	if (parent->fManager.CountRunningThreads() == 1)
+	{
+		// raise update dependencies complete message
+		parent->fMsgr.SendMessage(M_DEPENDENCIES_UPDATED);
+	}
 	parent->fManager.RemoveThread(thisThread);
 	return B_OK;
 }

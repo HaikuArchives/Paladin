@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	2910949358
+1	English	application/x-vnd.dw-Paladin	585773182
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -103,6 +103,7 @@ Cancel	Globals		Cancel
 System Develop libraries:	LibWindow		System Develop libraries:
 Full	ProjectSettingsWindow		Full
 Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.	Paladin		Project file '%projectname%.pld' already exists. The original file for this template is '%pldname%'. You'll need to open the project folder and figure out which one you wish to keep.
+ dependencies updated	ProjectWindow		 dependencies updated
 Git	SCMImportWindow		Git
 Paladin can't seem to find the debugger. Sorry.	ProjectBuilder		Paladin can't seem to find the debugger. Sorry.
 Device driver	ProjectSettingsWindow		Device driver

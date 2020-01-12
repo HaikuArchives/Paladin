@@ -295,19 +295,19 @@ ErrorList::AsString(void)
 
 
 void
-ParseGCCErrors(const char *string, ErrorList &masterlist)
+ParseGCCErrors(const char *errstring, ErrorList &masterlist)
 {
 	//list.msglist.MakeEmpty(); // DANGEROUS - shared structure
 	ErrorList list("");
-	if (!string)
+	if (!errstring)
 		return;
 	
-	int32 length = strlen(string);
+	int32 length = strlen(errstring);
 	if (length < 1)
 		return;
 	
 	char *data = new char[length + 1];
-	sprintf(data,"%s",string);
+	sprintf(data,"%s",errstring);
 	
 	char *item = strtok(data,"\n");
 	while (item)

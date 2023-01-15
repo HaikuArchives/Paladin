@@ -1,4 +1,4 @@
-1	English	application/x-vnd.dw-Paladin	585773182
+1	English	application/x-vnd.dw-Paladin	692112015
 Project	ProjectWindow		Project
 None	ProjectSettingsWindow		None
 Remove	CodeLibWindow		Remove
@@ -13,6 +13,7 @@ Delete current module	CodeLibWindow		Delete current module
 Search only system folders	FindOpenFileWindow		Search only system folders
 Emptying build cache	ProjectWindow		Emptying build cache
 Subversion	SCMManager		Subversion
+Quit	ProjectWindow		Quit
 Backspace	AsciiWindow	ASCII table description	Backspace
 This cannot be undone. Delete module?	CodeLibWindow		This cannot be undone. Delete module?
 New line	AsciiWindow	ASCII table description	New line

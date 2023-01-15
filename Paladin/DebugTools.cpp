@@ -129,9 +129,6 @@ void PrintStatus(status_t value)
 		case B_FILE_ERROR:
 			outstr="B_FILE_ERROR";
 			break;
-		case B_FILE_NOT_FOUND:
-			outstr="B_FILE_NOT_FOUND ";
-			break;
 		case B_ENTRY_NOT_FOUND:
 			outstr="B_ENTRY_NOT_FOUND ";
 			break;

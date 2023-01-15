@@ -8,6 +8,7 @@
  *		John Scipione, jscipione@gmail.com
  */
 
+#define _GNU_SOURCE
 
 #include "AsciiWindow.h"
 

@@ -1685,6 +1685,10 @@ ProjectWindow::CreateMenuBar()
 	BString aboutStr(B_TRANSLATE("About Paladin"));
 	fFileMenu->AddItem(new BMenuItem(aboutStr,
 		new BMessage(B_ABOUT_REQUESTED)));
+	fFileMenu->AddSeparatorItem();
+	BString quitString(B_TRANSLATE("Quit"));
+	fFileMenu->AddItem(new BMenuItem(quitString,
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fMenuBar->AddItem(fFileMenu);
 
 	// Source menu

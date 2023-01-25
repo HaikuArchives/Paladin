@@ -654,7 +654,7 @@ App::CreateNewProject(const BMessage &settings)
 		
 		BString wildcard("'");
 		wildcard << sourcePath.GetFullPath() << "'/*";
-		ShellHelper shell("cp -a ");
+		ShellHelper shell("cp --no-preserve=mode,ownership ");
 		shell << wildcard;
 		shell.AddQuotedArg(destPath.GetFullPath());
 		shell.Run();

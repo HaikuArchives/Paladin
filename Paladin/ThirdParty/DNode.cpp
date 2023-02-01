@@ -36,7 +36,7 @@ DNode::DNode(const BDirectory *dir, const char *path)
 	:	BNode(dir,path)
 {
 	BDirectory d(dir,path);
-	if (d.InitCheck() == B_OK);
+	if (d.InitCheck() == B_OK)
 	{
 		BEntry entry;
 		d.GetEntry(&entry);
@@ -92,7 +92,7 @@ status_t
 DNode::Set(const BDirectory *dir, const char *path)
 {
 	status_t status = BNode::SetTo(dir,path);
-	if (status == B_OK);
+	if (status == B_OK)
 	{
 		BEntry entry;
 		BDirectory d(dir,path);

@@ -437,7 +437,7 @@ App::MessageReceived(BMessage *msg)
 			CheckCreateOpenPanel();
 			fOpenPanel->GetPanelDirectory(&ref);
 			gLastProjectPath.SetTo(ref);
-			BWindow* openWindow = fOpenPanel->Window();
+			fOpenPanel->Window();
 			break;
 		}
 

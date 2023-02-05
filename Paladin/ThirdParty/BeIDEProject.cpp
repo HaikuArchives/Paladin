@@ -388,7 +388,7 @@ BeIDEProject::FileAt(const uint32 &index)
 }
 
 
-#pragma mark - Private Methods
+//#pragma mark - Private Methods
 
 void
 BeIDEProject::InitObject(void)

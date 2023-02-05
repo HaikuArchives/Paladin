@@ -205,7 +205,7 @@ SCMProjectImporter::GetSCMCommand(void)
 	return out;
 }
 
-#pragma mark - Importers
+//#pragma mark - Importers
 
 SourceforgeImporter::SourceforgeImporter(void)
 {

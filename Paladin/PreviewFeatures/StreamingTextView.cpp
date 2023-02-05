@@ -16,7 +16,6 @@ StreamingTextView::StreamingTextView(const char* name)
 	SetLayout(hGroup);
 	
 	hGroup->SetInsets(0, -1, -1, -1); // hides scroll bar borders
-	BView* hView = new BView("hview", 0, hGroup);
 
 	fText->MakeEditable(false);
 	

@@ -64,13 +64,11 @@ ProjectStatus::Draw(BRect updateRect)
 	// #325 Remove old text by drawing the background first
 	FillRect(bounds,B_SOLID_LOW);
 
-	rgb_color highColor = HighColor();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
 	StrokeLine(bounds.LeftTop(), bounds.RightTop());
 
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	MovePenTo(3, fBaseline);
-	char s[32];
 	DrawString(fMsg);
 }
 

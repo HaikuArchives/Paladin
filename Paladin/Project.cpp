@@ -131,6 +131,8 @@ Project::Load(const char* path)
 	fName = fPath.GetBaseName();
 
 	platform_t actualPlatform = DetectPlatform();
+	char platformType[3];
+	sprintf(platformType, "%d", actualPlatform);
 
 	STRACE(2,("Loading project %s\n",path));
 
@@ -188,7 +190,7 @@ Project::Load(const char* path)
 						value.ReplaceFirst("B_FIND_PATH_DEVELOP_LIB_DIRECTORY",
 							BString("/boot/system/develop/lib/x86"));
 					} else {
-						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n",actualPlatform));
+						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n", platformType));
 					}
 				}
 				if (value.FindFirst("B_FIND_PATH_LIB_DIRECTORY") == 0) {
@@ -199,7 +201,7 @@ Project::Load(const char* path)
 						value.ReplaceFirst("B_FIND_PATH_LIB_DIRECTORY",
 							BString("/boot/system/lib/x86"));
 					} else {
-						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n",actualPlatform));
+						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n", platformType));
 					}
 				}
 					
@@ -314,6 +316,11 @@ Project::Save(const char* path)
 		case SCM_NONE:
 		{
 			data << "SCM=none\n";
+			break;
+		}
+		
+		case SCM_INIT:
+		{
 			break;
 		}
 	}
@@ -970,11 +977,11 @@ Project::Link(void)
 	BLooper* looper = new BLooper();
 	looper->AddHandler(&handler);
 	BMessenger msgr(&handler,looper);
-	thread_id looperThread = looper->Run();
+	looper->Run();
 	CommandThread thread(&cmd,&msgr);
-	status_t startStatus = thread.Start();
+	thread.Start();
 	status_t okReturn = B_OK;
-	status_t waitStatus = thread.WaitForThread(&okReturn);
+	thread.WaitForThread(&okReturn);
 	
 	handler.WaitForExit();
 	
@@ -1021,11 +1028,11 @@ Project::UpdateResources(void)
 	BLooper* looper = new BLooper();
 	looper->AddHandler(&handler);
 	BMessenger msgr(&handler,looper);
-	thread_id looperThread = looper->Run();
+	looper->Run();
 	CommandThread thread(&cmd,&msgr);
-	status_t startStatus = thread.Start();
+	thread.Start();
 	status_t okReturn = B_OK;
-	status_t waitStatus = thread.WaitForThread(&okReturn);
+	thread.WaitForThread(&okReturn);
 	
 	handler.WaitForExit();
 	
@@ -1379,7 +1386,7 @@ Project::AddGroup(const char *name, int32 index)
 	if (!name)
 		return NULL;
 	
-	STRACE(1,("%s: Added group %s at %ld\n",GetName(),name,index));
+	STRACE(1,("%s: Added group %s at %d\n",GetName(),name,index));
 	SourceGroup *group = new SourceGroup(name);
 	if (index < 0)
 		fGroupList.AddItem(group);
@@ -1686,7 +1693,7 @@ Project::FindLibrary(const char *libname)
 	if (name == "libsupc++.so") // && platform != PLATFORM_HAIKU_GCC4)
 	{
 		// Security in depth - sometimes FindLibrary is called directly
-		STRACE(1,("%s: FindLibrary Ignoring %s\n",GetName(),name));
+		STRACE(1,("%s: FindLibrary Ignoring %s\n",GetName(),libname));
 		return outpath;
 	}
 	

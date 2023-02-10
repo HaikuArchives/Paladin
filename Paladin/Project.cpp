@@ -131,8 +131,6 @@ Project::Load(const char* path)
 	fName = fPath.GetBaseName();
 
 	platform_t actualPlatform = DetectPlatform();
-	char platformType[3];
-	sprintf(platformType, "%d", actualPlatform);
 
 	STRACE(2,("Loading project %s\n",path));
 
@@ -190,7 +188,7 @@ Project::Load(const char* path)
 						value.ReplaceFirst("B_FIND_PATH_DEVELOP_LIB_DIRECTORY",
 							BString("/boot/system/develop/lib/x86"));
 					} else {
-						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n", platformType));
+						STRACE(1,("UNKNOWN platform whilst resolving lib path: %d\n", actualPlatform));
 					}
 				}
 				if (value.FindFirst("B_FIND_PATH_LIB_DIRECTORY") == 0) {
@@ -201,7 +199,7 @@ Project::Load(const char* path)
 						value.ReplaceFirst("B_FIND_PATH_LIB_DIRECTORY",
 							BString("/boot/system/lib/x86"));
 					} else {
-						STRACE(1,("UNKNOWN platform whilst resolving lib path: %s\n", platformType));
+						STRACE(1,("UNKNOWN platform whilst resolving lib path: %d\n", actualPlatform));
 					}
 				}
 					
@@ -1386,7 +1384,7 @@ Project::AddGroup(const char *name, int32 index)
 	if (!name)
 		return NULL;
 	
-	STRACE(1,("%s: Added group %s at %d\n",GetName(),name,index));
+	STRACE(1,("%s: Added group %s at %" B_PRId32 "\n",GetName(),name,index));
 	SourceGroup *group = new SourceGroup(name);
 	if (index < 0)
 		fGroupList.AddItem(group);

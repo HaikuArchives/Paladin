@@ -724,14 +724,6 @@ SourceGroupItem::DrawItem(BView* owner, BRect frame, bool complete)
 	if (GetData()->expanded != IsExpanded())
 		GetData()->expanded = IsExpanded();
 
-
-	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR); // was {0, 0, 0, 255};
-	// not used - see StringListItem.cpp
-	rgb_color textSelectColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
-	rgb_color backColor = ui_color(B_LIST_BACKGROUND_COLOR); //was white;
-	rgb_color selectColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR); //was tint_color(white, B_DARKEN_2_TINT);
-
-
 	owner->SetFont(be_bold_font);
 	//owner->SetHighColor(black); 
 	BStringItem::DrawItem(owner, frame, complete);

@@ -165,7 +165,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 	BLooper* looper = new BLooper();
 	looper->AddHandler(&handler);
 	BMessenger msgr(&handler,looper);
-	thread_id looperThread = looper->Run();
+	looper->Run();
 	CommandThread thread(&cmd,&msgr);
 	status_t startStatus = thread.Start();
 	
@@ -176,7 +176,7 @@ SourceFileC::UpdateDependencies(BuildInfo &info)
 		errmsg = "CommandThread was unable to allocate a thread\n";
 	} else {
 		status_t okReturn = B_OK;
-		status_t waitStatus = thread.WaitForThread(&okReturn);
+		thread.WaitForThread(&okReturn);
 	
 		handler.WaitForExit(); // REQUIRED so as not to miss output/errors
 	
@@ -487,7 +487,7 @@ SourceFileC::Compile(BuildInfo &info, const CompileCommand& cc)
 	BLooper* looper = new BLooper();
 	looper->AddHandler(&handler);
 	BMessenger msgr(&handler,looper);
-	thread_id looperThread = looper->Run();
+	looper->Run();
 	CommandThread thread(&cmd,&msgr);
 	status_t startStatus = thread.Start();
 	
@@ -498,7 +498,7 @@ SourceFileC::Compile(BuildInfo &info, const CompileCommand& cc)
 		errmsg = "CommandThread was unable to allocate a thread\n";
 	} else {
 		status_t okReturn = B_OK;
-		status_t waitStatus = thread.WaitForThread(&okReturn);
+		thread.WaitForThread(&okReturn);
 	
 		handler.WaitForExit(); // REQUIRED so as not to miss output/errors
 	

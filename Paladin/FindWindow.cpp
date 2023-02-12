@@ -398,7 +398,7 @@ FindWindow::FindResults(void)
 	// This function is called from the FinderThread function, so locking is
 	// required when accessing any member variables.
 	Lock();
-	bool canReplace = fReplaceButton->IsEnabled();
+	fReplaceButton->IsEnabled();
 	EnableReplace(false);
 	for (int32 i = fResultList->CountItems() - 1; i >= 0; i--)
 	{

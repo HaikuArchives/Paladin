@@ -211,12 +211,12 @@ SourceFileResource::Compile(BuildInfo &info, const CompileCommand& cc) // const 
 	looper->AddHandler(&handler);
 	BMessenger msgr(&handler,looper);
 	//std::cout << "Resource Compile EXECUTING LOOPER" << std::endl;
-	thread_id looperThread = looper->Run();
+	looper->Run();
 	CommandThread thread(&cmd,&msgr);
 	//std::cout << "Resource Compile STARTING THREAD" << std::endl;
-	status_t startStatus = thread.Start();
+	thread.Start();
 	status_t okReturn = B_OK;
-	status_t waitStatus = thread.WaitForThread(&okReturn);
+	thread.WaitForThread(&okReturn);
 	
 	//std::cout << "Resource Compile THREAD COMPLETE" << std::endl;
 	

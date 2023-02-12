@@ -7,14 +7,6 @@
 #include "Makefile.h"
 #include "SourceFile.h"
 
-static BString _SerializeBool(bool val)
-{
-	return val ? "TRUE" : "FALSE";
-}
-//static BString _SerializeStringList(BStringList val)
-//{
-//	return val.Join(" \\\n\t");
-//}
 
 status_t
 MakeMake(Project *proj, DPath outfile)

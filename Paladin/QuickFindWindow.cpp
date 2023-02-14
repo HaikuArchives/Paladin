@@ -583,7 +583,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 					// Grab filename capitals, lowercase them, and see if it matches
 					char caps[20];
 					int idx = 0;
-					for (int sIdx = 0;sIdx < strlen(entryName) && idx < 20;sIdx++)
+					for (size_t sIdx = 0; sIdx < strlen(entryName) && idx < 20; sIdx++)
 					{
 						if (isupper(entryName[sIdx]))
 						{
@@ -592,7 +592,7 @@ QuickFindWindow::DoSearchFile(const char* text, BMessage* reply,BEntry& entry)
 					}
 					caps[idx] = '\0';
 					char textCaps[strlen(text)];
-					for (int tci = 0;tci < strlen(text);tci++)
+					for (size_t tci = 0;tci < strlen(text);tci++)
 					{
 						textCaps[tci] = toupper(text[tci]);
 					}

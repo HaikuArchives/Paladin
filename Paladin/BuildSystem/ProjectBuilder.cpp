@@ -422,7 +422,7 @@ ProjectBuilder::BuildThread(void *data)
 		msg.AddInt32("total",parent->fTotalFilesToBuild);
 		parent->fMsgr.SendMessage(&msg);
 		
-		BTRACE(("Thread %ld is precompiling file %s\n",thisThread,file->GetPath().GetFileName()));
+		BTRACE(("Thread %" B_PRId32 " is precompiling file %s\n",thisThread,file->GetPath().GetFileName()));
 		
 		BuildInfo *info = proj->GetBuildInfo();
 		//ErrorList errorList("");
@@ -450,7 +450,7 @@ ProjectBuilder::BuildThread(void *data)
 				parent->fManager.RemoveThread(thisThread);
 				parent->fManager.QuitAllThreads();
 				
-				BTRACE(("Thread %ld quit on errors after precompile\n",thisThread));
+				BTRACE(("Thread %" B_PRId32 " quit on errors after precompile\n",thisThread));
 				
 				return B_ERROR;
 			}
@@ -461,7 +461,7 @@ ProjectBuilder::BuildThread(void *data)
 		
 		if (parent->fManager.ThreadCheckQuit())
 		{
-			BTRACE(("Thread %ld asked to quit after precompile\n",thisThread));
+			BTRACE(("Thread %" B_PRId32 " asked to quit after precompile\n",thisThread));
 			
 			parent->fManager.RemoveThread(thisThread);
 			return B_OK;
@@ -483,10 +483,10 @@ ProjectBuilder::BuildThread(void *data)
 			std::string(proj->GetBuildInfo()->objectFolder.GetFullPath())
 		);
 		*/
-		BTRACE(("Thread %ld is compiling file %s\n",thisThread,file->GetPath().GetFileName()));
+		BTRACE(("Thread %" B_PRId32 " is compiling file %s\n",thisThread,file->GetPath().GetFileName()));
 		//sleep(10 * (thisThread % 10));
 		proj->CompileFile(file);
-		BTRACE(("Thread %ld compiling complete for file %s\n",thisThread,file->GetPath().GetFileName()));
+		BTRACE(("Thread %" B_PRId32 " compiling complete for file %s\n",thisThread,file->GetPath().GetFileName()));
 		
 		if (info->errorList.msglist.CountItems() > 0)
 		//if (errorList.msglist.CountItems() > 0)
@@ -509,7 +509,7 @@ ProjectBuilder::BuildThread(void *data)
 				parent->fManager.RemoveThread(thisThread);
 				parent->fManager.QuitAllThreads();
 				
-				BTRACE(("Thread %ld quit after compile\n",thisThread));
+				BTRACE(("Thread %" B_PRId32 " quit after compile\n",thisThread));
 				
 				return B_ERROR;
 			}
@@ -525,7 +525,7 @@ ProjectBuilder::BuildThread(void *data)
 		
 		if (parent->fManager.ThreadCheckQuit())
 		{
-			BTRACE(("Thread %ld asked to quit after compile\n",thisThread));
+			BTRACE(("Thread %" B_PRId32 " asked to quit after compile\n",thisThread));
 			
 			parent->fManager.RemoveThread(thisThread);
 			return B_OK;
@@ -583,7 +583,7 @@ ProjectBuilder::BuildThread(void *data)
 		while (parent->fManager.CountRunningThreads() > 1)
 			snooze(10000);
 		
-		BTRACE(("Thread %ld is performing postcompile processing\n",thisThread));
+		BTRACE(("Thread %" B_PRId32 " is performing postcompile processing\n",thisThread));
 		
 		// Check to see if linking is needed
 		BPath targetPath(proj->GetPath().GetFolder());
@@ -626,7 +626,7 @@ ProjectBuilder::BuildThread(void *data)
 					parent->fManager.RemoveThread(thisThread);
 					//parent->fManager.QuitAllThreads();
 					
-					BTRACE(("Thread %ld quit after linker errors\n",thisThread));
+					BTRACE(("Thread %" B_PRId32 " quit after linker errors\n",thisThread));
 					
 					return B_ERROR;
 				}
@@ -637,7 +637,7 @@ ProjectBuilder::BuildThread(void *data)
 			
 			if (parent->fManager.ThreadCheckQuit())
 			{
-				BTRACE(("Thread %ld asked to quit after link\n",thisThread));
+				BTRACE(("Thread %" B_PRId32 " asked to quit after link\n",thisThread));
 				parent->fManager.RemoveThread(thisThread);
 				proj->Unlock();
 				return B_OK;
@@ -747,7 +747,7 @@ ProjectBuilder::UpdateDependenciesThread(void* data)
 		while (true)
 		{
 			proj->Lock();
-			int32 idx = parent->fTotalFilesBuilt;
+			unsigned long idx = parent->fTotalFilesBuilt;
 			parent->fTotalFilesBuilt++;
 			proj->Unlock();
 			if (idx >= parent->fFilesToUpdate.size())
@@ -811,14 +811,14 @@ ThreadManager::SpawnThread(thread_func func, void *data)
 		int8 slot = FindFreeSlot();
 		if (slot >= 0)
 		{
-			BTRACE(("Spawning build thread %ld\n",t));
+			BTRACE(("Spawning build thread %" B_PRId32 "\n",t));
 			resume_thread(t);
 			fThreadArray[slot] = t;
 			fThreadCount++;
 		}
 		else
 		{
-			BTRACE(("No free slot so killing thread %ld\n",t));
+			BTRACE(("No free slot so killing thread %" B_PRId32 "\n",t));
 			kill_thread(t);
 		}
 	}

@@ -85,9 +85,9 @@ AboutView::AboutView(BRect frame)
 	}
 
 	if (variety == "Final")
-		sprintf(fVersion,"%s %"B_PRIu32".%"B_PRIu32,"Version", vi.major, vi.middle);
+		sprintf(fVersion,"%s %" B_PRIu32 ".%" B_PRIu32,"Version", vi.major, vi.middle);
 	else {
-		sprintf(fVersion, "%s %"B_PRIu32".%"B_PRIu32" %s%"B_PRIu32, 
+		sprintf(fVersion, "%s %" B_PRIu32 ".%" B_PRIu32 " %s%" B_PRIu32, 
 		        "Version", vi.major, vi.middle, variety.String(), vi.internal);
 	}
 

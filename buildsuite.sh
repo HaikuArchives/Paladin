@@ -105,7 +105,15 @@ else
 	echo "Building tests failed"
 	exit 1;
 fi
+
+for file in tests.o-*; do
+    if [[ -f $file ]]; then
+        rm $file
+    fi
+done
+
 ./tests.o
+
 if [ "$?" -eq "0" ]
 then
 	echo "Tests succeeded OK"

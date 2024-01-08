@@ -57,7 +57,7 @@ To build: run `pkgman install devel:libpcre unittest++_devel` and then run `./bu
 
 Here's how an editor window looks like:
 
-![Screenshot](readme_scrshot/hexvexed.png)
+![Screenshot](Documentation/images/hexvexed.png)
 
 *(Code excerpt from HexVexed)*
  
@@ -76,7 +76,7 @@ Double-clicking on an error or warning will open up the file containing it in th
 ### Backing Up Projects
 Your project can be quickly placed into a compressed archive in a folder of your choosing with your project's name and timestamp for the backup with just a click of this menu item.
 
-![Screenshot](readme_scrshot/backup.png)
+![Screenshot](Documentation/images/backup.png)
 
   
 ### Helper Tools

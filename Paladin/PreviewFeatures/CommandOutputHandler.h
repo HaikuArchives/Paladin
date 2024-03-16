@@ -5,6 +5,11 @@
 
 #include <Handler.h>
 
+
+#if !defined(__cplusplus) || __cplusplus < 201103L
+#define override
+#endif
+
 /*!
 	\class CommandOutputHandler
 	\brief Acts as a capture point for CommandThread output.

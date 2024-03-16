@@ -1,0 +1,29 @@
+name: "haiku-ci"
+on: [push, pull_request]
+
+jobs:
+  build-haiku:
+    timeout-minutes: 60
+    runs-on: ${{ matrix.config.runner }}
+    name: build-${{ matrix.config.os }}-${{ matrix.config.version }}-${{ matrix.config.architecture }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # The OS versions supported are specific to the version of the action
+          # https://github.com/cross-platform-actions/action/blob/master/changelog.md
+          - { os: haiku, version: 'r1beta4', runner: 'ubuntu-latest', architecture: 'x86-64' }
+          - { os: haiku, version: 'r1beta4',  runner: 'ubuntu-latest', architecture: 'x86' }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: korli/action@v0.23.0-haiku
+        with:
+          operating_system: ${{ matrix.config.os }}
+          version: ${{ matrix.config.version }}
+          architecture: ${{ matrix.config.architecture }}
+          run: |
+            ssh user@localhost "pkgman update -y haiku_devel devel:libpcre devel:libz unittest++_devel cmd:gcc" &&
+            sh ./buildsuite.sh 1

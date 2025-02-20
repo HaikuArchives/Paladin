@@ -33,7 +33,11 @@ private:
 			BListView*				fLicenseList;
 			BTextView*				fLicenseShort;
 			BTextView*				fLicenseLong;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+			BObjectList<BString, true>	fPathList;
+#else
 			BObjectList<BString>	fPathList;
+#endif
 };
 
 

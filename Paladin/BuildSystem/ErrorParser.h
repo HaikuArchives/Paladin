@@ -56,8 +56,11 @@ public:
 			
 			BString			AsString(void);
 			
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<error_msg, true>	msglist;
+#else
 	BObjectList<error_msg>	msglist;
-
+#endif
 private:
 			int32		fIndex;
 };

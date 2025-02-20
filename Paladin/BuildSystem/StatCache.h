@@ -27,7 +27,11 @@ public:
 	void			MakeEmpty(void);
 	
 private:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<statdata, true>	fList;
+#else
 	BObjectList<statdata>	fList;
+#endif
 	int32					fMaxItems;
 };
 

@@ -10,7 +10,11 @@
 #include "TextFile.h"
 
 TemplateManager::TemplateManager(void)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fList(20)
+#else
 	:	fList(20,true)
+#endif
 {
 }
 
@@ -79,9 +83,17 @@ TemplateManager::CountTemplates(void) const
 
 ProjectTemplate::ProjectTemplate(entry_ref ref)
 	:	fStatus(B_NO_INIT),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		fRefList(20),
+#else
 		fRefList(20,true),
+#endif
 		fTargetType(-1),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		fLibList(20)
+#else
 		fLibList(20,true)
+#endif
 {
 	Load(ref);
 }

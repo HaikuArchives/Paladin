@@ -203,6 +203,16 @@ private:
 	DPath						fPath,
 								fObjectPath;
 	
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<SourceFile, false>		fDirtyFiles;
+	BObjectList<SourceFile, true>		fLibraryList;
+	
+	BObjectList<ProjectPath, true>	fLocalIncludeList;
+	BObjectList<BString, true>		fSystemIncludeList,
+								fAccessList;
+	
+	BObjectList<SourceGroup, true>	fGroupList;
+#else
 	BObjectList<SourceFile>		fDirtyFiles;
 	BObjectList<SourceFile>		fLibraryList;
 	
@@ -211,6 +221,7 @@ private:
 								fAccessList;
 	
 	BObjectList<SourceGroup>	fGroupList;
+#endif
 	ErrorList					*fErrorList;
 	
 	BuildInfo					fBuildInfo;

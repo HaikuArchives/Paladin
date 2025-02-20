@@ -129,7 +129,7 @@ App::App(void)
 	InitGlobals();
 	EnsureTemplates();
 	
-	gProjectList = new LockableList<Project>(20,true);
+	gProjectList = new LockableList<Project>(20);
 	gProjectWindowPoint.Set(5,24);
 	
 	fOpenPanel = NULL;

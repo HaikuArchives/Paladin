@@ -63,8 +63,13 @@ private:
 		
 		status_t				fStatus;
 		BString					fName;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		BObjectList<ModFile, true>	fFiles;
+		BObjectList<BString, true>	fLibraries;
+#else
 		BObjectList<ModFile>	fFiles;
 		BObjectList<BString>	fLibraries;
+#endif
 		BString					fDescription;
 };
 
@@ -92,7 +97,11 @@ public:
 		
 		void			PrintToStream(void);
 private:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		BObjectList<CodeModule, true>	fModules;
+#else
 		BObjectList<CodeModule>	fModules;
+#endif
 };
 
 void SyncProjectModules(CodeLib &lib, Project *proj);

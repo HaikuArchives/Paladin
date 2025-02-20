@@ -16,7 +16,11 @@ public:
 
 private:
 		SourceType *	FindTypeForExtension(const char *ext);
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		BObjectList<SourceType, true>	fList;
+#else
 		BObjectList<SourceType>	fList;
+#endif
 };
 
 extern FileFactory gFileFactory;

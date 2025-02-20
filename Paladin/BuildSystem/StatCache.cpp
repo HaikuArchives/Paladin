@@ -4,7 +4,11 @@
 #include <stdio.h>
 
 StatCache::StatCache(void)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fList(20),
+#else
 	:	fList(20,true),
+#endif
 		fMaxItems(79)
 {
 	// 79 is the approximate number of stat structures that will fit into 4K, which

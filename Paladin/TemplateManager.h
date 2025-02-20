@@ -27,10 +27,18 @@ private:
 			entry_ref	RefForLib(const BString &path);
 			
 	status_t				fStatus;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<entry_ref, true>	fRefList;
+#else
 	BObjectList<entry_ref>	fRefList;
+#endif
 	BString					fProjFileName;
 	int32					fTargetType;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<entry_ref, true>	fLibList;
+#else
 	BObjectList<entry_ref>	fLibList;
+#endif
 	entry_ref				fRef;
 };
 
@@ -47,8 +55,11 @@ public:
 	int32				CountTemplates(void) const;
 	
 private:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<ProjectTemplate, true>	fList;
+#else
 	BObjectList<ProjectTemplate>	fList;
-
+#endif
 };
 
 #endif

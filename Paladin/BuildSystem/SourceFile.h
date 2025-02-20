@@ -96,7 +96,11 @@ public:
 			void		PrintToStream(void);
 			
 			BString					name;
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+			BObjectList<SourceFile, true>	filelist;
+#else
 			BObjectList<SourceFile>	filelist;
+#endif
 			bool					expanded;
 };
 

@@ -19,7 +19,11 @@ public:
 	SCMProjectImporter *	FindImporter(const char *name);
 
 private:
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<SCMProjectImporter, true>	fImporterList;
+#else
 	BObjectList<SCMProjectImporter>	fImporterList;
+#endif
 };
 
 

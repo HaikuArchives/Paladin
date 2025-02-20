@@ -5,7 +5,11 @@
 #include "Globals.h"
 
 SCMProjectImporterManager::SCMProjectImporterManager(void)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+  :	fImporterList(20)
+#else
   :	fImporterList(20,true)
+#endif
 {
 	fImporterList.AddItem(new SourceforgeImporter());
 	fImporterList.AddItem(new BitbucketImporter());

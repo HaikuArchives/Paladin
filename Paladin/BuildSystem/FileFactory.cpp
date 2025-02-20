@@ -13,7 +13,11 @@
 FileFactory gFileFactory;
 
 FileFactory::FileFactory(void)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fList(20)
+#else
 	:	fList(20,true)
+#endif
 {
 	LoadTypes();
 }

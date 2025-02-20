@@ -59,7 +59,11 @@ private:
 };
 
 void
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+TokenizeToList(const char *string, BObjectList<BString, true> &stringList)
+#else
 TokenizeToList(const char *string, BObjectList<BString> &stringList)
+#endif
 {
 	if (!string)
 		return;
@@ -109,7 +113,11 @@ FindWindow::FindWindow(BString workingDir)
 		fThreadID(-1),
 		fThreadMode(0),
 		fThreadQuitFlag(0),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		fFileList(20),
+#else
 		fFileList(20, true),
+#endif
 		fWorkingDir(""),
 		fProject(NULL)
 {
@@ -435,7 +443,11 @@ FindWindow::FindResults(void)
 	if (fThreadQuitFlag)
 		return;
 	
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<BString, true> resultList(20);
+#else
 	BObjectList<BString> resultList(20, true);
+#endif
 	TokenizeToList(out.String(), resultList);
 	
 	Lock();

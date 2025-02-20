@@ -49,7 +49,11 @@ private:
 	int8			fThreadMode;
 	int32			fThreadQuitFlag;
 	
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<BString, true>	fFileList;
+#else
 	BObjectList<BString>	fFileList;
+#endif
 	BString					fWorkingDir;
 	Project			*fProject;
 };

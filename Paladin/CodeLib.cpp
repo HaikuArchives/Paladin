@@ -52,16 +52,26 @@ GetCodeLibraryPath(void)
 CodeModule::CodeModule(void)
 	:	fStatus(B_NO_INIT),
 		fName("Untitled"),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		fFiles(20),
+		fLibraries(20)
+#else
 		fFiles(20,true),
 		fLibraries(20,true)
+#endif
 {
 }
 
 
 CodeModule::CodeModule(const char *name)
 	:	fStatus(B_NO_INIT),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		fFiles(20),
+		fLibraries(20)
+#else
 		fFiles(20,true),
 		fLibraries(20,true)
+#endif
 {
 	Load(name);
 }
@@ -607,7 +617,11 @@ CodeModule::LoadFile(entry_ref &fileref)
 
 
 CodeLib::CodeLib(void)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fModules(20)
+#else
 	:	fModules(20,true)
+#endif
 {
 }
 

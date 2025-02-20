@@ -46,7 +46,11 @@ LicenseManager::LicenseManager(const char* targetPath)
 	BWindow(BRect(0.0f, 0.0f, 640.0f, 480.0f), B_TRANSLATE("Add license to project"),
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fTargetPath(targetPath),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fPathList(20)
+#else
 	fPathList(20, true)
+#endif
 {
 	AddCommonFilter(new EscapeCancelFilter());
 

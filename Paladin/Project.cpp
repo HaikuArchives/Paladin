@@ -65,12 +65,21 @@ Project::Project(const char *name, const char *targetname)
 	BLocker(name),
 	fName(name),
 	fTargetName(targetname),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	fDirtyFiles(20),
+	fLibraryList(20),
+	fLocalIncludeList(20),
+	fSystemIncludeList(20),
+	fAccessList(20),
+	fGroupList(20),
+#else
 	fDirtyFiles(20,false),
 	fLibraryList(20,true),
 	fLocalIncludeList(20,true),
 	fSystemIncludeList(20,true),
 	fAccessList(20,true),
 	fGroupList(20,true),
+#endif
 	fReadOnly(false),
 	fDebug(false),
 	fProfile(false),

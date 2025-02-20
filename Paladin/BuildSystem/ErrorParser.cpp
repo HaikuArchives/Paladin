@@ -39,14 +39,22 @@ error_msg::PrintToStream(void)
 
 
 ErrorList::ErrorList(const char *string)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	msglist(20),
+#else
 	:	msglist(20,true),
+#endif
 		fIndex(0)
 {
 }
 
 
 ErrorList::ErrorList(const ErrorList &from)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	msglist(20),
+#else
 	:	msglist(20,true),
+#endif
 		fIndex(0)
 {
 	*this = from;

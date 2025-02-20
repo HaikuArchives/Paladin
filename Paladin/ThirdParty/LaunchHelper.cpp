@@ -10,27 +10,43 @@
 #define HAIKU_PIPE_HACK
 
 ArgList::ArgList(void)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fArgList(20)
+#else
 	:	fArgList(20, true)
+#endif
 {
 }
 
 
 ArgList::ArgList(const char *string)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fArgList(20)
+#else
 	:	fArgList(20, true)
+#endif
 {
 	ParseToArgs(string);
 }
 
 
 ArgList::ArgList(const BString &str)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fArgList(20)
+#else
 	:	fArgList(20, true)
+#endif
 {
 	ParseToArgs(str.String());
 }
 
 
 ArgList::ArgList(const ArgList &list)
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	:	fArgList(20)
+#else
 	:	fArgList(20, true)
+#endif
 {
 	*this = list;
 }

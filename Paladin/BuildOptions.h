@@ -35,7 +35,11 @@ class CompileOptions
 	
 
 	
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+	BObjectList<BString, true>		fLocalIncludeList,
+#else
 	BObjectList<BString>		fLocalIncludeList,
+#endif
 								fSystemIncludeList;
 	
 	bool		fDebug;

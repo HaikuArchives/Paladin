@@ -271,7 +271,11 @@ SourceFile::GetStat(const char *path, struct stat *s, bool use_cache) const
 
 SourceGroup::SourceGroup(const char *name_)
 	:	name(name_ ? name_ : "Source Files"),
+#if B_HAIKU_VERSION > B_HAIKU_VERSION_1_BETA_5
+		filelist(20),
+#else
 		filelist(20,true),
+#endif
 		expanded(true)
 {
 }

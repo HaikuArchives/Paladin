@@ -8,6 +8,7 @@
  *		DarkWyrm, bpmagic@columbus.rr.com
  *		John Scipione, jscipione@gmail.com
  *		Adam Fowler, adamfowleruk@gmail.com
+ *      Michael Brumbelow, mbrumbelow@gmail.com
  */
 #include "Paladin.h"
 

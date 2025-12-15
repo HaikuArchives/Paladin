@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: korli/action@v0.25.0-haiku3
+      - uses: korli/action@v0.25.0-haiku4
         with:
           operating_system: ${{ matrix.config.os }}
           version: ${{ matrix.config.version }}
